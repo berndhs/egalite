@@ -1,0 +1,10 @@
+Dchat
+=====
+
+direct chat using qxmpp
+
+This is an almost server-less chat.
+
+Chats are done over ssl sockets directly between two peers.
+Servers can be used for discovery to establish the direct ssl socket.
+
