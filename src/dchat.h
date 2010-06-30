@@ -51,6 +51,7 @@ private slots:
 
   void PassOK ();
   void PassCancel ();
+  void Send ();
 
 private:
 
@@ -61,6 +62,8 @@ private:
   QApplication   *pApp;
 
   QXmppClient   xclient;
+  QString       user;
+  QString       server;
   QString       password;
   QDialog      *passdial;
 

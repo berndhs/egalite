@@ -19,10 +19,13 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include <iostream>
 #include "dchat.h"
 #include "delib-debug.h"
+#include <QDebug>
 #include "ui_getpassword.h"
 #include <QXmppConfiguration.h>
+#include <QXmppMessage.h>
 
 
 namespace dchat {
@@ -31,6 +34,8 @@ DChatMain::DChatMain (QWidget *parent)
   :QDialog (parent),
    pApp (0),
    xclient (this),
+   user ("bernd@jtalk.berndnet"),
+   server ("jtalk.berndnet"),
    password (QString("password")),
    passdial (0)
 {
@@ -50,7 +55,7 @@ DChatMain::Run ()
   show ();
   qDebug () << "client error: " << xclient.getSocketError();
   if (GetPass()) {
-    xclient.connectToServer (QString("jtalk.berndnet"),QString ("bernd@jtalk.berndnet"),
+    xclient.connectToServer (server,user,
                            password);
   }
 }
@@ -67,6 +72,7 @@ void
 DChatMain::Connect ()
 {
   connect (ui.quitButton, SIGNAL (clicked()), SLOT (Quit()));
+  connect (ui.sendButton, SIGNAL (clicked()), SLOT (Send()));
 }
 
 bool
@@ -103,6 +109,19 @@ DChatMain::PassCancel ()
   if (passdial) {
     passdial->done (0);
   }
+}
+
+void
+DChatMain::Send ()
+{
+  QString body ("message body goes here");
+  QString to ("roteva@jtalk.berndnet");
+  xclient.sendMessage (to,body);
+  QXmppMessage msg (user,to,body);
+  QString outbuf;
+  QXmlStreamWriter out (&outbuf);
+  msg.toXml (&out);
+  std::cout << outbuf.toStdString() << std::endl;
 }
 
 
