@@ -17,7 +17,7 @@ TEMPLATE = app
 MAKEFILE = MakeDChat
 TARGET = bin/egalite
 
-QT += core gui network
+QT += core gui network xml xmlpatterns
 
 unix:{
   INCLUDEPATH += /usr/local/include/qxmpp

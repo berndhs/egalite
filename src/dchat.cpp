@@ -26,6 +26,10 @@
 #include "ui_getpassword.h"
 #include <QXmppConfiguration.h>
 #include <QXmppMessage.h>
+#include <QString>
+#include <QByteArray>
+#include <QDomDocument>
+#include <QDomElement>
 
 
 namespace dchat {
@@ -118,10 +122,11 @@ DChatMain::Send ()
   QString to ("roteva@jtalk.berndnet");
   xclient.sendMessage (to,body);
   QXmppMessage msg (user,to,body);
-  QString outbuf;
+  QByteArray outbuf;
   QXmlStreamWriter out (&outbuf);
   msg.toXml (&out);
-  std::cout << outbuf.toStdString() << std::endl;
+  std::cout << " message 1:"  << std::endl;
+  std::cout << outbuf.data() << std::endl;
 }
 
 
