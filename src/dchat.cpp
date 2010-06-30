@@ -20,14 +20,19 @@
  ****************************************************************/
 
 #include "dchat.h"
-#include <QXmppMessage.h>
+#include "delib-debug.h"
+#include "ui_getpassword.h"
+#include <QXmppConfiguration.h>
 
 
 namespace dchat {
 
 DChatMain::DChatMain (QWidget *parent)
   :QDialog (parent),
-   pApp (0)
+   pApp (0),
+   xclient (this),
+   password (QString("password")),
+   passdial (0)
 {
   ui.setupUi (this);
   Connect ();
@@ -43,6 +48,11 @@ void
 DChatMain::Run ()
 {
   show ();
+  qDebug () << "client error: " << xclient.getSocketError();
+  if (GetPass()) {
+    xclient.connectToServer (QString("jtalk.berndnet"),QString ("bernd@jtalk.berndnet"),
+                           password);
+  }
 }
 
 void
@@ -57,6 +67,42 @@ void
 DChatMain::Connect ()
 {
   connect (ui.quitButton, SIGNAL (clicked()), SLOT (Quit()));
+}
+
+bool
+DChatMain::GetPass ()
+{
+  if (passdial == 0) {
+    passdial = new QDialog (this);
+  }
+  Ui_GetString  passui;
+  passui.setupUi (passdial);
+  passui.textEnter->setText ("");
+  connect (passui.okButton, SIGNAL (clicked()), this, SLOT (PassOK()));
+  connect (passui.cancelButton, SIGNAL (clicked()), this, SLOT (PassCancel()));
+  int haveit = passdial->exec ();
+  if (haveit == 1) {
+    password = passui.textEnter->text ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void
+DChatMain::PassOK ()
+{
+  if (passdial) {
+    passdial->done (1);
+  }
+}
+
+void
+DChatMain::PassCancel ()
+{
+  if (passdial) {
+    passdial->done (0);
+  }
 }
 
 

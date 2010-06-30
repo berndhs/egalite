@@ -23,6 +23,8 @@
  ****************************************************************/
 #include "ui_dchat.h"
 #include <QDialog>
+#include <QXmppClient.h>
+
 
 class QApplication;
 
@@ -45,12 +47,22 @@ public slots:
 
   void Quit ();
 
+private slots:
+
+  void PassOK ();
+  void PassCancel ();
+
 private:
 
   void Connect ();
+  bool GetPass ();
 
   Ui_DChatMain    ui;
   QApplication   *pApp;
+
+  QXmppClient   xclient;
+  QString       password;
+  QDialog      *passdial;
 
 };
 
