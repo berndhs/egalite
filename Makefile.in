@@ -16,6 +16,7 @@
 PRO_FILE = dchat.pro
 MAKEFILE = MakeDChat
 TOP_MAKEFILE = Makefile
+TARGETS = bin/egalite
 
 all: $(MAKEFILE)
 	$(MAKE) -f $(MAKEFILE) all
@@ -35,16 +36,13 @@ release: $(MAKEFILE) FORCE
 	$(MAKE) -f $(MAKEFILE) release
 
 install: all FORCE
-	sh install.sh $(DESTDIR)
-
-userinstall:
-	sh install.sh $(HOME)/bin
+	install -m 0755 -p $(TARGETS) $(DESTDIR)
 
 qmake: 
-	$(QMAKE) $(PRO_FILE)
+	$(QMAKE) $(PRO_FILE) -o $(MAKEFILE)
 
 $(MAKEFILE): $(PRO_FILE)
-	$(QMAKE) $(PRO_FILE)
+	$(QMAKE) $(PRO_FILE) -o $(MAKEFILE)
 
 FORCE:
 

@@ -94,7 +94,9 @@ main (int argc, char* argv[])
   }
   bool showDebug = opts.SeenOpt ("debug");
 
-  deliberate::StartDebugLog ();
+  if (showDebug) {
+    deliberate::StartDebugLog ();
+  }
 
   /** the real main program starts here */
 

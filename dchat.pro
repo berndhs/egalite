@@ -15,7 +15,7 @@
 
 TEMPLATE = app
 MAKEFILE = MakeDChat
-TARGET = bin/dchat
+TARGET = bin/egalite
 
 QT += core gui network
 
