@@ -41,6 +41,8 @@ SOURCES = src/main.cpp \
 	src/dchat.cpp \
 	src/cmdoptions.cpp \
 	src/delib-debug.cpp \
+        src/deliberate.cpp \
+        src/version.cpp \
 
 
 
@@ -48,5 +50,7 @@ HEADERS = \
 	src/dchat.h \
 	src/cmdoptions.h \
 	src/delib-debug.h \
+        src/deliberate.h \
+        src/version.h \
 
 

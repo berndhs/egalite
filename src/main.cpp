@@ -23,10 +23,80 @@
 
 #include "dchat.h"
 
+#include <QApplication>
+#include <QSettings>
+#include <QStyle>
+#include <QStyleFactory>
+#include "delib-debug.h"
+#include "cmdoptions.h"
+#include "deliberate.h"
+#include "version.h"
+
+namespace deliberate {
+
+void
+SetStyle (QSettings &zett)
+{
+  QStringList avail = QStyleFactory::keys();
+  QString     normal("oxygen");
+  normal = zett.value ("style/windowstyle",normal).toString();
+  if (normal == "gtk+") {
+    qDebug () << "Windows style " << normal << " is broken, not supported";
+    return;
+  }
+  if (avail.contains (normal, Qt::CaseInsensitive)) {
+    QApplication::setStyle (normal);
+    zett.setValue ("style/windowstyle",normal);
+  } else {
+    QStyle * pSt = QApplication::style();
+    if (pSt) {
+      QString defaultname = pSt->objectName();
+      zett.setValue ("style/windowstyle",defaultname);
+    }
+  }
+}
+
+} // namespace
+
 int
 main (int argc, char* argv[])
 {
+  QCoreApplication::setApplicationName ("egalite");
+  QCoreApplication::setOrganizationName ("BerndStramm");
+  QCoreApplication::setOrganizationDomain ("bernd-stramm.com");
+  deliberate::ProgramVersion pv ("Egalite");
+  QCoreApplication::setApplicationVersion (pv.Version());
+  QSettings  settings;
+  deliberate::SetSettings (settings);
+  settings.setValue ("program",pv.MyName());
+
+  deliberate::SetStyle (settings);
+
   QApplication  app (argc,argv);
+
+  deliberate::CmdOptions  opts ("Egalite");
+  opts.AddSoloOption ("debug","D","show Debug log window");
+
+  deliberate::UseMyOwnMessageHandler ();
+
+  bool optsOk = opts.Parse (argc, argv);
+  if (!optsOk) {
+    opts.Usage ();
+    exit(1);
+  }
+  if (opts.WantHelp ()) {
+    opts.Usage ();
+    exit (0);
+  }
+  pv.CLIVersion ();
+  if (opts.WantVersion ()) {
+    exit (0);
+  }
+  bool showDebug = opts.SeenOpt ("debug");
+
+  deliberate::StartDebugLog ();
+
+  /** the real main program starts here */
 
   dchat::DChatMain  chatmain;
 
