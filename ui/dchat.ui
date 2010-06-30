@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DChat</string>
+   <string>Égalité!</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../dchat.qrc">
