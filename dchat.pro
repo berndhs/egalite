@@ -36,6 +36,7 @@ FORMS = \
 	ui/DebugLog.ui \
         ui/getpassword.ui \
         ui/config-edit.ui \
+        ui/mirror.ui \
 
 
 SOURCES = src/main.cpp \
@@ -45,6 +46,8 @@ SOURCES = src/main.cpp \
         src/deliberate.cpp \
         src/version.cpp \
         src/config-edit.cpp \
+        src/direct-listener.cpp \
+        src/server-socket.cpp \
 
 
 
@@ -55,6 +58,8 @@ HEADERS = \
         src/deliberate.h \
         src/version.h \
         src/config-edit.h \
+        src/direct-listener.h \
+        src/server-socket.h \
 
 
 

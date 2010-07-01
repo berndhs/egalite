@@ -1,5 +1,5 @@
-#ifndef DCHAT_H
-#define DCHAT_H
+#ifndef DIRECT_LISTENER_H
+#define DIRECT_LISTENER_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -21,63 +21,49 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_dchat.h"
-#include <QMainWindow>
-#include <QXmppClient.h>
 
-#include "config-edit.h"
-
-#include <map>
-
-
-class QApplication;
+#include <QTcpServer>
+#include <QList>
+#include <QSslCertificate>
+#include <QSslKey>
+#include <QHostAddress>
 
 namespace egalite 
 {
 
-class DirectListener;
+class ServerSocket;
 
-class DChatMain : public QMainWindow 
+class DirectListener : public QTcpServer
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
 
-  DChatMain (QWidget * parent = 0);
+  DirectListener (QObject *parent = 0);
+  ~DirectListener ();
 
-  void Init (QApplication *pap);
-
-  void Run ();
-
-public slots:
-
-  void Quit ();
+  void Init (QString certHost, QString pass);
+  void Listen (const QHostAddress & addr, int port);
 
 private slots:
 
-  void PassOK ();
-  void PassCancel ();
-  void Send ();
-  void Login ();
+  void SocketExit (ServerSocket * goner);
+
+protected:
+
+  void incomingConnection(int socketDescriptor);
 
 private:
 
-  void Connect ();
-  bool GetPass ();
+  typedef QList <ServerSocket*> SocketList;
 
-  Ui_DChatMain    ui;
-  QApplication   *pApp;
-  ConfigEdit     configEdit;
+  SocketList  sockets;
 
-  QXmppClient   xclient;
-  QString       user;
-  QString       server;
-  QString       password;
-  QDialog      *passdial;
+  QSslCertificate  cert;
+  QSslKey          key;
 
-  std::map <QString, DirectListener*> inDirect;
+} ;
 
-};
 
 } // namespace
 

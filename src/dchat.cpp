@@ -32,6 +32,8 @@
 #include <QDomDocument>
 #include <QDomElement>
 
+#include "direct-listener.h"
+
 using namespace deliberate;
 
 namespace egalite {
@@ -41,9 +43,6 @@ DChatMain::DChatMain (QWidget *parent)
    pApp (0),
    configEdit (this),
    xclient (this),
-   user ("bernd@jtalk.berndnet"),
-   server ("jtalk.berndnet"),
-   password (QString("password")),
    passdial (0)
 {
   ui.setupUi (this);
@@ -69,6 +68,11 @@ DChatMain::Run ()
   server = Settings().value ("network/server",server).toString();
   Settings().setValue ("network/server",server);
   
+  QString directHost ("reflect");
+  DirectListener * listen = new DirectListener (this);
+  inDirect[directHost] = listen;
+  listen->Init (directHost, QString("enkhuizen"));
+  listen->Listen (QHostAddress ("2001:4830:1135:1::1"),29999);
   show ();
 }
 
