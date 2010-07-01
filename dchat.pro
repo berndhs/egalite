@@ -37,6 +37,7 @@ FORMS = \
         ui/getpassword.ui \
         ui/config-edit.ui \
         ui/mirror.ui \
+        ui/cert-candidate.ui \
 
 
 SOURCES = src/main.cpp \
@@ -47,7 +48,9 @@ SOURCES = src/main.cpp \
         src/version.cpp \
         src/config-edit.cpp \
         src/direct-listener.cpp \
+        src/direct-caller.cpp \
         src/server-socket.cpp \
+        src/pick-cert.cpp \
 
 
 
@@ -59,7 +62,9 @@ HEADERS = \
         src/version.h \
         src/config-edit.h \
         src/direct-listener.h \
+        src/direct-caller.h \
         src/server-socket.h \
+        src/pick-cert.h \
 
 
 

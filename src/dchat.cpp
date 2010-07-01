@@ -33,6 +33,7 @@
 #include <QDomElement>
 
 #include "direct-listener.h"
+#include "direct-caller.h"
 
 using namespace deliberate;
 
@@ -92,6 +93,7 @@ DChatMain::Connect ()
 {
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
+  connect (ui.directButton, SIGNAL (clicked()), this, SLOT (CallDirect()));
 
   connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
   connect (ui.actionPreferences, SIGNAL (triggered()),
@@ -175,6 +177,39 @@ DChatMain::Send ()
   std::cout << " message 2: " << std::endl;
   std::cout << outb2.data() << std::endl;
   
+}
+
+void
+DChatMain::CallDirect ()
+{
+  static int callnum (0);
+  QString dest ("bernd.reflective-computing.com");
+  callnum++;
+  DirectCaller * newcall = new DirectCaller (this);
+  outDirect[callnum] = newcall;
+  newcall->Connect (dest, callnum);
+  connect (newcall, SIGNAL (Finished (int)), this, SLOT (ClearCall (int)));
+}
+
+void
+DChatMain::HangupDirect (int callid)
+{
+  std::map <int,DirectCaller*>::iterator callit;
+  callit = outDirect.find (callid);
+  if (callit != outDirect.end()) {
+    DirectCaller * call = callit->second;
+    call->Hangup ();
+  }
+}
+
+void
+DChatMain::ClearCall (int callid)
+{
+  std::map <int,DirectCaller*>::iterator callit;
+  callit = outDirect.find (callid);
+  if (callit != outDirect.end()) {
+    outDirect.erase (callit);
+  }
 }
 
 

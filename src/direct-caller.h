@@ -1,5 +1,6 @@
-#ifndef DCHAT_H
-#define DCHAT_H
+#ifndef MIRROR_H
+#define MIRROR_H
+
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -18,69 +19,65 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_dchat.h"
-#include <QMainWindow>
-#include <QXmppClient.h>
 
-#include "config-edit.h"
+#include <QSslSocket>
+#include <QSslError>
+#include <QDialog>
+#include <QTimer>
 
-#include <map>
-
+#include "ui_mirror.h"
 
 class QApplication;
 
-namespace egalite 
+namespace egalite
 {
 
-class DirectListener;
-class DirectCaller;
+class PickCert;
 
-class DChatMain : public QMainWindow 
+class DirectCaller : public QDialog
 {
-Q_OBJECT
+
+  Q_OBJECT
 
 public:
 
-  DChatMain (QWidget * parent = 0);
+  DirectCaller (QWidget *parent = 0);
 
-  void Init (QApplication *pap);
-
-  void Run ();
-
-public slots:
-
-  void Quit ();
+  void Connect (QString otherHost, int callid);
+  void Hangup ();
 
 private slots:
 
-  void PassOK ();
-  void PassCancel ();
-  void Send ();
-  void Login ();
-  void CallDirect ();
-  void HangupDirect (int callid);
-  void ClearCall (int callid);
+  void Quit ();
+
+  void EncryptDone ();
+  void Errors (const QList<QSslError>& errList);
+  void VerifyProblem ( const QSslError & error);
+  void Connected ();
+  void HostFound ();
+  void Disconnected ();
+  void SockDataReady ();
+  void DoSend ();
+
+signals:
+
+  void Finished (int myid);
+
 
 private:
 
-  void Connect ();
-  bool GetPass ();
+  void GetPeerMessage (QSslSocket *sock);
+  void ShowCertInfo (const QSslCertificate & cert);
+  bool PickOneCert (const QList <QSslCertificate> & clist);
 
-  Ui_DChatMain    ui;
-  QApplication   *pApp;
-  ConfigEdit     configEdit;
+  Ui_MirrorDisplay  ui;
 
-  QXmppClient   xclient;
-  QString       user;
-  QString       server;
-  QString       password;
-  QDialog      *passdial;
-
-  std::map <QString, DirectListener*> inDirect;
-  std::map <int,     DirectCaller*>   outDirect;
+  QSslSocket  *clientSock;
+  PickCert    *pickCert;
+  int         myCallid;
 
 };
 

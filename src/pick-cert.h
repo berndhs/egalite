@@ -1,5 +1,5 @@
-#ifndef DCHAT_H
-#define DCHAT_H
+#ifndef PICK_CERT_H
+#define PICK_CERT_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -18,71 +18,49 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_dchat.h"
-#include <QMainWindow>
-#include <QXmppClient.h>
 
-#include "config-edit.h"
+#include <QDialog>
+#include "ui_cert-candidate.h"
+#include <QList>
+#include <QSslCertificate>
 
-#include <map>
-
-
-class QApplication;
-
-namespace egalite 
+namespace egalite
 {
 
-class DirectListener;
-class DirectCaller;
-
-class DChatMain : public QMainWindow 
+class PickCert : public QDialog
 {
 Q_OBJECT
 
 public:
 
-  DChatMain (QWidget * parent = 0);
+  PickCert (QWidget *parent);
 
-  void Init (QApplication *pap);
-
-  void Run ();
-
-public slots:
-
-  void Quit ();
+  bool Pick (const QList <QSslCertificate> & clist);
 
 private slots:
 
-  void PassOK ();
-  void PassCancel ();
-  void Send ();
-  void Login ();
-  void CallDirect ();
-  void HangupDirect (int callid);
-  void ClearCall (int callid);
+  void Up ();
+  void Down ();
+  void Reject ();
+  void Accept ();
 
 private:
 
-  void Connect ();
-  bool GetPass ();
+  void Display (int index);
+  bool StillGood ();
 
-  Ui_DChatMain    ui;
-  QApplication   *pApp;
-  ConfigEdit     configEdit;
+  Ui_CertCandidate      ui;
 
-  QXmppClient   xclient;
-  QString       user;
-  QString       server;
-  QString       password;
-  QDialog      *passdial;
-
-  std::map <QString, DirectListener*> inDirect;
-  std::map <int,     DirectCaller*>   outDirect;
+  QList <QSslCertificate>  certs;
+  int                      ndx;
+  QSslCertificate          goodCert;
+  bool                     haveGoodCert;
 
 };
+
 
 } // namespace
 
