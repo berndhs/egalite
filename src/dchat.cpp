@@ -118,15 +118,27 @@ DChatMain::PassCancel ()
 void
 DChatMain::Send ()
 {
-  QString body ("message body goes here");
+  QString body ("this is the message");
   QString to ("roteva@jtalk.berndnet");
   xclient.sendMessage (to,body);
   QXmppMessage msg (user,to,body);
-  QByteArray outbuf;
+  QByteArray outbuf("<?xml version='1.0'>");
   QXmlStreamWriter out (&outbuf);
   msg.toXml (&out);
   std::cout << " message 1:"  << std::endl;
   std::cout << outbuf.data() << std::endl;
+
+  QDomDocument msgdoc;
+  msgdoc.setContent (outbuf);
+  std::cout << " message doc string " << msgdoc.toString().toStdString() << std::endl;
+  QByteArray outb2;
+  QXmlStreamWriter out2 (&outb2);
+  QXmppMessage msg2;
+  msg2.parse (msgdoc.documentElement());
+  msg2.toXml (&out2);
+  std::cout << " message 2: " << std::endl;
+  std::cout << outb2.data() << std::endl;
+  
 }
 
 
