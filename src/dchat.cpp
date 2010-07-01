@@ -22,6 +22,7 @@
 #include <iostream>
 #include "dchat.h"
 #include "delib-debug.h"
+#include "deliberate.h"
 #include <QDebug>
 #include "ui_getpassword.h"
 #include <QXmppConfiguration.h>
@@ -31,12 +32,14 @@
 #include <QDomDocument>
 #include <QDomElement>
 
+using namespace deliberate;
 
-namespace dchat {
+namespace egalite {
 
 DChatMain::DChatMain (QWidget *parent)
-  :QDialog (parent),
+  :QMainWindow (parent),
    pApp (0),
+   configEdit (this),
    xclient (this),
    user ("bernd@jtalk.berndnet"),
    server ("jtalk.berndnet"),
@@ -56,17 +59,25 @@ DChatMain::Init (QApplication *pap)
 void
 DChatMain::Run ()
 {
-  show ();
-  qDebug () << "client error: " << xclient.getSocketError();
-  if (GetPass()) {
-    xclient.connectToServer (server,user,
-                           password);
+  if (Settings().contains("sizes/main")) {
+    QSize defaultSize = size();
+    QSize newsize = Settings().value ("sizes/main", defaultSize).toSize();
+    resize (newsize);
   }
+  user = Settings().value ("network/user", user).toString();
+  Settings().setValue ("network/user",user);
+  server = Settings().value ("network/server",server).toString();
+  Settings().setValue ("network/server",server);
+  
+  show ();
 }
 
 void
 DChatMain::Quit ()
 {
+  QSize currentSize = size();
+  Settings().setValue ("sizes/main",currentSize);
+  Settings().sync();
   if (pApp) {
     pApp->quit ();
   }
@@ -75,8 +86,23 @@ DChatMain::Quit ()
 void
 DChatMain::Connect ()
 {
-  connect (ui.quitButton, SIGNAL (clicked()), SLOT (Quit()));
-  connect (ui.sendButton, SIGNAL (clicked()), SLOT (Send()));
+  connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
+  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
+
+  connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
+  connect (ui.actionPreferences, SIGNAL (triggered()),
+           &configEdit, SLOT (Exec()));
+  connect (ui.actionLog_In, SIGNAL (triggered()),
+           this, SLOT (Login()));
+}
+
+void
+DChatMain::Login ()
+{
+  if (GetPass()) {
+    xclient.connectToServer (server,user,
+                           password);
+  }
 }
 
 bool
@@ -87,12 +113,18 @@ DChatMain::GetPass ()
   }
   Ui_GetString  passui;
   passui.setupUi (passdial);
-  passui.textEnter->setText ("");
+  passui.userText->setText (user);
+  passui.serverText->setText (server);
+  passui.passwordText->setText ("");
   connect (passui.okButton, SIGNAL (clicked()), this, SLOT (PassOK()));
   connect (passui.cancelButton, SIGNAL (clicked()), this, SLOT (PassCancel()));
   int haveit = passdial->exec ();
   if (haveit == 1) {
-    password = passui.textEnter->text ();
+    password = passui.passwordText->text ();
+    user = passui.userText->text ();
+    server = passui.serverText->text ();
+    Settings().setValue ("network/user",user);
+    Settings().setValue ("network/server",server);
     return true;
   } else {
     return false;
@@ -118,7 +150,7 @@ DChatMain::PassCancel ()
 void
 DChatMain::Send ()
 {
-  QString body ("this is the message");
+  QString body = ui.inputLine->text();
   QString to ("roteva@jtalk.berndnet");
   xclient.sendMessage (to,body);
   QXmppMessage msg (user,to,body);

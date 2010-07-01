@@ -35,6 +35,7 @@ FORMS = \
 	ui/dchat.ui \
 	ui/DebugLog.ui \
         ui/getpassword.ui \
+        ui/config-edit.ui \
 
 
 SOURCES = src/main.cpp \
@@ -43,6 +44,7 @@ SOURCES = src/main.cpp \
 	src/delib-debug.cpp \
         src/deliberate.cpp \
         src/version.cpp \
+        src/config-edit.cpp \
 
 
 
@@ -52,5 +54,7 @@ HEADERS = \
 	src/delib-debug.h \
         src/deliberate.h \
         src/version.h \
+        src/config-edit.h \
+
 
 

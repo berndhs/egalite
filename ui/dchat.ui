@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DChatMain</class>
- <widget class="QDialog" name="DChatMain">
+ <widget class="QMainWindow" name="DChatMain">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,32 +17,95 @@
    <iconset resource="../dchat.qrc">
     <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QTextEdit" name="textDisplay"/>
-   </item>
-   <item row="1" column="0">
-    <widget class="QTextEdit" name="textInput"/>
-   </item>
-   <item row="2" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="quitButton">
-       <property name="text">
-        <string>Quit</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="sendButton">
-       <property name="text">
-        <string>Send</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-  </layout>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTextEdit" name="textDisplay">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>25</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="quitButton">
+        <property name="text">
+         <string>Quit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="sendButton">
+        <property name="text">
+         <string>Send</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLineEdit" name="inputLine">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>5</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>480</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionLog_In"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuConfig">
+    <property name="title">
+     <string>Config</string>
+    </property>
+    <addaction name="actionAccounts"/>
+    <addaction name="actionPreferences"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuConfig"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLog_In">
+   <property name="text">
+    <string>Log In</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionAccounts">
+   <property name="text">
+    <string>Accounts</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../dchat.qrc"/>

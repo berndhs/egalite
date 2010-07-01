@@ -1,5 +1,5 @@
-#ifndef DCHAT_H
-#define DCHAT_H
+#ifndef CONFIG_EDIT_H
+#define CONFIG_EDIT_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -21,58 +21,42 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_dchat.h"
-#include <QMainWindow>
-#include <QXmppClient.h>
+#include <QDialog>
+#include <QStandardItemModel>
+#include <QItemDelegate>
+#include "ui_config-edit.h"
 
-#include "config-edit.h"
+namespace egalite {
 
-
-class QApplication;
-
-namespace egalite 
-{
-
-class DChatMain : public QMainWindow 
-{
+class ConfigEdit : public QDialog, public Ui_ConfigEdit {
 Q_OBJECT
 
 public:
 
-  DChatMain (QWidget * parent = 0);
+  ConfigEdit (QWidget *parent);
+  ~ConfigEdit ();
 
-  void Init (QApplication *pap);
-
-  void Run ();
 
 public slots:
 
-  void Quit ();
+  void Load ();
+  void Cancel ();
+  void Save ();
+  void Exec ();
 
-private slots:
-
-  void PassOK ();
-  void PassCancel ();
-  void Send ();
-  void Login ();
 
 private:
 
-  void Connect ();
-  bool GetPass ();
 
-  Ui_DChatMain    ui;
-  QApplication   *pApp;
-  ConfigEdit     configEdit;
+  QStandardItemModel   *configModel;
+  QStringList          exemptGroups;
 
-  QXmppClient   xclient;
-  QString       user;
-  QString       server;
-  QString       password;
-  QDialog      *passdial;
+
 
 };
 
+
 } // namespace
+
 
 #endif

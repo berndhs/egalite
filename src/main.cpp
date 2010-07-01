@@ -100,7 +100,7 @@ main (int argc, char* argv[])
 
   /** the real main program starts here */
 
-  dchat::DChatMain  chatmain;
+  egalite::DChatMain  chatmain;
 
   chatmain.Init (&app);
 
