@@ -19,6 +19,7 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include "deliberate.h"
 #include "direct-caller.h"
 #include "pick-cert.h"
 #include <QDebug>
@@ -30,6 +31,9 @@
 #include <QSslKey>
 #include <QSslCipher>
 #include <QSsl>
+#include <QFile>
+
+using namespace deliberate;
 
 namespace egalite
 {
@@ -83,6 +87,23 @@ DirectCaller::Quit ()
 }
 
 void
+DirectCaller::KeyInit (QString certHost, QString pass)
+{
+  QFile keyfile (QString ("/home/bernd/ssl-cert/%1/key.pem").arg(certHost));
+  keyfile.open (QFile::ReadOnly);
+  QSslKey skey (&keyfile,QSsl::Rsa,
+                QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
+  keyfile.close();
+  key = skey;
+
+  QFile certfile (QString ("/home/bernd/ssl-cert/%1/cert.pem").arg(certHost));
+  certfile.open (QFile::ReadOnly);
+  QSslCertificate scert (&certfile);
+  certfile.close();
+  cert = scert;
+}
+
+void
 DirectCaller::Connect (QString otherHost, int callid)
 {
   myCallid = callid;
@@ -90,6 +111,14 @@ DirectCaller::Connect (QString otherHost, int callid)
   if (hinfo.addresses().isEmpty()) {
     exit (1);
   }
+  QString clientName ("barbados");
+  clientName = Settings().value ("direct/client",clientName).toString();
+  Settings().setValue ("direct/client",clientName);
+  KeyInit (clientName, "enkhuizen");
+
+  clientSock->setPrivateKey (key);
+  clientSock->setLocalCertificate (cert);
+
   QHostAddress hostAddress = hinfo.addresses().first ();
   setWindowTitle (tr("DirectCaller Client"));
   ui.otherHost->setText (hostAddress.toString());

@@ -70,6 +70,8 @@ DChatMain::Run ()
   Settings().setValue ("network/server",server);
   
   QString directHost ("reflect");
+  directHost = Settings().value ("direct/host",directHost).toString();
+  Settings().setValue ("direct/host",directHost);
   DirectListener * listen = new DirectListener (this);
   inDirect[directHost] = listen;
   listen->Init (directHost, QString("enkhuizen"));

@@ -27,6 +27,8 @@
 #include <QSslError>
 #include <QDialog>
 #include <QTimer>
+#include <QSslCertificate>
+#include <QSslKey>
 
 #include "ui_mirror.h"
 
@@ -72,12 +74,16 @@ private:
   void GetPeerMessage (QSslSocket *sock);
   void ShowCertInfo (const QSslCertificate & cert);
   bool PickOneCert (const QList <QSslCertificate> & clist);
+  void KeyInit (QString certHost, QString pass);
 
   Ui_MirrorDisplay  ui;
 
   QSslSocket  *clientSock;
   PickCert    *pickCert;
   int         myCallid;
+  QSslCertificate  cert;
+  QSslKey          key;
+
 
 };
 

@@ -33,6 +33,8 @@
 namespace egalite
 {
 
+class PickCert;
+
 class ServerSocket : public QThread
 {
   Q_OBJECT
@@ -73,8 +75,11 @@ signals:
 
 private:
 
+  bool PickOneCert (const QList <QSslCertificate> & clist);
+
   int           sockDescript;
   QSslSocket    *sock;
+  PickCert      *pickCert;
   QDialog       *dialog;
   Ui_MirrorDisplay  ui;
   bool          started;

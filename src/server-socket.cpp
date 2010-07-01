@@ -19,14 +19,16 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include "deliberate.h"
 #include "server-socket.h"
-//#include "egal-server.h"
-//#include "egalite-global.h"
+#include "pick-cert.h"
 #include <QSslSocket>
 #include <QAbstractSocket>
 #include <QSslKey>
 #include <QFile>
 #include <QHostAddress>
+
+using namespace deliberate;
 
 namespace egalite
 {
@@ -35,6 +37,7 @@ ServerSocket::ServerSocket (int socketDescriptor,
                             QSslKey argKey, QSslCertificate argCert)
   :QThread (0),
    sockDescript (socketDescriptor),
+   pickCert (0),
    started (false),
    key (argKey),
    cert (argCert)
@@ -51,6 +54,11 @@ ServerSocket::~ServerSocket ()
 {
   if (sock) {
     delete sock;
+    sock = 0;
+  }
+  if (pickCert) {
+    delete pickCert;
+    pickCert = 0;
   }
 }
 
@@ -88,9 +96,13 @@ ServerSocket::Start ()
   ui.dataLine->setText ("initialize socket");
   sock = new QSslSocket;
   sock->setProtocol (QSsl::AnyProtocol);
+  sock->setPeerVerifyMode (QSslSocket::VerifyPeer);
   QList <QSslCertificate> emptylist;
   sock->setCaCertificates (emptylist);
-  bool certok = sock->addCaCertificates ("/home/bernd/ssl-cert/reflect/cert.pem");
+  QString directHost ("reflect");
+  directHost = Settings().value ("direct/host",directHost).toString();
+  bool certok = sock->addCaCertificates 
+             (QString ("/home/bernd/ssl-cert/%1/cert.pem").arg(directHost));
   qDebug () << " adding certs ok is " << certok;
   if (sock == 0) {
     qDebug () << " cannot allocate socket ";
@@ -103,7 +115,6 @@ ServerSocket::Start ()
     emit ConnectError (sock->error());
     return;
   }
-  sock->setCaCertificates (QSslSocket::defaultCaCertificates());
   qDebug () << " socket " << sock << " in thread " << thread();
   connect (sock, SIGNAL (encrypted()), this, SLOT (EncryptDone()));
   connect (sock, SIGNAL (readyRead()), this, SLOT (Receive()));
@@ -191,12 +202,6 @@ ServerSocket::SockError ( QAbstractSocket::SocketError socketError )
 }
 
 void
-ServerSocket::VerifyProblem ( const QSslError & error)
-{
-  qDebug() << objectName() << "ServerSocket ssl verify error " << error;
-}
-
-void
 ServerSocket::SockModeChange (QSslSocket::SslMode newmode)
 {
   qDebug () << " socket " << sock << " mode is now " << newmode;
@@ -210,6 +215,35 @@ ServerSocket::caCertificates () const
   } else {
     QList <QSslCertificate> emptylist;
     return  emptylist;
+  }
+}
+
+void
+ServerSocket::VerifyProblem ( const QSslError & error)
+{
+  qDebug() << objectName() << "DirectCaller ssl verify error " << error;
+  if (sock) {
+    bool isok (false);
+    QList <QSslCertificate>  clist = sock->peerCertificateChain();
+    if (clist.size() > 0) {
+      isok = PickOneCert (clist);
+    }
+    if (isok) {
+      sock->ignoreSslErrors ();
+    }
+  }
+}
+
+bool
+ServerSocket::PickOneCert (const QList <QSslCertificate> & clist)
+{
+  if (pickCert == 0) {
+    pickCert = new PickCert (0);
+  }
+  if (pickCert) {
+    return pickCert->Pick (clist);
+  } else {
+    return false;
   }
 }
 
