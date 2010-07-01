@@ -78,7 +78,8 @@ DirectCaller::DirectCaller (QWidget *parent)
 void
 DirectCaller::Quit ()
 {
-  clientSock->disconnectFromHost ();
+  Hangup ();
+  
 }
 
 void
@@ -156,6 +157,8 @@ DirectCaller::Hangup ()
 {
   if (clientSock) {
     clientSock->disconnectFromHost ();
+    hide ();
+    
   }
 }
 
