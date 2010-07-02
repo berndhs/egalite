@@ -1,32 +1,22 @@
 #ifndef DELIB_DEBUG_H
 #define DELIB_DEBUG_H
 
-/****************************************************************
- * This file is distributed under the following license:
- *
- * Copyright (C) 2010, Bernd Stramm
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
- *  Boston, MA  02110-1301, USA.
- ****************************************************************/
+//
+//  Copyright (C) 2010 - Bernd H Stramm
+//
+// This file is distributed under the terms of
+// the GNU General Public License version 2
+//
+// This software is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//
+//
 
 
-
-// 
+//
 // Usage:
-// 
+//
 // - Static Log:
 //
 //    Make sure DELIBERATE_DEBUG is set to a non-zero value , e.g.
@@ -67,43 +57,61 @@
 #include <QDebug>
 #include <QCloseEvent>
 
-namespace deliberate {
+namespace deliberate
+{
 
 void UseMyOwnMessageHandler ();
 
-void StartDebugLog ();
+void StartDebugLog (bool gui=true);
 void StopDebugLog ();
 bool DebugLogRecording ();
 
 void MyOwnMessageOutput (QtMsgType type, const char* msg);
 
-class DebugLog : public QDialog, public Ui_LogDialog {
-Q_OBJECT
+class DebugLog : public QDialog, public Ui_LogDialog
+{
+  Q_OBJECT
 
 public:
 
   DebugLog (QWidget * parent);
   DebugLog ();
-  
+
   bool Log (const char * msg);
+  bool Log (const char * kind, const char * msg);
   void closeEvent (QCloseEvent *event);
-  
+
 public slots:
 
   void Close ();
   void quit ();
-  void StopLogging () { isLogging = false; }
-  void StartLogging () { isLogging = true; }
-  bool IsLogging () { return isLogging; }
-  
+  void StopLogging () {
+    isLogging = false;
+  }
+  void StartLogging () {
+    isLogging = true;
+  }
+  bool IsLogging () {
+    return isLogging;
+  }
+  bool IsUsingGui () {
+    return useGui;
+  }
+  bool UseGui (bool gui=true) {
+    useGui=gui;
+    return gui;
+  }
+  void SaveLog ();
+
 private slots:
 
-  
+
 private:
 
   void  Connect ();
 
   bool  isLogging;
+  bool  useGui;
 
 };
 
