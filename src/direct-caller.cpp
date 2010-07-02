@@ -125,6 +125,7 @@ DirectCaller::Connect (QString otherHost, int callid)
   ui.otherHost->setText (hostAddress.toString());
   qDebug () << " before connection mirror sock config " ;
   ShowConfig (clientSock->sslConfiguration());
+qDebug () << " before conenction CALLER cert is " << clientSock->localCertificate();
   clientSock->connectToHostEncrypted (otherHost, 29999,
                                       hinfo.hostName(),
                                       QIODevice::ReadWrite);

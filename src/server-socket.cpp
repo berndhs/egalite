@@ -221,10 +221,16 @@ ServerSocket::caCertificates () const
 void
 ServerSocket::VerifyProblem ( const QSslError & error)
 {
-  qDebug() << objectName() << "DirectCaller ssl verify error " << error;
+  qDebug() << objectName() << " SERVER ServerSocket ssl verify error " << error;
+  qDebug () << objectName()<< " SERVER sock " << sock;
   if (sock) {
     bool isok (false);
     QList <QSslCertificate>  clist = sock->peerCertificateChain();
+qDebug () << " SERVER: other side chain " << clist;
+    QSslCertificate callerCert = sock->peerCertificate ();
+qDebug () << " SERVER: other side cert " << callerCert;
+    clist.append (callerCert);
+qDebug () << " SERVER ServerSocket num certs " << clist.size();
     if (clist.size() > 0) {
       isok = PickOneCert (clist);
     }
