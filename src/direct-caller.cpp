@@ -117,8 +117,6 @@ DirectCaller::Connect (QString otherHost, int callid)
   Settings().setValue ("direct/client",clientName);
   KeyInit (clientName, "enkhuizen");
 
-  clientSock->setPrivateKey (key);
-  clientSock->setLocalCertificate (cert);
 
   QHostAddress hostAddress = hinfo.addresses().first ();
   setWindowTitle (tr("DirectCaller Client"));
@@ -126,8 +124,7 @@ DirectCaller::Connect (QString otherHost, int callid)
   qDebug () << " before connection mirror sock config " ;
   ShowConfig (clientSock->sslConfiguration());
 qDebug () << " before conenction CALLER cert is " << clientSock->localCertificate();
-  clientSock->connectToHostEncrypted (otherHost, 29999,
-                                      hinfo.hostName(),
+  clientSock->connectToHost (otherHost, 29999,
                                       QIODevice::ReadWrite);
 
   qDebug () << " clientSock isEncrypted () " << clientSock->isEncrypted();
@@ -203,6 +200,9 @@ DirectCaller::Connected ()
   QString port = QString::number (clientSock->peerPort());
   ui.otherIP->setText (ip + ":" + port);
   ui.dataLine->setText (QString ());
+  clientSock->setPrivateKey (key);
+  clientSock->setLocalCertificate (cert);
+  clientSock->startServerEncryption ();
 }
 
 void
