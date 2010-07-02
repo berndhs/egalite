@@ -22,6 +22,7 @@ QT += core gui network xml xmlpatterns
 unix:{
   INCLUDEPATH += /usr/local/include/qxmpp
   LIBS += -L/usr/local/lib/qxmpp -lQXmppClient
+  DEFINES += DELIBERATE_DEBUG=1
 }
 
 RESOURCES = dchat.qrc

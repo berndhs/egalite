@@ -43,7 +43,7 @@ DChatMain::DChatMain (QWidget *parent)
   :QMainWindow (parent),
    pApp (0),
    configEdit (this),
-   xclient (this),
+   xclient (0),
    passdial (0)
 {
   ui.setupUi (this);
@@ -108,7 +108,10 @@ void
 DChatMain::Login ()
 {
   if (GetPass()) {
-    xclient.connectToServer (server,user,
+    if (!xclient) {
+      xclient = new QXmppClient (this);
+    }
+    xclient->connectToServer (server,user,
                            password);
   }
 }
@@ -160,7 +163,9 @@ DChatMain::Send ()
 {
   QString body = ui.inputLine->text();
   QString to ("roteva@jtalk.berndnet");
-  xclient.sendMessage (to,body);
+  if (xclient) {
+    xclient->sendMessage (to,body);
+  }
   QXmppMessage msg (user,to,body);
   QByteArray outbuf("<?xml version='1.0'>");
   QXmlStreamWriter out (&outbuf);
@@ -189,6 +194,7 @@ DChatMain::CallDirect ()
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
   outDirect[callnum] = newcall;
+qDebug () << " start direct connect " << callnum << " call " << newcall;
   newcall->Connect (dest, callnum);
   connect (newcall, SIGNAL (Finished (int)), this, SLOT (ClearCall (int)));
 }
@@ -201,6 +207,7 @@ DChatMain::HangupDirect (int callid)
   if (callit != outDirect.end()) {
     DirectCaller * call = callit->second;
     call->Hangup ();
+qDebug () << " end direct connect " << callid << " call " << call;
   }
 }
 

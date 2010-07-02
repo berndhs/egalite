@@ -25,11 +25,14 @@
 namespace egalite
 {
 
-PickCert::PickCert (QWidget * parent)
+PickCert::PickCert (QWidget * parent, QString title)
   :QDialog (parent),
    haveGoodCert (false)
 {
   ui.setupUi (this);
+  setObjectName (QString("PickCert %1").arg(title));
+  QString wintitle = windowTitle();
+  setWindowTitle (wintitle + " " + title);
 
   connect (ui.acceptButton, SIGNAL (clicked()), this, SLOT (Accept()));
   connect (ui.rejectButton, SIGNAL (clicked()), this, SLOT (Reject()));

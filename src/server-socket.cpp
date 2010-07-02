@@ -96,7 +96,7 @@ ServerSocket::Start ()
   ui.dataLine->setText ("initialize socket");
   sock = new QSslSocket;
   sock->setProtocol (QSsl::AnyProtocol);
-  sock->setPeerVerifyMode (QSslSocket::VerifyPeer);
+  sock->setPeerVerifyMode (QSslSocket::QueryPeer);
   QList <QSslCertificate> emptylist;
   sock->setCaCertificates (emptylist);
   QString directHost ("reflect");
@@ -238,7 +238,7 @@ bool
 ServerSocket::PickOneCert (const QList <QSslCertificate> & clist)
 {
   if (pickCert == 0) {
-    pickCert = new PickCert (0);
+    pickCert = new PickCert (0,QString("Incoming"));
   }
   if (pickCert) {
     return pickCert->Pick (clist);

@@ -73,7 +73,7 @@ private:
   QApplication   *pApp;
   ConfigEdit     configEdit;
 
-  QXmppClient   xclient;
+  QXmppClient   *xclient;
   QString       user;
   QString       server;
   QString       password;

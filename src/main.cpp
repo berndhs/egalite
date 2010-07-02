@@ -77,7 +77,7 @@ main (int argc, char* argv[])
   deliberate::CmdOptions  opts ("Egalite");
   opts.AddSoloOption ("debug","D","show Debug log window");
 
-  deliberate::UseMyOwnMessageHandler ();
+  //deliberate::UseMyOwnMessageHandler ();
 
   bool optsOk = opts.Parse (argc, argv);
   if (!optsOk) {

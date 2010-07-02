@@ -62,6 +62,7 @@ DirectCaller::DirectCaller (QWidget *parent)
   clientSock = new QSslSocket (this);
   //clientSock->setProtocol (egalite::SslProto);
   clientSock->setProtocol (QSsl::SslV3);
+  clientSock->setPeerVerifyMode (QSslSocket::VerifyPeer);
   QList <QSslCertificate> emptylist;
   clientSock->setCaCertificates (emptylist);
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
@@ -145,7 +146,7 @@ DirectCaller::EncryptDone ()
 void
 DirectCaller::Errors (const QList<QSslError>& errList)
 {
-  qDebug () << objectName() <<  " DirectCaller ssl error list: ";
+  qDebug () << objectName() <<  " CALLER DirectCaller ssl error list: ";
   QList<QSslError>::const_iterator  erit;
   for (erit=errList.begin(); erit != errList.end(); erit++) {
     qDebug () << "ssl error "<< *erit;
@@ -155,7 +156,8 @@ DirectCaller::Errors (const QList<QSslError>& errList)
 void
 DirectCaller::VerifyProblem ( const QSslError & error)
 {
-  qDebug() << objectName() << "DirectCaller ssl verify error " << error;
+  qDebug() << objectName() << " CALLER DirectCaller ssl verify error " << error;
+  qDebug () << " CALLER client socket " << clientSock;
   if (clientSock) {
     bool isok (false);
     QList <QSslCertificate>  clist = clientSock->peerCertificateChain();
@@ -172,7 +174,7 @@ bool
 DirectCaller::PickOneCert (const QList <QSslCertificate> & clist)
 {
   if (pickCert == 0) {
-    pickCert = new PickCert (this);
+    pickCert = new PickCert (this, QString ("Outgoing"));
   }
   if (pickCert) {
     return pickCert->Pick (clist);

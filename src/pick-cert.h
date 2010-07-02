@@ -36,7 +36,7 @@ Q_OBJECT
 
 public:
 
-  PickCert (QWidget *parent);
+  PickCert (QWidget *parent, QString title);
 
   bool Pick (const QList <QSslCertificate> & clist);
 
