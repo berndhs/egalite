@@ -189,6 +189,25 @@ ServerSocket::Errors (const QList<QSslError>& errList)
   for (erit=errList.begin(); erit != errList.end(); erit++) {
     qDebug () << "ssl error "<< *erit;
   }
+  qDebug () << objectName()<< " SERVER sock " << sock;
+  if (sock) {
+    bool isok (false);
+    QList <QSslCertificate>  clist = sock->peerCertificateChain();
+qDebug () << " SERVER: peer is called " << sock->peerName();
+qDebug () << " SERVER: peer IP " << sock->peerAddress();
+qDebug () << " SERVER: peer PORT " << sock->peerPort ();
+qDebug () << " SERVER: other side chain " << clist;
+    QSslCertificate callerCert = sock->peerCertificate ();
+qDebug () << " SERVER: other side cert " << callerCert;
+    clist.append (callerCert);
+qDebug () << " SERVER ServerSocket num certs " << clist.size();
+    if (clist.size() > 0) {
+      isok = PickOneCert (clist);
+    }
+    if (isok) {
+      sock->ignoreSslErrors ();
+    }
+  }
 }
 
 void
@@ -222,22 +241,6 @@ void
 ServerSocket::VerifyProblem ( const QSslError & error)
 {
   qDebug() << objectName() << " SERVER ServerSocket ssl verify error " << error;
-  qDebug () << objectName()<< " SERVER sock " << sock;
-  if (sock) {
-    bool isok (false);
-    QList <QSslCertificate>  clist = sock->peerCertificateChain();
-qDebug () << " SERVER: other side chain " << clist;
-    QSslCertificate callerCert = sock->peerCertificate ();
-qDebug () << " SERVER: other side cert " << callerCert;
-    clist.append (callerCert);
-qDebug () << " SERVER ServerSocket num certs " << clist.size();
-    if (clist.size() > 0) {
-      isok = PickOneCert (clist);
-    }
-    if (isok) {
-      sock->ignoreSslErrors ();
-    }
-  }
 }
 
 bool
