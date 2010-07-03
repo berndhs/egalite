@@ -235,7 +235,7 @@ SymmetricSocket::Receive ()
 void
 SymmetricSocket::Errors (const QList<QSslError>& errList)
 {
-  qDebug () << objectName() << " SymmetricSocket ssl error list: ";
+  qDebug () << objectName() << " SymmetricSocket ssl BIG ERROR list: ";
   QList<QSslError>::const_iterator  erit;
   for (erit=errList.begin(); erit != errList.end(); erit++) {
     qDebug () << "ssl error "<< *erit;
@@ -264,7 +264,7 @@ qDebug () << " SERVER SymmetricSocket num certs " << clist.size();
 void
 SymmetricSocket::SockError ( QAbstractSocket::SocketError socketError )
 {
-  qDebug () << " abstract socket error " << socketError;
+  qDebug () << " ABSTRACT socket error " << socketError;
   qDebug () << " ssl errors " << sock->sslErrors ();
   if (socketError == QAbstractSocket::UnknownSocketError) {
     sock->ignoreSslErrors ();
@@ -274,7 +274,7 @@ SymmetricSocket::SockError ( QAbstractSocket::SocketError socketError )
 void
 SymmetricSocket::SockModeChange (QSslSocket::SslMode newmode)
 {
-  qDebug () << " socket " << sock << " mode is now " << newmode;
+  qDebug () << " socket " << sock << " NEW MODE is now " << newmode;
 }
 
 QList<QSslCertificate>
@@ -291,7 +291,7 @@ SymmetricSocket::caCertificates () const
 void
 SymmetricSocket::VerifyProblem ( const QSslError & error)
 {
-  qDebug() << objectName() << " SERVER SymmetricSocket ssl verify error " << error;
+  qDebug() << objectName() << " SERVER SymmetricSocket ssl VERIFY error " << error;
 }
 
 bool

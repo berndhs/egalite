@@ -81,7 +81,7 @@ DChatMain::Run ()
   connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
   connect (listen, SIGNAL (SocketReady (SymmetricSocket *)),
-           this, SLOT (IncomingDirect (SymmetricSocket *)));
+           this, SLOT (ConnectDirect (SymmetricSocket *)));
   show ();
 }
 
