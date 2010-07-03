@@ -175,9 +175,10 @@ SymmetricSocket::Start ()
 
   sock->setPrivateKey (key);
   sock->setLocalCertificate (cert);
-  qDebug () << " starting server sock " << sock << " encryption while in mode " << sock->mode();
+qDebug () << " symmetric sock cert " << cert;
+  qDebug () << " starting symmetric sock " << sock << " encryption while in mode " << sock->mode();
   sock->startServerEncryption ();
-  qDebug () << " started  server sock " << sock << "encryption now in mode   " << sock->mode();
+  qDebug () << " started  symmetric sock " << sock << "encryption now in mode   " << sock->mode();
   started = true;
 }
 
