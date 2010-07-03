@@ -150,6 +150,8 @@ SymmetricSocket::Init ()
     emit ConnectError (sock->error());
     return;
   }
+  sock->setPrivateKey (key);
+  sock->setLocalCertificate (cert);
   qDebug () << " socket " << sock << " in thread " << thread();
   connect (sock, SIGNAL (encrypted()), this, SLOT (EncryptDone()));
   connect (sock, SIGNAL (readyRead()), this, SLOT (Receive()));
@@ -173,11 +175,8 @@ SymmetricSocket::Start ()
   ui.otherIP->setText (peerIp + " : " + QString::number(peerPort));
   ui.dataLine->clear ();
 
-  sock->setPrivateKey (key);
-  sock->setLocalCertificate (cert);
 qDebug () << " symmetric sock cert " << cert;
   qDebug () << " starting symmetric sock " << sock << " encryption while in mode " << sock->mode();
-  sock->startServerEncryption ();
   qDebug () << " started  symmetric sock " << sock << "encryption now in mode   " << sock->mode();
   started = true;
 }
