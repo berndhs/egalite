@@ -61,7 +61,7 @@ private slots:
 
   void Quit ();
 
-  void EncryptDone ();
+  void EncryptDone (SymmetricSocket *sock);
   //void Errors (const QList<QSslError>& errList);
   //void VerifyProblem ( const QSslError & error);
 
@@ -69,6 +69,7 @@ signals:
 
   void Finished (int myid);
   void Received (const QByteArray &data);
+  void ConnectionReady (SymmetricSocket * sock);
 
 
 private:

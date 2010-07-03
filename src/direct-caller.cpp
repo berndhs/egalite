@@ -74,6 +74,8 @@ DirectCaller::Setup ()
   clientSock->Init ();
 qDebug () << " did sock Init() for " << clientSock;
   clientSock->setPeerVerifyMode (QSslSocket::VerifyPeer);
+  connect (clientSock, SIGNAL (Ready (SymmetricSocket*)),
+           this, SLOT (EncryptDone (SymmetricSocket*)));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
 #if 0
   connect (clientSock, SIGNAL (connected()), this, SLOT (Connected()));
@@ -141,9 +143,10 @@ DirectCaller::Connect (QString otherHost, int callid)
 }
 
 void
-DirectCaller::EncryptDone ()
+DirectCaller::EncryptDone (SymmetricSocket *sock)
 {
-  qDebug () << " EncryptDone";
+  qDebug () << " Caller emit ConnectionReady " << sock;
+  emit ConnectionReady (sock);
 }
 
 #if 0

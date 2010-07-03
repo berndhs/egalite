@@ -70,6 +70,7 @@ DirectListener::incomingConnection (int socketDescriptor)
 void
 DirectListener::IsReady (SymmetricSocket * sock)
 {
+  qDebug () << " Listener socket ready " << sock;
   emit SocketReady (sock);
 }
 

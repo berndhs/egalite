@@ -49,6 +49,7 @@ public:
 
   void Start ();
   void Init ();
+  QString PeerName ();
 
   void setPeerVerifyMode ( QSslSocket::PeerVerifyMode mode );
   void connectToHostEncrypted ( const QString & hostName, 

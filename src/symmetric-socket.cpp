@@ -200,7 +200,7 @@ SymmetricSocket::Disconnected ()
 void
 SymmetricSocket::EncryptDone ()
 {
-  qDebug () << " server side encrypt done";
+  qDebug () << " symmetric encrypt done " << this;
   emit Ready (this);
 }
 
@@ -209,6 +209,16 @@ SymmetricSocket::SendData (const QByteArray &data)
 {
   if (sock) {
     sock->write (data);
+  }
+}
+
+QString
+SymmetricSocket::PeerName ()
+{
+  if (sock) {
+    return sock->peerName();
+  } else {
+    return (tr("anonymous"));
   }
 }
 

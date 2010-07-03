@@ -37,6 +37,7 @@ namespace egalite
 
 class DirectListener;
 class DirectCaller;
+class SymmetricSocket;
 
 class DChatMain : public QMainWindow 
 {
@@ -56,6 +57,7 @@ public slots:
   void GetMessage (const QXmppMessage  & msg);
   void GetRaw (const QByteArray &data);
   void SendDirect ();
+  void ReplyDirect ();
 
 private slots:
 
@@ -66,6 +68,7 @@ private slots:
   void CallDirect ();
   void HangupDirect (int callid);
   void ClearCall (int callid);
+  void ConnectDirect (SymmetricSocket *direct);
 
 private:
 
@@ -85,6 +88,8 @@ private:
 
   std::map <QString, DirectListener*> inDirect;
   std::map <int,     DirectCaller*>   outDirect;
+
+  std::map <QString, SymmetricSocket *> directChats;
 
 };
 
