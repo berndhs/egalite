@@ -52,7 +52,9 @@ DirectListener::incomingConnection (int socketDescriptor)
   qDebug () << " egal server " << this << "new connection " << socketDescriptor;
   SymmetricSocket * newsock = new SymmetricSocket (socketDescriptor,
       key,cert) ;
+  newsock->Init ();
   newsock->setPeerVerifyMode (QSslSocket::VerifyPeer);
+  newsock->Socket()->startServerEncryption ();
   connect (newsock, SIGNAL (Exiting (SymmetricSocket*)),
            this, SLOT (SocketExit (SymmetricSocket*)));
   connect (newsock, SIGNAL (ReceiveData (const QByteArray &)),
@@ -60,7 +62,6 @@ DirectListener::incomingConnection (int socketDescriptor)
   connect (newsock, SIGNAL (Ready (SymmetricSocket*)),
            this, SLOT (IsReady (SymmetricSocket*)));
   sockets << newsock;
-  newsock->Init ();
   newsock->Start ();
   qDebug () << " new server side sock has certs: " << newsock->caCertificates();
 //  qDebug () << " new server side sock has conf: " ;

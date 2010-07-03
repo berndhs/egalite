@@ -43,7 +43,8 @@ class SymmetricSocket : public QObject
 public:
 
   SymmetricSocket (int socketDescriptor,
-                QSslKey argKey, QSslCertificate argCert);
+                   QSslKey argKey, 
+                   QSslCertificate argCert);
   SymmetricSocket (QSslKey argKey, QSslCertificate argCert);
   ~SymmetricSocket ();
 
