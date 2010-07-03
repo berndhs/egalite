@@ -205,6 +205,7 @@ DirectCaller::Hangup ()
 void
 DirectCaller::Send (const QByteArray & data)
 {
+qDebug () << " direct writing " << data;
   clientSock->write (data);
 }
 

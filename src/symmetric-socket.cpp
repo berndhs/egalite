@@ -99,6 +99,7 @@ SymmetricSocket::connectToHostEncrypted ( const QString & hostName,
                                 const QString & sslPeerName,
                                 QSslSocket::OpenMode mode)
 {
+qDebug () << " connect encrypted with " << sock;
   if (sock) {
     sock->connectToHostEncrypted (hostName, port, sslPeerName, mode);
   }
@@ -115,6 +116,7 @@ SymmetricSocket::disconnectFromHost ()
 qint64
 SymmetricSocket::write (const QByteArray & byteArray)
 {
+qDebug () << " symmetric write " << byteArray;
   if (sock) {
     return sock->write (byteArray);
   } else {
@@ -207,6 +209,7 @@ SymmetricSocket::EncryptDone ()
 void
 SymmetricSocket::SendData (const QByteArray &data)
 {
+qDebug () << " Send Data " << data;
   if (sock) {
     sock->write (data);
   }
@@ -238,7 +241,7 @@ SymmetricSocket::Errors (const QList<QSslError>& errList)
   qDebug () << objectName() << " SymmetricSocket ssl BIG ERROR list: ";
   QList<QSslError>::const_iterator  erit;
   for (erit=errList.begin(); erit != errList.end(); erit++) {
-    qDebug () << "ssl error "<< *erit;
+    qDebug () << "ssl ERROR "<< *erit;
   }
   qDebug () << objectName()<< " SERVER sock " << sock;
   if (sock) {
@@ -266,9 +269,12 @@ SymmetricSocket::SockError ( QAbstractSocket::SocketError socketError )
 {
   qDebug () << " ABSTRACT socket error " << socketError;
   qDebug () << " ssl errors " << sock->sslErrors ();
+qDebug () << " ABSTRACT sees peer cert " << sock->peerCertificate ();
+#if 0
   if (socketError == QAbstractSocket::UnknownSocketError) {
     sock->ignoreSslErrors ();
   }
+#endif
 }
 
 void
