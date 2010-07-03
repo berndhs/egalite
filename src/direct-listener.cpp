@@ -52,7 +52,7 @@ DirectListener::incomingConnection (int socketDescriptor)
   qDebug () << " egal server " << this << "new connection " << socketDescriptor;
   SymmetricSocket * newsock = new SymmetricSocket (socketDescriptor,
       key,cert) ;
-  newsock->setPeerVerifyMode (QSslSocket::QueryPeer);
+  newsock->setPeerVerifyMode (QSslSocket::VerifyPeer);
   connect (newsock, SIGNAL (Exiting (SymmetricSocket*)),
            this, SLOT (SocketExit (SymmetricSocket*)));
   connect (newsock, SIGNAL (ReceiveData (const QByteArray &)),

@@ -241,6 +241,7 @@ qDebug () << " start direct connect " << callnum << " call " << newcall;
 void
 DChatMain::ConnectDirect (SymmetricSocket * sock)
 {
+qDebug () << " have connection with " << sock;
   if (sock) {
     QString other = sock->PeerName();
     directChats [other] = sock;
