@@ -27,6 +27,7 @@
 #include <QSslCertificate>
 #include <QSslKey>
 #include <QHostAddress>
+#include <QByteArray>
 
 namespace egalite 
 {
@@ -45,9 +46,17 @@ public:
   void Init (QString certHost, QString pass);
   void Listen (const QHostAddress & addr, int port);
 
+public slots:
+
+  void GetData (const QByteArray &data);
+
 private slots:
 
   void SocketExit (ServerSocket * goner);
+
+signals:
+
+  void Receive (const QByteArray &data);
 
 protected:
 

@@ -53,6 +53,9 @@ public:
 public slots:
 
   void Quit ();
+  void GetMessage (const QXmppMessage  & msg);
+  void GetRaw (const QByteArray &data);
+  void SendDirect ();
 
 private slots:
 
@@ -78,6 +81,7 @@ private:
   QString       server;
   QString       password;
   QDialog      *passdial;
+  int           callnum;
 
   std::map <QString, DirectListener*> inDirect;
   std::map <int,     DirectCaller*>   outDirect;

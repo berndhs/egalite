@@ -50,6 +50,11 @@ public:
 
   void Connect (QString otherHost, int callid);
   void Hangup ();
+  QString Party (); /// who is on the other side
+
+public slots:
+
+  void Send (const QByteArray &data);
 
 private slots:
 
@@ -67,6 +72,7 @@ private slots:
 signals:
 
   void Finished (int myid);
+  void Received (const QByteArray &data);
 
 
 private:
@@ -81,6 +87,7 @@ private:
   QSslSocket  *clientSock;
   PickCert    *pickCert;
   int         myCallid;
+  QString     party;
   QSslCertificate  cert;
   QSslKey          key;
 

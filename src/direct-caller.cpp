@@ -87,6 +87,12 @@ DirectCaller::Quit ()
   
 }
 
+QString
+DirectCaller::Party ()
+{
+  return party;
+}
+
 void
 DirectCaller::KeyInit (QString certHost, QString pass)
 {
@@ -108,6 +114,7 @@ void
 DirectCaller::Connect (QString otherHost, int callid)
 {
   myCallid = callid;
+  party = otherHost;
   QHostInfo hinfo = QHostInfo::fromName (otherHost);
   if (hinfo.addresses().isEmpty()) {
     exit (1);
@@ -215,6 +222,8 @@ void
 DirectCaller::GetPeerMessage (QSslSocket *sock)
 {
   bool enc = sock->isEncrypted();
+#if 0
+  // old raw stuff
   QString encstr (enc ? " [encrypted] " : " [clear] ");
   QByteArray message = sock->readAll();
   ui.dataLine->setText (QString(message) + encstr);
@@ -223,6 +232,9 @@ DirectCaller::GetPeerMessage (QSslSocket *sock)
   QString otherPort = QString::number (sock->peerPort());
   ui.otherIP->setText (otherIp + " : " + otherPort + encstr);
   ui.otherHost->setText (otherName);
+#endif
+  QByteArray message = sock->readAll ();
+  emit Received (message);
 }
 
 void
@@ -247,6 +259,12 @@ DirectCaller::DoSend ()
   QByteArray senddata = ui.dataLine->text().toUtf8();
   ui.dataLine->setText (tr("sending..."));
   clientSock->write (senddata);
+}
+
+void
+DirectCaller::Send (const QByteArray & data)
+{
+  clientSock->write (data);
 }
 
 } // namespace

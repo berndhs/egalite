@@ -176,9 +176,13 @@ void
 ServerSocket::Receive ()
 {
   QByteArray data = sock->readAll ();
+#if 0
+  // old raw stuff
   bool enc = sock->isEncrypted();
   QString encstr (enc ? " [encrypted] " : " [clear] ");
   ui.dataLine->setText (data + encstr);
+#endif
+  emit ReceiveData (data);
 }
 
 void

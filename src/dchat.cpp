@@ -44,7 +44,8 @@ DChatMain::DChatMain (QWidget *parent)
    pApp (0),
    configEdit (this),
    xclient (0),
-   passdial (0)
+   passdial (0),
+   callnum (0)
 {
   ui.setupUi (this);
   Connect ();
@@ -76,6 +77,8 @@ DChatMain::Run ()
   inDirect[directHost] = listen;
   listen->Init (directHost, QString("enkhuizen"));
   listen->Listen (QHostAddress ("2001:4830:1135:1::1"),29999);
+  connect (listen, SIGNAL (Receive (const QByteArray &)),
+           this, SLOT (GetRaw (const QByteArray&)));
   show ();
 }
 
@@ -96,7 +99,8 @@ DChatMain::Connect ()
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.directButton, SIGNAL (clicked()), this, SLOT (CallDirect()));
-
+  connect (ui.sendDirectButton, SIGNAL (clicked()),
+           this, SLOT (SendDirect()));
   connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
   connect (ui.actionPreferences, SIGNAL (triggered()),
            &configEdit, SLOT (Exec()));
@@ -111,8 +115,9 @@ DChatMain::Login ()
     if (!xclient) {
       xclient = new QXmppClient (this);
     }
-    xclient->connectToServer (server,user,
-                           password);
+    xclient->connectToServer (server,user, password);
+    connect (xclient, SIGNAL (messageReceived  (const QXmppMessage  &)),
+             this, SLOT (GetMessage (const QXmppMessage &)));
   }
 }
 
@@ -159,6 +164,31 @@ DChatMain::PassCancel ()
 }
 
 void
+DChatMain::GetMessage (const QXmppMessage & msg)
+{
+  QString from = msg.from ();
+  QString to   = msg.to ();
+  QString body = msg.body ();
+  QString pattern ("%1 says to %2: %3");
+  QString msgtext = pattern.arg(from).arg(to).arg(body);
+  ui.textDisplay->append (msgtext);
+  qDebug () << " message from " << from << " to " << to << 
+               " is " << body;
+}
+
+
+void
+DChatMain::GetRaw (const QByteArray &data)
+{
+  QDomDocument msgDoc;
+  msgDoc.setContent (data);
+  QXmppMessage msg;
+  msg.parse (msgDoc.documentElement());
+  GetMessage (msg);
+qDebug () << " received raw message " << data;
+}
+
+void
 DChatMain::Send ()
 {
   QString body = ui.inputLine->text();
@@ -189,7 +219,6 @@ DChatMain::Send ()
 void
 DChatMain::CallDirect ()
 {
-  static int callnum (0);
   QString dest ("bernd.reflective-computing.com");
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
@@ -197,6 +226,22 @@ DChatMain::CallDirect ()
 qDebug () << " start direct connect " << callnum << " call " << newcall;
   newcall->Connect (dest, callnum);
   connect (newcall, SIGNAL (Finished (int)), this, SLOT (ClearCall (int)));
+  connect (newcall, SIGNAL (Received (const QByteArray &)),
+           this, SLOT (GetRaw (const QByteArray &)));
+}
+
+void
+DChatMain::SendDirect ()
+{
+  DirectCaller *call = outDirect[callnum];
+  QString data = ui.inputLine->text();
+  QXmppMessage msg (user,call->Party(), data);
+  
+  QByteArray outbuf("<?xml version='1.0'>");
+  QXmlStreamWriter out (&outbuf);
+  msg.toXml (&out);
+  call->Send (outbuf);
+qDebug () << " sending direct: " << outbuf;
 }
 
 void

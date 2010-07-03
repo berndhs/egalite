@@ -54,6 +54,8 @@ DirectListener::incomingConnection (int socketDescriptor)
       key,cert) ;
   connect (newsock, SIGNAL (Exiting (ServerSocket*)),
            this, SLOT (SocketExit (ServerSocket*)));
+  connect (newsock, SIGNAL (ReceiveData (const QByteArray &)),
+           this, SLOT (GetData (const QByteArray &)));
   sockets << newsock;
   newsock->Start ();
   qDebug () << " new server side sock has certs: " << newsock->caCertificates();
@@ -65,6 +67,12 @@ void
 DirectListener::SocketExit (ServerSocket * goner)
 {
   sockets.removeAll (goner);
+}
+
+void
+DirectListener::GetData (const QByteArray &data)
+{
+  emit Receive (data);
 }
 
 void

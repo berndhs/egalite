@@ -72,6 +72,7 @@ signals:
 
   void ConnectError (QSslSocket::SocketError socketError);
   void Exiting (ServerSocket * self);
+  void ReceiveData (const QByteArray &data);
 
 private:
 
