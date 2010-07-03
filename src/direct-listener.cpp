@@ -20,7 +20,7 @@
  ****************************************************************/
 
 #include "direct-listener.h"
-#include "server-socket.h"
+#include "symmetric-socket.h"
 #include <QFile>
 #include <QSslConfiguration>
 
@@ -50,13 +50,17 @@ void
 DirectListener::incomingConnection (int socketDescriptor)
 {
   qDebug () << " egal server " << this << "new connection " << socketDescriptor;
-  ServerSocket * newsock = new ServerSocket (socketDescriptor,
+  SymmetricSocket * newsock = new SymmetricSocket (socketDescriptor,
       key,cert) ;
-  connect (newsock, SIGNAL (Exiting (ServerSocket*)),
-           this, SLOT (SocketExit (ServerSocket*)));
+  newsock->setPeerVerifyMode (QSslSocket::QueryPeer);
+  connect (newsock, SIGNAL (Exiting (SymmetricSocket*)),
+           this, SLOT (SocketExit (SymmetricSocket*)));
   connect (newsock, SIGNAL (ReceiveData (const QByteArray &)),
            this, SLOT (GetData (const QByteArray &)));
+  connect (newsock, SIGNAL (Ready (SymmetricSocket*)),
+           this, SLOT (IsReady (SymmetricSocket*)));
   sockets << newsock;
+  newsock->Init ();
   newsock->Start ();
   qDebug () << " new server side sock has certs: " << newsock->caCertificates();
 //  qDebug () << " new server side sock has conf: " ;
@@ -64,9 +68,19 @@ DirectListener::incomingConnection (int socketDescriptor)
 }
 
 void
-DirectListener::SocketExit (ServerSocket * goner)
+DirectListener::IsReady (SymmetricSocket * sock)
 {
-  sockets.removeAll (goner);
+  emit SocketReady (sock);
+}
+
+bool
+DirectListener::TakeSocket (SymmetricSocket * sock)
+{
+  if (sockets.contains (sock)) {
+    sockets.removeAll (sock);
+    return true;
+  }
+  return false;
 }
 
 void

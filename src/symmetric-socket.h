@@ -22,12 +22,13 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include <QThread>
+
 #include <QSslSocket>
 #include <QSslCertificate>
 #include <QSslKey>
 #include "ui_mirror.h"
 #include <QDialog>
+#include <QObject>
 
 
 namespace egalite
@@ -35,18 +36,28 @@ namespace egalite
 
 class PickCert;
 
-class ServerSocket : public QThread
+class SymmetricSocket : public QObject
 {
   Q_OBJECT
 
 public:
 
-  ServerSocket (int socketDescriptor,
+  SymmetricSocket (int socketDescriptor,
                 QSslKey argKey, QSslCertificate argCert);
-  ~ServerSocket ();
+  SymmetricSocket (QSslKey argKey, QSslCertificate argCert);
+  ~SymmetricSocket ();
 
-  void run ();
   void Start ();
+  void Init ();
+
+  void setPeerVerifyMode ( QSslSocket::PeerVerifyMode mode );
+  void connectToHostEncrypted ( const QString & hostName, 
+                                quint16 port, 
+                                const QString & sslPeerName,
+                                QSslSocket::OpenMode mode = QSslSocket::ReadWrite );
+  void disconnectFromHost ();
+
+  qint64 write ( const QByteArray & byteArray );
 
   QList<QSslCertificate> caCertificates () const;
   QSslSocket* Socket () {
@@ -61,9 +72,10 @@ public slots:
   void SockModeChange (QSslSocket::SslMode newmode);
   void SockError ( QAbstractSocket::SocketError socketError );
 
+  void SendData (const QByteArray &data);
+
 private slots:
 
-  void Send ();
   void Receive ();
   void Disconnected ();
   void EncryptDone ();
@@ -71,14 +83,16 @@ private slots:
 signals:
 
   void ConnectError (QSslSocket::SocketError socketError);
-  void Exiting (ServerSocket * self);
+  void Exiting (SymmetricSocket * self);
   void ReceiveData (const QByteArray &data);
+  void Ready (SymmetricSocket * self);
 
 private:
 
   bool PickOneCert (const QList <QSslCertificate> & clist);
 
   int           sockDescript;
+  bool          haveDescriptor;
   QSslSocket    *sock;
   PickCert      *pickCert;
   QDialog       *dialog;

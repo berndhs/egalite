@@ -222,12 +222,15 @@ DChatMain::CallDirect ()
   QString dest ("bernd.reflective-computing.com");
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
-  outDirect[callnum] = newcall;
+  if (newcall) {
+    newcall->Setup ();
+    outDirect[callnum] = newcall;
 qDebug () << " start direct connect " << callnum << " call " << newcall;
-  newcall->Connect (dest, callnum);
-  connect (newcall, SIGNAL (Finished (int)), this, SLOT (ClearCall (int)));
-  connect (newcall, SIGNAL (Received (const QByteArray &)),
-           this, SLOT (GetRaw (const QByteArray &)));
+    newcall->Connect (dest, callnum);
+    connect (newcall, SIGNAL (Finished (int)), this, SLOT (ClearCall (int)));
+    connect (newcall, SIGNAL (Received (const QByteArray &)),
+             this, SLOT (GetRaw (const QByteArray &)));
+  }
 }
 
 void

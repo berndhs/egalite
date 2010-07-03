@@ -50,7 +50,7 @@ SOURCES = src/main.cpp \
         src/config-edit.cpp \
         src/direct-listener.cpp \
         src/direct-caller.cpp \
-        src/server-socket.cpp \
+        src/symmetric-socket.cpp \
         src/pick-cert.cpp \
 
 
@@ -64,7 +64,7 @@ HEADERS = \
         src/config-edit.h \
         src/direct-listener.h \
         src/direct-caller.h \
-        src/server-socket.h \
+        src/symmetric-socket.h \
         src/pick-cert.h \
 
 

@@ -22,6 +22,7 @@
 #include "deliberate.h"
 #include "direct-caller.h"
 #include "pick-cert.h"
+#include "symmetric-socket.h"
 #include <QDebug>
 #include <QApplication>
 #include <QHostAddress>
@@ -58,14 +59,23 @@ DirectCaller::DirectCaller (QWidget *parent)
   :QDialog (parent),
    pickCert (0)
 {
+}
+
+
+void
+DirectCaller::Setup ()
+{
   ui.setupUi (this);
-  clientSock = new QSslSocket (this);
-  //clientSock->setProtocol (egalite::SslProto);
-  clientSock->setProtocol (QSsl::SslV3);
+  QString clientName ("barbados");
+  clientName = Settings().value ("direct/client",clientName).toString();
+  Settings().setValue ("direct/client",clientName);
+  KeyInit (clientName, "enkhuizen");
+  clientSock = new SymmetricSocket (key, cert);
+  clientSock->Init ();
+qDebug () << " did sock Init() for " << clientSock;
   clientSock->setPeerVerifyMode (QSslSocket::VerifyPeer);
-  QList <QSslCertificate> emptylist;
-  clientSock->setCaCertificates (emptylist);
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
+#if 0
   connect (clientSock, SIGNAL (connected()), this, SLOT (Connected()));
   connect (clientSock, SIGNAL (hostFound()), this, SLOT (HostFound()));
   connect (clientSock, SIGNAL (disconnected ()), this, SLOT (Disconnected()));
@@ -75,8 +85,8 @@ DirectCaller::DirectCaller (QWidget *parent)
            this, SLOT (Errors (const QList<QSslError>&)));
   connect (clientSock, SIGNAL (peerVerifyError (const QSslError&)),
            this, SLOT (VerifyProblem (const QSslError&)));
+#endif
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (DoSend()));
-
   show ();
 }
 
@@ -119,38 +129,24 @@ DirectCaller::Connect (QString otherHost, int callid)
   if (hinfo.addresses().isEmpty()) {
     exit (1);
   }
-  QString clientName ("barbados");
-  clientName = Settings().value ("direct/client",clientName).toString();
-  Settings().setValue ("direct/client",clientName);
-  KeyInit (clientName, "enkhuizen");
-
-  clientSock->setPrivateKey (key);
-  clientSock->setLocalCertificate (cert);
-
   QHostAddress hostAddress = hinfo.addresses().first ();
   setWindowTitle (tr("DirectCaller Client"));
   ui.otherHost->setText (hostAddress.toString());
-  qDebug () << " before connection mirror sock config " ;
-  ShowConfig (clientSock->sslConfiguration());
-qDebug () << " before conenction CALLER cert is " << clientSock->localCertificate();
+//  qDebug () << " before connection mirror sock config " ;
+//  ShowConfig (clientSock->sslConfiguration());
   clientSock->connectToHostEncrypted (otherHost, 29999,
                                       hinfo.hostName(),
-                                      QIODevice::ReadWrite);
+                                      QSslSocket::ReadWrite);
 
-  qDebug () << " clientSock isEncrypted () " << clientSock->isEncrypted();
-  qDebug () << " clientSock proto " << clientSock->protocol ();
-  qDebug () << " after connection mirror sock cert " << clientSock->caCertificates ();
-  qDebug () << " after connection mirror sock config ";
-  //ShowConfig ( clientSock->sslConfiguration());
 }
 
 void
 DirectCaller::EncryptDone ()
 {
   qDebug () << " EncryptDone";
-  ShowConfig (clientSock->sslConfiguration());
 }
 
+#if 0
 void
 DirectCaller::Errors (const QList<QSslError>& errList)
 {
@@ -178,6 +174,8 @@ DirectCaller::VerifyProblem ( const QSslError & error)
   }
 }
 
+#endif
+
 bool
 DirectCaller::PickOneCert (const QList <QSslCertificate> & clist)
 {
@@ -196,69 +194,8 @@ DirectCaller::Hangup ()
 {
   if (clientSock) {
     clientSock->disconnectFromHost ();
-    hide ();
-    
+    hide (); 
   }
-}
-
-void
-DirectCaller::Connected ()
-{
-  QString name = clientSock->peerName();
-  ui.otherHost->setText (name);
-  QString ip = clientSock->peerAddress().toString();
-  QString port = QString::number (clientSock->peerPort());
-  ui.otherIP->setText (ip + ":" + port);
-  ui.dataLine->setText (QString ());
-}
-
-void
-DirectCaller::SockDataReady ()
-{
-  GetPeerMessage (clientSock);
-}
-
-void
-DirectCaller::GetPeerMessage (QSslSocket *sock)
-{
-  bool enc = sock->isEncrypted();
-#if 0
-  // old raw stuff
-  QString encstr (enc ? " [encrypted] " : " [clear] ");
-  QByteArray message = sock->readAll();
-  ui.dataLine->setText (QString(message) + encstr);
-  QString otherName = sock->peerName();
-  QString otherIp   = sock->peerAddress().toString ();
-  QString otherPort = QString::number (sock->peerPort());
-  ui.otherIP->setText (otherIp + " : " + otherPort + encstr);
-  ui.otherHost->setText (otherName);
-#endif
-  QByteArray message = sock->readAll ();
-  emit Received (message);
-}
-
-void
-DirectCaller::HostFound ()
-{
-  qDebug () << " found host at "
-            << clientSock->peerAddress().toString()
-            << " is " << clientSock->peerName();
-}
-
-void
-DirectCaller::Disconnected ()
-{
-  qDebug () << " disconnect ";
-  qDebug () << " Error: " << clientSock->error();
-  emit Finished (myCallid);
-}
-
-void
-DirectCaller::DoSend ()
-{
-  QByteArray senddata = ui.dataLine->text().toUtf8();
-  ui.dataLine->setText (tr("sending..."));
-  clientSock->write (senddata);
 }
 
 void

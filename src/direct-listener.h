@@ -32,7 +32,7 @@
 namespace egalite 
 {
 
-class ServerSocket;
+class SymmetricSocket;
 
 class DirectListener : public QTcpServer
 {
@@ -46,17 +46,18 @@ public:
   void Init (QString certHost, QString pass);
   void Listen (const QHostAddress & addr, int port);
 
+  bool TakeSocket (SymmetricSocket * sock);
+
 public slots:
 
   void GetData (const QByteArray &data);
-
-private slots:
-
-  void SocketExit (ServerSocket * goner);
+  void IsReady (SymmetricSocket *sock);
 
 signals:
 
   void Receive (const QByteArray &data);
+
+  void SocketReady (SymmetricSocket * sock);
 
 protected:
 
@@ -64,7 +65,7 @@ protected:
 
 private:
 
-  typedef QList <ServerSocket*> SocketList;
+  typedef QList <SymmetricSocket*> SocketList;
 
   SocketList  sockets;
 

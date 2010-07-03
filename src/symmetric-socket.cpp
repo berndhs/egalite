@@ -20,7 +20,7 @@
  ****************************************************************/
 
 #include "deliberate.h"
-#include "server-socket.h"
+#include "symmetric-socket.h"
 #include "pick-cert.h"
 #include <QSslSocket>
 #include <QAbstractSocket>
@@ -33,10 +33,11 @@ using namespace deliberate;
 namespace egalite
 {
 
-ServerSocket::ServerSocket (int socketDescriptor,
+SymmetricSocket::SymmetricSocket (int socketDescriptor,
                             QSslKey argKey, QSslCertificate argCert)
-  :QThread (0),
-   sockDescript (socketDescriptor),
+  :sockDescript (socketDescriptor),
+   haveDescriptor (true),
+   sock (0),
    pickCert (0),
    started (false),
    key (argKey),
@@ -44,13 +45,34 @@ ServerSocket::ServerSocket (int socketDescriptor,
 {
   dialog = new QDialog;
   ui.setupUi (dialog);
-  dialog->setWindowTitle (tr("Server Socket"));
+  dialog->setWindowTitle (tr("Symmetric Socket"));
+#if 0
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Done()));
+#endif
   dialog->show();
 }
 
-ServerSocket::~ServerSocket ()
+SymmetricSocket::SymmetricSocket (QSslKey argKey, QSslCertificate argCert)
+  :sockDescript (-1),
+   haveDescriptor (false),
+   sock (0),
+   pickCert (0),
+   started (false),
+   key (argKey),
+   cert (argCert)
+{
+  dialog = new QDialog;
+  ui.setupUi (dialog);
+  dialog->setWindowTitle (tr("Symmetric Socket"));
+#if 0
+  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
+  connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Done()));
+#endif
+  dialog->show();
+}
+
+SymmetricSocket::~SymmetricSocket ()
 {
   if (sock) {
     delete sock;
@@ -63,53 +85,66 @@ ServerSocket::~ServerSocket ()
 }
 
 void
-ServerSocket::run ()
+SymmetricSocket::setPeerVerifyMode (QSslSocket::PeerVerifyMode mode)
 {
-  qDebug () << " socket run called " << thread();
-  qDebug () << " started: " << started;
-  if (!started) {
-    Start ();
+  if (sock) {
+qDebug () << " set peer verify mode for ssl sock " << sock << " to " << mode;
+    sock->setPeerVerifyMode (mode);
   }
-  QByteArray message ("Hello from Server ");
-  if (sock->isEncrypted()) {
-    message.append (" encrypted");
-  } else {
-    message.append (" clear");
+}
+  
+void 
+SymmetricSocket::connectToHostEncrypted ( const QString & hostName, 
+                                quint16 port, 
+                                const QString & sslPeerName,
+                                QSslSocket::OpenMode mode)
+{
+  if (sock) {
+    sock->connectToHostEncrypted (hostName, port, sslPeerName, mode);
   }
-  int nbytes(0);
-  nbytes = sock->write (message);
-  qDebug () << " wrote " << nbytes << " bytes";
-  qDebug () << " sock isEncrypted () " << sock->isEncrypted();
-  qDebug () << " sock proto " << sock->protocol();
-  QThread::run ();
 }
 
 void
-ServerSocket::Start ()
+SymmetricSocket::disconnectFromHost ()
+{
+  if (sock) {
+    sock->disconnectFromHost ();
+  }
+}
+
+qint64
+SymmetricSocket::write (const QByteArray & byteArray)
+{
+  if (sock) {
+    return sock->write (byteArray);
+  } else {
+    return -1;
+  }
+}
+
+void
+SymmetricSocket::Init ()
 {
   if (started) {
     qDebug () << " already started" ;
     return;
   }
-  qDebug () << " starting socket thread " << this;
+  qDebug () << " starting socket  " << this;
 
   ui.dataLine->setText ("initialize socket");
   sock = new QSslSocket;
   sock->setProtocol (QSsl::AnyProtocol);
-  sock->setPeerVerifyMode (QSslSocket::QueryPeer);
   QList <QSslCertificate> emptylist;
   sock->setCaCertificates (emptylist);
-  QString directHost ("reflect");
-  directHost = Settings().value ("direct/host",directHost).toString();
-  bool certok = sock->addCaCertificates 
-             (QString ("/home/bernd/ssl-cert/%1/cert.pem").arg(directHost));
-  qDebug () << " adding certs ok is " << certok;
   if (sock == 0) {
     qDebug () << " cannot allocate socket ";
     emit ConnectError (QAbstractSocket::UnknownSocketError);
     return;
   }
-  bool ok = sock->setSocketDescriptor (sockDescript);
+  bool ok (true);
+  if (haveDescriptor) {
+    ok = sock->setSocketDescriptor (sockDescript);
+  }
   if (!ok) {
     qDebug () << " error setting socket " << sock->error();
     emit ConnectError (sock->error());
@@ -127,6 +162,11 @@ ServerSocket::Start ()
            this, SLOT (SockModeChange (QSslSocket::SslMode )));
   connect (sock, SIGNAL (error ( QAbstractSocket::SocketError  )),
            this, SLOT (SockError ( QAbstractSocket::SocketError )));
+}
+
+void
+SymmetricSocket::Start ()
+{
   ui.otherHost->setText (sock->peerName());
   QString peerIp = sock->peerAddress().toString();
   quint16 peerPort = sock->peerPort();
@@ -139,56 +179,53 @@ ServerSocket::Start ()
   sock->startServerEncryption ();
   qDebug () << " started  server sock " << sock << "encryption now in mode   " << sock->mode();
   started = true;
-  start();
 }
 
 void
-ServerSocket::Done ()
+SymmetricSocket::Done ()
 {
   qDebug () << " server socket Done";
   sock->close ();
   dialog->done(0);
   emit Exiting (this);
-  QThread::quit ();
 }
 
 void
-ServerSocket::Disconnected ()
+SymmetricSocket::Disconnected ()
 {
   qDebug () << " server socket disconnected ";
   Done();
 }
 
 void
-ServerSocket::EncryptDone ()
+SymmetricSocket::EncryptDone ()
 {
   qDebug () << " server side encrypt done";
+  emit Ready (this);
 }
 
 void
-ServerSocket::Send ()
+SymmetricSocket::SendData (const QByteArray &data)
 {
-  QString data = ui.dataLine->text ();
-  sock->write (data.toUtf8());
+  if (sock) {
+    sock->write (data);
+  }
 }
 
 void
-ServerSocket::Receive ()
+SymmetricSocket::Receive ()
 {
-  QByteArray data = sock->readAll ();
-#if 0
-  // old raw stuff
-  bool enc = sock->isEncrypted();
-  QString encstr (enc ? " [encrypted] " : " [clear] ");
-  ui.dataLine->setText (data + encstr);
-#endif
+  QByteArray data;
+  if (sock) {
+    data = sock->readAll ();
+  }
   emit ReceiveData (data);
 }
 
 void
-ServerSocket::Errors (const QList<QSslError>& errList)
+SymmetricSocket::Errors (const QList<QSslError>& errList)
 {
-  qDebug () << objectName() << " ServerSocket ssl error list: ";
+  qDebug () << objectName() << " SymmetricSocket ssl error list: ";
   QList<QSslError>::const_iterator  erit;
   for (erit=errList.begin(); erit != errList.end(); erit++) {
     qDebug () << "ssl error "<< *erit;
@@ -204,7 +241,7 @@ qDebug () << " SERVER: other side chain " << clist;
     QSslCertificate callerCert = sock->peerCertificate ();
 qDebug () << " SERVER: other side cert " << callerCert;
     clist.append (callerCert);
-qDebug () << " SERVER ServerSocket num certs " << clist.size();
+qDebug () << " SERVER SymmetricSocket num certs " << clist.size();
     if (clist.size() > 0) {
       isok = PickOneCert (clist);
     }
@@ -215,7 +252,7 @@ qDebug () << " SERVER ServerSocket num certs " << clist.size();
 }
 
 void
-ServerSocket::SockError ( QAbstractSocket::SocketError socketError )
+SymmetricSocket::SockError ( QAbstractSocket::SocketError socketError )
 {
   qDebug () << " abstract socket error " << socketError;
   qDebug () << " ssl errors " << sock->sslErrors ();
@@ -225,13 +262,13 @@ ServerSocket::SockError ( QAbstractSocket::SocketError socketError )
 }
 
 void
-ServerSocket::SockModeChange (QSslSocket::SslMode newmode)
+SymmetricSocket::SockModeChange (QSslSocket::SslMode newmode)
 {
   qDebug () << " socket " << sock << " mode is now " << newmode;
 }
 
 QList<QSslCertificate>
-ServerSocket::caCertificates () const
+SymmetricSocket::caCertificates () const
 {
   if (sock) {
     return sock->caCertificates ();
@@ -242,13 +279,13 @@ ServerSocket::caCertificates () const
 }
 
 void
-ServerSocket::VerifyProblem ( const QSslError & error)
+SymmetricSocket::VerifyProblem ( const QSslError & error)
 {
-  qDebug() << objectName() << " SERVER ServerSocket ssl verify error " << error;
+  qDebug() << objectName() << " SERVER SymmetricSocket ssl verify error " << error;
 }
 
 bool
-ServerSocket::PickOneCert (const QList <QSslCertificate> & clist)
+SymmetricSocket::PickOneCert (const QList <QSslCertificate> & clist)
 {
   if (pickCert == 0) {
     pickCert = new PickCert (0,QString("Incoming"));

@@ -23,7 +23,6 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include <QSslSocket>
 #include <QSslError>
 #include <QDialog>
 #include <QTimer>
@@ -38,6 +37,7 @@ namespace egalite
 {
 
 class PickCert;
+class SymmetricSocket;
 
 class DirectCaller : public QDialog
 {
@@ -48,6 +48,7 @@ public:
 
   DirectCaller (QWidget *parent = 0);
 
+  void Setup ();
   void Connect (QString otherHost, int callid);
   void Hangup ();
   QString Party (); /// who is on the other side
@@ -61,13 +62,8 @@ private slots:
   void Quit ();
 
   void EncryptDone ();
-  void Errors (const QList<QSslError>& errList);
-  void VerifyProblem ( const QSslError & error);
-  void Connected ();
-  void HostFound ();
-  void Disconnected ();
-  void SockDataReady ();
-  void DoSend ();
+  //void Errors (const QList<QSslError>& errList);
+  //void VerifyProblem ( const QSslError & error);
 
 signals:
 
@@ -77,19 +73,19 @@ signals:
 
 private:
 
-  void GetPeerMessage (QSslSocket *sock);
+ // void GetPeerMessage (QSslSocket *sock);
   void ShowCertInfo (const QSslCertificate & cert);
   bool PickOneCert (const QList <QSslCertificate> & clist);
   void KeyInit (QString certHost, QString pass);
 
   Ui_MirrorDisplay  ui;
 
-  QSslSocket  *clientSock;
-  PickCert    *pickCert;
-  int         myCallid;
-  QString     party;
-  QSslCertificate  cert;
-  QSslKey          key;
+  SymmetricSocket  *clientSock;
+  PickCert         *pickCert;
+  int               myCallid;
+  QString           party;
+  QSslCertificate   cert;
+  QSslKey           key;
 
 
 };
