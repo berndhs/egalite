@@ -39,6 +39,7 @@ FORMS = \
         ui/config-edit.ui \
         ui/mirror.ui \
         ui/cert-candidate.ui \
+        ui/cert-store.ui \
 
 
 SOURCES = src/main.cpp \
@@ -66,6 +67,7 @@ HEADERS = \
         src/direct-caller.h \
         src/symmetric-socket.h \
         src/pick-cert.h \
+        src/cert-store.h \
 
 
 

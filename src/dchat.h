@@ -26,6 +26,7 @@
 #include <QXmppClient.h>
 
 #include "config-edit.h"
+#include "cert-store.h"
 
 #include <map>
 
@@ -85,6 +86,8 @@ private:
   QString       password;
   QDialog      *passdial;
   int           callnum;
+
+  CertMap       certMap;
 
   std::map <QString, DirectListener*> inDirect;
   std::map <int,     DirectCaller*>   outDirect;
