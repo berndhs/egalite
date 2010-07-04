@@ -1,5 +1,5 @@
-#ifndef CERT_STORE_H
-#define CERT_STORE_H
+#ifndef CERT_TYPES_H
+#define CERT_TYPES_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -24,49 +24,30 @@
 
 #include <QString>
 #include <map>
-#include <QDialog>
-#include "ui_cert-store.h"
-#include "cert-types.h"
 
 namespace egalite
 {
 
-/** \brief CertStore keep track of SSL identities defined by certificates.
-  *
-  * This serves as a storage container. It also has a gui edit facility.
-  */
-
-class CertStore : public QDialog
+class CertRecord 
 {
-Q_OBJECT
-
 public:
 
-  CertStore (QWidget *parent = 0);
+   CertRecord (QString id, QString pk, QString c)
+      :ident (id), privateKey (pk), cert (c) {}
 
-  void Connect ();
-
-  /** \brief Init - load from cert storage file. */
-  void Init ();
-
-public slots:
-
-  /** \brief Dialog - gui to add/remove/edit identities. */
-  void Dialog ();
-
-private slots:
-
-  void SaveChanges ();
+   QString Id () { return ident; }
+   QString Key () { return privateKey; }
+   QString Cert () { return cert; }
 
 private:
-  
-  void ReadFile (const QString filename);
-  void WriteFile (const QString filename);
 
-  Ui_CertStore     ui;
-  QString          certFileName;
-  CertMap          certMap;
+    QString    ident;
+    QString    privateKey;
+    QString    cert;
+
 };
+
+typedef std::map <QString, CertRecord> CertMap;
 
 } // namespace
 

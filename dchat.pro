@@ -17,7 +17,7 @@ TEMPLATE = app
 MAKEFILE = MakeDChat
 TARGET = bin/egalite
 
-QT += core gui network xml xmlpatterns
+QT += core gui network xml xmlpatterns sql
 
 unix:{
   INCLUDEPATH += /usr/local/include/qxmpp
@@ -53,6 +53,7 @@ SOURCES = src/main.cpp \
         src/direct-caller.cpp \
         src/symmetric-socket.cpp \
         src/pick-cert.cpp \
+        src/cert-store.cpp \
 
 
 
@@ -67,6 +68,7 @@ HEADERS = \
         src/direct-caller.h \
         src/symmetric-socket.h \
         src/pick-cert.h \
+        src/cert-types.h \
         src/cert-store.h \
 
 

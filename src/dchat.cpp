@@ -44,6 +44,7 @@ DChatMain::DChatMain (QWidget *parent)
   :QMainWindow (parent),
    pApp (0),
    configEdit (this),
+   certStore (this),
    xclient (0),
    passdial (0),
    callnum (0)
@@ -66,6 +67,7 @@ DChatMain::Run ()
     QSize newsize = Settings().value ("sizes/main", defaultSize).toSize();
     resize (newsize);
   }
+  certStore.Init ();
   user = Settings().value ("network/user", user).toString();
   Settings().setValue ("network/user",user);
   server = Settings().value ("network/server",server).toString();
@@ -111,6 +113,8 @@ DChatMain::Connect ()
            &configEdit, SLOT (Exec()));
   connect (ui.actionLog_In, SIGNAL (triggered()),
            this, SLOT (Login()));
+  connect (ui.actionDirect, SIGNAL (triggered()),
+           &certStore, SLOT (Dialog ()));
 }
 
 void

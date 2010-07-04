@@ -79,6 +79,7 @@ private:
   Ui_DChatMain    ui;
   QApplication   *pApp;
   ConfigEdit     configEdit;
+  CertStore      certStore;
 
   QXmppClient   *xclient;
   QString       user;
@@ -87,7 +88,6 @@ private:
   QDialog      *passdial;
   int           callnum;
 
-  CertMap       certMap;
 
   std::map <QString, DirectListener*> inDirect;
   std::map <int,     DirectCaller*>   outDirect;
