@@ -25,8 +25,14 @@
 #include <QString>
 #include <map>
 #include <QDialog>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QStringList>
+#include <QModelIndex>
 #include "ui_cert-store.h"
 #include "cert-types.h"
+
+class QStandardItemModel;
 
 namespace egalite
 {
@@ -58,14 +64,28 @@ private slots:
 
   void SaveChanges ();
 
+  void ClickedList (const QModelIndex &index);
+
 private:
   
-  void ReadFile (const QString filename);
-  void WriteFile (const QString filename);
+  void ReadDB (const QString filename);
+  void WriteDB (const QString filename);
+  void CheckExists (const QString filename);
+  void CheckDBComplete (const QString filename);
+  void MakeElement (const QString name);
+
+  QString ElementType (QString name);
 
   Ui_CertStore     ui;
   QString          certFileName;
   CertMap          certMap;
+  QSqlDatabase     certDB;
+  QString          conName;
+
+  QStandardItemModel  *identListModel;
+
+  QStringList     dbElementList;
+
 };
 
 } // namespace

@@ -1,6 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
   <file alias="dchatlogo.png">images/e6.png</file>
+  <file alias="schema-certificates.sql">qrcfiles/schema-certificates.sql</file>
+  <file alias="schema-uniqueident.sql">qrcfiles/schema-uniqueident.sql</file>
 </qresource>
 </RCC>
 

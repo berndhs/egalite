@@ -35,6 +35,8 @@ public:
    CertRecord (QString id, QString pk, QString c)
       :ident (id), privateKey (pk), cert (c) {}
 
+   CertRecord ():ident(""),privateKey(""), cert (""){}
+
    QString Id () { return ident; }
    QString Key () { return privateKey; }
    QString Cert () { return cert; }
