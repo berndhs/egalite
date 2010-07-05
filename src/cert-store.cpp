@@ -79,7 +79,7 @@ CertStore::Init ()
   CheckExists (certFileName);
   certDB.setDatabaseName (certFileName);
   certDB.open ();
-  ReadDB (certFileName);
+  ReadDB ();
 }
 
 void
@@ -101,7 +101,6 @@ CertStore::SelectItem (const QModelIndex &index)
   editItem = identListModel->itemFromIndex (index);
   if (editItem) { 
     currentRec = certMap[editItem->text()];
-    qDebug () << " user picked item " << currentRec.Id();
     ui.nameEdit->setText (currentRec.Id());
     ui.keyEdit->setPlainText (currentRec.Key ());
     ui.certEdit->setPlainText (currentRec.Cert ());
@@ -124,7 +123,6 @@ void
 CertStore::ShowCertDetails (bool showCooked)
 {
   QSslCertificate cert = currentCert;
-qDebug () << " try to show cert details : " << showCooked;
   QStringList lines;
   if (showCooked) {
     ui.certEdit->setReadOnly (true);
@@ -157,7 +155,6 @@ qDebug () << " try to show cert details : " << showCooked;
     ui.certEdit->setReadOnly (false);
     lines << currentRec.Cert();
   }
-qDebug () << " detail lines are: " << lines;
   QStringList::iterator lit;
   ui.certEdit->clear ();
   for (lit = lines.begin(); lit != lines.end(); lit++) {
@@ -202,7 +199,7 @@ CertStore::SaveChanges ()
 }
 
 void
-CertStore::ReadDB (const QString filename)
+CertStore::ReadDB ()
 {
   QSqlQuery allquery (certDB);
   allquery.exec (QString ("select * from certificates"));
@@ -238,7 +235,6 @@ CertStore::WriteDB (const QString filename)
     qry.bindValue (1,QVariant (certRec.Key()));
     qry.bindValue (2,QVariant (certRec.Cert()));
     qry.exec ();
-qDebug () << " wrote for id " << certit->first;
   }
 }
 
@@ -289,7 +285,6 @@ void
 CertStore::MakeElement (const QString elem)
 {
   QString filename = QString (":/schema-%1.sql").arg (elem);
-  qDebug () << " make " << elem << " from file " << filename;
   QFile schemafile (filename);
   schemafile.open (QFile::ReadOnly);
   QByteArray createcommands = schemafile.readAll ();
@@ -298,7 +293,6 @@ CertStore::MakeElement (const QString elem)
   QSqlQuery qry (certDB);
   qry.prepare (querytext);
   bool ok = qry.exec ();
-  qDebug () << " ok: " << ok << " for " << createcommands;
 }
 
 } // namespace

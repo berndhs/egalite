@@ -74,7 +74,7 @@ private slots:
 
 private:
   
-  void ReadDB (const QString filename);
+  void ReadDB ();
   void WriteDB (const QString filename);
   void CheckExists (const QString filename);
   void CheckDBComplete (const QString filename);
