@@ -29,10 +29,12 @@
 #include <QSqlQuery>
 #include <QStringList>
 #include <QModelIndex>
+#include <QSslCertificate>
 #include "ui_cert-store.h"
 #include "cert-types.h"
 
 class QStandardItemModel;
+class QStandardItem;
 
 namespace egalite
 {
@@ -63,8 +65,12 @@ public slots:
 private slots:
 
   void SaveChanges ();
+  void NewIdent ();
+  void SaveIdent ();
+  void ShowCertDetails (bool showCooked);
 
-  void ClickedList (const QModelIndex &index);
+  void SelectItem (const QModelIndex &index);
+  void ToggleView ();
 
 private:
   
@@ -81,8 +87,12 @@ private:
   CertMap          certMap;
   QSqlDatabase     certDB;
   QString          conName;
+  CertRecord       currentRec;
+  QSslCertificate  currentCert;
+  bool             viewDetails;
 
   QStandardItemModel  *identListModel;
+  QStandardItem       *editItem;
 
   QStringList     dbElementList;
 

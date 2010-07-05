@@ -38,7 +38,8 @@ namespace egalite
 {
 
 CertStore::CertStore (QWidget *parent)
-  :QDialog (parent)
+  :QDialog (parent),
+   viewDetails (false)
 {
   ui.setupUi (this);
   Connect ();
@@ -55,7 +56,12 @@ CertStore::Connect ()
   connect (ui.exitButton, SIGNAL (clicked()), this, SLOT (accept()));
   connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (SaveChanges()));
   connect (ui.identList, SIGNAL (clicked (const QModelIndex &)),
-           this, SLOT (ClickedList (const QModelIndex &)));
+           this, SLOT (SelectItem (const QModelIndex &)));
+
+  connect (ui.newIdButton, SIGNAL (clicked()), this, SLOT (NewIdent()));
+  connect (ui.saveIdButton, SIGNAL (clicked()), this, SLOT (SaveIdent()));
+  connect (ui.changeViewButton, SIGNAL (clicked()),
+           this, SLOT (ToggleView()));
 }
 
 void
@@ -90,12 +96,103 @@ CertStore::Dialog ()
 }
 
 void
-CertStore::ClickedList (const QModelIndex &index)
+CertStore::SelectItem (const QModelIndex &index)
 {
-  QStandardItem *item = identListModel->itemFromIndex (index);
-  if (item) { 
-    CertRecord rec = certMap[item->text()];
+  editItem = identListModel->itemFromIndex (index);
+  if (editItem) { 
+    currentRec = certMap[editItem->text()];
+    qDebug () << " user picked item " << currentRec.Id();
+    ui.nameEdit->setText (currentRec.Id());
+    ui.keyEdit->setPlainText (currentRec.Key ());
+    ui.certEdit->setPlainText (currentRec.Cert ());
+    currentCert = QSslCertificate (currentRec.Cert().toAscii());
+    viewDetails = false;
+    ui.changeViewButton->setEnabled (true);
+    ShowCertDetails (viewDetails);
   }
+}
+
+void
+CertStore::ToggleView ()
+{
+  viewDetails = ! viewDetails;
+  ShowCertDetails (viewDetails);
+  ui.certEdit->setReadOnly (viewDetails);
+}
+
+void
+CertStore::ShowCertDetails (bool showCooked)
+{
+  QSslCertificate cert = currentCert;
+qDebug () << " try to show cert details : " << showCooked;
+  QStringList lines;
+  if (showCooked) {
+    ui.certEdit->setReadOnly (true);
+    lines  << tr("Organization: %1")
+              .arg(cert.subjectInfo(QSslCertificate::Organization))
+        << tr("Subunit: %1")
+              .arg(cert.subjectInfo(QSslCertificate::OrganizationalUnitName))
+        << tr("Country: %1")
+              .arg(cert.subjectInfo(QSslCertificate::CountryName))
+        << tr("Locality: %1")
+              .arg(cert.subjectInfo(QSslCertificate::LocalityName))
+        << tr("State/Province: %1")
+              .arg(cert.subjectInfo(QSslCertificate::StateOrProvinceName))
+        << tr("Common Name: %1")
+              .arg(cert.subjectInfo(QSslCertificate::CommonName))
+        << QString("------------")
+        << tr("Issuer Organization: %1")
+              .arg(cert.issuerInfo(QSslCertificate::Organization))
+        << tr("Issuer Unit Name: %1")
+              .arg(cert.issuerInfo(QSslCertificate::OrganizationalUnitName))
+        << tr("Issuer Country: %1")
+              .arg(cert.issuerInfo(QSslCertificate::CountryName))
+        << tr("Issuer Locality: %1")
+              .arg(cert.issuerInfo(QSslCertificate::LocalityName))
+        << tr("Issuer State/Province: %1")
+              .arg(cert.issuerInfo(QSslCertificate::StateOrProvinceName))
+        << tr("Issuer Common Name: %1")
+              .arg(cert.issuerInfo(QSslCertificate::CommonName));
+  } else {
+    ui.certEdit->setReadOnly (false);
+    lines << currentRec.Cert();
+  }
+qDebug () << " detail lines are: " << lines;
+  QStringList::iterator lit;
+  ui.certEdit->clear ();
+  for (lit = lines.begin(); lit != lines.end(); lit++) {
+    ui.certEdit->appendPlainText (*lit);
+  }
+}
+
+void
+CertStore::NewIdent ()
+{
+  ui.nameEdit->setText (tr("New Identity"));
+  ui.keyEdit->clear ();
+  ui.certEdit->clear ();
+  ui.certEdit->setReadOnly (false);
+  viewDetails = false;
+  ui.changeViewButton->setEnabled (false);
+}
+
+void
+CertStore::SaveIdent ()
+{
+  QString id = ui.nameEdit->text ();
+  CertMap::iterator  certit = certMap.find (id);
+  bool isnew = (certit == certMap.end());
+  if (isnew) {
+    editItem = new QStandardItem (id);
+    identListModel->appendRow (editItem);
+  }
+  currentRec.SetId (id);
+  currentRec.SetKey (ui.keyEdit->toPlainText ());
+  currentRec.SetCert (ui.certEdit->toPlainText ());
+  certMap [id] = currentRec;
+  QModelIndex index = identListModel->indexFromItem (editItem);
+  ui.identList->scrollTo (index);
+  SelectItem (index);
 }
 
 void
@@ -128,6 +225,21 @@ void
 CertStore::WriteDB (const QString filename)
 {
   CheckDBComplete (filename);
+  CertMap::iterator  certit;
+  CertRecord  certRec;
+  QString  qryString ("insert or replace into certificates "
+                       " (ident, privatekey, pemcert) "
+                       " values (?, ?, ?)");
+  for (certit = certMap.begin(); certit != certMap.end(); certit++ ) {
+    certRec = certit->second;
+    QSqlQuery qry (certDB);
+    qry.prepare (qryString);
+    qry.bindValue (0,QVariant (certRec.Id()));
+    qry.bindValue (1,QVariant (certRec.Key()));
+    qry.bindValue (2,QVariant (certRec.Cert()));
+    qry.exec ();
+qDebug () << " wrote for id " << certit->first;
+  }
 }
 
 void

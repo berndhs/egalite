@@ -41,6 +41,10 @@ public:
    QString Key () { return privateKey; }
    QString Cert () { return cert; }
 
+   void SetId (QString s) { ident = s; }
+   void SetKey (QString s) { privateKey = s; }
+   void SetCert (QString s) { cert = s; }
+
 private:
 
     QString    ident;
