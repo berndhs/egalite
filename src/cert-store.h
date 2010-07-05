@@ -57,6 +57,9 @@ public:
   /** \brief Init - load from cert storage file. */
   void Init ();
 
+  CertRecord  Cert (QString id);
+  bool        HaveCert (QString id);
+
 public slots:
 
   /** \brief Dialog - gui to add/remove/edit identities. */

@@ -95,6 +95,25 @@ CertStore::Dialog ()
   exec ();
 }
 
+bool
+CertStore::HaveCert (QString id)
+{
+  CertMap::const_iterator certit = certMap.find (id);
+  return (certit != certMap.end());
+}
+
+CertRecord 
+CertStore::Cert (QString id)
+{
+  CertMap::const_iterator certit = certMap.find (id);
+  if (certit != certMap.end()) {
+    return certit->second;
+  } else {
+    CertRecord empty;
+    return empty;
+  }
+}
+
 void
 CertStore::SelectItem (const QModelIndex &index)
 {
@@ -292,7 +311,7 @@ CertStore::MakeElement (const QString elem)
   QString querytext (createcommands);
   QSqlQuery qry (certDB);
   qry.prepare (querytext);
-  bool ok = qry.exec ();
+  qry.exec ();
 }
 
 } // namespace
