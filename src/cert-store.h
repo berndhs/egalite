@@ -59,6 +59,7 @@ public:
 
   CertRecord  Cert (QString id);
   bool        HaveCert (QString id);
+  QStringList NameList ();
 
 public slots:
 

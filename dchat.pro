@@ -40,6 +40,7 @@ FORMS = \
         ui/mirror.ui \
         ui/cert-candidate.ui \
         ui/cert-store.ui \
+        ui/pick-string.ui \
 
 
 SOURCES = src/main.cpp \
@@ -54,6 +55,7 @@ SOURCES = src/main.cpp \
         src/symmetric-socket.cpp \
         src/pick-cert.cpp \
         src/cert-store.cpp \
+        src/pick-string.cpp \
 
 
 
@@ -70,6 +72,7 @@ HEADERS = \
         src/pick-cert.h \
         src/cert-types.h \
         src/cert-store.h \
+        src/pick-string.h \
 
 
 

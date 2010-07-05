@@ -114,6 +114,17 @@ CertStore::Cert (QString id)
   }
 }
 
+QStringList
+CertStore::NameList ()
+{
+  QStringList list;
+  CertMap::const_iterator certit;
+  for (certit = certMap.begin(); certit != certMap.end(); certit++) {
+    list << certit->first;
+  }
+  return list;
+}
+
 void
 CertStore::SelectItem (const QModelIndex &index)
 {

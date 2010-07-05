@@ -67,7 +67,6 @@ private slots:
   void Send ();
   void Login ();
   void CallDirect ();
-  void HangupDirect (int callid);
   void ClearCall (int callid);
   void ConnectDirect (SymmetricSocket *direct);
 
@@ -75,6 +74,7 @@ private:
 
   void Connect ();
   bool GetPass ();
+  void CallDirectFrom (QString nick);
 
   Ui_DChatMain    ui;
   QApplication   *pApp;
@@ -90,7 +90,7 @@ private:
 
 
   std::map <QString, DirectListener*> inDirect;
-  std::map <int,     DirectCaller*>   outDirect;
+  std::map <int, DirectCaller*>   outDirect;
 
   std::map <QString, SymmetricSocket *> directChats;
 

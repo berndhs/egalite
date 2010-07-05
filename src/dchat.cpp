@@ -35,6 +35,7 @@
 #include "direct-listener.h"
 #include "direct-caller.h"
 #include "symmetric-socket.h"
+#include "pick-string.h"
 
 using namespace deliberate;
 
@@ -228,11 +229,21 @@ DChatMain::Send ()
 void
 DChatMain::CallDirect ()
 {
+  PickString     pickString (this);
+  QStringList    origins = certStore.NameList();
+  pickString.SetTitle (tr("Choose Direct Identity"));
+  int choice = pickString.Pick (origins);
+  if (choice != 1) {
+    return;
+  }
+  QString  originNick = pickString.Choice ();
+  CertRecord outCert = certStore.Cert (originNick);
+  
   QString dest ("bernd.reflective-computing.com");
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
   if (newcall) {
-    newcall->Setup ();
+    newcall->Setup (outCert);
     outDirect[callnum] = newcall;
 qDebug () << " start direct connect " << callnum << " call " << newcall;
     newcall->Connect (dest, callnum);
@@ -282,17 +293,6 @@ DChatMain::ReplyDirect ()
 qDebug () << " reply direct : " << outbuf;
 }
 
-void
-DChatMain::HangupDirect (int callid)
-{
-  std::map <int,DirectCaller*>::iterator callit;
-  callit = outDirect.find (callid);
-  if (callit != outDirect.end()) {
-    DirectCaller * call = callit->second;
-    call->Hangup ();
-qDebug () << " end direct connect " << callid << " call " << call;
-  }
-}
 
 void
 DChatMain::ClearCall (int callid)

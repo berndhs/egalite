@@ -63,13 +63,17 @@ DirectCaller::DirectCaller (QWidget *parent)
 
 
 void
-DirectCaller::Setup ()
+DirectCaller::Setup (CertRecord & certRec)
 {
   ui.setupUi (this);
   QString clientName ("barbados");
   clientName = Settings().value ("direct/client",clientName).toString();
   Settings().setValue ("direct/client",clientName);
-  KeyInit (clientName, "enkhuizen");
+ 
+  QString pass ("enkhuizen");
+  key = QSslKey (certRec.Key().toAscii(),QSsl::Rsa,
+                QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
+  cert = QSslCertificate (certRec.Cert().toAscii());
   clientSock = new SymmetricSocket (key, cert);
   clientSock->Init ();
 qDebug () << " did sock Init() for " << clientSock;

@@ -28,6 +28,7 @@
 #include <QTimer>
 #include <QSslCertificate>
 #include <QSslKey>
+#include "cert-store.h"
 
 #include "ui_mirror.h"
 
@@ -48,7 +49,7 @@ public:
 
   DirectCaller (QWidget *parent = 0);
 
-  void Setup ();
+  void Setup (CertRecord & certRec);
   void Connect (QString otherHost, int callid);
   void Hangup ();
   QString Party (); /// who is on the other side
