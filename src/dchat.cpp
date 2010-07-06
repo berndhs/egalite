@@ -79,8 +79,11 @@ DChatMain::Run ()
   Settings().setValue ("direct/host",directHost);
   DirectListener * listen = new DirectListener (this);
   inDirect[directHost] = listen;
+  QString ownAddress ("0::1");
+  ownAddress = Settings().value ("direct/address",ownAddress).toString();
+  Settings().setValue ("direct/address",ownAddress);
   listen->Init (directHost, QString("enkhuizen"));
-  listen->Listen (QHostAddress ("2001:4830:1135:1::1"),29999);
+  listen->Listen (QHostAddress (ownAddress),29999);
   connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
   connect (listen, SIGNAL (SocketReady (SymmetricSocket *)),

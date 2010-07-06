@@ -43,8 +43,7 @@ DirectListener::~DirectListener ()
 void
 DirectListener::Listen (const QHostAddress &addr, int port)
 {
- // listen (addr,port);
-  listen (QHostAddress::AnyIPv6,port);
+  listen (addr,port);
 }
 
 void
