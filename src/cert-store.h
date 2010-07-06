@@ -31,6 +31,7 @@
 #include <QModelIndex>
 #include <QSslCertificate>
 #include "ui_cert-store.h"
+#include "ui_contact-edit.h"
 #include "cert-types.h"
 
 class QStandardItemModel;
@@ -39,12 +40,13 @@ class QStandardItem;
 namespace egalite
 {
 
-/** \brief CertStore keep track of SSL identities defined by certificates.
+/** \brief CertStore keep track of SSL identities defined by certificates, and
+  *  keep track of contact addresses for direct contacts.
   *
   * This serves as a storage container. It also has a gui edit facility.
   */
 
-class CertStore : public QDialog
+class CertStore : public QObject
 {
 Q_OBJECT
 
@@ -52,43 +54,54 @@ public:
 
   CertStore (QWidget *parent = 0);
 
-  void Connect ();
-
   /** \brief Init - load from cert storage file. */
   void Init ();
 
   CertRecord  Cert (QString id);
   bool        HaveCert (QString id);
   QStringList NameList ();
+  QString     ContactAddress (QString id);
 
 public slots:
 
-  /** \brief Dialog - gui to add/remove/edit identities. */
-  void Dialog ();
+  /** \brief CertDialog - gui to add/remove/edit identities. */
+  void CertDialog ();
+  /** \brief ContactDialog - gui to add/remove/edit contact addresses. */
+  void ContactDialog ();
 
 private slots:
 
-  void SaveChanges ();
+  void SaveCerts ();
   void NewIdent ();
   void SaveIdent ();
   void ShowCertDetails (bool showCooked);
+
+  void SaveContacts ();
+  void NewContact ();
+  void DeleteContact ();
 
   void SelectItem (const QModelIndex &index);
   void ToggleView ();
 
 private:
-  
+
+  void Connect ();
   void ReadDB ();
-  void WriteDB (const QString filename);
+  void WriteCerts (const QString filename);
+  void WriteContacts (const QString filename);
   void CheckExists (const QString filename);
   void CheckDBComplete (const QString filename);
   void MakeElement (const QString name);
 
   QString ElementType (QString name);
 
-  Ui_CertStore     ui;
-  QString          certFileName;
-  CertMap          certMap;
+  Ui_CertStore     uiCert;
+  QDialog         *certDialog;
+  Ui_ContactEdit   uiContact;
+  QDialog         *contactDialog;
+  QString          dbFileName;
+  CertMap          homeCertMap;
+  ContactAddrMap   contactAddrMap;
   QSqlDatabase     certDB;
   QString          conName;
   CertRecord       currentRec;
@@ -97,6 +110,7 @@ private:
 
   QStandardItemModel  *identListModel;
   QStandardItem       *editItem;
+  QStandardItemModel  *addressModel;
 
   QStringList     dbElementList;
 

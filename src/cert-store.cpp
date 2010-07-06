@@ -15,7 +15,7 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
+ *  along with certDialog program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  *****************************************************************/
@@ -38,75 +38,109 @@ namespace egalite
 {
 
 CertStore::CertStore (QWidget *parent)
-  :QDialog (parent),
+  :QObject (parent),
    viewDetails (false)
 {
-  ui.setupUi (this);
+  certDialog = new QDialog (parent);
+  uiCert.setupUi (certDialog);
+  contactDialog = new QDialog (parent);
+  uiContact.setupUi (contactDialog);
   Connect ();
   dbElementList << "certificates"
-                << "uniqueident";
+                << "uniqueident"
+                << "directcontacts"
+                << "uniquenick";
 
-  identListModel = new QStandardItemModel (this);
-  ui.identList->setModel (identListModel);
+  identListModel = new QStandardItemModel (certDialog);
+  uiCert.identList->setModel (identListModel);
+  addressModel = new QStandardItemModel (contactDialog);
+  uiContact.addressTable->setModel (addressModel);
 }
 
 void
 CertStore::Connect ()
 {
-  connect (ui.exitButton, SIGNAL (clicked()), this, SLOT (accept()));
-  connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (SaveChanges()));
-  connect (ui.identList, SIGNAL (clicked (const QModelIndex &)),
+  connect (uiCert.exitButton, SIGNAL (clicked()), certDialog, SLOT (accept()));
+  connect (uiCert.saveButton, SIGNAL (clicked()), this, SLOT (SaveCerts()));
+  connect (uiCert.identList, SIGNAL (clicked (const QModelIndex &)),
            this, SLOT (SelectItem (const QModelIndex &)));
 
-  connect (ui.newIdButton, SIGNAL (clicked()), this, SLOT (NewIdent()));
-  connect (ui.saveIdButton, SIGNAL (clicked()), this, SLOT (SaveIdent()));
-  connect (ui.changeViewButton, SIGNAL (clicked()),
+  connect (uiCert.newIdButton, SIGNAL (clicked()), this, SLOT (NewIdent()));
+  connect (uiCert.saveIdButton, SIGNAL (clicked()), this, SLOT (SaveIdent()));
+  connect (uiCert.changeViewButton, SIGNAL (clicked()),
            this, SLOT (ToggleView()));
+
+  connect (uiContact.exitButton, SIGNAL (clicked()), 
+           contactDialog, SLOT (accept ()));
+  connect (uiContact.saveButton, SIGNAL (clicked()),
+           this, SLOT (SaveContacts ()));
+  connect (uiContact,newButton, SIGNAL (clicked()),
+           this, SLOT (NewContact ()));
+  connect (uiContact, deleteButton, SIGNAL (clicked()),
+           this, SLOT (DeleteContact ()));
 }
 
 void
 CertStore::Init ()
 {
-  certFileName =  QDesktopServices::storageLocation 
+  dbFileName =  QDesktopServices::storageLocation 
               (QDesktopServices::DataLocation)
               + QDir::separator()
-              + QString ("certificates.sql");
-  certFileName = Settings().value ("files/certificates",certFileName).toString();
-  Settings().setValue ("files/certificates",certFileName);
+              + QString ("addressing.sql");
+  dbFileName = Settings().value ("files/addressing",dbFileName).toString();
+  Settings().setValue ("files/addressing",dbFileName);
 
-  conName = QString ("certificateDB");
+  conName = QString ("addressingDB");
   certDB = QSqlDatabase::addDatabase ("QSQLITE",conName);
-  CheckExists (certFileName);
-  certDB.setDatabaseName (certFileName);
+  CheckExists (dbFileName);
+  certDB.setDatabaseName (dbFileName);
   certDB.open ();
   ReadDB ();
 }
 
 void
-CertStore::Dialog ()
+CertStore::CertDialog ()
 {
   identListModel->clear ();
   CertMap::iterator  certit;
-  for (certit = certMap.begin(); certit != certMap.end(); certit++) {
+  for (certit = homeCertMap.begin(); certit != homeCertMap.end(); certit++) {
     QStandardItem *item = new QStandardItem (certit->first);
     item->setEditable (false);
     identListModel->appendRow (item);
   }
-  exec ();
+  certDialog->exec ();
+}
+
+void
+CertStore::ContactDialog ()
+{
+  addressModel->clear ();
+  ContactAddrMap::iterator addrit;
+  QStandardItem  *nickItem, *addrItem;
+  int row (0);
+  for (addrit = contactAddrMap.begin (), row=0; 
+       addrit != contactAddrMap.end();
+       addrit++, row++) {
+    nickItem = new QStandardItem (addrit->first);
+    addrItem = new QStandardItem (addrit->second);
+    addressModel->setItem (row,0,nickItem);
+    addressModel->setItem (row,1,addrItem);
+  }
+  contactDialog->exec ();
 }
 
 bool
 CertStore::HaveCert (QString id)
 {
-  CertMap::const_iterator certit = certMap.find (id);
-  return (certit != certMap.end());
+  CertMap::const_iterator certit = homeCertMap.find (id);
+  return (certit != homeCertMap.end());
 }
 
 CertRecord 
 CertStore::Cert (QString id)
 {
-  CertMap::const_iterator certit = certMap.find (id);
-  if (certit != certMap.end()) {
+  CertMap::const_iterator certit = homeCertMap.find (id);
+  if (certit != homeCertMap.end()) {
     return certit->second;
   } else {
     CertRecord empty;
@@ -119,10 +153,16 @@ CertStore::NameList ()
 {
   QStringList list;
   CertMap::const_iterator certit;
-  for (certit = certMap.begin(); certit != certMap.end(); certit++) {
+  for (certit = homeCertMap.begin(); certit != homeCertMap.end(); certit++) {
     list << certit->first;
   }
   return list;
+}
+
+void
+CertStore::SaveContacts ()
+{
+  WriteContacts (dbFileName);
 }
 
 void
@@ -130,13 +170,13 @@ CertStore::SelectItem (const QModelIndex &index)
 {
   editItem = identListModel->itemFromIndex (index);
   if (editItem) { 
-    currentRec = certMap[editItem->text()];
-    ui.nameEdit->setText (currentRec.Id());
-    ui.keyEdit->setPlainText (currentRec.Key ());
-    ui.certEdit->setPlainText (currentRec.Cert ());
+    currentRec = homeCertMap[editItem->text()];
+    uiCert.nameEdit->setText (currentRec.Id());
+    uiCert.keyEdit->setPlainText (currentRec.Key ());
+    uiCert.certEdit->setPlainText (currentRec.Cert ());
     currentCert = QSslCertificate (currentRec.Cert().toAscii());
     viewDetails = false;
-    ui.changeViewButton->setEnabled (true);
+    uiCert.changeViewButton->setEnabled (true);
     ShowCertDetails (viewDetails);
   }
 }
@@ -146,7 +186,7 @@ CertStore::ToggleView ()
 {
   viewDetails = ! viewDetails;
   ShowCertDetails (viewDetails);
-  ui.certEdit->setReadOnly (viewDetails);
+  uiCert.certEdit->setReadOnly (viewDetails);
 }
 
 void
@@ -155,7 +195,7 @@ CertStore::ShowCertDetails (bool showCooked)
   QSslCertificate cert = currentCert;
   QStringList lines;
   if (showCooked) {
-    ui.certEdit->setReadOnly (true);
+    uiCert.certEdit->setReadOnly (true);
     lines  << tr("Organization: %1")
               .arg(cert.subjectInfo(QSslCertificate::Organization))
         << tr("Subunit: %1")
@@ -182,74 +222,86 @@ CertStore::ShowCertDetails (bool showCooked)
         << tr("Issuer Common Name: %1")
               .arg(cert.issuerInfo(QSslCertificate::CommonName));
   } else {
-    ui.certEdit->setReadOnly (false);
+    uiCert.certEdit->setReadOnly (false);
     lines << currentRec.Cert();
   }
   QStringList::iterator lit;
-  ui.certEdit->clear ();
+  uiCert.certEdit->clear ();
   for (lit = lines.begin(); lit != lines.end(); lit++) {
-    ui.certEdit->appendPlainText (*lit);
+    uiCert.certEdit->appendPlainText (*lit);
   }
 }
 
 void
 CertStore::NewIdent ()
 {
-  ui.nameEdit->setText (tr("New Identity"));
-  ui.keyEdit->clear ();
-  ui.certEdit->clear ();
-  ui.certEdit->setReadOnly (false);
+  uiCert.nameEdit->setText (tr("New Identity"));
+  uiCert.keyEdit->clear ();
+  uiCert.certEdit->clear ();
+  uiCert.certEdit->setReadOnly (false);
   viewDetails = false;
-  ui.changeViewButton->setEnabled (false);
+  uiCert.changeViewButton->setEnabled (false);
 }
 
 void
 CertStore::SaveIdent ()
 {
-  QString id = ui.nameEdit->text ();
-  CertMap::iterator  certit = certMap.find (id);
-  bool isnew = (certit == certMap.end());
+  QString id = uiCert.nameEdit->text ();
+  CertMap::iterator  certit = homeCertMap.find (id);
+  bool isnew = (certit == homeCertMap.end());
   if (isnew) {
     editItem = new QStandardItem (id);
     identListModel->appendRow (editItem);
   }
   currentRec.SetId (id);
-  currentRec.SetKey (ui.keyEdit->toPlainText ());
-  currentRec.SetCert (ui.certEdit->toPlainText ());
-  certMap [id] = currentRec;
+  currentRec.SetKey (uiCert.keyEdit->toPlainText ());
+  currentRec.SetCert (uiCert.certEdit->toPlainText ());
+  homeCertMap [id] = currentRec;
   QModelIndex index = identListModel->indexFromItem (editItem);
-  ui.identList->scrollTo (index);
+  uiCert.identList->scrollTo (index);
   SelectItem (index);
 }
 
 void
-CertStore::SaveChanges ()
+CertStore::SaveCerts ()
 {
-  WriteDB (certFileName);
+  WriteCerts (dbFileName);
 }
 
 void
 CertStore::ReadDB ()
 {
-  QSqlQuery allquery (certDB);
-  allquery.exec (QString ("select * from certificates"));
-  int identNdx = allquery.record().indexOf ("ident");
-  int keyNdx   = allquery.record().indexOf ("privatekey");
-  int certNdx  = allquery.record().indexOf ("pemcert");
+  QSqlQuery certQuery (certDB);
+  certQuery.exec (QString ("select * from certificates"));
+  int identNdx = certQuery.record().indexOf ("ident");
+  int keyNdx   = certQuery.record().indexOf ("privatekey");
+  int certNdx  = certQuery.record().indexOf ("pemcert");
   QString ident,key,cert;
-  certMap.clear ();
-  while (allquery.next()) {
-    ident = allquery.value (identNdx).toString();
-    key   = allquery.value (keyNdx).toString();
-    cert  = allquery.value (certNdx).toString();
+  homeCertMap.clear ();
+  while (certQuery.next()) {
+    ident = certQuery.value (identNdx).toString();
+    key   = certQuery.value (keyNdx).toString();
+    cert  = certQuery.value (certNdx).toString();
     CertRecord rec (ident, key, cert);
-    certMap.insert (std::pair<QString,CertRecord>(ident,rec));
+    homeCertMap.insert (std::pair<QString,CertRecord>(ident,rec));
+  }
+
+  QSqlQuery contactQuery (certDB);
+  contactQuery.exec (QString ("select * from directcontacts"));
+  int nickNdx = contactQuery.record().indexOf ("nick");
+  int addrNdx = contactQuery.record().indexOf ("address");
+  QString nick, addr;
+  contactAddrMap.clear ();
+  while (contactQuery.next()) {
+    nick = contactQuery.value (nickNdx).toString();
+    addr = contactQuery.value (addrNdx).toString();
+    contactAddrMap [nick] = addr;
   }
 }
 
 
 void
-CertStore::WriteDB (const QString filename)
+CertStore::WriteCerts (const QString filename)
 {
   CheckDBComplete (filename);
   CertMap::iterator  certit;
@@ -257,13 +309,35 @@ CertStore::WriteDB (const QString filename)
   QString  qryString ("insert or replace into certificates "
                        " (ident, privatekey, pemcert) "
                        " values (?, ?, ?)");
-  for (certit = certMap.begin(); certit != certMap.end(); certit++ ) {
+  for (certit = homeCertMap.begin(); certit != homeCertMap.end(); certit++ ) {
     certRec = certit->second;
     QSqlQuery qry (certDB);
     qry.prepare (qryString);
     qry.bindValue (0,QVariant (certRec.Id()));
     qry.bindValue (1,QVariant (certRec.Key()));
     qry.bindValue (2,QVariant (certRec.Cert()));
+    qry.exec ();
+  }
+}
+
+void
+CertStore::WriteContacts (const QString filename)
+{
+  CheckDBComplete (filename);
+  ContactAddrMap::iterator  addrit;
+  QString nick, addr;
+  QString  qryString ("insert or replace into directcontacts "
+                       " (nick, address) "
+                       " values (?, ?)");
+  for (addrit = contactAddrMap.begin(); 
+       addrit != contactAddrMap.end(); 
+       addrit++ ) {
+    QSqlQuery qry (certDB);
+    qry.prepare (qryString);
+    nick = addrit->first;
+    addr = addrit->second;
+    qry.bindValue (0,QVariant (nick);
+    qry.bindValue (1,QVariant (addr);
     qry.exec ();
   }
 }
@@ -323,6 +397,7 @@ CertStore::MakeElement (const QString elem)
   QSqlQuery qry (certDB);
   qry.prepare (querytext);
   qry.exec ();
+qDebug () << " making " << querytext;
 }
 
 } // namespace

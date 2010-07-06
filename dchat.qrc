@@ -3,6 +3,8 @@
   <file alias="dchatlogo.png">images/e6.png</file>
   <file alias="schema-certificates.sql">qrcfiles/schema-certificates.sql</file>
   <file alias="schema-uniqueident.sql">qrcfiles/schema-uniqueident.sql</file>
+  <file alias="schema-directcontacts.sql">qrcfiles/schema-directcontacts.sql</file>
+  <file alias="schema-uniquenick.sql">qrcfiles/schema-uniquenick.sql</file>
 </qresource>
 </RCC>
 

@@ -95,13 +95,7 @@
     </property>
     <addaction name="actionLog_In"/>
     <addaction name="actionQuit"/>
-   </widget>
-   <widget class="QMenu" name="menuConfig">
-    <property name="title">
-     <string>Config</string>
-    </property>
-    <addaction name="actionAccounts"/>
-    <addaction name="actionPreferences"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuIdentities">
     <property name="title">
@@ -110,9 +104,16 @@
     <addaction name="actionDirect"/>
     <addaction name="actionServer"/>
    </widget>
+   <widget class="QMenu" name="menuContacts">
+    <property name="title">
+     <string>Contacts</string>
+    </property>
+    <addaction name="contactDirectAction"/>
+    <addaction name="contactServerAction"/>
+   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuConfig"/>
    <addaction name="menuIdentities"/>
+   <addaction name="menuContacts"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLog_In">
@@ -143,6 +144,21 @@
   <action name="actionServer">
    <property name="text">
     <string>Server</string>
+   </property>
+  </action>
+  <action name="contactDirectAction">
+   <property name="text">
+    <string>Direct</string>
+   </property>
+  </action>
+  <action name="contactServerAction">
+   <property name="text">
+    <string>Server</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>

@@ -40,6 +40,7 @@ FORMS = \
         ui/mirror.ui \
         ui/cert-candidate.ui \
         ui/cert-store.ui \
+        ui/contact-edit.ui \
         ui/pick-string.ui \
 
 

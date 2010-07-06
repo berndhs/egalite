@@ -110,12 +110,14 @@ DChatMain::Connect ()
   connect (ui.replyDirectButton, SIGNAL (clicked()),
            this, SLOT (ReplyDirect()));
   connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
-  connect (ui.actionPreferences, SIGNAL (triggered()),
+  connect (ui.actionSettings, SIGNAL (triggered()),
            &configEdit, SLOT (Exec()));
   connect (ui.actionLog_In, SIGNAL (triggered()),
            this, SLOT (Login()));
   connect (ui.actionDirect, SIGNAL (triggered()),
-           &certStore, SLOT (Dialog ()));
+           &certStore, SLOT (CertDialog ()));
+  connect (ui.contactDirectAction, SIGNAL (triggered()),
+           &certStore, SLOT (ContactDialog ()));
 }
 
 void

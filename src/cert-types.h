@@ -54,6 +54,7 @@ private:
 };
 
 typedef std::map <QString, CertRecord> CertMap;
+typedef std::map <QString, QString>    ContactAddrMap;
 
 } // namespace
 
