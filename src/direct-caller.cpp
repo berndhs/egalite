@@ -150,9 +150,6 @@ DirectCaller::ConnectAddress (QString addr, QString name, int callid)
   party = addr;
   setWindowTitle (tr("DirectCaller Client"));
   ui.otherHost->setText (name);
-//  qDebug () << " before connection mirror sock config " ;
-//  ShowConfig (clientSock->sslConfiguration());
-qDebug () << " before connectToHost, have local cert " << clientSock->Socket()->localCertificate();
   clientSock->connectToHostEncrypted (addr, 29999,
                                       name,
                                       QSslSocket::ReadWrite);
