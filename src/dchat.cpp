@@ -232,16 +232,22 @@ void
 DChatMain::CallDirect ()
 {
   PickString     pickString (this);
-  QStringList    origins = certStore.NameList();
+  QStringList    choiceList = certStore.NameList();
   pickString.SetTitle (tr("Choose Direct Identity"));
-  int choice = pickString.Pick (origins);
+  int choice = pickString.Pick (choiceList);
   if (choice != 1) {
     return;
   }
   QString  originNick = pickString.Choice ();
   CertRecord outCert = certStore.Cert (originNick);
   
-  QString dest ("bernd.reflective-computing.com");
+  choiceList = certStore.ContactList ();
+  pickString.SetTitle (tr("Choose Destination"));
+  choice = pickString.Pick (choiceList);
+  if (choice != 1) {
+    return;
+  }
+  QString dest = pickString.Choice ();
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
   if (newcall) {

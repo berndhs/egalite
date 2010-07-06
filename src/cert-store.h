@@ -61,6 +61,7 @@ public:
   bool        HaveCert (QString id);
   QStringList NameList ();
   QString     ContactAddress (QString id);
+  QStringList ContactList ();
 
 public slots:
 
@@ -92,6 +93,8 @@ private:
   void CheckExists (const QString filename);
   void CheckDBComplete (const QString filename);
   void MakeElement (const QString name);
+  void RefreshContactMap ();
+  void RefreshContactModel ();
 
   QString ElementType (QString name);
 
