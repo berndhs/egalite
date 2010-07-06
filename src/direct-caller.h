@@ -51,6 +51,7 @@ public:
 
   void Setup (CertRecord & certRec);
   void Connect (QString otherHost, int callid);
+  void ConnectAddress (QString addr, QString name, int callid);
   void Hangup ();
   QString Party (); /// who is on the other side
 

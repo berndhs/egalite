@@ -137,6 +137,17 @@ CertStore::Cert (QString id)
   }
 }
 
+QString
+CertStore::ContactAddress (QString id)
+{
+  ContactAddrMap::const_iterator addrit = contactAddrMap.find (id);
+  if (addrit != contactAddrMap.end()) {
+    return addrit->second;
+  } else {
+    return QString ("::1");
+  }
+}
+
 QStringList
 CertStore::NameList ()
 {

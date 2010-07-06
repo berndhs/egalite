@@ -66,9 +66,6 @@ void
 DirectCaller::Setup (CertRecord & certRec)
 {
   ui.setupUi (this);
-  QString clientName ("barbados");
-  clientName = Settings().value ("direct/client",clientName).toString();
-  Settings().setValue ("direct/client",clientName);
  
   QString pass ("enkhuizen");
   key = QSslKey (certRec.Key().toAscii(),QSsl::Rsa,
@@ -143,6 +140,21 @@ DirectCaller::Connect (QString otherHost, int callid)
 qDebug () << " before connectToHost, have local cert " << clientSock->Socket()->localCertificate();
   clientSock->connectToHostEncrypted (otherHost, 29999,
                                       hinfo.hostName(),
+                                      QSslSocket::ReadWrite);
+
+}
+void
+DirectCaller::ConnectAddress (QString addr, QString name, int callid)
+{
+  myCallid = callid;
+  party = addr;
+  setWindowTitle (tr("DirectCaller Client"));
+  ui.otherHost->setText (name);
+//  qDebug () << " before connection mirror sock config " ;
+//  ShowConfig (clientSock->sslConfiguration());
+qDebug () << " before connectToHost, have local cert " << clientSock->Socket()->localCertificate();
+  clientSock->connectToHostEncrypted (addr, 29999,
+                                      name,
                                       QSslSocket::ReadWrite);
 
 }

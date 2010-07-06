@@ -248,13 +248,14 @@ DChatMain::CallDirect ()
     return;
   }
   QString dest = pickString.Choice ();
+  QString destaddr = certStore.ContactAddress (dest);
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
   if (newcall) {
     newcall->Setup (outCert);
     outDirect[callnum] = newcall;
 qDebug () << " start direct connect " << callnum << " call " << newcall;
-    newcall->Connect (dest, callnum);
+    newcall->ConnectAddress (destaddr, dest, callnum);
     connect (newcall, SIGNAL (Finished (int)), this, SLOT (ClearCall (int)));
     connect (newcall, SIGNAL (ConnectionReady (SymmetricSocket*)),
              this, SLOT (ConnectDirect (SymmetricSocket*)));
