@@ -59,7 +59,7 @@ signals:
 
   void Receive (const QByteArray &data);
 
-  void SocketReady (SymmetricSocket * sock, QString name);
+  void SocketReady (SymmetricSocket * sock);
   void SocketClosed (SymmetricSocket *sock);
 
 protected:
