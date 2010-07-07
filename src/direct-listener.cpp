@@ -50,24 +50,42 @@ void
 DirectListener::incomingConnection (int socketDescriptor)
 {
   qDebug () << " Direct Listener " << this << "new connection " << socketDescriptor;
+  qDebug () << " Listener adding cert " << cert;
   SymmetricSocket * newsock = new SymmetricSocket (socketDescriptor,
       key,cert) ;
-  newsock->Init ();
-  newsock->Socket()->setPeerVerifyMode (QSslSocket::VerifyPeer);
-  qDebug ()<< " Listener before encrypt - errors: " << newsock->Socket()->error();
-  qDebug ()<< " Listener before encrypt - valid: " << newsock->Socket()->isValid();
-  newsock->Socket()->startServerEncryption ();
   connect (newsock, SIGNAL (Exiting (SymmetricSocket*)),
            this, SLOT (SocketExit (SymmetricSocket*)));
   connect (newsock, SIGNAL (ReceiveData (const QByteArray &)),
            this, SLOT (GetData (const QByteArray &)));
   connect (newsock, SIGNAL (Ready (SymmetricSocket*)),
            this, SLOT (IsReady (SymmetricSocket*)));
+  newsock->Init ();
+  newsock->Socket()->setPeerVerifyMode (QSslSocket::VerifyPeer);
+  newsock->Socket()->startServerEncryption ();
+qDebug () << " Listener peer verify mode  " << newsock->Socket()->peerVerifyMode();
+qDebug () << " Listener peer verify depth " << newsock->Socket()->peerVerifyDepth();
   sockets << newsock;
   newsock->Start ();
   qDebug () << " new server side sock has certs: " << newsock->caCertificates();
 //  qDebug () << " new server side sock has conf: " ;
 //  ShowConfig (newsock->Socket()->sslConfiguration());
+}
+
+void
+DirectListener::Init (QString certHost, QString pass)
+{
+  QFile keyfile (QString ("/home/bernd/ssl-cert/%1/key.pem").arg(certHost));
+  keyfile.open (QFile::ReadOnly);
+  QSslKey skey (&keyfile,QSsl::Rsa,
+                QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
+  keyfile.close();
+  key = skey;
+
+  QFile certfile (QString ("/home/bernd/ssl-cert/%1/cert.pem").arg(certHost));
+  certfile.open (QFile::ReadOnly);
+  QSslCertificate scert (&certfile);
+  certfile.close();
+  cert = scert;
 }
 
 void
@@ -94,20 +112,9 @@ DirectListener::GetData (const QByteArray &data)
 }
 
 void
-DirectListener::Init (QString certHost, QString pass)
+DirectListener::SocketExit (SymmetricSocket *sock)
 {
-  QFile keyfile (QString ("/home/bernd/ssl-cert/%1/key.pem").arg(certHost));
-  keyfile.open (QFile::ReadOnly);
-  QSslKey skey (&keyfile,QSsl::Rsa,
-                QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
-  keyfile.close();
-  key = skey;
-
-  QFile certfile (QString ("/home/bernd/ssl-cert/%1/cert.pem").arg(certHost));
-  certfile.open (QFile::ReadOnly);
-  QSslCertificate scert (&certfile);
-  certfile.close();
-  cert = scert;
+  emit SocketClosed (sock);
 }
 
 

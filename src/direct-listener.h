@@ -52,12 +52,14 @@ public slots:
 
   void GetData (const QByteArray &data);
   void IsReady (SymmetricSocket *sock);
+  void SocketExit (SymmetricSocket *sock);
 
 signals:
 
   void Receive (const QByteArray &data);
 
   void SocketReady (SymmetricSocket * sock);
+  void SocketClosed (SymmetricSocket *sock);
 
 protected:
 
