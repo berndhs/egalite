@@ -49,11 +49,12 @@ DirectListener::Listen (const QHostAddress &addr, int port)
 void
 DirectListener::incomingConnection (int socketDescriptor)
 {
-  qDebug () << " egal server " << this << "new connection " << socketDescriptor;
+  qDebug () << " Direct Listener " << this << "new connection " << socketDescriptor;
   SymmetricSocket * newsock = new SymmetricSocket (socketDescriptor,
       key,cert) ;
   newsock->Init ();
   newsock->setPeerVerifyMode (QSslSocket::VerifyPeer);
+  qDebug ()<< " Listener before encrypt - errors: " << newsock->Socket()->error();
   newsock->Socket()->startServerEncryption ();
   connect (newsock, SIGNAL (Exiting (SymmetricSocket*)),
            this, SLOT (SocketExit (SymmetricSocket*)));
