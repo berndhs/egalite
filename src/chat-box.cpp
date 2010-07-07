@@ -37,6 +37,11 @@ ChatBox::ChatBox (QWidget *parent)
   ui.setupUi (this);
 }
 
+ChatBox::~ChatBox ()
+{
+  qDebug () << " deallocated chat box " << this;
+}
+
 void
 ChatBox::Add (QWidget *widget, QString title)
 {
@@ -54,6 +59,23 @@ void
 ChatBox::Close ()
 {
   qDebug () << " close chat box called";
+  int howmany = ui.tabWidget->count();
+  for (int w = 0; w < howmany; w++) {
+    ui.tabWidget->widget(w)->close ();
+  }
+  close ();
+}
+
+bool
+ChatBox::HaveWidget (QWidget *widget)
+{
+  int howmany = ui.tabWidget->count ();
+  for (int w=0; w < howmany; w++) {
+    if (ui.tabWidget->widget (w) == widget) {
+      return true;
+    }
+  }
+  return false;
 }
 
 } // namespace

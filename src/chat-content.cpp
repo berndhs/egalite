@@ -1,6 +1,9 @@
 
 #include "chat-content.h"
-
+#include <QXmppMessage.h>
+#include <QXmlStreamWriter>
+#include <QDomDocument>
+#include <QDebug>
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -30,6 +33,49 @@ ChatContent::ChatContent (QWidget *parent)
   :QDialog (parent)
 {
   ui.setupUi (this);
+
+  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
+  connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
+}
+
+void
+ChatContent::Incoming (const QByteArray & data)
+{
+  QDomDocument msgDoc;
+  msgDoc.setContent (data);
+  QXmppMessage msg;
+  msg.parse (msgDoc.documentElement());
+  GetMessage (msg);
+}
+
+void
+ChatContent::GetMessage (const QXmppMessage & msg)
+{
+  QString from = msg.from ();
+  QString to   = msg.to ();
+  QString body = msg.body ();
+  QString pattern ("%1 says to %2: %3");
+  QString msgtext = pattern.arg(from).arg(to).arg(body);
+  ui.textHistory->append (msgtext);
+  qDebug () << " message from " << from << " to " << to << 
+               " is " << body;
+}
+
+void
+ChatContent::Send ()
+{
+  QString content = ui.chatInput->text();
+  QXmppMessage msg ("here","there",content);
+  QByteArray outbuf ("<?xml version='1.0'>");
+  QXmlStreamWriter out (&outbuf);
+  msg.toXml (&out);
+  emit Outgoing (outbuf);
+}
+
+void
+ChatContent::EndChat ()
+{
+  emit Disconnect ();
 }
 
 } // namespace

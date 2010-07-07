@@ -87,6 +87,19 @@ SymmetricSocket::~SymmetricSocket ()
     delete pickCert;
     pickCert = 0;
   }
+  if (checkTimer) {
+    checkTimer->stop ();
+    delete checkTimer;
+    checkTimer = 0;
+  }
+}
+
+void
+SymmetricSocket::close ()
+{
+  if (checkTimer) {
+    checkTimer->stop ();
+  }
 }
 
 void

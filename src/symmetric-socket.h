@@ -78,6 +78,7 @@ public slots:
 
   void Done ();
   void Close ();
+  void close ();
   void Errors (const QList<QSslError>& errList);
   void VerifyProblem ( const QSslError & error);
   void SockModeChange (QSslSocket::SslMode newmode);

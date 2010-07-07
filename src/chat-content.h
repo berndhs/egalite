@@ -25,6 +25,9 @@
 
 #include "ui_chat-content.h"
 #include <QDialog>
+#include <QByteArray>
+
+class QXmppMessage;
 
 namespace egalite
 {
@@ -37,7 +40,23 @@ public:
 
   ChatContent (QWidget * parent=0);
 
+public slots:
+
+  void Incoming (const QByteArray &data);
+
+private slots:
+
+  void Send ();
+  void EndChat ();
+
+signals:
+
+  void Outgoing (const QByteArray &data);
+  void Disconnect ();
+
 private:
+
+  void GetMessage (const QXmppMessage & msg);
 
   Ui_ChatContent   ui;
 };

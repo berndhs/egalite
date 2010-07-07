@@ -34,10 +34,12 @@ Q_OBJECT
 public:
 
   ChatBox (QWidget *parent = 0);
+  ~ChatBox ();
 
   void Run ();
 
   void Add (QWidget *widget, QString title);
+  bool HaveWidget (QWidget *widget);
 
 public slots:
 

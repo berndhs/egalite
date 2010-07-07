@@ -283,6 +283,14 @@ qDebug () << " have connection with " << sock;
     ChatContent * newCont = new ChatContent (this);
     newChat->Add (newCont,tr("Chat"));
     directChats [other] = newChat;
+    connect (newCont, SIGNAL (Outgoing (const QByteArray&)),
+             sock, SLOT (SendData (const QByteArray&)));
+    connect (sock, SIGNAL (ReceiveData (const QByteArray&)),
+             newCont, SLOT (Incoming (const QByteArray&)));
+    connect (newCont, SIGNAL (Disconnect ()),
+             sock, SLOT (Close()));
+    connect (sock, SIGNAL (Exiting(SymmetricSocket *)), 
+             this, SLOT (ClearDirect (SymmetricSocket *)));
     newChat->Run ();
     connect (sock, SIGNAL (ReceiveData (const QByteArray &)),
              this, SLOT (GetRaw (const QByteArray &)));
@@ -290,16 +298,26 @@ qDebug () << " have connection with " << sock;
 }
 
 void
-DChatMain::ConnectDirect (SymmetricSocket * sock, QString name)
+DChatMain::ClearDirect (SymmetricSocket * sock)
 {
-qDebug () << " have connection with " << sock;
-  if (sock) {
-    ChatBox * newChat = new ChatBox (this);
-    newChat->Add (sock->Dialog(),"Status"); 
-    directChats [name] = newChat;
-    newChat->Run ();
-    connect (sock, SIGNAL (ReceiveData (const QByteArray &)),
-             this, SLOT (GetRaw (const QByteArray &)));
+  if (sock == 0) {
+    return;
+  }
+  if (sock->Dialog() == 0) {
+    return;
+  }
+  std::map <QString, ChatBox *>::iterator chase, foundit;
+  foundit = directChats.end();
+  for (chase = directChats.begin (); chase != directChats.end(); chase++) {
+    if (chase->second->HaveWidget (sock->Dialog())) {
+      foundit = chase;
+      break;
+    }
+  }
+  if (foundit != directChats.end()) {
+    ChatBox *deadChat = foundit->second;
+    directChats.erase (foundit);
+    deadChat->Close ();
   }
 }
 
