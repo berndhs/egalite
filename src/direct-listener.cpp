@@ -53,8 +53,9 @@ DirectListener::incomingConnection (int socketDescriptor)
   SymmetricSocket * newsock = new SymmetricSocket (socketDescriptor,
       key,cert) ;
   newsock->Init ();
-  newsock->setPeerVerifyMode (QSslSocket::VerifyPeer);
+  newsock->Socket()->setPeerVerifyMode (QSslSocket::VerifyPeer);
   qDebug ()<< " Listener before encrypt - errors: " << newsock->Socket()->error();
+  qDebug ()<< " Listener before encrypt - valid: " << newsock->Socket()->isValid();
   newsock->Socket()->startServerEncryption ();
   connect (newsock, SIGNAL (Exiting (SymmetricSocket*)),
            this, SLOT (SocketExit (SymmetricSocket*)));
