@@ -27,6 +27,7 @@
 #include <QSslKey>
 #include <QFile>
 #include <QHostAddress>
+#include <QTimer>
 
 using namespace deliberate;
 
@@ -39,13 +40,16 @@ SymmetricSocket::SymmetricSocket (int socketDescriptor,
    haveDescriptor (true),
    sock (0),
    pickCert (0),
-   started (false),
    key (argKey),
-   cert (argCert)
+   cert (argCert),
+   checkTimer (0)
 {
   dialog = new QDialog;
   ui.setupUi (dialog);
   dialog->setWindowTitle (tr("Symmetric Socket"));
+  checkTimer = new QTimer (this);
+  connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
+  checkTimer->start (10);
 #if 0
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Done()));
@@ -58,13 +62,16 @@ SymmetricSocket::SymmetricSocket (QSslKey argKey, QSslCertificate argCert)
    haveDescriptor (false),
    sock (0),
    pickCert (0),
-   started (false),
    key (argKey),
-   cert (argCert)
+   cert (argCert),
+   checkTimer (0)
 {
   dialog = new QDialog;
   ui.setupUi (dialog);
   dialog->setWindowTitle (tr("Symmetric Socket"));
+  checkTimer = new QTimer (this);
+  connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
+  checkTimer->start (100);
 #if 0
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Done()));
@@ -127,13 +134,9 @@ qDebug () << " symmetric write " << byteArray;
 void
 SymmetricSocket::Init ()
 {
-  if (started) {
-    qDebug () << " already started" ;
-    return;
-  }
   qDebug () << " starting socket  " << this;
 
-  ui.dataLine->setText ("initialize socket");
+  ui.dataLine->setText ("initializing");
   sock = new QSslSocket;
   sock->setProtocol (QSsl::AnyProtocol);
   QList <QSslCertificate> emptylist;
@@ -166,30 +169,26 @@ SymmetricSocket::Init ()
            this, SLOT (SockModeChange (QSslSocket::SslMode )));
   connect (sock, SIGNAL (error ( QAbstractSocket::SocketError  )),
            this, SLOT (SockError ( QAbstractSocket::SocketError )));
-}
-
-void
-SymmetricSocket::Start ()
-{
-  ui.otherHost->setText (sock->peerName());
-  QString peerIp = sock->peerAddress().toString();
-  quint16 peerPort = sock->peerPort();
-  ui.otherIP->setText (peerIp + " : " + QString::number(peerPort));
-  ui.dataLine->clear ();
-
-qDebug () << " symmetric sock cert " << cert;
-  qDebug () << " starting symmetric sock " << sock << " encryption while in mode " << sock->mode();
-  qDebug () << " started  symmetric sock " << sock << "encryption now in mode   " << sock->mode();
-  started = true;
+  connect (ui.closeButton, SIGNAL (clicked()), this, SLOT (Close ()));
 }
 
 void
 SymmetricSocket::Done ()
 {
   qDebug () << " server socket Done";
-  sock->close ();
+  if (sock) {
+    sock->close ();
+  }
   dialog->done(0);
   emit Exiting (this);
+}
+
+void
+SymmetricSocket::Close ()
+{
+  if (sock) {
+    sock->close ();
+  }
 }
 
 void
@@ -203,6 +202,9 @@ void
 SymmetricSocket::EncryptDone ()
 {
   qDebug () << " SYMMETRIC encrypt done " << this;
+  ui.dataLine->setText (tr("Ready"));
+  checkTimer->stop ();
+  checkTimer->start (1000);
   emit Ready (this);
 }
 
@@ -310,6 +312,19 @@ SymmetricSocket::PickOneCert (const QList <QSslCertificate> & clist)
     return pickCert->Pick (clist);
   } else {
     return false;
+  }
+}
+
+void
+SymmetricSocket::TimerReport ()
+{
+  ui.addressLine->setText (QString("0x")+QString::number(qulonglong (sock),16));
+  if (sock) {
+    ui.stateLine->setText (QString::number (int(sock->state())));
+    ui.validBar->setValue (sock->isValid() ? 1 : 0);
+    ui.encryptedBar->setValue (sock->isEncrypted() ? 1 : 0);
+    ui.remoteAddress->setText (sock->peerAddress().toString());
+    ui.localAddress->setText (sock->localAddress().toString());
   }
 }
 

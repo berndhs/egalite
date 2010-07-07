@@ -31,6 +31,8 @@
 #include <QObject>
 
 
+class QTimer;
+
 namespace egalite
 {
 
@@ -69,12 +71,14 @@ public:
 public slots:
 
   void Done ();
+  void Close ();
   void Errors (const QList<QSslError>& errList);
   void VerifyProblem ( const QSslError & error);
   void SockModeChange (QSslSocket::SslMode newmode);
   void SockError ( QAbstractSocket::SocketError socketError );
 
   void SendData (const QByteArray &data);
+  void TimerReport ();
 
 private slots:
 
@@ -99,9 +103,9 @@ private:
   PickCert      *pickCert;
   QDialog       *dialog;
   Ui_MirrorDisplay  ui;
-  bool          started;
   QSslKey       key;
   QSslCertificate cert;
+  QTimer       *checkTimer;
 
 
 } ;

@@ -56,7 +56,8 @@ ShowConfig (const QSslConfiguration & conf)
 }
 
 DirectCaller::DirectCaller (QWidget *parent)
-  :QDialog (parent),
+  :QObject (parent),
+   parentWidget (parent),
    pickCert (0)
 {
 }
@@ -65,8 +66,6 @@ DirectCaller::DirectCaller (QWidget *parent)
 void
 DirectCaller::Setup (CertRecord & certRec)
 {
-  ui.setupUi (this);
- 
   QString pass ("enkhuizen");
   key = QSslKey (certRec.Key().toAscii(),QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
@@ -77,20 +76,6 @@ qDebug () << " did sock Init() for " << clientSock;
   clientSock->setPeerVerifyMode (QSslSocket::VerifyPeer);
   connect (clientSock, SIGNAL (Ready (SymmetricSocket*)),
            this, SLOT (EncryptDone (SymmetricSocket*)));
-  connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
-#if 0
-  connect (clientSock, SIGNAL (connected()), this, SLOT (Connected()));
-  connect (clientSock, SIGNAL (hostFound()), this, SLOT (HostFound()));
-  connect (clientSock, SIGNAL (disconnected ()), this, SLOT (Disconnected()));
-  connect (clientSock, SIGNAL (readyRead()), this, SLOT (SockDataReady()));
-  connect (clientSock, SIGNAL (encrypted()), this, SLOT (EncryptDone()));
-  connect (clientSock, SIGNAL (sslErrors( const QList<QSslError>&)),
-           this, SLOT (Errors (const QList<QSslError>&)));
-  connect (clientSock, SIGNAL (peerVerifyError (const QSslError&)),
-           this, SLOT (VerifyProblem (const QSslError&)));
-#endif
-  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (DoSend()));
-  show ();
 }
 
 void
@@ -129,14 +114,7 @@ DirectCaller::Connect (QString otherHost, int callid)
   myCallid = callid;
   party = otherHost;
   QHostInfo hinfo = QHostInfo::fromName (otherHost);
-  if (hinfo.addresses().isEmpty()) {
-    exit (1);
-  }
   QHostAddress hostAddress = hinfo.addresses().first ();
-  setWindowTitle (tr("DirectCaller Client"));
-  ui.otherHost->setText (hostAddress.toString());
-//  qDebug () << " before connection mirror sock config " ;
-//  ShowConfig (clientSock->sslConfiguration());
 qDebug () << " before connectToHost, have local cert " << clientSock->Socket()->localCertificate();
   clientSock->connectToHostEncrypted (otherHost, 29999,
                                       hinfo.hostName(),
@@ -148,8 +126,6 @@ DirectCaller::ConnectAddress (QString addr, QString name, int callid)
 {
   myCallid = callid;
   party = addr;
-  setWindowTitle (tr("DirectCaller Client"));
-  ui.otherHost->setText (name);
   clientSock->connectToHostEncrypted (addr, 29999,
                                       name,
                                       QSslSocket::ReadWrite);
@@ -163,41 +139,12 @@ DirectCaller::EncryptDone (SymmetricSocket *sock)
   emit ConnectionReady (sock);
 }
 
-#if 0
-void
-DirectCaller::Errors (const QList<QSslError>& errList)
-{
-  qDebug () << objectName() <<  " CALLER DirectCaller ssl error list: ";
-  QList<QSslError>::const_iterator  erit;
-  for (erit=errList.begin(); erit != errList.end(); erit++) {
-    qDebug () << "ssl error "<< *erit;
-  }
-}
-
-void
-DirectCaller::VerifyProblem ( const QSslError & error)
-{
-  qDebug() << objectName() << " CALLER DirectCaller ssl verify error " << error;
-  qDebug () << " CALLER client socket " << clientSock;
-  if (clientSock) {
-    bool isok (false);
-    QList <QSslCertificate>  clist = clientSock->peerCertificateChain();
-    if (clist.size() > 0) {
-      isok = PickOneCert (clist);
-    }
-    if (isok) {
-      clientSock->ignoreSslErrors ();
-    }
-  }
-}
-
-#endif
 
 bool
 DirectCaller::PickOneCert (const QList <QSslCertificate> & clist)
 {
   if (pickCert == 0) {
-    pickCert = new PickCert (this, QString ("Outgoing"));
+    pickCert = new PickCert (parentWidget, QString ("Outgoing"));
   }
   if (pickCert) {
     return pickCert->Pick (clist);
@@ -211,7 +158,6 @@ DirectCaller::Hangup ()
 {
   if (clientSock) {
     clientSock->disconnectFromHost ();
-    hide (); 
   }
 }
 

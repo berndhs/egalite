@@ -24,13 +24,12 @@
  ****************************************************************/
 
 #include <QSslError>
-#include <QDialog>
+#include <QObject>
+#include <QWidget>
 #include <QTimer>
 #include <QSslCertificate>
 #include <QSslKey>
 #include "cert-store.h"
-
-#include "ui_mirror.h"
 
 class QApplication;
 
@@ -40,7 +39,7 @@ namespace egalite
 class PickCert;
 class SymmetricSocket;
 
-class DirectCaller : public QDialog
+class DirectCaller : public QObject
 {
 
   Q_OBJECT
@@ -81,7 +80,7 @@ private:
   bool PickOneCert (const QList <QSslCertificate> & clist);
   void KeyInit (QString certHost, QString pass);
 
-  Ui_MirrorDisplay  ui;
+  QWidget          *parentWidget;
 
   SymmetricSocket  *clientSock;
   PickCert         *pickCert;

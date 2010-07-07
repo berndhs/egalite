@@ -63,7 +63,6 @@ DirectListener::incomingConnection (int socketDescriptor)
   newsock->Socket()->setPeerVerifyMode (QSslSocket::VerifyPeer);
   newsock->Socket()->startServerEncryption ();
   sockets << newsock;
-  newsock->Start ();
   qDebug () << " new server side sock has certs: " << newsock->caCertificates();
 //  qDebug () << " new server side sock has conf: " ;
 //  ShowConfig (newsock->Socket()->sslConfiguration());
