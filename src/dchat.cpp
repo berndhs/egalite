@@ -82,12 +82,19 @@ DChatMain::Run ()
   QString ownAddress ("0::1");
   ownAddress = Settings().value ("direct/address",ownAddress).toString();
   Settings().setValue ("direct/address",ownAddress);
-  listen->Init (directHost, QString("enkhuizen"));
-  listen->Listen (QHostAddress (ownAddress),29999);
+  if (certStore.HaveCert (directHost)) {
+    CertRecord hostCert = certStore.Cert (directHost);
+    QString pass ("enkhuizen");
+    QSslKey key (hostCert.Key().toAscii(),QSsl::Rsa,
+                QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
+    QSslCertificate scert (hostCert.Cert().toAscii());
+    listen->Init (directHost, key, scert);
+    listen->Listen (QHostAddress (ownAddress),29999);
+  }
   connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
-  connect (listen, SIGNAL (SocketReady (SymmetricSocket *)),
-           this, SLOT (ConnectDirect (SymmetricSocket *)));
+  connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),
+           this, SLOT (ConnectDirect (SymmetricSocket *, QString)));
   show ();
 }
 
@@ -272,6 +279,17 @@ qDebug () << " have connection with " << sock;
   if (sock) {
     QString other = sock->PeerName();
     directChats [other] = sock;
+    connect (sock, SIGNAL (ReceiveData (const QByteArray &)),
+             this, SLOT (GetRaw (const QByteArray &)));
+  }
+}
+
+void
+DChatMain::ConnectDirect (SymmetricSocket * sock, QString name)
+{
+qDebug () << " have connection with " << sock;
+  if (sock) {
+    directChats [name] = sock;
     connect (sock, SIGNAL (ReceiveData (const QByteArray &)),
              this, SLOT (GetRaw (const QByteArray &)));
   }

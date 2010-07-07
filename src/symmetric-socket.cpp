@@ -195,21 +195,21 @@ SymmetricSocket::Done ()
 void
 SymmetricSocket::Disconnected ()
 {
-  qDebug () << " server socket disconnected ";
+  qDebug () << " SYMMETRIC socket disconnected ";
   Done();
 }
 
 void
 SymmetricSocket::EncryptDone ()
 {
-  qDebug () << " symmetric encrypt done " << this;
+  qDebug () << " SYMMETRIC encrypt done " << this;
   emit Ready (this);
 }
 
 void
 SymmetricSocket::SendData (const QByteArray &data)
 {
-qDebug () << " Send Data " << data;
+qDebug () << "SYMMETRIC Send Data " << data;
   if (sock) {
     sock->write (data);
   }
@@ -238,7 +238,7 @@ SymmetricSocket::Receive ()
 void
 SymmetricSocket::Errors (const QList<QSslError>& errList)
 {
-  qDebug () << objectName() << " SymmetricSocket ssl BIG ERROR list: ";
+  qDebug () << objectName() << " SYMMETRIC ssl BIG ERROR list: ";
   QList<QSslError>::const_iterator  erit;
   for (erit=errList.begin(); erit != errList.end(); erit++) {
     qDebug () << "ssl ERROR "<< *erit;
@@ -267,7 +267,7 @@ qDebug () << " SERVER SymmetricSocket num certs " << clist.size();
 void
 SymmetricSocket::SockError ( QAbstractSocket::SocketError socketError )
 {
-  qDebug () << " ABSTRACT socket error " << socketError;
+  qDebug () << "SYMMETRIC ABSTRACT socket error " << socketError;
   qDebug () << " ssl errors " << sock->sslErrors ();
 qDebug () << " ABSTRACT sees peer cert " << sock->peerCertificate ();
 #if 0

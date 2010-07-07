@@ -50,9 +50,9 @@ void
 DirectListener::incomingConnection (int socketDescriptor)
 {
   qDebug () << " Direct Listener " << this << "new connection " << socketDescriptor;
-  qDebug () << " Listener adding cert " << cert;
+  qDebug () << " Listener adding mCert " << mCert;
   SymmetricSocket * newsock = new SymmetricSocket (socketDescriptor,
-      key,cert) ;
+      mKey,mCert) ;
   connect (newsock, SIGNAL (Exiting (SymmetricSocket*)),
            this, SLOT (SocketExit (SymmetricSocket*)));
   connect (newsock, SIGNAL (ReceiveData (const QByteArray &)),
@@ -62,8 +62,6 @@ DirectListener::incomingConnection (int socketDescriptor)
   newsock->Init ();
   newsock->Socket()->setPeerVerifyMode (QSslSocket::VerifyPeer);
   newsock->Socket()->startServerEncryption ();
-qDebug () << " Listener peer verify mode  " << newsock->Socket()->peerVerifyMode();
-qDebug () << " Listener peer verify depth " << newsock->Socket()->peerVerifyDepth();
   sockets << newsock;
   newsock->Start ();
   qDebug () << " new server side sock has certs: " << newsock->caCertificates();
@@ -74,25 +72,33 @@ qDebug () << " Listener peer verify depth " << newsock->Socket()->peerVerifyDept
 void
 DirectListener::Init (QString certHost, QString pass)
 {
-  QFile keyfile (QString ("/home/bernd/ssl-cert/%1/key.pem").arg(certHost));
+  QFile keyfile (QString ("/home/bernd/ssl-mCert/%1/mKey.pem").arg(certHost));
   keyfile.open (QFile::ReadOnly);
   QSslKey skey (&keyfile,QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
   keyfile.close();
-  key = skey;
+  mKey = skey;
 
-  QFile certfile (QString ("/home/bernd/ssl-cert/%1/cert.pem").arg(certHost));
+  QFile certfile (QString ("/home/bernd/ssl-mCert/%1/mCert.pem").arg(certHost));
   certfile.open (QFile::ReadOnly);
   QSslCertificate scert (&certfile);
   certfile.close();
-  cert = scert;
+  mCert = scert;
+}
+
+void
+DirectListener::Init (QString iname, QSslKey ikey, QSslCertificate icert)
+{
+  mName = iname;
+  mKey = ikey;
+  mCert = icert;
 }
 
 void
 DirectListener::IsReady (SymmetricSocket * sock)
 {
   qDebug () << " Listener socket ready " << sock;
-  emit SocketReady (sock);
+  emit SocketReady (sock, mName);
 }
 
 bool

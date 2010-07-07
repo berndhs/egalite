@@ -44,6 +44,7 @@ public:
   ~DirectListener ();
 
   void Init (QString certHost, QString pass);
+  void Init (QString iname, QSslKey ikey, QSslCertificate icert);
   void Listen (const QHostAddress & addr, int port);
 
   bool TakeSocket (SymmetricSocket * sock);
@@ -58,7 +59,7 @@ signals:
 
   void Receive (const QByteArray &data);
 
-  void SocketReady (SymmetricSocket * sock);
+  void SocketReady (SymmetricSocket * sock, QString name);
   void SocketClosed (SymmetricSocket *sock);
 
 protected:
@@ -71,8 +72,9 @@ private:
 
   SocketList  sockets;
 
-  QSslCertificate  cert;
-  QSslKey          key;
+  QSslCertificate  mCert;
+  QSslKey          mKey;
+  QString          mName;
 
 } ;
 
