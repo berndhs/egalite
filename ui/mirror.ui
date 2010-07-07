@@ -179,6 +179,32 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="2">
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
    <item row="5" column="0">
@@ -186,16 +212,22 @@
      <item>
       <widget class="QPushButton" name="closeButton">
        <property name="text">
-        <string>Close</string>
+        <string>Disconnect</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="sendButton">
-       <property name="text">
-        <string>Send</string>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-      </widget>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>

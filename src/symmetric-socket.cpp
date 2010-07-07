@@ -40,6 +40,7 @@ SymmetricSocket::SymmetricSocket (int socketDescriptor,
    haveDescriptor (true),
    sock (0),
    pickCert (0),
+   dialog (0),
    key (argKey),
    cert (argCert),
    checkTimer (0)
@@ -50,10 +51,6 @@ SymmetricSocket::SymmetricSocket (int socketDescriptor,
   checkTimer = new QTimer (this);
   connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
   checkTimer->start (10);
-#if 0
-  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
-  connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Done()));
-#endif
   dialog->show();
 }
 
@@ -62,6 +59,7 @@ SymmetricSocket::SymmetricSocket (QSslKey argKey, QSslCertificate argCert)
    haveDescriptor (false),
    sock (0),
    pickCert (0),
+   dialog (0),
    key (argKey),
    cert (argCert),
    checkTimer (0)
@@ -88,6 +86,22 @@ SymmetricSocket::~SymmetricSocket ()
   if (pickCert) {
     delete pickCert;
     pickCert = 0;
+  }
+}
+
+void
+SymmetricSocket::Show ()
+{
+  if (dialog) {
+    dialog->show ();
+  }
+}
+
+void
+SymmetricSocket::Hide ()
+{
+  if (dialog) {
+    dialog->hide ();
   }
 }
 

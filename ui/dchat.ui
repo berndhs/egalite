@@ -41,13 +41,6 @@
     </item>
     <item row="2" column="0">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QPushButton" name="sendDirectButton">
-        <property name="text">
-         <string>Direct-Send</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="directButton">
         <property name="text">

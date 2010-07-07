@@ -42,6 +42,8 @@ FORMS = \
         ui/cert-store.ui \
         ui/contact-edit.ui \
         ui/pick-string.ui \
+        ui/chat-box.ui \
+        ui/chat-content.ui \
 
 
 SOURCES = src/main.cpp \
@@ -57,6 +59,8 @@ SOURCES = src/main.cpp \
         src/pick-cert.cpp \
         src/cert-store.cpp \
         src/pick-string.cpp \
+        src/chat-box.cpp \
+        src/chat-content.cpp \
 
 
 
@@ -74,6 +78,8 @@ HEADERS = \
         src/cert-types.h \
         src/cert-store.h \
         src/pick-string.h \
+        src/chat-box.h \
+        src/chat-content.h \
 
 
 

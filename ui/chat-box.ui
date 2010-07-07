@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ChatBox</class>
+ <widget class="QDialog" name="ChatBox">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>420</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Direct Chat</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../dchat.qrc">
+    <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
+  </property>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>471</width>
+     <height>561</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../dchat.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -52,6 +52,8 @@ public:
 
   void Start ();
   void Init ();
+  void Show ();
+  void Hide ();
   QString PeerName ();
 
   void setPeerVerifyMode ( QSslSocket::PeerVerifyMode mode );
@@ -66,6 +68,10 @@ public:
   QList<QSslCertificate> caCertificates () const;
   QSslSocket* Socket () {
     return sock;
+  }
+
+  QDialog * Dialog () {
+    return dialog;
   }
 
 public slots:

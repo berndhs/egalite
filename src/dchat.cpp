@@ -36,6 +36,8 @@
 #include "direct-caller.h"
 #include "symmetric-socket.h"
 #include "pick-string.h"
+#include "chat-box.h"
+#include "chat-content.h"
 
 using namespace deliberate;
 
@@ -115,8 +117,6 @@ DChatMain::Connect ()
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.directButton, SIGNAL (clicked()), this, SLOT (CallDirect()));
-  connect (ui.sendDirectButton, SIGNAL (clicked()),
-           this, SLOT (SendDirect()));
   connect (ui.replyDirectButton, SIGNAL (clicked()),
            this, SLOT (ReplyDirect()));
   connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
@@ -278,7 +278,12 @@ DChatMain::ConnectDirect (SymmetricSocket * sock)
 qDebug () << " have connection with " << sock;
   if (sock) {
     QString other = sock->PeerName();
-    directChats [other] = sock;
+    ChatBox * newChat = new ChatBox (this);
+    newChat->Add (sock->Dialog(),tr("Status")); 
+    ChatContent * newCont = new ChatContent (this);
+    newChat->Add (newCont,tr("Chat"));
+    directChats [other] = newChat;
+    newChat->Run ();
     connect (sock, SIGNAL (ReceiveData (const QByteArray &)),
              this, SLOT (GetRaw (const QByteArray &)));
   }
@@ -289,7 +294,10 @@ DChatMain::ConnectDirect (SymmetricSocket * sock, QString name)
 {
 qDebug () << " have connection with " << sock;
   if (sock) {
-    directChats [name] = sock;
+    ChatBox * newChat = new ChatBox (this);
+    newChat->Add (sock->Dialog(),"Status"); 
+    directChats [name] = newChat;
+    newChat->Run ();
     connect (sock, SIGNAL (ReceiveData (const QByteArray &)),
              this, SLOT (GetRaw (const QByteArray &)));
   }
@@ -298,6 +306,7 @@ qDebug () << " have connection with " << sock;
 void
 DChatMain::SendDirect ()
 {
+#if 0
   SymmetricSocket *call = directChats.begin ()->second;
   QString data = ui.inputLine->text();
   QXmppMessage msg (user,call->PeerName(), data);
@@ -306,12 +315,13 @@ DChatMain::SendDirect ()
   QXmlStreamWriter out (&outbuf);
   msg.toXml (&out);
   call->SendData (outbuf);
-qDebug () << " sending direct: " << outbuf;
+#endif
 }
 
 void
 DChatMain::ReplyDirect ()
 {
+#if 0
   SymmetricSocket *call = directChats.begin ()->second;
   QString data = ui.inputLine->text();
   QXmppMessage msg (user,call->PeerName(), data);
@@ -321,6 +331,7 @@ DChatMain::ReplyDirect ()
   msg.toXml (&out);
   call->SendData (outbuf);
 qDebug () << " reply direct : " << outbuf;
+#endif
 }
 
 

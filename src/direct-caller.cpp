@@ -121,6 +121,7 @@ qDebug () << " before connectToHost, have local cert " << clientSock->Socket()->
                                       QSslSocket::ReadWrite);
 
 }
+
 void
 DirectCaller::ConnectAddress (QString addr, QString name, int callid)
 {
@@ -129,7 +130,6 @@ DirectCaller::ConnectAddress (QString addr, QString name, int callid)
   clientSock->connectToHostEncrypted (addr, 29999,
                                       name,
                                       QSslSocket::ReadWrite);
-
 }
 
 void

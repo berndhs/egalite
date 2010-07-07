@@ -39,6 +39,7 @@ namespace egalite
 class DirectListener;
 class DirectCaller;
 class SymmetricSocket;
+class ChatBox;
 
 class DChatMain : public QMainWindow 
 {
@@ -93,7 +94,7 @@ private:
   std::map <QString, DirectListener*> inDirect;
   std::map <int, DirectCaller*>   outDirect;
 
-  std::map <QString, SymmetricSocket *> directChats;
+  std::map <QString, ChatBox *> directChats;
 
 };
 
