@@ -48,7 +48,7 @@ public:
 
   DirectCaller (QWidget *parent = 0);
 
-  void Setup (CertRecord & certRec);
+  void Setup (CertRecord & certRec, int remotePort);
   void Connect (QString otherHost, int callid);
   void ConnectAddress (QString addr, QString name, int callid);
   void Hangup ();
@@ -83,6 +83,7 @@ private:
   QString           party;
   QSslCertificate   cert;
   QSslKey           key;
+  int               publicPort;
 
 
 };

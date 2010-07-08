@@ -64,8 +64,9 @@ DirectCaller::DirectCaller (QWidget *parent)
 
 
 void
-DirectCaller::Setup (CertRecord & certRec)
+DirectCaller::Setup (CertRecord & certRec, int remotePort)
 {
+  publicPort = remotePort;
   QString pass ("enkhuizen");
   key = QSslKey (certRec.Key().toAscii(),QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
@@ -100,7 +101,7 @@ DirectCaller::Connect (QString otherHost, int callid)
   QHostInfo hinfo = QHostInfo::fromName (otherHost);
   QHostAddress hostAddress = hinfo.addresses().first ();
 qDebug () << " before connectToHost, have local cert " << clientSock->Socket()->localCertificate();
-  clientSock->connectToHostEncrypted (otherHost, 29999,
+  clientSock->connectToHostEncrypted (otherHost, publicPort,
                                       hinfo.hostName(),
                                       QSslSocket::ReadWrite);
 
@@ -111,7 +112,7 @@ DirectCaller::ConnectAddress (QString addr, QString name, int callid)
 {
   myCallid = callid;
   party = addr;
-  clientSock->connectToHostEncrypted (addr, 29999,
+  clientSock->connectToHostEncrypted (addr, publicPort,
                                       name,
                                       QSslSocket::ReadWrite);
 }

@@ -50,6 +50,7 @@ DChatMain::DChatMain (QWidget *parent)
    configEdit (this),
    certStore (this),
    xclient (0),
+   publicPort (29999),
    passdial (0),
    callnum (0)
 {
@@ -76,6 +77,9 @@ DChatMain::Run ()
   Settings().setValue ("network/user",user);
   server = Settings().value ("network/server",server).toString();
   Settings().setValue ("network/server",server);
+
+  publicPort = Settings().value ("network/publicport",publicPort).toInt ();
+  Settings().setValue ("network/publicport",publicPort);
   
   QString directHost ("reflect");
   directHost = Settings().value ("direct/host",directHost).toString();
@@ -92,7 +96,7 @@ DChatMain::Run ()
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
     QSslCertificate scert (hostCert.Cert().toAscii());
     listen->Init (directHost, key, scert);
-    listen->Listen (QHostAddress (ownAddress),29999);
+    listen->Listen (QHostAddress (ownAddress),publicPort);
   }
   connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
@@ -240,6 +244,7 @@ DChatMain::Send ()
   
 }
 
+/** \brief CallDirect - set up a direct connection */
 void
 DChatMain::CallDirect ()
 {
@@ -264,7 +269,7 @@ DChatMain::CallDirect ()
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
   if (newcall) {
-    newcall->Setup (outCert);
+    newcall->Setup (outCert, publicPort);
     outDirect[callnum] = newcall;
 qDebug () << " start direct connect " << callnum << " call " << newcall;
     newcall->ConnectAddress (destaddr, dest, callnum);

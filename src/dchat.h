@@ -84,6 +84,7 @@ private:
   CertStore      certStore;
 
   QXmppClient   *xclient;
+  int           publicPort;
   QString       user;
   QString       server;
   QString       password;
