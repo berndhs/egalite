@@ -81,9 +81,12 @@ DChatMain::Run ()
   publicPort = Settings().value ("network/publicport",publicPort).toInt ();
   Settings().setValue ("network/publicport",publicPort);
   
-  QString directHost ("reflect");
+  QString directHost ("");
   directHost = Settings().value ("direct/host",directHost).toString();
   Settings().setValue ("direct/host",directHost);
+  QString directPass ("");
+  directPass = Settings().value ("direct/password",directPass).toString();
+  Settings().setValue ("direct/password",directPass);
   DirectListener * listen = new DirectListener (this);
   inDirect[directHost] = listen;
   QString ownAddress ("0::1");
@@ -91,9 +94,8 @@ DChatMain::Run ()
   Settings().setValue ("direct/address",ownAddress);
   if (certStore.HaveCert (directHost)) {
     CertRecord hostCert = certStore.Cert (directHost);
-    QString pass ("enkhuizen");
     QSslKey key (hostCert.Key().toAscii(),QSsl::Rsa,
-                QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
+                QSsl::Pem, QSsl::PrivateKey, directPass.toUtf8());
     QSslCertificate scert (hostCert.Cert().toAscii());
     listen->Init (directHost, key, scert);
     listen->Listen (QHostAddress (ownAddress),publicPort);
