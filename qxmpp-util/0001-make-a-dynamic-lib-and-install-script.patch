@@ -1,0 +1,37 @@
+From 5e20464b945d115ce6984fb14d144be14177fd5f Mon Sep 17 00:00:00 2001
+From: Bernd Stramm <bernd.stramm@gmail.com>
+Date: Fri, 2 Jul 2010 19:53:43 -0400
+Subject: [PATCH] make a dynamic lib and install script
+
+---
+ install.sh        |    4 ++++
+ source/source.pro |    2 +-
+ 2 files changed, 5 insertions(+), 1 deletions(-)
+ create mode 100755 install.sh
+
+diff --git a/install.sh b/install.sh
+new file mode 100755
+index 0000000..5428c47
+--- /dev/null
++++ b/install.sh
+@@ -0,0 +1,4 @@
++#!/bin/bash
++
++install -p source/release/*.so* /usr/local/lib/qxmpp/
++install -p source/*.h /usr/local/include/qxmpp/
+diff --git a/source/source.pro b/source/source.pro
+index 51276b5..f5f7eae 100644
+--- a/source/source.pro
++++ b/source/source.pro
+@@ -1,7 +1,7 @@
+ TEMPLATE = lib
+ QT += network \
+     xml
+-CONFIG += staticlib \
++CONFIG += dll \
+     debug_and_release
+ 
+ # Make sure the library gets built in the same location
+-- 
+1.7.1
+

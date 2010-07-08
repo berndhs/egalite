@@ -122,8 +122,6 @@ DChatMain::Connect ()
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.directButton, SIGNAL (clicked()), this, SLOT (CallDirect()));
-  connect (ui.replyDirectButton, SIGNAL (clicked()),
-           this, SLOT (ReplyDirect()));
   connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
   connect (ui.actionSettings, SIGNAL (triggered()),
            &configEdit, SLOT (Exec()));
@@ -324,37 +322,6 @@ DChatMain::ClearDirect (SymmetricSocket * sock)
     directChats.erase (foundit);
     deadChat->Close ();
   }
-}
-
-void
-DChatMain::SendDirect ()
-{
-#if 0
-  SymmetricSocket *call = directChats.begin ()->second;
-  QString data = ui.inputLine->text();
-  QXmppMessage msg (user,call->PeerName(), data);
-  
-  QByteArray outbuf("<?xml version='1.0'>");
-  QXmlStreamWriter out (&outbuf);
-  msg.toXml (&out);
-  call->SendData (outbuf);
-#endif
-}
-
-void
-DChatMain::ReplyDirect ()
-{
-#if 0
-  SymmetricSocket *call = directChats.begin ()->second;
-  QString data = ui.inputLine->text();
-  QXmppMessage msg (user,call->PeerName(), data);
-  
-  QByteArray outbuf("<?xml version='1.0'>");
-  QXmlStreamWriter out (&outbuf);
-  msg.toXml (&out);
-  call->SendData (outbuf);
-qDebug () << " reply direct : " << outbuf;
-#endif
 }
 
 

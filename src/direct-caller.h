@@ -71,7 +71,6 @@ signals:
 
 private:
 
- // void GetPeerMessage (QSslSocket *sock);
   void ShowCertInfo (const QSslCertificate & cert);
   bool PickOneCert (const QList <QSslCertificate> & clist);
 

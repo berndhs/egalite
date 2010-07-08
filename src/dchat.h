@@ -58,8 +58,6 @@ public slots:
   void Quit ();
   void GetMessage (const QXmppMessage  & msg);
   void GetRaw (const QByteArray &data);
-  void SendDirect ();
-  void ReplyDirect ();
 
 private slots:
 
