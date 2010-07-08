@@ -51,7 +51,6 @@ public:
 
 public slots:
 
-  void GetData (const QByteArray &data);
   void IsReady (SymmetricSocket *sock);
   void SocketExit (SymmetricSocket *sock);
 

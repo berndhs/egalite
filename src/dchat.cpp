@@ -27,6 +27,7 @@
 #include "ui_getpassword.h"
 #include <QXmppConfiguration.h>
 #include <QXmppMessage.h>
+#include <QXmppRoster.h>
 #include <QString>
 #include <QByteArray>
 #include <QDomDocument>
@@ -140,6 +141,7 @@ DChatMain::Login ()
     xclient->connectToServer (server,user, password);
     connect (xclient, SIGNAL (messageReceived  (const QXmppMessage  &)),
              this, SLOT (GetMessage (const QXmppMessage &)));
+    qDebug () << xclient->getRoster ().getRosterBareJids ();
   }
 }
 
@@ -292,8 +294,6 @@ qDebug () << " have connection with " << sock;
     connect (sock, SIGNAL (Exiting(SymmetricSocket *)), 
              this, SLOT (ClearDirect (SymmetricSocket *)));
     newChat->Run ();
-    connect (sock, SIGNAL (ReceiveData (const QByteArray &)),
-             this, SLOT (GetRaw (const QByteArray &)));
   }
 }
 

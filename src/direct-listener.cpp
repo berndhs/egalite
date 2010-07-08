@@ -55,8 +55,6 @@ DirectListener::incomingConnection (int socketDescriptor)
       mKey,mCert) ;
   connect (newsock, SIGNAL (Exiting (SymmetricSocket*)),
            this, SLOT (SocketExit (SymmetricSocket*)));
-  connect (newsock, SIGNAL (ReceiveData (const QByteArray &)),
-           this, SLOT (GetData (const QByteArray &)));
   connect (newsock, SIGNAL (Ready (SymmetricSocket*)),
            this, SLOT (IsReady (SymmetricSocket*)));
   newsock->Init ();
@@ -110,11 +108,6 @@ DirectListener::TakeSocket (SymmetricSocket * sock)
   return false;
 }
 
-void
-DirectListener::GetData (const QByteArray &data)
-{
-  emit Receive (data);
-}
 
 void
 DirectListener::SocketExit (SymmetricSocket *sock)
