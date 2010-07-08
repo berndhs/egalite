@@ -74,7 +74,6 @@ private:
  // void GetPeerMessage (QSslSocket *sock);
   void ShowCertInfo (const QSslCertificate & cert);
   bool PickOneCert (const QList <QSslCertificate> & clist);
-  void KeyInit (QString certHost, QString pass);
 
   QWidget          *parentWidget;
 

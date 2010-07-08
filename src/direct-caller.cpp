@@ -91,22 +91,6 @@ DirectCaller::Party ()
   return party;
 }
 
-void
-DirectCaller::KeyInit (QString certHost, QString pass)
-{
-  QFile keyfile (QString ("/home/bernd/ssl-cert/%1/key.pem").arg(certHost));
-  keyfile.open (QFile::ReadOnly);
-  QSslKey skey (&keyfile,QSsl::Rsa,
-                QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
-  keyfile.close();
-  key = skey;
-
-  QFile certfile (QString ("/home/bernd/ssl-cert/%1/cert.pem").arg(certHost));
-  certfile.open (QFile::ReadOnly);
-  QSslCertificate scert (&certfile);
-  certfile.close();
-  cert = scert;
-}
 
 void
 DirectCaller::Connect (QString otherHost, int callid)
