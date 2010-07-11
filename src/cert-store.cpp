@@ -28,6 +28,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QFileDialog>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QDebug>
@@ -39,7 +40,8 @@ namespace egalite
 
 CertStore::CertStore (QWidget *parent)
   :QObject (parent),
-   viewDetails (false)
+   viewDetails (false),
+   lastDirUsed ("")
 {
   certDialog = new QDialog (parent);
   uiCert.setupUi (certDialog);
@@ -69,6 +71,10 @@ CertStore::Connect ()
   connect (uiCert.saveIdButton, SIGNAL (clicked()), this, SLOT (SaveIdent()));
   connect (uiCert.changeViewButton, SIGNAL (clicked()),
            this, SLOT (ToggleView()));
+  connect (uiCert.loadKeyButton , SIGNAL (clicked()), 
+           this, SLOT (LoadKey ()));
+  connect (uiCert.loadCertButton , SIGNAL (clicked()), 
+           this, SLOT (LoadCert ()));
 
   connect (uiContact.exitButton, SIGNAL (clicked()), 
            contactDialog, SLOT (accept ()));
@@ -108,6 +114,8 @@ CertStore::CertDialog ()
     item->setEditable (false);
     identListModel->appendRow (item);
   }
+  uiCert.keyEdit->clear ();
+  uiCert.certEdit->clear ();
   certDialog->exec ();
 }
 
@@ -188,6 +196,47 @@ CertStore::DeleteContact ()
   int row = current.row ();
   addressModel->removeRow (row);
   RefreshContactMap ();
+}
+
+void
+CertStore::LoadKey ()
+{
+  QString keyval;
+  QString filename;
+  bool    isok;
+  filename = QFileDialog::getOpenFileName (certDialog, tr("Select Key File"),
+                lastDirUsed);
+  if (filename.length() > 0) {
+    QFile  keyfile (filename);
+    isok = keyfile.open (QFile::ReadOnly);
+    if (isok) {
+      QByteArray keydata = keyfile.readAll();
+      keyval = QString (keydata);
+      uiCert.keyEdit->setPlainText (keyval);
+      lastDirUsed = QFileInfo (keyfile).absolutePath();
+    }
+  }
+}
+
+void
+CertStore::LoadCert ()
+{
+  QString certval;
+  QString filename;
+  bool    isok;
+  filename = QFileDialog::getOpenFileName (certDialog, 
+                tr("Select Certificate File"),
+                lastDirUsed);
+  if (filename.length() > 0) {
+    QFile  certfile (filename);
+    isok = certfile.open (QFile::ReadOnly);
+    if (isok) {
+      QByteArray certdata = certfile.readAll();
+      certval = QString (certdata);
+      uiCert.certEdit->setPlainText (certval);
+      lastDirUsed = QFileInfo (certfile).absolutePath();
+    }
+  }
 }
 
 void

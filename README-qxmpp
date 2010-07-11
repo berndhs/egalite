@@ -1,5 +1,7 @@
 To install the QXmpp code, you can use the files
-in the qxmpp-util/ directory.
+in the qxmpp-util/ directory. Copy the patch to where
+you put the top of the qxmpp tree (above source/ and example/),
+and apply the patch.
 
 The QXmpp code itself is here:
 
