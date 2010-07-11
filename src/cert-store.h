@@ -76,6 +76,8 @@ private slots:
   void NewIdent ();
   void SaveIdent ();
   void ShowCertDetails (bool showCooked);
+  void LoadKey ();
+  void LoadCert ();
 
   void SaveContacts ();
   void NewContact ();
@@ -116,6 +118,8 @@ private:
   QStandardItemModel  *addressModel;
 
   QStringList     dbElementList;
+
+  QString         lastDirUsed;
 
 };
 
