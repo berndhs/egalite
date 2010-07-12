@@ -48,11 +48,12 @@ public:
 
   DirectCaller (QWidget *parent = 0);
 
-  void Setup (CertRecord & certRec, int remotePort);
+  void Setup (CertRecord & certRec, int remotePort, QString localNick);
   void Connect (QString otherHost, int callid);
   void ConnectAddress (QString addr, QString name, int callid);
   void Hangup ();
   QString Party (); /// who is on the other side
+  QString Local (); /// who is on this side
 
 public slots:
 
@@ -66,7 +67,7 @@ private slots:
 signals:
 
   void Finished (int myid);
-  void ConnectionReady (SymmetricSocket * sock);
+  void ConnectionReady (SymmetricSocket * sock, QString localNick);
 
 
 private:
@@ -80,6 +81,7 @@ private:
   PickCert         *pickCert;
   int               myCallid;
   QString           party;
+  QString           localName;
   QSslCertificate   cert;
   QSslKey           key;
   int               publicPort;

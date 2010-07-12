@@ -36,6 +36,19 @@ ChatContent::ChatContent (QWidget *parent)
 
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
+  connect (ui.chatInput, SIGNAL (returnPressed()), this, SLOT (Send()));
+}
+
+void
+ChatContent::SetRemoteName (const QString & name)
+{
+  remoteName = name;
+}
+
+void
+ChatContent::SetLocalName (const QString & name)
+{
+  localName = name;
 }
 
 void
@@ -65,11 +78,13 @@ void
 ChatContent::Send ()
 {
   QString content = ui.chatInput->text();
-  QXmppMessage msg ("here","there",content);
+  QXmppMessage msg (localName,remoteName,content);
   QByteArray outbuf ("<?xml version='1.0'>");
   QXmlStreamWriter out (&outbuf);
   msg.toXml (&out);
   emit Outgoing (outbuf);
+  Incoming (outbuf);
+  ui.chatInput->clear ();
 }
 
 void

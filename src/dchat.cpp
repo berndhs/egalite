@@ -100,8 +100,8 @@ DChatMain::Run ()
   }
   connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
-  connect (listen, SIGNAL (SocketReady (SymmetricSocket *)),
-           this, SLOT (ConnectDirect (SymmetricSocket *)));
+  connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),
+           this, SLOT (ConnectDirect (SymmetricSocket *, QString)));
   show ();
 }
 
@@ -266,19 +266,20 @@ DChatMain::CallDirect ()
   QString destaddr = certStore.ContactAddress (dest);
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
+
   if (newcall) {
-    newcall->Setup (outCert, publicPort);
+    newcall->Setup (outCert, publicPort, originNick);
     outDirect[callnum] = newcall;
 qDebug () << " start direct connect " << callnum << " call " << newcall;
     newcall->ConnectAddress (destaddr, dest, callnum);
     connect (newcall, SIGNAL (Finished (int)), this, SLOT (ClearCall (int)));
-    connect (newcall, SIGNAL (ConnectionReady (SymmetricSocket*)),
-             this, SLOT (ConnectDirect (SymmetricSocket*)));
+    connect (newcall, SIGNAL (ConnectionReady (SymmetricSocket*, QString)),
+             this, SLOT (ConnectDirect (SymmetricSocket*, QString)));
   }
 }
 
 void
-DChatMain::ConnectDirect (SymmetricSocket * sock)
+DChatMain::ConnectDirect (SymmetricSocket * sock, QString localNick)
 {
 qDebug () << " have connection with " << sock;
   if (sock) {
@@ -286,6 +287,8 @@ qDebug () << " have connection with " << sock;
     ChatBox * newChat = new ChatBox (this);
     newChat->Add (sock->Dialog(),tr("Status")); 
     ChatContent * newCont = new ChatContent (this);
+    newCont->SetRemoteName (other);
+    newCont->SetLocalName (localNick);
     newChat->Add (newCont,tr("Chat"));
     directChats [other] = newChat;
     connect (newCont, SIGNAL (Outgoing (const QByteArray&)),
