@@ -218,6 +218,11 @@ DChatMain::GetMessage (const QXmppMessage & msg)
                " is " << body;
   if (serverChats.find (from) != serverChats.end()) {
     serverChats[from]->Incoming (msg);
+  } else {
+    StartServerChat (from);
+    if (serverChats.find (from) != serverChats.end()) {
+      serverChats[from]->Incoming (msg);
+    }
   }
 }
 
