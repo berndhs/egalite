@@ -132,19 +132,6 @@ DirectCaller::EncryptDone (SymmetricSocket *sock)
 }
 
 
-bool
-DirectCaller::PickOneCert (const QList <QSslCertificate> & clist)
-{
-  if (pickCert == 0) {
-    pickCert = new PickCert (parentWidget, QString ("Outgoing"));
-  }
-  if (pickCert) {
-    return pickCert->Pick (clist);
-  } else {
-    return false;
-  }
-}
-
 void
 DirectCaller::Hangup ()
 {

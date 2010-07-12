@@ -40,13 +40,17 @@ PickCert::PickCert (QWidget * parent, QString title)
   connect (ui.nextButton, SIGNAL (clicked()), this, SLOT (Down()));
 }
 
-bool
-PickCert::Pick (const QList <QSslCertificate> & clist)
+void
+PickCert::Pick (const QList <QSslCertificate> & clist,
+                 bool & pickedOne,
+                 QSslCertificate & pickedCert)
 {
   certs = clist;
   if (haveGoodCert) {
     if (StillGood ()) {
-      return true;
+      pickedOne = true;
+      pickedCert = goodCert;
+      return;
     }
     haveGoodCert = false;
   }
@@ -54,7 +58,8 @@ PickCert::Pick (const QList <QSslCertificate> & clist)
   Display (ndx);
   show ();
   int userChoice = exec ();
-  return userChoice == 1;
+  pickedCert = goodCert;
+  pickedOne = ( userChoice == 1 );
 }
 
 void

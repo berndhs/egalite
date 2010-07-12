@@ -67,7 +67,7 @@ ChatContent::GetMessage (const QXmppMessage & msg)
   QString from = msg.from ();
   QString to   = msg.to ();
   QString body = msg.body ();
-  QString pattern ("%1 says to %2: %3");
+  QString pattern ("<b>%1</b> says to <b>%2</b>: %3");
   QString msgtext = pattern.arg(from).arg(to).arg(body);
   ui.textHistory->append (msgtext);
   qDebug () << " message from " << from << " to " << to << 

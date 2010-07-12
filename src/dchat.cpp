@@ -289,8 +289,8 @@ qDebug () << " have connection with " << sock;
     ChatBox * newChat = new ChatBox (this);
     newChat->Add (sock->Dialog(),tr("Status")); 
     ChatContent * newCont = new ChatContent (this);
-    newCont->SetRemoteName (other);
-    newCont->SetLocalName (localNick);
+    newCont->SetRemoteName (sock->RemoteName());
+    newCont->SetLocalName (sock->LocalName());
     newChat->Add (newCont,tr("Chat"));
     directChats [other] = newChat;
     connect (newCont, SIGNAL (Outgoing (const QByteArray&)),
