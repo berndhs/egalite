@@ -1,5 +1,6 @@
-#ifndef CHAT_BOX_H
-#define CHAT_BOX_H
+
+#ifndef SERVER_CONTACT_H
+#define SERVER_CONTACT_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -22,48 +23,19 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include "ui_chat-box.h"
-
-
-class QXmppMessage;
-
 namespace egalite
 {
 
-/** \brief ChatBox contains widgets relating to a chat, organized in tabs.
-  * These widgets can be chat contents (i.e. the text), or socket widgets,
-  * or anything else that is related to a single chat connection.
-  */
-
-class ChatBox : public QDialog
+class ServerContact
 {
-Q_OBJECT
-
-public:
-
-  ChatBox (QWidget *parent = 0);
-  ~ChatBox ();
-
-  void Run ();
-  void SetTitle (QString boxtitle);
-  void Add (QWidget *widget, QString title);
-  bool HaveWidget (QWidget *widget);
-
-public slots:
-
-  void Close ();
-  void Incoming (const QXmppMessage &msg);
-
-signals:
-
-  void HandoffIncoming (const QXmppMessage &msg);
-
-private:
-
-  Ui_ChatBox     ui;
-
+  public:
+    
+    QString    name;
+    QString    state;
+    QString    resource;
 };
 
 } // namespace
 
 #endif
+

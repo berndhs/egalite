@@ -30,13 +30,20 @@ namespace egalite
 {
 
 ChatContent::ChatContent (QWidget *parent)
-  :QDialog (parent)
+  :QDialog (parent),
+   chatMode (ChatModeRaw)
 {
   ui.setupUi (this);
 
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
   connect (ui.chatInput, SIGNAL (returnPressed()), this, SLOT (Send()));
+}
+
+void
+ChatContent::SetMode (Mode mode)
+{
+  chatMode = mode;
 }
 
 void
@@ -58,11 +65,11 @@ ChatContent::Incoming (const QByteArray & data)
   msgDoc.setContent (data);
   QXmppMessage msg;
   msg.parse (msgDoc.documentElement());
-  GetMessage (msg);
+  Incoming (msg);
 }
 
 void
-ChatContent::GetMessage (const QXmppMessage & msg)
+ChatContent::Incoming (const QXmppMessage & msg)
 {
   QString from = msg.from ();
   QString to   = msg.to ();
@@ -79,11 +86,18 @@ ChatContent::Send ()
 {
   QString content = ui.chatInput->text();
   QXmppMessage msg (localName,remoteName,content);
-  QByteArray outbuf ("<?xml version='1.0'>");
-  QXmlStreamWriter out (&outbuf);
-  msg.toXml (&out);
-  emit Outgoing (outbuf);
-  Incoming (outbuf);
+qDebug () << " Chat Content send mode " << chatMode; 
+  if (chatMode == ChatModeRaw) {
+    QByteArray outbuf ("<?xml version='1.0'>");
+    QXmlStreamWriter out (&outbuf);
+    msg.toXml (&out);
+    emit Outgoing (outbuf);
+  } else if (chatMode == ChatModeXmpp) {
+qDebug () << " emit xmpp ";
+    emit Outgoing (msg);
+  }
+  /// be optimistic and report what we just sent as being echoed back
+  Incoming (msg);
   ui.chatInput->clear ();
 }
 

@@ -32,6 +32,7 @@
 #include <QByteArray>
 #include <QDomDocument>
 #include <QDomElement>
+#include <QModelIndex>
 
 #include "direct-listener.h"
 #include "direct-caller.h"
@@ -39,6 +40,7 @@
 #include "pick-string.h"
 #include "chat-box.h"
 #include "chat-content.h"
+#include "server-contact.h"
 
 using namespace deliberate;
 
@@ -47,15 +49,25 @@ namespace egalite {
 DChatMain::DChatMain (QWidget *parent)
   :QMainWindow (parent),
    pApp (0),
+   contactModel (this),
    configEdit (this),
    certStore (this),
    xclient (0),
    publicPort (29999),
    passdial (0),
-   callnum (0)
+   callnum (0),
+   debugTimer (0),
+   xmppTimer (0)
 {
   ui.setupUi (this);
+  ui.contactView->setModel (&contactModel);
   Connect ();
+  debugTimer = new QTimer (this);
+  connect (debugTimer, SIGNAL (timeout()), this, SLOT (DebugCheck()));
+  debugTimer->start (15000);
+  xmppTimer = new QTimer (this);
+  connect (xmppTimer, SIGNAL (timeout()), this, SLOT (XmppPoll ()));
+  xmppTimer->start (10000);
 }
 
 void
@@ -131,6 +143,8 @@ DChatMain::Connect ()
            &certStore, SLOT (CertDialog ()));
   connect (ui.contactDirectAction, SIGNAL (triggered()),
            &certStore, SLOT (ContactDialog ()));
+  connect (ui.contactView, SIGNAL (activated (const QModelIndex &)),
+           this, SLOT (PickedItem (const QModelIndex &)));
 }
 
 void
@@ -141,9 +155,11 @@ DChatMain::Login ()
       xclient = new QXmppClient (this);
     }
     xclient->connectToServer (server,user, password);
+    xmppUser = user;
+qDebug () << " after connect attempt: " << xclient->isConnected ();
     connect (xclient, SIGNAL (messageReceived  (const QXmppMessage  &)),
              this, SLOT (GetMessage (const QXmppMessage &)));
-    qDebug () << xclient->getRoster ().getRosterBareJids ();
+    QTimer::singleShot (3000, this, SLOT (XmppPoll()));
   }
 }
 
@@ -197,9 +213,12 @@ DChatMain::GetMessage (const QXmppMessage & msg)
   QString body = msg.body ();
   QString pattern ("%1 says to %2: %3");
   QString msgtext = pattern.arg(from).arg(to).arg(body);
-  ui.textDisplay->append (msgtext);
+//  ui.textDisplay->append (msgtext);
   qDebug () << " message from " << from << " to " << to << 
                " is " << body;
+  if (serverChats.find (from) != serverChats.end()) {
+    serverChats[from]->Incoming (msg);
+  }
 }
 
 
@@ -218,7 +237,7 @@ void
 DChatMain::Send ()
 {
   QString body = ui.inputLine->text();
-  QString to ("roteva@jtalk.berndnet");
+  QString to ("bernd.stramm@gmail.com");
   if (xclient) {
     xclient->sendMessage (to,body);
   }
@@ -239,7 +258,18 @@ DChatMain::Send ()
   msg2.toXml (&out2);
   std::cout << " message 2: " << std::endl;
   std::cout << outb2.data() << std::endl;
-  
+}
+
+void
+DChatMain::Send (const QXmppMessage & msg)
+{
+qDebug () << " DChat Main send xmpp";
+  QXmppMessage outMsg (msg);
+  if (xclient) {
+    QStringList parts = outMsg.to().split("/");
+    outMsg.setTo (parts.at(0));
+    xclient->sendMessage (outMsg.to(), outMsg.body());
+  }
 }
 
 /** \brief CallDirect - set up a direct connection */
@@ -282,11 +312,14 @@ void
 DChatMain::ConnectDirect (SymmetricSocket * sock, QString localNick)
 {
 qDebug () << " have connection with " << sock;
+Q_UNUSED (localNick);
   if (sock) {
     QString other = sock->PeerName();
     ChatBox * newChat = new ChatBox (this);
+    newChat->SetTitle (tr("direct ") + localNick);
     newChat->Add (sock->Dialog(),tr("Status")); 
     ChatContent * newCont = new ChatContent (this);
+    newCont->SetMode (ChatContent::ChatModeRaw);
     newCont->SetRemoteName (sock->RemoteName());
     newCont->SetLocalName (sock->LocalName());
     newChat->Add (newCont,tr("Chat"));
@@ -301,6 +334,24 @@ qDebug () << " have connection with " << sock;
              this, SLOT (ClearDirect (SymmetricSocket *)));
     newChat->Run ();
   }
+}
+
+void
+DChatMain::StartServerChat (QString remoteName)
+{
+  ChatBox * newChat = new ChatBox (this);
+  newChat->SetTitle (tr("Xmpp ") + remoteName);
+  ChatContent * newCont = new ChatContent (this);
+  newCont->SetMode (ChatContent::ChatModeXmpp);
+  newCont->SetRemoteName (remoteName);
+  newCont->SetLocalName (xmppUser);
+  newChat->Add (newCont, tr("Chat"));
+  serverChats [remoteName] = newChat;
+  connect (newCont, SIGNAL (Outgoing (const QXmppMessage&)),
+           this, SLOT (Send (const QXmppMessage&)));
+  connect (newChat, SIGNAL (HandoffIncoming (const QXmppMessage&)),
+            newCont, SLOT (Incoming (const QXmppMessage&)));
+  newChat->Run ();
 }
 
 void
@@ -338,6 +389,70 @@ DChatMain::ClearCall (int callid)
   }
 }
 
+void
+DChatMain::PickedItem (const QModelIndex &index)
+{
+  qDebug () << " picked model item " << index;
+  QMap <int, QVariant> itemData = contactModel.itemData (index);
+  qDebug () << " item data: " << itemData;
+  int row = index.row ();
+  QStandardItem *nameCell = contactModel.item (row,1);
+  QStandardItem *resoCell = contactModel.item (row,2);
+  if (nameCell) {
+    QString  target (nameCell->text());
+    if (resoCell) {
+      target.append ("/");
+      target.append (resoCell->text());
+    }
+    StartServerChat (target);
+  }
+}
+
+void
+DChatMain::XmppPoll ()
+{
+  QStringList  contactJids;
+  if (xclient == 0) {
+    return;
+  }
+  contactJids = xclient->getRoster().getRosterBareJids();
+  xmppConfig = xclient->getConfiguration ();
+  qDebug () << " qxmpp resource: " << xmppConfig.resource ();
+
+  QStringList::const_iterator stit;
+  for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
+    QString id = *stit;
+    QStringList resources = xclient->getRoster().getResources (id);
+    QString res;
+    QStringList::const_iterator   rit;
+    for (rit = resources.begin (); rit != resources.end (); rit++) {
+      res = *rit;
+      QString bigId = id + QString("/") + res;
+      if (serverContacts.find (bigId) == serverContacts.end ()) {
+        ServerContact * newContact = new ServerContact;
+        newContact->name = id;
+        newContact->state = QString("?");
+        newContact->resource = res;
+        QStandardItem * nameItem = new QStandardItem (newContact->name);
+        QStandardItem * stateItem = new QStandardItem (newContact->state);
+        QStandardItem * resourceItem = new QStandardItem (newContact->resource);
+        QList <QStandardItem*> row;
+        row << stateItem;
+        row << nameItem;
+        row << resourceItem;
+        contactModel.appendRow (row);
+        serverContacts [bigId] = newContact;
+      }
+    }
+    
+  }
+}
+
+void
+DChatMain::DebugCheck ()
+{
+  qDebug () << " xclient at " << xclient;
+}
 
 } // namespace
 

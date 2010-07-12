@@ -38,7 +38,19 @@ Q_OBJECT
 
 public:
 
+  /** \brief ChatContent::Mode - None: don't send anything
+                                  Raw: send bytes
+                                  Xmpp: send xmpp
+   */
+
+  enum Mode { ChatModeNone = 0, 
+               ChatModeRaw  = 1,
+               ChatModeXmpp = 2
+             };
+
   ChatContent (QWidget * parent=0);
+
+  void SetMode (Mode mode);
 
   void SetRemoteName (const QString & name);
   void SetLocalName  (const QString & name);
@@ -49,6 +61,7 @@ public:
 public slots:
 
   void Incoming (const QByteArray &data);
+  void Incoming (const QXmppMessage &msg);
 
 private slots:
 
@@ -58,16 +71,16 @@ private slots:
 signals:
 
   void Outgoing (const QByteArray &data);
+  void Outgoing (const QXmppMessage &msg);
   void Disconnect ();
 
 private:
-
-  void GetMessage (const QXmppMessage & msg);
 
   Ui_ChatContent   ui;
 
   QString          remoteName;
   QString          localName;
+  Mode             chatMode;
 };
 
 } // namespace
