@@ -73,7 +73,6 @@ signals:
 private:
 
   void ShowCertInfo (const QSslCertificate & cert);
-  bool PickOneCert (const QList <QSslCertificate> & clist);
 
   QWidget          *parentWidget;
 

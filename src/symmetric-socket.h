@@ -55,6 +55,8 @@ public:
   void Show ();
   void Hide ();
   QString PeerName ();
+  QString RemoteName () { return remoteName; }
+  QString LocalName () { return localName; }
 
   void setPeerVerifyMode ( QSslSocket::PeerVerifyMode mode );
   void connectToHostEncrypted ( const QString & hostName, 
@@ -113,6 +115,8 @@ private:
   QSslKey       key;
   QSslCertificate cert;
   QTimer       *checkTimer;
+  QString      remoteName;
+  QString      localName;
 
 
 } ;

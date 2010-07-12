@@ -70,8 +70,8 @@ SymmetricSocket::SymmetricSocket (QSslKey argKey, QSslCertificate argCert)
   checkTimer = new QTimer (this);
   connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
   checkTimer->start (100);
+  localName = cert.subjectInfo (QSslCertificate::CommonName);
 #if 0
-  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Done()));
 #endif
   dialog->show();
@@ -337,7 +337,13 @@ SymmetricSocket::PickOneCert (const QList <QSslCertificate> & clist)
     pickCert = new PickCert (0,QString("Incoming"));
   }
   if (pickCert) {
-    return pickCert->Pick (clist);
+    bool accepted (false);
+    QSslCertificate goodCert;
+    pickCert->Pick (clist, accepted, goodCert);
+    if (accepted) {
+      remoteName = goodCert.subjectInfo (QSslCertificate::CommonName);
+    }
+    return accepted;
   } else {
     return false;
   }

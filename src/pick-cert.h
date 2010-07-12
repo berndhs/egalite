@@ -38,7 +38,9 @@ public:
 
   PickCert (QWidget *parent, QString title);
 
-  bool Pick (const QList <QSslCertificate> & clist);
+  void Pick (const QList <QSslCertificate> & clist,
+              bool & pickedOne,
+              QSslCertificate & pickedCert);
 
 private slots:
 
