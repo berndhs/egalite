@@ -50,7 +50,8 @@ SymmetricSocket::SymmetricSocket (int socketDescriptor,
   dialog->setWindowTitle (tr("Symmetric Socket"));
   checkTimer = new QTimer (this);
   connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
-  checkTimer->start (10);
+  checkTimer->start (100);
+  localName = cert.subjectInfo (QSslCertificate::CommonName);
   dialog->show();
 }
 
@@ -342,6 +343,8 @@ SymmetricSocket::PickOneCert (const QList <QSslCertificate> & clist)
     pickCert->Pick (clist, accepted, goodCert);
     if (accepted) {
       remoteName = goodCert.subjectInfo (QSslCertificate::CommonName);
+    } else {
+      remoteName = tr("Connection Refused");
     }
     return accepted;
   } else {
