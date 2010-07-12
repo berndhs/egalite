@@ -67,7 +67,7 @@ private slots:
   void Login ();
   void CallDirect ();
   void ClearCall (int callid);
-  void ConnectDirect (SymmetricSocket *direct);
+  void ConnectDirect (SymmetricSocket *direct, QString localNick);
   void ClearDirect (SymmetricSocket *direct);
 
 private:

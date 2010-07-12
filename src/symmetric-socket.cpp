@@ -240,7 +240,8 @@ SymmetricSocket::SendData (const QByteArray &data)
 {
 qDebug () << "SYMMETRIC Send Data " << data;
   if (sock) {
-    sock->write (data);
+    qint64 bytesSent = sock->write (data);
+    Q_UNUSED (bytesSent);
   }
 }
 

@@ -95,7 +95,7 @@ void
 DirectListener::IsReady (SymmetricSocket * sock)
 {
   qDebug () << " Listener socket ready " << sock;
-  emit SocketReady (sock);
+  emit SocketReady (sock, mName);
 }
 
 bool

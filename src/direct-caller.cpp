@@ -64,8 +64,9 @@ DirectCaller::DirectCaller (QWidget *parent)
 
 
 void
-DirectCaller::Setup (CertRecord & certRec, int remotePort)
+DirectCaller::Setup (CertRecord & certRec, int remotePort, QString localNick)
 {
+  localName = localNick;
   publicPort = remotePort;
   QString pass ("enkhuizen");
   key = QSslKey (certRec.Key().toAscii(),QSsl::Rsa,
@@ -90,6 +91,12 @@ QString
 DirectCaller::Party ()
 {
   return party;
+}
+
+QString
+DirectCaller::Local ()
+{
+  return localName;
 }
 
 
@@ -121,7 +128,7 @@ void
 DirectCaller::EncryptDone (SymmetricSocket *sock)
 {
   qDebug () << " Caller emit ConnectionReady " << sock;
-  emit ConnectionReady (sock);
+  emit ConnectionReady (sock, localName);
 }
 
 

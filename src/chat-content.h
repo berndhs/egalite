@@ -40,6 +40,12 @@ public:
 
   ChatContent (QWidget * parent=0);
 
+  void SetRemoteName (const QString & name);
+  void SetLocalName  (const QString & name);
+
+  QString RemoteName () { return remoteName; }
+  QString LocalName () { return localName; }
+
 public slots:
 
   void Incoming (const QByteArray &data);
@@ -59,6 +65,9 @@ private:
   void GetMessage (const QXmppMessage & msg);
 
   Ui_ChatContent   ui;
+
+  QString          remoteName;
+  QString          localName;
 };
 
 } // namespace
