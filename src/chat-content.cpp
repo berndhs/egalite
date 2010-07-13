@@ -35,9 +35,12 @@ ChatContent::ChatContent (QWidget *parent)
 {
   ui.setupUi (this);
 
+  ui.quitButton->setDefault (false);
+  ui.sendButton->setDefault (true);
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
   connect (ui.chatInput, SIGNAL (returnPressed()), this, SLOT (Send()));
+  ui.quitButton->setDefault (false);
 }
 
 void
@@ -104,6 +107,7 @@ qDebug () << " emit xmpp ";
 void
 ChatContent::EndChat ()
 {
+qDebug () << " EndChat called";
   emit Disconnect ();
 }
 
