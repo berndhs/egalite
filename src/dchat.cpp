@@ -159,6 +159,8 @@ DChatMain::Login ()
 qDebug () << " after connect attempt: " << xclient->isConnected ();
     connect (xclient, SIGNAL (messageReceived  (const QXmppMessage  &)),
              this, SLOT (GetMessage (const QXmppMessage &)));
+    connect (xclient, SIGNAL (error (QXmppClient::Error)),
+             this, SLOT (XmppError (QXmppClient::Error)));
     QTimer::singleShot (3000, this, SLOT (XmppPoll()));
   }
 }
@@ -206,6 +208,22 @@ DChatMain::PassCancel ()
 }
 
 void
+DChatMain::XmppError (QXmppClient::Error err)
+{
+  switch (err) {
+  case QXmppClient::SocketError: 
+    qDebug () << " xmpp socket error";
+    break;
+  case QXmppClient::KeepAliveError:
+    qDebug () << " xmpp keep alive arror";
+    break;
+  case QXmppClient::XmppStreamError:
+    qDebug () << " xmpp stream error";
+    break;
+  }
+}
+
+void
 DChatMain::GetMessage (const QXmppMessage & msg)
 {
   QString from = msg.from ();
@@ -213,7 +231,6 @@ DChatMain::GetMessage (const QXmppMessage & msg)
   QString body = msg.body ();
   QString pattern ("%1 says to %2: %3");
   QString msgtext = pattern.arg(from).arg(to).arg(body);
-//  ui.textDisplay->append (msgtext);
   qDebug () << " message from " << from << " to " << to << 
                " is " << body;
   if (serverChats.find (from) != serverChats.end()) {
@@ -422,7 +439,6 @@ DChatMain::XmppPoll ()
   }
   contactJids = xclient->getRoster().getRosterBareJids();
   xmppConfig = xclient->getConfiguration ();
-  qDebug () << " qxmpp resource: " << xmppConfig.resource ();
 
   QStringList::const_iterator stit;
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
@@ -456,7 +472,9 @@ DChatMain::XmppPoll ()
 void
 DChatMain::DebugCheck ()
 {
-  qDebug () << " xclient at " << xclient;
+  if (!xclient) {
+    qDebug () <<" DEBUG: no xclient";
+  }
 }
 
 } // namespace

@@ -78,6 +78,7 @@ private slots:
   void XmppPoll ();
   void DebugCheck ();
   void PickedItem (const QModelIndex & index );
+  void XmppError (QXmppClient::Error err);
 
 private:
 
