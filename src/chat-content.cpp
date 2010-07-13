@@ -76,11 +76,9 @@ ChatContent::Incoming (const QXmppMessage & msg)
   QString from = msg.from ();
   QString to   = msg.to ();
   QString body = msg.body ();
-  QString pattern ("<b>%1</b> says to <b>%2</b>: %3");
+  QString pattern (tr("<b>%1</b> says to <b>%2</b>: %3"));
   QString msgtext = pattern.arg(from).arg(to).arg(body);
   ui.textHistory->append (msgtext);
-  qDebug () << " message from " << from << " to " << to << 
-               " is " << body;
 }
 
 void
@@ -92,14 +90,12 @@ ChatContent::Send ()
     return;
   }
   QXmppMessage msg (localName,remoteName,content);
-qDebug () << " Chat Content send mode " << chatMode; 
   if (chatMode == ChatModeRaw) {
     QByteArray outbuf ("<?xml version='1.0'>");
     QXmlStreamWriter out (&outbuf);
     msg.toXml (&out);
     emit Outgoing (outbuf);
   } else if (chatMode == ChatModeXmpp) {
-qDebug () << " emit xmpp ";
     emit Outgoing (msg);
   }
   /// be optimistic and report what we just sent as being echoed back

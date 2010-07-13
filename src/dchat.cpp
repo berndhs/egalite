@@ -133,7 +133,6 @@ void
 DChatMain::Connect ()
 {
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
-  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.directButton, SIGNAL (clicked()), this, SLOT (CallDirect()));
   connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
   connect (ui.actionSettings, SIGNAL (triggered()),
@@ -258,32 +257,6 @@ DChatMain::GetRaw (const QByteArray &data)
 qDebug () << " received raw message " << data;
 }
 
-void
-DChatMain::Send ()
-{
-  QString body = ui.inputLine->text();
-  QString to ("bernd.stramm@gmail.com");
-  if (xclient) {
-    xclient->sendMessage (to,body);
-  }
-  QXmppMessage msg (user,to,body);
-  QByteArray outbuf("<?xml version='1.0'>");
-  QXmlStreamWriter out (&outbuf);
-  msg.toXml (&out);
-  std::cout << " message 1:"  << std::endl;
-  std::cout << outbuf.data() << std::endl;
-
-  QDomDocument msgdoc;
-  msgdoc.setContent (outbuf);
-  std::cout << " message doc string " << msgdoc.toString().toStdString() << std::endl;
-  QByteArray outb2;
-  QXmlStreamWriter out2 (&outb2);
-  QXmppMessage msg2;
-  msg2.parse (msgdoc.documentElement());
-  msg2.toXml (&out2);
-  std::cout << " message 2: " << std::endl;
-  std::cout << outb2.data() << std::endl;
-}
 
 void
 DChatMain::Send (const QXmppMessage & msg)

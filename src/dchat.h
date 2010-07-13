@@ -70,7 +70,6 @@ private slots:
 
   void PassOK ();
   void PassCancel ();
-  void Send ();
   void Login ();
   void CallDirect ();
   void ClearCall (int callid);

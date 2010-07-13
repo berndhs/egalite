@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
-    <height>600</height>
+    <width>300</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,16 +17,11 @@
    <iconset resource="../dchat.qrc">
     <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
   </property>
-  <widget class="QTabWidget" name="tabWidget">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>10</y>
-     <width>420</width>
-     <height>590</height>
-    </rect>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabWidget"/>
+   </item>
+  </layout>
  </widget>
  <resources>
   <include location="../dchat.qrc"/>
