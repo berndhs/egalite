@@ -80,6 +80,7 @@ HEADERS = \
         src/pick-string.h \
         src/chat-box.h \
         src/chat-content.h \
+        src/server-contact.h \
 
 
 

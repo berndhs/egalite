@@ -301,11 +301,6 @@ SymmetricSocket::SockError ( QAbstractSocket::SocketError socketError )
   qDebug () << "SYMMETRIC ABSTRACT socket error " << socketError;
   qDebug () << " ssl errors " << sock->sslErrors ();
 qDebug () << " ABSTRACT sees peer cert " << sock->peerCertificate ();
-#if 0
-  if (socketError == QAbstractSocket::UnknownSocketError) {
-    sock->ignoreSslErrors ();
-  }
-#endif
 }
 
 void

@@ -24,14 +24,17 @@
 #include "ui_dchat.h"
 #include <QMainWindow>
 #include <QXmppClient.h>
+#include <QXmppConfiguration.h>
+#include <QStandardItemModel>
 
 #include "config-edit.h"
 #include "cert-store.h"
 
 #include <map>
 
-
+class QTimer;
 class QApplication;
+class QModelIndex;
 
 namespace egalite 
 {
@@ -40,6 +43,7 @@ class DirectListener;
 class DirectCaller;
 class SymmetricSocket;
 class ChatBox;
+class ServerContact;
 
 class DChatMain : public QMainWindow 
 {
@@ -58,6 +62,7 @@ public slots:
   void Quit ();
   void GetMessage (const QXmppMessage  & msg);
   void GetRaw (const QByteArray &data);
+  void Send (const QXmppMessage & msg);
 
 private slots:
 
@@ -68,7 +73,12 @@ private slots:
   void CallDirect ();
   void ClearCall (int callid);
   void ConnectDirect (SymmetricSocket *direct, QString localNick);
+  void StartServerChat (QString remoteName);
   void ClearDirect (SymmetricSocket *direct);
+  void XmppPoll ();
+  void DebugCheck ();
+  void PickedItem (const QModelIndex & index );
+  void XmppError (QXmppClient::Error err);
 
 private:
 
@@ -78,23 +88,32 @@ private:
 
   Ui_DChatMain    ui;
   QApplication   *pApp;
+
+  QStandardItemModel  contactModel;
+
   ConfigEdit     configEdit;
   CertStore      certStore;
 
   QXmppClient   *xclient;
+  QXmppConfiguration  xmppConfig;
   int           publicPort;
   QString       user;
+  QString       xmppUser;
   QString       server;
   QString       password;
   QDialog      *passdial;
   int           callnum;
+  QTimer       *debugTimer;
+  QTimer       *xmppTimer;
 
 
   std::map <QString, DirectListener*> inDirect;
   std::map <int, DirectCaller*>   outDirect;
 
   std::map <QString, ChatBox *> directChats;
+  std::map <QString, ChatBox *> serverChats;
 
+  std::map <QString, ServerContact*> serverContacts;
 };
 
 } // namespace

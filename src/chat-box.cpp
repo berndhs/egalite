@@ -27,6 +27,7 @@
  ****************************************************************/
 
 #include <QDebug>
+#include <QXmppMessage.h>
 
 namespace egalite
 {
@@ -76,6 +77,18 @@ ChatBox::HaveWidget (QWidget *widget)
     }
   }
   return false;
+}
+
+void
+ChatBox::SetTitle (QString boxtitle)
+{
+  this->setWindowTitle (boxtitle);
+}
+
+void
+ChatBox::Incoming (const QXmppMessage & msg)
+{
+  emit HandoffIncoming (msg);
 }
 
 } // namespace
