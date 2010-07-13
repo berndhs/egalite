@@ -117,6 +117,11 @@ DChatMain::Run ()
            this, SLOT (GetRaw (const QByteArray&)));
   connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),
            this, SLOT (ConnectDirect (SymmetricSocket *, QString)));
+  QStringList contactHeaders;
+  contactHeaders << tr("Status")
+                 << tr("Name")
+                 << tr("Login");
+  contactModel.setHorizontalHeaderLabels (contactHeaders);
   show ();
 }
 
