@@ -104,6 +104,5 @@ main (int argc, char* argv[])
   chatmain.Init (&app);
 
   chatmain.Run ();
-  app.exec ();
-
+  return app.exec ();
 }

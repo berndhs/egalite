@@ -1,4 +1,4 @@
-#
+
 # dchat 
 #
 #//
@@ -16,6 +16,7 @@
 TEMPLATE = app
 MAKEFILE = MakeDChat
 TARGET = bin/egalite
+CONFIG += debug
 
 QT += core gui network xml xmlpatterns sql
 
@@ -23,6 +24,10 @@ unix:{
   INCLUDEPATH += /usr/local/include/qxmpp
   LIBS += -L/usr/local/lib/qxmpp -lQXmppClient
   DEFINES += DELIBERATE_DEBUG=1
+}
+win32:{
+  INCLUDEPATH += ../qxmpp/source
+  LIBS += ../qxmpp/source/debug/libQXmppClient_d.a
 }
 
 RESOURCES = dchat.qrc
