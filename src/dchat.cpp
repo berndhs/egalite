@@ -28,6 +28,7 @@
 #include <QXmppConfiguration.h>
 #include <QXmppMessage.h>
 #include <QXmppRoster.h>
+#include <QXmppPresence.h>
 #include <QString>
 #include <QByteArray>
 #include <QDomDocument>
@@ -161,6 +162,8 @@ qDebug () << " after connect attempt: " << xclient->isConnected ();
              this, SLOT (GetMessage (const QXmppMessage &)));
     connect (xclient, SIGNAL (error (QXmppClient::Error)),
              this, SLOT (XmppError (QXmppClient::Error)));
+    connect (xclient, SIGNAL (presenceReceived (const QXmppPresence &)),
+             this, SLOT (XPresenceChange (const QXmppPresence &)));
     QTimer::singleShot (3000, this, SLOT (XmppPoll()));
   }
 }
@@ -433,6 +436,68 @@ DChatMain::PickedItem (const QModelIndex &index)
 }
 
 void
+DChatMain::XPresenceChange (const QXmppPresence & presence)
+{
+  qDebug () << " someone came or left";
+  QString remoteId = presence.from ();
+  QXmppPresence::Status status = presence.status();
+  QXmppPresence::Status::Type stype = status.type ();
+  QString statusText = status.statusText (); 
+  QStringList parts = remoteId.split ('/',QString::SkipEmptyParts);
+  QString id = parts.at(0);
+  QString resource;
+  if (parts.size () > 1) {
+    resource = parts.at(1);
+  }
+  int nrows = contactModel.rowCount ();
+  QStandardItem * nameItem, * resourceItem (0);
+  for (int r=0; r<nrows; r++) {
+    nameItem = contactModel.item (r,1);
+    resourceItem = contactModel.item (r,2);
+    if (nameItem && resourceItem) {
+      if (nameItem->text() == id && resourceItem->text() == resource) {
+        SetStatus (r, stype);
+      }
+    }
+  }
+}
+
+void 
+DChatMain::SetStatus (int row, 
+                       QXmppPresence::Status::Type stype)
+{
+  QStandardItem * stateItem = contactModel.item (row,0);
+  if (stateItem == 0) {
+    stateItem = new QStandardItem;
+    contactModel.setItem (row,0,stateItem);
+  }
+  stateItem->setText (StatusName (stype));
+}
+
+QString
+DChatMain::StatusName (QXmppPresence::Status::Type stype)
+{
+  switch (stype) {
+  case QXmppPresence::Status::Offline: 
+    return tr ("-");
+  case QXmppPresence::Status::Online:
+    return tr ("On");
+  case QXmppPresence::Status::Away:
+    return tr ("away");
+  case QXmppPresence::Status::XA:
+    return tr ("XA");
+  case QXmppPresence::Status::DND:
+    return tr ("DND");
+  case QXmppPresence::Status::Chat:
+    return tr ("Chatty");
+  case QXmppPresence::Status::Invisible:
+    return tr ("Hiding");
+  default:
+    return tr ("?");
+  }
+}
+
+void
 DChatMain::XmppPoll ()
 {
   QStringList  contactJids;
@@ -464,6 +529,9 @@ DChatMain::XmppPoll ()
         row << nameItem;
         row << resourceItem;
         contactModel.appendRow (row);
+        QXmppPresence pres = xclient->getRoster().getPresence (id,res);
+        QXmppPresence::Status::Type stype = pres.status().type ();
+        stateItem->setText (StatusName (stype));
         serverContacts [bigId] = newContact;
       }
     }

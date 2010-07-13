@@ -36,10 +36,9 @@ ChatContent::ChatContent (QWidget *parent)
   ui.setupUi (this);
 
   ui.quitButton->setDefault (false);
-  ui.sendButton->setDefault (true);
+  ui.sendButton->setDefault (true);  /// send when Return pressed
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
-  connect (ui.chatInput, SIGNAL (returnPressed()), this, SLOT (Send()));
   ui.quitButton->setDefault (false);
 }
 
@@ -87,7 +86,11 @@ ChatContent::Incoming (const QXmppMessage & msg)
 void
 ChatContent::Send ()
 {
-  QString content = ui.chatInput->text();
+  QString content = ui.chatInput->text().trimmed ();
+  ui.chatInput->clear ();
+  if (content.length() < 1) {            /// dont send empty messages
+    return;
+  }
   QXmppMessage msg (localName,remoteName,content);
 qDebug () << " Chat Content send mode " << chatMode; 
   if (chatMode == ChatModeRaw) {
@@ -101,7 +104,6 @@ qDebug () << " emit xmpp ";
   }
   /// be optimistic and report what we just sent as being echoed back
   Incoming (msg);
-  ui.chatInput->clear ();
 }
 
 void

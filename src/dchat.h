@@ -25,6 +25,7 @@
 #include <QMainWindow>
 #include <QXmppClient.h>
 #include <QXmppConfiguration.h>
+#include <QXmppPresence.h>
 #include <QStandardItemModel>
 
 #include "config-edit.h"
@@ -63,6 +64,7 @@ public slots:
   void GetMessage (const QXmppMessage  & msg);
   void GetRaw (const QByteArray &data);
   void Send (const QXmppMessage & msg);
+  void XPresenceChange (const QXmppPresence & 	presence );
 
 private slots:
 
@@ -85,6 +87,8 @@ private:
   void Connect ();
   bool GetPass ();
   void CallDirectFrom (QString nick);
+  QString StatusName (QXmppPresence::Status::Type stype);
+  void    SetStatus (int row, QXmppPresence::Status::Type stype);
 
   Ui_DChatMain    ui;
   QApplication   *pApp;
