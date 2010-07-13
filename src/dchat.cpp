@@ -373,6 +373,8 @@ DChatMain::StartServerChat (QString remoteName)
            this, SLOT (Send (const QXmppMessage&)));
   connect (newChat, SIGNAL (HandoffIncoming (const QXmppMessage&)),
             newCont, SLOT (Incoming (const QXmppMessage&)));
+  connect (newCont, SIGNAL (Disconnect()),
+            newChat, SLOT (Close ()));
   newChat->Run ();
 }
 
