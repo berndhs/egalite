@@ -46,6 +46,9 @@ class SymmetricSocket;
 class ChatBox;
 class ServerContact;
 
+/** \brief The main messenger/chat application.
+  */
+
 class DChatMain : public QMainWindow 
 {
 Q_OBJECT
