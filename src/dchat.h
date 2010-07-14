@@ -115,6 +115,7 @@ private:
 
   ConfigEdit     configEdit;
   CertStore      certStore;
+  deliberate::HelpView  helpView;
 
   QXmppClient   *xclient;
   QXmppConfiguration  xmppConfig;
@@ -127,7 +128,7 @@ private:
   int           callnum;
   QTimer       *debugTimer;
   QTimer       *xmppTimer;
-  deliberate::HelpView  helpView;
+  QTimer       *announceHeartbeat;
 
 
   std::map <QString, DirectListener*> inDirect;
