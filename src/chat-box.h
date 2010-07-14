@@ -47,12 +47,13 @@ public:
   void Run ();
   void SetTitle (QString boxtitle);
   void Add (QWidget *widget, QString title);
-  bool HaveWidget (QWidget *widget);
+  int WidgetIndex (QWidget *widget);
 
 public slots:
 
   void Close ();
   void Incoming (const QXmppMessage &msg);
+  void WidgetActivity (QWidget *activeWidget);
 
 signals:
 

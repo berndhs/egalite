@@ -79,6 +79,7 @@ signals:
   void Outgoing (const QByteArray &data);
   void Outgoing (const QXmppMessage &msg);
   void Disconnect ();
+  void Activity (QWidget * activeWidget);
 
 private:
 

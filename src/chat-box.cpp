@@ -67,16 +67,22 @@ ChatBox::Close ()
   close ();
 }
 
-bool
-ChatBox::HaveWidget (QWidget *widget)
+int
+ChatBox::WidgetIndex (QWidget *widget)
 {
   int howmany = ui.tabWidget->count ();
   for (int w=0; w < howmany; w++) {
     if (ui.tabWidget->widget (w) == widget) {
-      return true;
+      return w;
     }
   }
-  return false;
+  return -1;
+}
+
+void
+ChatBox::WidgetActivity (QWidget *widget)
+{
+  ui.tabWidget->setCurrentWidget (widget);
 }
 
 void

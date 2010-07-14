@@ -327,6 +327,8 @@ Q_UNUSED (localNick);
     newCont->SetLocalName (sock->LocalName());
     newChat->Add (newCont,tr("Chat"));
     directChats [other] = newChat;
+    connect (newCont, SIGNAL (Activity (QWidget*)),
+             newChat, SLOT (WidgetActivity (QWidget*)));
     connect (newCont, SIGNAL (Outgoing (const QByteArray&)),
              sock, SLOT (SendData (const QByteArray&)));
     connect (sock, SIGNAL (ReceiveData (const QByteArray&)),
@@ -350,6 +352,8 @@ DChatMain::StartServerChat (QString remoteName)
   newCont->SetLocalName (xmppUser);
   newChat->Add (newCont, tr("Chat"));
   serverChats [remoteName] = newChat;
+  connect (newCont, SIGNAL (Activity (const QWidget*)),
+           newChat, SLOT (WidgetActivity (const QWidget*)));
   connect (newCont, SIGNAL (Outgoing (const QXmppMessage&)),
            this, SLOT (Send (const QXmppMessage&)));
   connect (newChat, SIGNAL (HandoffIncoming (const QXmppMessage&)),
@@ -371,7 +375,7 @@ DChatMain::ClearDirect (SymmetricSocket * sock)
   std::map <QString, ChatBox *>::iterator chase, foundit;
   foundit = directChats.end();
   for (chase = directChats.begin (); chase != directChats.end(); chase++) {
-    if (chase->second->HaveWidget (sock->Dialog())) {
+    if (chase->second->WidgetIndex (sock->Dialog()) >= 0) {
       foundit = chase;
       break;
     }
