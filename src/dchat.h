@@ -100,8 +100,9 @@ private:
                       QString res, 
                       QXmppPresence::Status::Type stype,
                       QString statusText);
-  void    ResetContactSeen ();
-  void    FlushStaleContacts ();
+  void    ResetContactSeen (ContactMap & contacts);
+  void    FlushStaleContacts (ContactMap & contacts,
+                              QStandardItemModel & model);
 
   Ui_DChatMain    ui;
   QApplication   *pApp;
