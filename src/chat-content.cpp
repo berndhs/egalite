@@ -79,6 +79,8 @@ ChatContent::Incoming (const QXmppMessage & msg)
   QString pattern (tr("<b>%1</b> says to <b>%2</b>: %3"));
   QString msgtext = pattern.arg(from).arg(to).arg(body);
   ui.textHistory->append (msgtext);
+qDebug () << " emit activity " << this;
+  emit Activity (this);
 }
 
 void

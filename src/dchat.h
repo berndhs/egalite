@@ -30,6 +30,7 @@
 
 #include "config-edit.h"
 #include "cert-store.h"
+#include "server-contact.h"
 
 #include <map>
 
@@ -44,7 +45,11 @@ class DirectListener;
 class DirectCaller;
 class SymmetricSocket;
 class ChatBox;
-class ServerContact;
+
+typedef  std::map <QString, ChatBox*>         ChatMap;
+
+/** \brief The main messenger/chat application.
+  */
 
 class DChatMain : public QMainWindow 
 {
@@ -83,11 +88,16 @@ private slots:
 
 private:
 
-  void Connect ();
-  bool GetPass ();
-  void CallDirectFrom (QString nick);
+  void    Connect ();
+  bool    GetPass ();
+  void    CallDirectFrom (QString nick);
   QString StatusName (QXmppPresence::Status::Type stype);
   void    SetStatus (int row, QXmppPresence::Status::Type stype);
+  void    AddContact (QString id, 
+                      QString res, 
+                      QXmppPresence::Status::Type stype);
+  void    ResetContactSeen ();
+  void    FlushStaleContacts ();
 
   Ui_DChatMain    ui;
   QApplication   *pApp;
@@ -113,10 +123,10 @@ private:
   std::map <QString, DirectListener*> inDirect;
   std::map <int, DirectCaller*>   outDirect;
 
-  std::map <QString, ChatBox *> directChats;
-  std::map <QString, ChatBox *> serverChats;
+  ChatMap directChats;
+  ChatMap serverChats;
 
-  std::map <QString, ServerContact*> serverContacts;
+  ContactMap serverContacts;
 };
 
 } // namespace

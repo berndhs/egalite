@@ -32,6 +32,12 @@ class QXmppMessage;
 namespace egalite
 {
 
+/** \brief The dialog window that deals with text of a chat connection.
+ * 
+ * This class knows about displaying text, and grabbing text from 
+ * the input area. It doesn't know about how text is sent or received.
+ */
+
 class ChatContent : public QDialog 
 {
 Q_OBJECT
@@ -73,6 +79,7 @@ signals:
   void Outgoing (const QByteArray &data);
   void Outgoing (const QXmppMessage &msg);
   void Disconnect ();
+  void Activity (QWidget * activeWidget);
 
 private:
 

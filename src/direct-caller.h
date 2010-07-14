@@ -39,6 +39,12 @@ namespace egalite
 class PickCert;
 class SymmetricSocket;
 
+/** \brief Establish a new SSL connection to someone listening.
+  *
+  * The caller presents an SSL certificate to the remote side, and
+  * talks to the symmetric socket.
+  */
+
 class DirectCaller : public QObject
 {
 

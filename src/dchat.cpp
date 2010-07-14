@@ -34,6 +34,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QModelIndex>
+#include <set>
 
 #include "direct-listener.h"
 #include "direct-caller.h"
@@ -65,10 +66,10 @@ DChatMain::DChatMain (QWidget *parent)
   Connect ();
   debugTimer = new QTimer (this);
   connect (debugTimer, SIGNAL (timeout()), this, SLOT (DebugCheck()));
-  debugTimer->start (15000);
+  debugTimer->start (10000);
   xmppTimer = new QTimer (this);
   connect (xmppTimer, SIGNAL (timeout()), this, SLOT (XmppPoll ()));
-  xmppTimer->start (10000);
+  xmppTimer->start (15000);
 }
 
 void
@@ -329,6 +330,8 @@ Q_UNUSED (localNick);
     newCont->SetLocalName (sock->LocalName());
     newChat->Add (newCont,tr("Chat"));
     directChats [other] = newChat;
+    connect (newCont, SIGNAL (Activity (QWidget*)),
+             newChat, SLOT (WidgetActivity (QWidget*)));
     connect (newCont, SIGNAL (Outgoing (const QByteArray&)),
              sock, SLOT (SendData (const QByteArray&)));
     connect (sock, SIGNAL (ReceiveData (const QByteArray&)),
@@ -352,6 +355,8 @@ DChatMain::StartServerChat (QString remoteName)
   newCont->SetLocalName (xmppUser);
   newChat->Add (newCont, tr("Chat"));
   serverChats [remoteName] = newChat;
+  connect (newCont, SIGNAL (Activity (const QWidget*)),
+           newChat, SLOT (WidgetActivity (const QWidget*)));
   connect (newCont, SIGNAL (Outgoing (const QXmppMessage&)),
            this, SLOT (Send (const QXmppMessage&)));
   connect (newChat, SIGNAL (HandoffIncoming (const QXmppMessage&)),
@@ -373,7 +378,7 @@ DChatMain::ClearDirect (SymmetricSocket * sock)
   std::map <QString, ChatBox *>::iterator chase, foundit;
   foundit = directChats.end();
   for (chase = directChats.begin (); chase != directChats.end(); chase++) {
-    if (chase->second->HaveWidget (sock->Dialog())) {
+    if (chase->second->WidgetIndex (sock->Dialog()) >= 0) {
       foundit = chase;
       break;
     }
@@ -429,16 +434,71 @@ DChatMain::XPresenceChange (const QXmppPresence & presence)
   if (parts.size () > 1) {
     resource = parts.at(1);
   }
-  int nrows = contactModel.rowCount ();
+  ContactMap::iterator contactit = serverContacts.find (remoteId);
+  if (contactit != serverContacts.end()) {
+    if (contactit->second) {
+      SetStatus (contactit->second->modelRow, stype);
+      contactit->second->recentlySeen = true;
+    }
+  } else {
+    AddContact (id, resource, stype);
+  }
+}
+
+void
+DChatMain::ResetContactSeen ()
+{
+  ContactMap::iterator  contactit;
+  for (contactit = serverContacts.begin (); 
+       contactit != serverContacts.end ();
+       contactit ++) {
+    if (contactit->second) {
+      contactit->second->recentlySeen = false;
+    }
+  }
+}
+
+void
+DChatMain::FlushStaleContacts ()
+{
+  // determine outdated rows and remove them
+  std::set <int> staleRows;
+  std::set <QString> staleContacts;
+  ContactMap::iterator  contactit;
+  for (contactit = serverContacts.begin (); 
+       contactit != serverContacts.end ();
+       contactit ++) {
+    if (contactit->second) {
+      if (!(contactit->second->recentlySeen)) {
+        staleRows.insert (contactit->second->modelRow);
+        staleContacts.insert (contactit->second->name 
+                              + QString("/")
+                              + contactit->second->resource);
+      }
+    }
+  }  
+  std::set <int>::const_reverse_iterator  rowrit;
+  for (rowrit = staleRows.rbegin(); rowrit != staleRows.rend(); rowrit++) {
+    contactModel.removeRows (*rowrit, 1);
+  }
+  // recalculate row numbers
+  int nrows = contactModel.rowCount();
   QStandardItem * nameItem, * resourceItem (0);
   for (int r=0; r<nrows; r++) {
     nameItem = contactModel.item (r,1);
     resourceItem = contactModel.item (r,2);
     if (nameItem && resourceItem) {
-      if (nameItem->text() == id && resourceItem->text() == resource) {
-        SetStatus (r, stype);
+      QString bigId = nameItem->text () + QString ("/") + resourceItem->text();
+      contactit = serverContacts.find (bigId);
+      if (contactit != serverContacts.end()) {
+        contactit->second->modelRow = r;
       }
     }
+  }
+  std::set <QString>::const_iterator bigIdIt;
+  for (bigIdIt = staleContacts.begin (); bigIdIt != staleContacts.end();
+       bigIdIt++) {
+    serverContacts.erase (*bigIdIt);
   }
 }
 
@@ -486,7 +546,7 @@ DChatMain::XmppPoll ()
   }
   contactJids = xclient->getRoster().getRosterBareJids();
   xmppConfig = xclient->getConfiguration ();
-
+  ResetContactSeen ();
   QStringList::const_iterator stit;
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
@@ -496,27 +556,43 @@ DChatMain::XmppPoll ()
     for (rit = resources.begin (); rit != resources.end (); rit++) {
       res = *rit;
       QString bigId = id + QString("/") + res;
-      if (serverContacts.find (bigId) == serverContacts.end ()) {
-        ServerContact * newContact = new ServerContact;
-        newContact->name = id;
-        newContact->state = QString("?");
-        newContact->resource = res;
-        QStandardItem * nameItem = new QStandardItem (newContact->name);
-        QStandardItem * stateItem = new QStandardItem (newContact->state);
-        QStandardItem * resourceItem = new QStandardItem (newContact->resource);
-        QList <QStandardItem*> row;
-        row << stateItem;
-        row << nameItem;
-        row << resourceItem;
-        contactModel.appendRow (row);
-        QXmppPresence pres = xclient->getRoster().getPresence (id,res);
-        QXmppPresence::Status::Type stype = pres.status().type ();
-        stateItem->setText (StatusName (stype));
-        serverContacts [bigId] = newContact;
+      QXmppPresence pres = xclient->getRoster().getPresence (id,res);
+      QXmppPresence::Status::Type stype = pres.status().type ();
+
+      ContactMap::iterator contactit = serverContacts.find (bigId);
+      if (contactit == serverContacts.end ()) {
+        AddContact (id, res, stype);
+      } else {
+        SetStatus (contactit->second->modelRow, stype);
+        contactit->second->recentlySeen = true;
       }
-    }
-    
+    } 
   }
+  FlushStaleContacts ();
+}
+
+void
+DChatMain::AddContact (QString id, 
+                       QString res, 
+                       QXmppPresence::Status::Type stype)
+{
+  ServerContact * newContact = new ServerContact;
+  newContact->name = id;
+  newContact->state = QString("?");
+  newContact->resource = res;
+  newContact->recentlySeen = true;
+  QStandardItem * nameItem = new QStandardItem (newContact->name);
+  QStandardItem * stateItem = new QStandardItem (newContact->state);
+  QStandardItem * resourceItem = new QStandardItem (newContact->resource);
+  QList <QStandardItem*> row;
+  row << stateItem;
+  row << nameItem;
+  row << resourceItem;
+  contactModel.appendRow (row);
+  newContact->modelRow = stateItem->row ();
+  stateItem->setText (StatusName (stype));
+  QString  bigId = id + QString("/") + res;
+  serverContacts [bigId] = newContact;
 }
 
 void

@@ -23,17 +23,31 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include <map>
+
 namespace egalite
 {
 
 class ServerContact
 {
   public:
+
+    ServerContact ()
+                 :name(""),
+                  state(""),
+                  resource(""),
+                  modelRow(0),
+                  recentlySeen(true)  
+                 {}
     
     QString    name;
     QString    state;
     QString    resource;
+    int        modelRow;
+    bool       recentlySeen;
 };
+
+typedef  std::map <QString, ServerContact*>   ContactMap;
 
 } // namespace
 
