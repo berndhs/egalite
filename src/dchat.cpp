@@ -456,11 +456,11 @@ DChatMain::XPresenceChange (const QXmppPresence & presence)
 }
 
 void
-DChatMain::ResetContactSeen ()
+DChatMain::ResetContactSeen (ContactMap & contacts)
 {
   ContactMap::iterator  contactit;
-  for (contactit = serverContacts.begin (); 
-       contactit != serverContacts.end ();
+  for (contactit = contacts.begin (); 
+       contactit != contacts.end ();
        contactit ++) {
     if (contactit->second) {
       contactit->second->recentlySeen = false;
@@ -469,14 +469,15 @@ DChatMain::ResetContactSeen ()
 }
 
 void
-DChatMain::FlushStaleContacts ()
+DChatMain::FlushStaleContacts (ContactMap & contacts, 
+                               QStandardItemModel & model)
 {
   // determine outdated rows and remove them
   std::set <int> staleRows;
   std::set <QString> staleContacts;
   ContactMap::iterator  contactit;
-  for (contactit = serverContacts.begin (); 
-       contactit != serverContacts.end ();
+  for (contactit = contacts.begin (); 
+       contactit != contacts.end ();
        contactit ++) {
     if (contactit->second) {
       if (!(contactit->second->recentlySeen)) {
@@ -489,18 +490,18 @@ DChatMain::FlushStaleContacts ()
   }  
   std::set <int>::const_reverse_iterator  rowrit;
   for (rowrit = staleRows.rbegin(); rowrit != staleRows.rend(); rowrit++) {
-    contactModel.removeRows (*rowrit, 1);
+    model.removeRows (*rowrit, 1);
   }
   // recalculate row numbers
-  int nrows = contactModel.rowCount();
+  int nrows = model.rowCount();
   QStandardItem * nameItem, * resourceItem (0);
   for (int r=0; r<nrows; r++) {
-    nameItem = contactModel.item (r,1);
-    resourceItem = contactModel.item (r,2);
+    nameItem = model.item (r,1);
+    resourceItem = model.item (r,2);
     if (nameItem && resourceItem) {
       QString bigId = nameItem->text () + QString ("/") + resourceItem->text();
-      contactit = serverContacts.find (bigId);
-      if (contactit != serverContacts.end()) {
+      contactit = contacts.find (bigId);
+      if (contactit != contacts.end()) {
         contactit->second->modelRow = r;
       }
     }
@@ -508,7 +509,7 @@ DChatMain::FlushStaleContacts ()
   std::set <QString>::const_iterator bigIdIt;
   for (bigIdIt = staleContacts.begin (); bigIdIt != staleContacts.end();
        bigIdIt++) {
-    serverContacts.erase (*bigIdIt);
+    contacts.erase (*bigIdIt);
   }
 }
 
@@ -561,7 +562,7 @@ DChatMain::XmppPoll ()
   }
   contactJids = xclient->getRoster().getRosterBareJids();
   xmppConfig = xclient->getConfiguration ();
-  ResetContactSeen ();
+  ResetContactSeen (serverContacts);
   QStringList::const_iterator stit;
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
@@ -584,7 +585,7 @@ DChatMain::XmppPoll ()
       }
     } 
   }
-  FlushStaleContacts ();
+  FlushStaleContacts (serverContacts, contactModel);
 }
 
 void
