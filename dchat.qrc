@@ -5,6 +5,8 @@
   <file alias="schema-uniqueident.sql">qrcfiles/schema-uniqueident.sql</file>
   <file alias="schema-directcontacts.sql">qrcfiles/schema-directcontacts.sql</file>
   <file alias="schema-uniquenick.sql">qrcfiles/schema-uniquenick.sql</file>
+  <file alias="LICENSE.txt">qrcfiles/LICENSE.txt</file>
+  <file alias="helpman.html">qrcfiles/helpman.html</file>
 </qresource>
 </RCC>
 

@@ -23,6 +23,7 @@
 #include "dchat.h"
 #include "delib-debug.h"
 #include "deliberate.h"
+#include "version.h"
 #include <QDebug>
 #include "ui_getpassword.h"
 #include <QXmppConfiguration.h>
@@ -59,7 +60,8 @@ DChatMain::DChatMain (QWidget *parent)
    passdial (0),
    callnum (0),
    debugTimer (0),
-   xmppTimer (0)
+   xmppTimer (0),
+   helpView (this)
 {
   ui.setupUi (this);
   ui.contactView->setModel (&contactModel);
@@ -153,6 +155,12 @@ DChatMain::Connect ()
            &certStore, SLOT (ContactDialog ()));
   connect (ui.contactView, SIGNAL (activated (const QModelIndex &)),
            this, SLOT (PickedItem (const QModelIndex &)));
+  connect (ui.actionLicense, SIGNAL (triggered()),
+           this, SLOT (License()));
+  connect (ui.actionManual, SIGNAL (triggered()),
+           this, SLOT (Manual ()));
+  connect (ui.actionAbout, SIGNAL (triggered()),
+           this, SLOT (About ()));
 }
 
 void
@@ -175,6 +183,25 @@ qDebug () << " after connect attempt: " << xclient->isConnected ();
     QTimer::singleShot (2500, this, SLOT (AnnounceMe ()));
   }
 }
+
+void
+DChatMain::License ()
+{
+  helpView.Show ("qrc:/LICENSE.txt");
+}
+
+void
+DChatMain::Manual ()
+{
+  helpView.Show ("qrc:/helpman.html");
+}
+
+void
+DChatMain::About ()
+{
+  deliberate::ProgramVersion::ShowVersionWindow ();
+}
+
 
 void
 DChatMain::AnnounceMe ()
