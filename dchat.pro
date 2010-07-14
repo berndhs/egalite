@@ -18,7 +18,7 @@ MAKEFILE = MakeDChat
 TARGET = bin/egalite
 CONFIG += debug
 
-QT += core gui network xml xmlpatterns sql
+QT += core gui network xml xmlpatterns sql webkit
 
 unix:{
   INCLUDEPATH += /usr/local/include/qxmpp
@@ -49,6 +49,7 @@ FORMS = \
         ui/pick-string.ui \
         ui/chat-box.ui \
         ui/chat-content.ui \
+        ui/helpwin.ui \
 
 
 SOURCES = src/main.cpp \
@@ -66,6 +67,7 @@ SOURCES = src/main.cpp \
         src/pick-string.cpp \
         src/chat-box.cpp \
         src/chat-content.cpp \
+        src/helpview.cpp \
 
 
 
@@ -86,6 +88,7 @@ HEADERS = \
         src/chat-box.h \
         src/chat-content.h \
         src/server-contact.h \
+        src/helpview.h \
 
 
 

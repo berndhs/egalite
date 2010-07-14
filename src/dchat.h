@@ -31,6 +31,7 @@
 #include "config-edit.h"
 #include "cert-store.h"
 #include "server-contact.h"
+#include "helpview.h"
 
 #include <map>
 
@@ -73,6 +74,9 @@ public slots:
 
 private slots:
 
+  void About ();
+  void License ();
+  void Manual ();
   void PassOK ();
   void PassCancel ();
   void Login ();
@@ -123,6 +127,7 @@ private:
   int           callnum;
   QTimer       *debugTimer;
   QTimer       *xmppTimer;
+  deliberate::HelpView  helpView;
 
 
   std::map <QString, DirectListener*> inDirect;
