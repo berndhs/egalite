@@ -85,6 +85,7 @@ private slots:
   void DebugCheck ();
   void PickedItem (const QModelIndex & index );
   void XmppError (QXmppClient::Error err);
+  void AnnounceMe ();
 
 private:
 
@@ -92,10 +93,13 @@ private:
   bool    GetPass ();
   void    CallDirectFrom (QString nick);
   QString StatusName (QXmppPresence::Status::Type stype);
-  void    SetStatus (int row, QXmppPresence::Status::Type stype);
+  void    SetStatus (int row, 
+                     QXmppPresence::Status::Type stype,
+                     QString statusText);
   void    AddContact (QString id, 
                       QString res, 
-                      QXmppPresence::Status::Type stype);
+                      QXmppPresence::Status::Type stype,
+                      QString statusText);
   void    ResetContactSeen ();
   void    FlushStaleContacts ();
 

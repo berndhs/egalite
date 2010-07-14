@@ -170,6 +170,18 @@ qDebug () << " after connect attempt: " << xclient->isConnected ();
     connect (xclient, SIGNAL (presenceReceived (const QXmppPresence &)),
              this, SLOT (XPresenceChange (const QXmppPresence &)));
     QTimer::singleShot (3000, this, SLOT (XmppPoll()));
+    QTimer::singleShot (2500, this, SLOT (AnnounceMe ()));
+  }
+}
+
+void
+DChatMain::AnnounceMe ()
+{
+  QXmppPresence::Status status (QXmppPresence::Status::Online,
+                      QString ("testing Egalite"));
+  QXmppPresence pres (QXmppPresence::Available, status);
+  if (xclient) {
+    xclient->sendPacket (pres);
   }
 }
 
@@ -435,11 +447,11 @@ DChatMain::XPresenceChange (const QXmppPresence & presence)
   ContactMap::iterator contactit = serverContacts.find (remoteId);
   if (contactit != serverContacts.end()) {
     if (contactit->second) {
-      SetStatus (contactit->second->modelRow, stype);
+      SetStatus (contactit->second->modelRow, stype, statusText);
       contactit->second->recentlySeen = true;
     }
   } else {
-    AddContact (id, resource, stype);
+    AddContact (id, resource, stype, statusText);
   }
 }
 
@@ -502,14 +514,19 @@ DChatMain::FlushStaleContacts ()
 
 void 
 DChatMain::SetStatus (int row, 
-                       QXmppPresence::Status::Type stype)
+                      QXmppPresence::Status::Type stype,
+                      QString statusText)
 {
   QStandardItem * stateItem = contactModel.item (row,0);
   if (stateItem == 0) {
     stateItem = new QStandardItem;
     contactModel.setItem (row,0,stateItem);
   }
-  stateItem->setText (StatusName (stype));
+  if (statusText.length() == 0) {
+    stateItem->setText (StatusName (stype));
+  } else {
+    stateItem->setText (statusText);
+  }
 }
 
 QString
@@ -559,9 +576,10 @@ DChatMain::XmppPoll ()
 
       ContactMap::iterator contactit = serverContacts.find (bigId);
       if (contactit == serverContacts.end ()) {
-        AddContact (id, res, stype);
+        AddContact (id, res, stype, pres.status().statusText());
       } else {
-        SetStatus (contactit->second->modelRow, stype);
+        SetStatus (contactit->second->modelRow, 
+                   stype, pres.status().statusText());
         contactit->second->recentlySeen = true;
       }
     } 
@@ -572,7 +590,8 @@ DChatMain::XmppPoll ()
 void
 DChatMain::AddContact (QString id, 
                        QString res, 
-                       QXmppPresence::Status::Type stype)
+                       QXmppPresence::Status::Type stype,
+                       QString statusText)
 {
   ServerContact * newContact = new ServerContact;
   newContact->name = id;
@@ -588,7 +607,11 @@ DChatMain::AddContact (QString id,
   row << resourceItem;
   contactModel.appendRow (row);
   newContact->modelRow = stateItem->row ();
-  stateItem->setText (StatusName (stype));
+  if (statusText.length() == 0) {
+    stateItem->setText (StatusName (stype));
+  } else {
+    stateItem->setText (statusText);
+  }
   QString  bigId = id + QString("/") + res;
   serverContacts [bigId] = newContact;
 }
