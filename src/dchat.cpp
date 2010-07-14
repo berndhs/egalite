@@ -55,23 +55,27 @@ DChatMain::DChatMain (QWidget *parent)
    contactModel (this),
    configEdit (this),
    certStore (this),
+   helpView (this),
    xclient (0),
    publicPort (29999),
    passdial (0),
    callnum (0),
    debugTimer (0),
    xmppTimer (0),
-   helpView (this)
+   announceHeartbeat (0)
 {
   ui.setupUi (this);
   ui.contactView->setModel (&contactModel);
   Connect ();
   debugTimer = new QTimer (this);
   connect (debugTimer, SIGNAL (timeout()), this, SLOT (DebugCheck()));
-  debugTimer->start (10000);
+  debugTimer->start (10 * 1000); // 15 secs
   xmppTimer = new QTimer (this);
   connect (xmppTimer, SIGNAL (timeout()), this, SLOT (XmppPoll ()));
-  xmppTimer->start (15000);
+  xmppTimer->start (15 * 1000); // 15 secs
+  announceHeartbeat = new QTimer (this);
+  connect (announceHeartbeat, SIGNAL (timeout()), this, SLOT (AnnounceMe()));
+  announceHeartbeat->start (1000*60*2); // 2 minutes
 }
 
 void
