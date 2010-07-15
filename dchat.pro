@@ -21,8 +21,8 @@ CONFIG += debug
 QT += core gui network xml xmlpatterns sql webkit
 
 unix:{
-  INCLUDEPATH += /usr/local/include/qxmpp
-  LIBS += -L/usr/local/lib/qxmpp -lQXmppClient
+  INCLUDEPATH += /usr/include/qxmpp
+  LIBS += -L/usr/lib64/qxmpp -lQXmppClient
   DEFINES += DELIBERATE_DEBUG=1
 }
 win32:{
