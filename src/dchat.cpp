@@ -191,13 +191,13 @@ qDebug () << " after connect attempt: " << xclient->isConnected ();
 void
 DChatMain::License ()
 {
-  helpView.Show ("qrc:/LICENSE.txt");
+  helpView.Show ("qrc:/help/LICENSE.txt");
 }
 
 void
 DChatMain::Manual ()
 {
-  helpView.Show ("qrc:/helpman.html");
+  helpView.Show ("qrc:/help/helpman.html");
 }
 
 void
