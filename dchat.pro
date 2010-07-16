@@ -18,30 +18,26 @@ MAKEFILE = MakeDChat
 TARGET = bin/egalite
 CONFIG += debug
 
+message ("generating MAKEFILE as $$MAKEFILE")
 QT += core gui network xml xmlpatterns sql webkit
 
-unix:{
+unix {
   message ("Applying Unix settings")
   INCLUDEPATH += /usr/local/include/qxmpp
   DEFINES += DELIBERATE_DEBUG=1
+  exists ("/usr/local/lib64") {
+    LIBS += -L/usr/local/lib64 -lQXmppClient
+  } else { 
+    LIBS += -L/usr/local/lib -lQXmppClient
+  }
 }
-linux-g++:message ("Detecting Linux and gnu C++")
-linux-g++-64:message ("Detecting Linux and gnu C++ 64 bit")
-linux-g++-32:message ("Detecting Linux and gnu C++ 32 bit")
 
-linux-g++-64:{
-  message ("Linux g++ 64 bit")
-  LIBS += -L/usr/local/lib64/ -lQXmppClient
-}
-linux-g++-32:{
-  message ("Linux g++ 32 bit")
-  LIBS += -L/usr/local/lib/ -lQXmppClient
-}
-win32:{
-  message ("Using Windows 32 bit settings")
+win32 {
+  message ("Applying Windows 32 bit settings")
   INCLUDEPATH += ../qxmpp/source
   LIBS += ../qxmpp/source/debug/libQXmppClient_d.a
 }
+message ("using extra libs $$LIBS")
 
 RESOURCES = dchat.qrc
 
