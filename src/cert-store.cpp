@@ -510,7 +510,7 @@ CertStore::ElementType (QString name)
 void
 CertStore::MakeElement (const QString elem)
 {
-  QString filename = QString (":/schema-%1.sql").arg (elem);
+  QString filename = QString (":/schemas/%1.sql").arg (elem);
   QFile schemafile (filename);
   schemafile.open (QFile::ReadOnly);
   QByteArray createcommands = schemafile.readAll ();

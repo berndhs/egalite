@@ -22,7 +22,7 @@ QT += core gui network xml xmlpatterns sql webkit
 
 unix:{
   INCLUDEPATH += /usr/local/include/qxmpp
-  LIBS += -L/usr/local/lib64/qxmpp -lQXmppClient
+  LIBS += -L/usr/local/lib64/ -lQXmppClient
   DEFINES += DELIBERATE_DEBUG=1
 }
 win32:{
