@@ -3,7 +3,10 @@
 #include <QXmppMessage.h>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
+#include <QRegExp>
+#include <QDesktopServices>
 #include <QDebug>
+#include "link-mangle.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -39,6 +42,8 @@ ChatContent::ChatContent (QWidget *parent)
   ui.sendButton->setDefault (true);  /// send when Return pressed
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
+  connect (ui.textHistory, SIGNAL (anchorClicked (const QUrl&)),
+          this, SLOT (HandleAnchor (const QUrl&)));
   ui.quitButton->setDefault (false);
 }
 
@@ -75,10 +80,16 @@ ChatContent::Incoming (const QXmppMessage & msg)
 {
   QString from = msg.from ();
   QString to   = msg.to ();
-  QString body = msg.body ();
+  QString body = msg.body ().trimmed();
+  if (body.length() < 1) {
+    return;
+  }
   QString pattern (tr("<b>%1</b> says to <b>%2</b>: %3"));
   QString msgtext = pattern.arg(from).arg(to).arg(body);
-  ui.textHistory->append (msgtext);
+  QString cookedText = LinkMangle::Anchorize (msgtext,
+                                   QRegExp ("(https?://)(\\S*)"),
+                                   LinkMangle::HttpAnchor);
+  ui.textHistory->append (cookedText);
 qDebug () << " emit activity " << this;
   emit Activity (this);
 }
@@ -109,6 +120,12 @@ ChatContent::EndChat ()
 {
 qDebug () << " EndChat called";
   emit Disconnect ();
+}
+
+void
+ChatContent::HandleAnchor (const QUrl & url)
+{
+  QDesktopServices::openUrl (url);
 }
 
 } // namespace

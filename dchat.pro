@@ -77,6 +77,7 @@ SOURCES = src/main.cpp \
         src/chat-box.cpp \
         src/chat-content.cpp \
         src/helpview.cpp \
+        src/link-mangle.cpp \
 
 
 
@@ -98,6 +99,7 @@ HEADERS = \
         src/chat-content.h \
         src/server-contact.h \
         src/helpview.h \
+        src/link-mangle.h \
 
 
 
