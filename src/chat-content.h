@@ -26,6 +26,7 @@
 #include "ui_chat-content.h"
 #include <QDialog>
 #include <QByteArray>
+#include <QUrl>
 
 class QXmppMessage;
 
@@ -68,6 +69,7 @@ public slots:
 
   void Incoming (const QByteArray &data);
   void Incoming (const QXmppMessage &msg);
+  void HandleAnchor (const QUrl & url);
 
 private slots:
 
