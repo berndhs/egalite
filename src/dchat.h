@@ -26,6 +26,9 @@
 #include <QXmppClient.h>
 #include <QXmppConfiguration.h>
 #include <QXmppPresence.h>
+#include <QXmppIq.h>
+#include <QXmppDiscoveryIq.h>
+#include <QDomElement>
 #include <QStandardItemModel>
 
 #include "config-edit.h"
@@ -90,6 +93,11 @@ private slots:
   void PickedItem (const QModelIndex & index );
   void XmppError (QXmppClient::Error err);
   void AnnounceMe ();
+  void XmppConnected ();
+  void XmppDisconnected ();
+  void XmppElementReceived (const QDomElement & elt, bool & handled);
+  void XmppIqReceived (const QXmppIq & iq);
+  void XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq);
 
 private:
 

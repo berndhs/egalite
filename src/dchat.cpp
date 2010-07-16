@@ -172,6 +172,8 @@ DChatMain::Login ()
     if (!xclient) {
       xclient = new QXmppClient (this);
     }
+    QXmppConfiguration & xconfig = xclient->getConfiguration();
+    xconfig.setResource ("Egalite.");
     xclient->connectToServer (server,user, password);
     xmppUser = user;
 qDebug () << " after connect attempt: " << xclient->isConnected ();
@@ -181,8 +183,16 @@ qDebug () << " after connect attempt: " << xclient->isConnected ();
              this, SLOT (XmppError (QXmppClient::Error)));
     connect (xclient, SIGNAL (presenceReceived (const QXmppPresence &)),
              this, SLOT (XPresenceChange (const QXmppPresence &)));
-    QTimer::singleShot (3000, this, SLOT (XmppPoll()));
-    QTimer::singleShot (2500, this, SLOT (AnnounceMe ()));
+    connect (xclient, SIGNAL (connected ()), 
+             this, SLOT (XmppConnected ()));
+    connect (xclient, SIGNAL (disconnected ()),
+             this, SLOT (XmppDisconnected ()));
+    connect (xclient, SIGNAL (elementReceived (const QDomElement &, bool &)),
+             this, SLOT (XmppElementReceive (const QDomElement &, bool &)));
+    connect (xclient, SIGNAL (iqReceived (const QXmppIq &)),
+             this, SLOT (XmppIqReceived (const QXmppIq &)));
+    connect (xclient, SIGNAL (discoveryIqReceived (const QXmppDiscoveryIq &)),
+             this, SLOT (XmppDiscoveryIqReceived (const QXmppDiscoveryIq &)));
   }
 }
 
@@ -646,6 +656,38 @@ DChatMain::AddContact (QString id,
   }
   QString  bigId = id + QString("/") + res;
   serverContacts [bigId] = newContact;
+}
+
+void
+DChatMain::XmppConnected ()
+{
+  AnnounceMe ();
+  XmppPoll ();
+}
+
+void
+DChatMain::XmppDisconnected ()
+{
+  qDebug () << " xmpp client disconnected";
+}
+
+void
+DChatMain::XmppElementReceived (const QDomElement & elt, bool & handled)
+{
+  qDebug () << " received DOM elt from xclient ";
+  handled = false;
+}
+
+void
+DChatMain::XmppIqReceived (const QXmppIq & iq)
+{
+  qDebug () << " received IQ ";
+}
+
+void
+DChatMain::XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq)
+{
+  qDebug () << " received Discovery Iq ";
 }
 
 void
