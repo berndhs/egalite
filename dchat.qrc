@@ -10,7 +10,7 @@
 </qresource>
 <qresource prefix="/help">
   <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
-  <file alias="helpman.html">helpfiles//helpman.html</file>
+  <file alias="helpman.html">helpfiles/helpman.html</file>
 </qresource>
 </RCC>
 
