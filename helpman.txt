@@ -5,6 +5,29 @@ v0.1, July 2010
 
 *Egalite* is a instant messenger program.
 
+== Configuration ==
+
+=== Icons ===
+Egalite provides a number of standard icons for things like the status of
+contacts, making it easier to see if they are online, away, don't want to be
+disturbed or similar things.
+
+You can replace these standard icons with icons on your own system. To do this,
+you can edit the *icondir* and *iconsize* items in the *style* section of
+the configuration.
+
+To find an icon corresponding to the state of a contact, the icon file needs
+to have a standardized name. These are the names used by Egalite:
+
+.Status Icon File Names
+----
+user-away-extended.png
+user-away.png
+user-busy.png
+user-invisible.png
+user-offline.png
+user-online.png
+----
 == License and Warranty ==
 
 This is free open source software, hence the usual licensing. And the 
