@@ -204,7 +204,6 @@ DChatMain::Login ()
     xconfig.setResource ("Egalite.");
     xclient->connectToServer (server,user, password);
     xmppUser = user;
-qDebug () << " after connect attempt: " << xclient->isConnected ();
     connect (xclient, SIGNAL (messageReceived  (const QXmppMessage  &)),
              this, SLOT (GetMessage (const QXmppMessage &)));
     connect (xclient, SIGNAL (error (QXmppClient::Error)),
