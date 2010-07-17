@@ -565,10 +565,20 @@ DChatMain::SetStatus (int row,
     contactModel.setItem (row,0,stateItem);
   }
   if (statusText.length() == 0) {
-    stateItem->setText (StatusName (stype));
-  } else {
-    stateItem->setText (statusText);
+    statusText = StatusName (stype);
   }
+  if (statusText == QString ("DND")) {
+    stateItem->setIcon (QIcon (":/icons/user-busy.png"));
+    qDebug () << " busy icon ";
+  } else if (statusText == QString ("away")) {
+    stateItem->setIcon (QIcon (":/icons/user-away.png"));
+    qDebug () << " away icon ";
+  } else if (statusText == QString ("On")) {
+    stateItem->setIcon (QIcon (":/icons/user-online.png"));
+  }
+  stateItem->setText (statusText);
+  
+qDebug () << " did set status row " << row << " text " << stateItem->text();
 }
 
 QString
@@ -649,11 +659,7 @@ DChatMain::AddContact (QString id,
   row << resourceItem;
   contactModel.appendRow (row);
   newContact->modelRow = stateItem->row ();
-  if (statusText.length() == 0) {
-    stateItem->setText (StatusName (stype));
-  } else {
-    stateItem->setText (statusText);
-  }
+  SetStatus (newContact->modelRow, stype, statusText);
   QString  bigId = id + QString("/") + res;
   serverContacts [bigId] = newContact;
 }
