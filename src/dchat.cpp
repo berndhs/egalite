@@ -113,7 +113,7 @@ DChatMain::SetSettings ()
   publicPort = Settings().value ("network/publicport",publicPort).toInt ();
   Settings().setValue ("network/publicport",publicPort);
   
-  QString directHost ("reflect");
+  QString directHost ("");
   directHost = Settings().value ("direct/host",directHost).toString();
   Settings().setValue ("direct/host",directHost);
   DirectListener * listen (0);
