@@ -146,8 +146,10 @@ DChatMain::SetSettings ()
   iconDir = Settings().value ("style/icondir",iconDir).toString ();
   Settings().setValue ("style/icondir",iconDir);
   iconPath = iconDir;
+  iconPath.append ('/');
   iconPath.append (iconSize);
   iconPath.append ("/status/");
+qDebug () << " icon path " << iconPath;
 }
 
 void
