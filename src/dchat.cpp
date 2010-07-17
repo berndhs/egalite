@@ -149,7 +149,6 @@ DChatMain::SetSettings ()
   iconPath.append ('/');
   iconPath.append (iconSize);
   iconPath.append ("/status/");
-qDebug () << " icon path " << iconPath;
 }
 
 void

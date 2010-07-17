@@ -28,6 +28,14 @@ user-invisible.png
 user-offline.png
 user-online.png
 ----
+[NOTE]
+=========================
+Icons are typically scaled to fit into the space given by their
+surroundings. Therefore, changing your icons to a different size may not
+have the effect you anticipate. Icons with more bits are not always displayed
+bigger.
+=========================
+
 == License and Warranty ==
 
 This is free open source software, hence the usual licensing. And the 
@@ -35,7 +43,7 @@ usual warranty, or lack thereof:
 
 ****
 These programs are distributed under the terms of the 
-GNU General Public License version 3.
+GNU General Public License version 2.
 
 See the file *LICENSE.txt* for the complete text of the license. You can
 also find it on http://www.gnu.org. Or you can select *Help->License* from the
