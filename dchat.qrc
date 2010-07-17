@@ -2,10 +2,10 @@
 <qresource>
   <file alias="dchatlogo.png">images/e6.png</file>
 </qresource>
-<qresource prefix="icons">
-  <file alias="user-busy.png">images/user-busy.png</file>
-  <file alias="user-away.png">images/user-away.png</file>
-  <file alias="user-online.png">images/user-online.png</file>
+<qresource prefix="icons/22x22">
+  <file alias="user-busy.png">images/22x22/user-busy.png</file>
+  <file alias="user-away.png">images/22x22/user-away.png</file>
+  <file alias="user-online.png">images/22x22/user-online.png</file>
 </qresource>
 <qresource prefix="/schemas">
   <file alias="certificates.sql">schemafiles/certificates.sql</file>
