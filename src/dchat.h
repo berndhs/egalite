@@ -83,6 +83,7 @@ private slots:
   void PassOK ();
   void PassCancel ();
   void Login ();
+  void EditSettings ();
   void CallDirect ();
   void ClearCall (int callid);
   void ConnectDirect (SymmetricSocket *direct, QString localNick);
@@ -101,6 +102,7 @@ private slots:
 
 private:
 
+  void    SetSettings ();
   void    Connect ();
   bool    GetPass ();
   void    CallDirectFrom (QString nick);
@@ -111,6 +113,7 @@ private:
                      QString statusText);
   void    AddContact (QString id, 
                       QString res, 
+                      QString friendOf,
                       QXmppPresence::Status::Type stype,
                       QString statusText);
   void    ResetContactSeen (ContactMap & contacts);

@@ -93,6 +93,18 @@ DChatMain::Run ()
     resize (newsize);
   }
   certStore.Init ();
+  SetSettings ();
+  QStringList contactHeaders;
+  contactHeaders << tr("Status")
+                 << tr("Name")
+                 << tr("Login");
+  contactModel.setHorizontalHeaderLabels (contactHeaders);
+  show ();
+}
+
+void
+DChatMain::SetSettings ()
+{
   user = Settings().value ("network/user", user).toString();
   Settings().setValue ("network/user",user);
   server = Settings().value ("network/server",server).toString();
@@ -104,8 +116,13 @@ DChatMain::Run ()
   QString directHost ("reflect");
   directHost = Settings().value ("direct/host",directHost).toString();
   Settings().setValue ("direct/host",directHost);
-  DirectListener * listen = new DirectListener (this);
-  inDirect[directHost] = listen;
+  DirectListener * listen (0);
+  if (inDirect.find (directHost) == inDirect.end ()) {
+    listen = new DirectListener (this);
+    inDirect [directHost] = listen;
+  } else {
+    listen = inDirect [directHost];
+  }
   QString ownAddress ("0::1");
   ownAddress = Settings().value ("direct/address",ownAddress).toString();
   Settings().setValue ("direct/address",ownAddress);
@@ -117,23 +134,20 @@ DChatMain::Run ()
     QSslCertificate scert (hostCert.Cert().toAscii());
     listen->Init (directHost, key, scert);
     listen->Listen (QHostAddress (ownAddress),publicPort);
-  }
+  }  
   connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
   connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),
            this, SLOT (ConnectDirect (SymmetricSocket *, QString)));
-  QStringList contactHeaders;
-  contactHeaders << tr("Status")
-                 << tr("Name")
-                 << tr("Login");
-  contactModel.setHorizontalHeaderLabels (contactHeaders);
   iconSize = QString ("22x22");
-  iconSize = QSettings ().value ("style/iconsize",iconSize).toString();
-  QSettings().setValue ("style/iconsize",iconSize);
-  iconPath = QString (":/icons/");
+  iconSize = Settings ().value ("style/iconsize",iconSize).toString();
+  Settings().setValue ("style/iconsize",iconSize);
+  QString iconDir = QString (":/icons");
+  iconDir = Settings().value ("style/icondir",iconDir).toString ();
+  Settings().setValue ("style/icondir",iconDir);
+  iconPath = iconDir;
   iconPath.append (iconSize);
-  iconPath.append ("/");
-  show ();
+  iconPath.append ("/status/");
 }
 
 void
@@ -154,7 +168,7 @@ DChatMain::Connect ()
   connect (ui.directButton, SIGNAL (clicked()), this, SLOT (CallDirect()));
   connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
   connect (ui.actionSettings, SIGNAL (triggered()),
-           &configEdit, SLOT (Exec()));
+           this, SLOT (EditSettings ()));
   connect (ui.actionLog_In, SIGNAL (triggered()),
            this, SLOT (Login()));
   connect (ui.actionDirect, SIGNAL (triggered()),
@@ -169,6 +183,13 @@ DChatMain::Connect ()
            this, SLOT (Manual ()));
   connect (ui.actionAbout, SIGNAL (triggered()),
            this, SLOT (About ()));
+}
+
+void
+DChatMain::EditSettings ()
+{
+  configEdit.Exec ();
+  SetSettings ();
 }
 
 void
@@ -498,7 +519,9 @@ DChatMain::XPresenceChange (const QXmppPresence & presence)
       contactit->second->recentlySeen = true;
     }
   } else {
-    AddContact (id, resource, stype, statusText);
+    QString ownId    = presence.to ();
+    parts = ownId.split ('/', QString::SkipEmptyParts);
+    AddContact (id, resource, parts.at(0), stype, statusText);
   }
 }
 
@@ -607,19 +630,19 @@ DChatMain::StatusIcon (QXmppPresence::Status::Type stype)
 {
   switch (stype) {
   case QXmppPresence::Status::Offline: 
-    return QIcon ();
+    return QIcon (iconPath + QString ("user-offline.png"));
   case QXmppPresence::Status::Online:
     return QIcon (iconPath + QString("user-online.png"));
   case QXmppPresence::Status::Away:
     return QIcon (iconPath + QString ("user-away.png"));
   case QXmppPresence::Status::XA:
-    return QIcon();
+    return QIcon(iconPath + QString ("user-away-extended.png"));
   case QXmppPresence::Status::DND:
     return QIcon (iconPath + QString ("user-busy.png"));
   case QXmppPresence::Status::Chat:
-    return QIcon();
+    return QIcon(iconPath + QString ("user-online.png"));
   case QXmppPresence::Status::Invisible:
-    return QIcon();
+    return QIcon(iconPath + QString ("user-invisible"));
   default:
     return QIcon();
   }
@@ -636,6 +659,7 @@ DChatMain::XmppPoll ()
   xmppConfig = xclient->getConfiguration ();
   ResetContactSeen (serverContacts);
   QStringList::const_iterator stit;
+  QString thisUser = xmppConfig.user ();
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
     QStringList resources = xclient->getRoster().getResources (id);
@@ -649,7 +673,7 @@ DChatMain::XmppPoll ()
 
       ContactMap::iterator contactit = serverContacts.find (bigId);
       if (contactit == serverContacts.end ()) {
-        AddContact (id, res, stype, pres.status().statusText());
+        AddContact (id, res, thisUser, stype, pres.status().statusText());
       } else {
         SetStatus (contactit->second->modelRow, 
                    stype, pres.status().statusText());
@@ -663,12 +687,14 @@ DChatMain::XmppPoll ()
 void
 DChatMain::AddContact (QString id, 
                        QString res, 
+                       QString friendOf,
                        QXmppPresence::Status::Type stype,
                        QString statusText)
 {
   ServerContact * newContact = new ServerContact;
   newContact->name = id;
   newContact->state = QString("?");
+  newContact->friendOf = friendOf,
   newContact->resource = res;
   newContact->recentlySeen = true;
   QStandardItem * nameItem = new QStandardItem (newContact->name);
