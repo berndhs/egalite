@@ -56,6 +56,12 @@ LinkMangle::HttpAnchor (QString & anchor, QString ref)
   anchor =  QString("<a href=\"%1\">%1</a>").arg(ref);
 }
 
+QRegExp
+LinkMangle::HttpExp ()
+{
+  return QRegExp ("(https?://)(\\S*)");
+}
+
 #if 0
 void
 LinkMangle::TwitAtAnchor (QString & anchor, QString ref)

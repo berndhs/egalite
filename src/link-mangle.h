@@ -50,6 +50,7 @@ public:
   * matched portion in the new text.
   */
 
+static QRegExp HttpExp ();
 static QString Anchorize (const QString &text, QRegExp regular, 
                          void (*anchorFunc)(QString&, QString));
 

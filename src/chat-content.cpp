@@ -87,7 +87,7 @@ ChatContent::Incoming (const QXmppMessage & msg)
   QString pattern (tr("<b>%1</b> says to <b>%2</b>: %3"));
   QString msgtext = pattern.arg(from).arg(to).arg(body);
   QString cookedText = LinkMangle::Anchorize (msgtext,
-                                   QRegExp ("(https?://)(\\S*)"),
+                                   LinkMangle::HttpExp (),
                                    LinkMangle::HttpAnchor);
   ui.textHistory->append (cookedText);
 qDebug () << " emit activity " << this;
