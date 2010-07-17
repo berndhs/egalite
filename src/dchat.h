@@ -105,6 +105,7 @@ private:
   bool    GetPass ();
   void    CallDirectFrom (QString nick);
   QString StatusName (QXmppPresence::Status::Type stype);
+  QIcon   StatusIcon (QXmppPresence::Status::Type stype);
   void    SetStatus (int row, 
                      QXmppPresence::Status::Type stype,
                      QString statusText);
@@ -137,6 +138,9 @@ private:
   QTimer       *debugTimer;
   QTimer       *xmppTimer;
   QTimer       *announceHeartbeat;
+
+  QString      iconPath;
+  QString      iconSize;
 
 
   std::map <QString, DirectListener*> inDirect;

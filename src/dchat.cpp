@@ -129,6 +129,12 @@ DChatMain::Run ()
                  << tr("Name")
                  << tr("Login");
   contactModel.setHorizontalHeaderLabels (contactHeaders);
+  iconSize = QString ("22x22");
+  iconSize = QSettings ().value ("style/iconsize",iconSize).toString();
+  QSettings().setValue ("style/iconsize",iconSize);
+  iconPath = QString (":/icons/");
+  iconPath.append (iconSize);
+  iconPath.append ("/");
   show ();
 }
 
@@ -569,15 +575,7 @@ DChatMain::SetStatus (int row,
   if (statusText.length() == 0) {
     statusText = StatusName (stype);
   }
-  if (statusText == QString ("DND")) {
-    stateItem->setIcon (QIcon (":/icons/user-busy.png"));
-    qDebug () << " busy icon ";
-  } else if (statusText == QString ("away")) {
-    stateItem->setIcon (QIcon (":/icons/user-away.png"));
-    qDebug () << " away icon ";
-  } else if (statusText == QString ("On")) {
-    stateItem->setIcon (QIcon (":/icons/user-online.png"));
-  }
+  stateItem->setIcon (StatusIcon (stype));
   stateItem->setText (statusText);
   
 qDebug () << " did set status row " << row << " text " << stateItem->text();
@@ -603,6 +601,29 @@ DChatMain::StatusName (QXmppPresence::Status::Type stype)
     return tr ("Hiding");
   default:
     return tr ("?");
+  }
+}
+
+QIcon
+DChatMain::StatusIcon (QXmppPresence::Status::Type stype)
+{
+  switch (stype) {
+  case QXmppPresence::Status::Offline: 
+    return QIcon ();
+  case QXmppPresence::Status::Online:
+    return QIcon (iconPath + QString("user-online.png"));
+  case QXmppPresence::Status::Away:
+    return QIcon (iconPath + QString ("user-away.png"));
+  case QXmppPresence::Status::XA:
+    return QIcon();
+  case QXmppPresence::Status::DND:
+    return QIcon (iconPath + QString ("user-busy.png"));
+  case QXmppPresence::Status::Chat:
+    return QIcon();
+  case QXmppPresence::Status::Invisible:
+    return QIcon();
+  default:
+    return QIcon();
   }
 }
 
