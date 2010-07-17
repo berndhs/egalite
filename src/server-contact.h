@@ -33,16 +33,27 @@ class ServerContact
   public:
 
     ServerContact ()
-                 :name(""),
-                  state(""),
-                  resource(""),
-                  modelRow(0),
-                  recentlySeen(true)  
+                 :name (""),
+                  state (""),
+                  resource (""),
+                  friendOf (""),
+                  modelRow (0),
+                  recentlySeen (true)  
                  {}
+    ServerContact (QString n, QString st, QString res, QString fo,
+                   int r=0, bool s=true)
+                 :name (n),
+                  state (st),
+                  resource (res),
+                  friendOf (fo),
+                  modelRow (r),
+                  recentlySeen (s)
+                  {}
     
     QString    name;
     QString    state;
     QString    resource;
+    QString    friendOf;
     int        modelRow;
     bool       recentlySeen;
 };
