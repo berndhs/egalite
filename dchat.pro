@@ -35,7 +35,11 @@ unix {
 win32 {
   message ("Applying Windows 32 bit settings")
   INCLUDEPATH += ../qxmpp/source
+debug {
   LIBS += ../qxmpp/source/debug/libQXmppClient_d.a
+} else {
+  LIBS += ../qxmpp/source/debug/libQXmppClient.a
+}
 }
 message ("using extra libs $$LIBS")
 
