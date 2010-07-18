@@ -39,22 +39,6 @@ using namespace deliberate;
 namespace egalite
 {
 
-void
-ShowConfig (const QSslConfiguration & conf)
-{
-  qDebug () << " SSL configuration: ";
-  qDebug () << " Certificates: " << conf.caCertificates();
-// qDebug () << " Ciphers: " << conf.ciphers();
-  qDebug () << " NULL: " << conf.isNull();
-  qDebug () << " local Cert: " << conf.localCertificate();
-  qDebug () << " peer Cert: " << conf.peerCertificate ();
-  qDebug () << " peer Cert Chain: " << conf.peerCertificateChain ();
-  qDebug () << " peer verify depnth: " << conf.peerVerifyDepth ();
-  qDebug () << " peer verfiy mode: " << conf.peerVerifyMode ();
-  qDebug () << " private key: " << conf.privateKey ();
-  qDebug () << " session cipher: " << conf.sessionCipher ();
-}
-
 DirectCaller::DirectCaller (QWidget *parent)
   :QObject (parent),
    parentWidget (parent),

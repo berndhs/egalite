@@ -734,12 +734,14 @@ DChatMain::XmppElementReceived (const QDomElement & elt, bool & handled)
 void
 DChatMain::XmppIqReceived (const QXmppIq & iq)
 {
+  Q_UNUSED (iq);
   qDebug () << " received IQ ";
 }
 
 void
 DChatMain::XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq)
 {
+  Q_UNUSED (disIq);
   qDebug () << " received Discovery Iq ";
 }
 
