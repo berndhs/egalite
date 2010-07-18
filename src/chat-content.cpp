@@ -85,8 +85,8 @@ ChatContent::Incoming (const QXmppMessage & msg)
     return;
   }
   QDateTime  now = QDateTime::currentDateTime();
-  QString pattern (tr("(%4) <b>%1</b>: %3"));
-  QString msgtext = pattern.arg(from).arg(to).arg(body)
+  QString pattern (tr("(%3) <b>%1</b>: %2"));
+  QString msgtext = pattern.arg(from).arg(body)
                            .arg (now.toString (Qt::DefaultLocaleShortDate));
   QString cookedText = LinkMangle::Anchorize (msgtext,
                                    LinkMangle::HttpExp (),
