@@ -119,6 +119,11 @@ private:
   void    ResetContactSeen (ContactMap & contacts);
   void    FlushStaleContacts (ContactMap & contacts,
                               QStandardItemModel & model);
+  QString PresenceTypeString (QXmppPresence::Type t);
+  void    UpdateState (const QString & ownId,
+                       const QString & remoteId, 
+                       const QXmppPresence::Status & status);
+  void    HandleSubscription (const QXmppPresence & presence);
 
   Ui_DChatMain    ui;
   QApplication   *pApp;

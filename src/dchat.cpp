@@ -501,9 +501,21 @@ DChatMain::PickedItem (const QModelIndex &index)
 void
 DChatMain::XPresenceChange (const QXmppPresence & presence)
 {
-  qDebug () << " someone came or left";
-  QString remoteId = presence.from ();
+  QXmppPresence::Type   presType = presence.type ();
   QXmppPresence::Status status = presence.status();
+  if (presType == QXmppPresence::Available 
+      || presType == QXmppPresence::Unavailable) {
+    UpdateState (presence.to(), presence.from(), status);
+  } else {
+    HandleSubscription (presence);
+  }
+}
+
+void
+DChatMain::UpdateState (const QString & ownId,
+                        const QString & remoteId, 
+                        const QXmppPresence::Status & status)
+{
   QXmppPresence::Status::Type stype = status.type ();
   QString statusText = status.statusText (); 
   QStringList parts = remoteId.split ('/',QString::SkipEmptyParts);
@@ -519,9 +531,42 @@ DChatMain::XPresenceChange (const QXmppPresence & presence)
       contactit->second->recentlySeen = true;
     }
   } else {
-    QString ownId    = presence.to ();
     parts = ownId.split ('/', QString::SkipEmptyParts);
     AddContact (id, resource, parts.at(0), stype, statusText);
+  }
+}
+
+void
+DChatMain::HandleSubscription (const QXmppPresence & presence)
+{
+  qDebug () << " they want change in subscribe status";
+  qDebug () << " other user " << presence.from ();
+  qDebug () << " this user  " << presence.to ();
+  qDebug () << " want       " << PresenceTypeString (presence.type());
+}
+
+QString
+DChatMain::PresenceTypeString (QXmppPresence::Type t)
+{
+  switch (t) {
+    case QXmppPresence::Error: 
+      return tr ("pres-error");
+    case QXmppPresence::Available:
+      return tr ("Available");
+    case QXmppPresence::Unavailable:
+      return tr ("Not Available");
+    case QXmppPresence::Subscribe:
+      return tr ("Want to Subscribed");
+    case QXmppPresence::Subscribed:
+      return tr ("Done Subscribed");
+    case QXmppPresence::Unsubscribe:
+      return tr ("Want to Un-Subscribe");
+    case QXmppPresence::Unsubscribed:
+      return tr ("Done Un-Subscribed");
+    case QXmppPresence::Probe:
+      return tr ("Probe");
+    default:
+      return QString ("invalid type");
   }
 }
 
