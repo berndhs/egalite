@@ -56,6 +56,7 @@ DChatMain::DChatMain (QWidget *parent)
    configEdit (this),
    certStore (this),
    helpView (this),
+   subscriptionDialog (this),
    xclient (0),
    publicPort (29999),
    passdial (0),
@@ -215,7 +216,7 @@ DChatMain::Login ()
     connect (xclient, SIGNAL (disconnected ()),
              this, SLOT (XmppDisconnected ()));
     connect (xclient, SIGNAL (elementReceived (const QDomElement &, bool &)),
-             this, SLOT (XmppElementReceive (const QDomElement &, bool &)));
+             this, SLOT (XmppElementReceived (const QDomElement &, bool &)));
     connect (xclient, SIGNAL (iqReceived (const QXmppIq &)),
              this, SLOT (XmppIqReceived (const QXmppIq &)));
     connect (xclient, SIGNAL (discoveryIqReceived (const QXmppDiscoveryIq &)),
@@ -249,7 +250,7 @@ DChatMain::AnnounceMe ()
                       QString ("testing Egalite"));
   QXmppPresence pres (QXmppPresence::Available, status);
   if (xclient) {
-    xclient->sendPacket (pres);
+    xclient->setClientPresence (pres);
   }
 }
 
@@ -507,7 +508,7 @@ DChatMain::XPresenceChange (const QXmppPresence & presence)
       || presType == QXmppPresence::Unavailable) {
     UpdateState (presence.to(), presence.from(), status);
   } else {
-    HandleSubscription (presence);
+    subscriptionDialog.RemoteAskChange (xclient, presence);
   }
 }
 
@@ -534,15 +535,6 @@ DChatMain::UpdateState (const QString & ownId,
     parts = ownId.split ('/', QString::SkipEmptyParts);
     AddContact (id, resource, parts.at(0), stype, statusText);
   }
-}
-
-void
-DChatMain::HandleSubscription (const QXmppPresence & presence)
-{
-  qDebug () << " they want change in subscribe status";
-  qDebug () << " other user " << presence.from ();
-  qDebug () << " this user  " << presence.to ();
-  qDebug () << " want       " << PresenceTypeString (presence.type());
 }
 
 QString
@@ -773,6 +765,7 @@ void
 DChatMain::XmppElementReceived (const QDomElement & elt, bool & handled)
 {
   qDebug () << " received DOM elt from xclient ";
+  qDebug () << elt.tagName();
   handled = false;
 }
 

@@ -63,6 +63,7 @@ FORMS = \
         ui/chat-box.ui \
         ui/chat-content.ui \
         ui/helpwin.ui \
+        ui/subscription.ui \
 
 
 SOURCES = src/main.cpp \
@@ -82,6 +83,7 @@ SOURCES = src/main.cpp \
         src/chat-content.cpp \
         src/helpview.cpp \
         src/link-mangle.cpp \
+        src/subscription-change.cpp \
 
 
 
@@ -104,6 +106,7 @@ HEADERS = \
         src/server-contact.h \
         src/helpview.h \
         src/link-mangle.h \
+        src/subscription-change.h \
 
 
 

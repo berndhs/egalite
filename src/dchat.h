@@ -35,6 +35,7 @@
 #include "cert-store.h"
 #include "server-contact.h"
 #include "helpview.h"
+#include "subscription-change.h"
 
 #include <map>
 
@@ -123,16 +124,16 @@ private:
   void    UpdateState (const QString & ownId,
                        const QString & remoteId, 
                        const QXmppPresence::Status & status);
-  void    HandleSubscription (const QXmppPresence & presence);
 
   Ui_DChatMain    ui;
   QApplication   *pApp;
 
   QStandardItemModel  contactModel;
 
-  ConfigEdit     configEdit;
-  CertStore      certStore;
+  ConfigEdit            configEdit;
+  CertStore             certStore;
   deliberate::HelpView  helpView;
+  SubscriptionChange    subscriptionDialog;
 
   QXmppClient   *xclient;
   QXmppConfiguration  xmppConfig;
