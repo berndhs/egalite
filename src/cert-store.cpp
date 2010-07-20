@@ -38,25 +38,38 @@ using namespace deliberate;
 namespace egalite
 {
 
-CertStore::CertStore (QWidget *parent)
-  :QObject (parent),
+CertStore * CertStore::instance (0);
+
+CertStore & 
+CertStore::IF ()
+{
+  if (instance == 0) {
+    instance = new CertStore;
+  }
+  return *instance;
+}
+
+CertStore *
+CertStore::Object ()
+{
+  if (instance == 0) {
+    instance = new CertStore;
+  }
+  return instance;
+}
+
+CertStore::CertStore ()
+  :QObject (0),
    viewDetails (false),
    lastDirUsed ("")
 {
-  certDialog = new QDialog (parent);
-  uiCert.setupUi (certDialog);
-  contactDialog = new QDialog (parent);
-  uiContact.setupUi (contactDialog);
-  Connect ();
   dbElementList << "certificates"
                 << "uniqueident"
                 << "directcontacts"
-                << "uniquenick";
-
-  identListModel = new QStandardItemModel (certDialog);
-  uiCert.identList->setModel (identListModel);
-  addressModel = new QStandardItemModel (contactDialog);
-  uiContact.addressTable->setModel (addressModel);
+                << "uniquenick"
+                << "remotecerts"
+                << "uniqueremote"
+                << "uniqueremotecert";
 }
 
 void
@@ -87,8 +100,22 @@ CertStore::Connect ()
 }
 
 void
-CertStore::Init ()
+CertStore::Init (QWidget *parentWidget)
 {
+  bool initDone (false);
+  if (initDone) {
+    return;
+  }
+  initDone = true;
+  certDialog = new QDialog (parentWidget);
+  uiCert.setupUi (certDialog);
+  contactDialog = new QDialog (parentWidget);
+  uiContact.setupUi (contactDialog);
+  Connect ();
+  identListModel = new QStandardItemModel (certDialog);
+  uiCert.identList->setModel (identListModel);
+  addressModel = new QStandardItemModel (contactDialog);
+  uiContact.addressTable->setModel (addressModel);
   dbFileName =  QDesktopServices::storageLocation 
               (QDesktopServices::DataLocation)
               + QDir::separator()
@@ -422,6 +449,20 @@ CertStore::WriteContacts (const QString filename)
     qry.bindValue (1,QVariant (addr));
     qry.exec ();
   }
+}
+
+void
+CertStore::StoreRemote (const QString &nick, const QByteArray &pem)
+{ 
+  CheckDBComplete (dbFileName);
+  QString  qryString ("insert or replace into remotecerts "
+                       " (ident, pemcert) "
+                       " values (?, ?)");
+  QSqlQuery qry (certDB);
+  qry.prepare (qryString);
+  qry.bindValue (0, QVariant (nick));
+  qry.bindValue (1, QVariant (pem));
+  qry.exec ();
 }
 
 void

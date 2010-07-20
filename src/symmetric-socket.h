@@ -26,7 +26,7 @@
 #include <QSslSocket>
 #include <QSslCertificate>
 #include <QSslKey>
-#include "ui_mirror.h"
+#include "ui_socket-display.h"
 #include <QDialog>
 #include <QObject>
 
@@ -94,6 +94,7 @@ private slots:
   void Receive ();
   void Disconnected ();
   void EncryptDone ();
+  void SaveCertRequest (const QString & name, const QByteArray & pem);
 
 signals:
 
@@ -101,6 +102,7 @@ signals:
   void Exiting (SymmetricSocket * self);
   void ReceiveData (const QByteArray &data);
   void Ready (SymmetricSocket * self);
+  void SaveRemoteCert (const QString & name, const QByteArray & pem);
 
 private:
 
@@ -111,7 +113,7 @@ private:
   QSslSocket    *sock;
   PickCert      *pickCert;
   QDialog       *dialog;
-  Ui_MirrorDisplay  ui;
+  Ui_SocketDisplay  ui;
   QSslKey       key;
   QSslCertificate cert;
   QTimer       *checkTimer;

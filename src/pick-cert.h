@@ -24,6 +24,7 @@
 
 #include <QDialog>
 #include "ui_cert-candidate.h"
+#include "ui_save-as.h"
 #include <QList>
 #include <QSslCertificate>
 
@@ -48,6 +49,11 @@ private slots:
   void Down ();
   void Reject ();
   void Accept ();
+  void AcceptStore ();
+
+signals:
+
+  void SaveRemote (const QString & nick, const QByteArray & pem);
 
 private:
 
@@ -55,6 +61,8 @@ private:
   bool StillGood ();
 
   Ui_CertCandidate      ui;
+  Ui_SaveName           saveUi;
+  QDialog               saveDialog;
 
   QList <QSslCertificate>  certs;
   int                      ndx;

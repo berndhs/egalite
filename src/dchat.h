@@ -131,7 +131,6 @@ private:
   QStandardItemModel  contactModel;
 
   ConfigEdit            configEdit;
-  CertStore             certStore;
   deliberate::HelpView  helpView;
   SubscriptionChange    subscriptionDialog;
 

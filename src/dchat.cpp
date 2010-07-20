@@ -54,7 +54,6 @@ DChatMain::DChatMain (QWidget *parent)
    pApp (0),
    contactModel (this),
    configEdit (this),
-   certStore (this),
    helpView (this),
    subscriptionDialog (this),
    xclient (0),
@@ -93,7 +92,7 @@ DChatMain::Run ()
     QSize newsize = Settings().value ("sizes/main", defaultSize).toSize();
     resize (newsize);
   }
-  certStore.Init ();
+  CertStore::IF().Init (this);
   SetSettings ();
   QStringList contactHeaders;
   contactHeaders << tr("Status")
@@ -127,8 +126,8 @@ DChatMain::SetSettings ()
   QString ownAddress ("0::1");
   ownAddress = Settings().value ("direct/address",ownAddress).toString();
   Settings().setValue ("direct/address",ownAddress);
-  if (certStore.HaveCert (directHost)) {
-    CertRecord hostCert = certStore.Cert (directHost);
+  if (CertStore::IF().HaveCert (directHost)) {
+    CertRecord hostCert = CertStore::IF().Cert (directHost);
     QString pass ("enkhuizen");
     QSslKey key (hostCert.Key().toAscii(),QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
@@ -174,9 +173,9 @@ DChatMain::Connect ()
   connect (ui.actionLog_In, SIGNAL (triggered()),
            this, SLOT (Login()));
   connect (ui.actionDirect, SIGNAL (triggered()),
-           &certStore, SLOT (CertDialog ()));
+           CertStore::Object(), SLOT (CertDialog ()));
   connect (ui.contactDirectAction, SIGNAL (triggered()),
-           &certStore, SLOT (ContactDialog ()));
+           CertStore::Object(), SLOT (ContactDialog ()));
   connect (ui.contactView, SIGNAL (activated (const QModelIndex &)),
            this, SLOT (PickedItem (const QModelIndex &)));
   connect (ui.actionLicense, SIGNAL (triggered()),
@@ -362,23 +361,23 @@ void
 DChatMain::CallDirect ()
 {
   PickString     pickString (this);
-  QStringList    choiceList = certStore.NameList();
+  QStringList    choiceList = CertStore::IF().NameList();
   pickString.SetTitle (tr("Choose Direct Identity"));
   int choice = pickString.Pick (choiceList);
   if (choice != 1) {
     return;
   }
   QString  originNick = pickString.Choice ();
-  CertRecord outCert = certStore.Cert (originNick);
+  CertRecord outCert = CertStore::IF().Cert (originNick);
   
-  choiceList = certStore.ContactList ();
+  choiceList = CertStore::IF().ContactList ();
   pickString.SetTitle (tr("Choose Destination"));
   choice = pickString.Pick (choiceList);
   if (choice != 1) {
     return;
   }
   QString dest = pickString.Choice ();
-  QString destaddr = certStore.ContactAddress (dest);
+  QString destaddr = CertStore::IF().ContactAddress (dest);
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
 

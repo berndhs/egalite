@@ -55,7 +55,7 @@ FORMS = \
 	ui/DebugLog.ui \
         ui/getpassword.ui \
         ui/config-edit.ui \
-        ui/mirror.ui \
+        ui/socket-display.ui \
         ui/cert-candidate.ui \
         ui/cert-store.ui \
         ui/contact-edit.ui \
@@ -64,6 +64,7 @@ FORMS = \
         ui/chat-content.ui \
         ui/helpwin.ui \
         ui/subscription.ui \
+        ui/save-as.ui \
 
 
 SOURCES = src/main.cpp \

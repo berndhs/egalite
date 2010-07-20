@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MirrorDisplay</class>
- <widget class="QDialog" name="MirrorDisplay">
+ <class>SocketDisplay</class>
+ <widget class="QDialog" name="SocketDisplay">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Mirror</string>
+   <string>Connection</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../dchat.qrc">
+    <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
@@ -233,6 +237,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../dchat.qrc"/>
+ </resources>
  <connections/>
 </ui>

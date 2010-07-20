@@ -22,6 +22,7 @@
 #include "deliberate.h"
 #include "symmetric-socket.h"
 #include "pick-cert.h"
+#include "cert-store.h"
 #include <QSslSocket>
 #include <QAbstractSocket>
 #include <QSslKey>
@@ -332,6 +333,8 @@ SymmetricSocket::PickOneCert (const QList <QSslCertificate> & clist)
 {
   if (pickCert == 0) {
     pickCert = new PickCert (0,QString("Incoming"));
+    connect (pickCert, SIGNAL (SaveRemote (const QString &, const QByteArray &)),
+             this, SLOT (SaveCertRequest (const QString &, const QByteArray &)));
   }
   if (pickCert) {
     bool accepted (false);
@@ -346,6 +349,12 @@ SymmetricSocket::PickOneCert (const QList <QSslCertificate> & clist)
   } else {
     return false;
   }
+}
+
+void
+SymmetricSocket::SaveCertRequest (const QString & name, const QByteArray & pem)
+{
+  CertStore::IF().StoreRemote (name, pem);
 }
 
 void

@@ -44,6 +44,7 @@ namespace egalite
   *  keep track of contact addresses for direct contacts.
   *
   * This serves as a storage container. It also has a gui edit facility.
+  * It is a Singleton.
   */
 
 class CertStore : public QObject
@@ -52,10 +53,12 @@ Q_OBJECT
 
 public:
 
-  CertStore (QWidget *parent = 0);
+
+  static CertStore & IF();
+  static CertStore * Object();
 
   /** \brief Init - load from cert storage file. */
-  void Init ();
+  void Init (QWidget *parentWidget = 0);
 
   CertRecord  Cert (QString id);
   bool        HaveCert (QString id);
@@ -69,6 +72,7 @@ public slots:
   void CertDialog ();
   /** \brief ContactDialog - gui to add/remove/edit contact addresses. */
   void ContactDialog ();
+  void StoreRemote (const QString & nick, const QByteArray & pem);
 
 private slots:
 
@@ -87,6 +91,8 @@ private slots:
   void ToggleView ();
 
 private:
+
+  CertStore ();
 
   void Connect ();
   void ReadDB ();
@@ -120,6 +126,8 @@ private:
   QStringList     dbElementList;
 
   QString         lastDirUsed;
+
+  static CertStore * instance;
 
 };
 

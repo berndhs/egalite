@@ -27,17 +27,25 @@ namespace egalite
 
 PickCert::PickCert (QWidget * parent, QString title)
   :QDialog (parent),
+   saveDialog (this),
    haveGoodCert (false)
 {
   ui.setupUi (this);
+  saveUi.setupUi (&saveDialog);
   setObjectName (QString("PickCert %1").arg(title));
   QString wintitle = windowTitle();
   setWindowTitle (wintitle + " " + title);
 
   connect (ui.acceptButton, SIGNAL (clicked()), this, SLOT (Accept()));
+  connect (ui.storeButton, SIGNAL (clicked()), this, SLOT (AcceptStore()));
   connect (ui.rejectButton, SIGNAL (clicked()), this, SLOT (Reject()));
   connect (ui.nextButton, SIGNAL (clicked()), this, SLOT (Up()));
   connect (ui.nextButton, SIGNAL (clicked()), this, SLOT (Down()));
+
+  connect (saveUi.saveButton, SIGNAL (clicked()), 
+           &saveDialog, SLOT (accept ()));
+  connect (saveUi.saveButton, SIGNAL (clicked()), 
+           &saveDialog, SLOT (reject ()));
 }
 
 void
@@ -68,6 +76,19 @@ PickCert::Accept ()
   haveGoodCert = true;
   goodCert = certs.at(ndx);
   done (1);
+}
+
+void
+PickCert::AcceptStore ()
+{
+  Accept ();
+  saveUi.nickEdit->setText (ui.certOrgLine->text ());
+  int saveit = saveDialog.exec ();
+  if (saveit == 1) {
+    QString nick = saveUi.nickEdit->text ();
+    QByteArray pem = goodCert.toPem ();
+    emit SaveRemote (nick, pem);
+  }
 }
 
 bool
