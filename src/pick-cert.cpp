@@ -88,7 +88,8 @@ void
 PickCert::AcceptStore ()
 {
   Accept ();
-  saveUi.nickEdit->setText (ui.certOrgLine->text ());
+  saveUi.nickEdit->setText (goodCert.subjectInfo 
+                                  (QSslCertificate::CommonName));
   int saveit = saveDialog.exec ();
 qDebug () << "AcceptStore " << saveit << " for " << saveUi.nickEdit->text();
   if (saveit == 1) {
