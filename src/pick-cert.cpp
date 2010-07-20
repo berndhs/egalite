@@ -20,7 +20,7 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include "pick-cert.h"
-
+#include <QDebug>
 
 namespace egalite
 {
@@ -44,7 +44,7 @@ PickCert::PickCert (QWidget * parent, QString title)
 
   connect (saveUi.saveButton, SIGNAL (clicked()), 
            &saveDialog, SLOT (accept ()));
-  connect (saveUi.saveButton, SIGNAL (clicked()), 
+  connect (saveUi.cancelButton, SIGNAL (clicked()), 
            &saveDialog, SLOT (reject ()));
 }
 
@@ -84,6 +84,7 @@ PickCert::AcceptStore ()
   Accept ();
   saveUi.nickEdit->setText (ui.certOrgLine->text ());
   int saveit = saveDialog.exec ();
+qDebug () << "AcceptStore " << saveit << " for " << saveUi.nickEdit->text();
   if (saveit == 1) {
     QString nick = saveUi.nickEdit->text ();
     QByteArray pem = goodCert.toPem ();
