@@ -20,6 +20,8 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include "pick-cert.h"
+#include "cert-store.h"
+#include <QDateTime>
 #include <QDebug>
 
 namespace egalite
@@ -62,6 +64,10 @@ PickCert::Pick (const QList <QSslCertificate> & clist,
     }
     haveGoodCert = false;
   }
+  if (HaveGoodSavedCert (clist, pickedCert)) {
+    pickedOne = true;
+    return;
+  }
   ndx = 0;
   Display (ndx);
   show ();
@@ -98,7 +104,28 @@ PickCert::StillGood ()
   int c;
   for (c=0; c<certs.size(); c++) {
     if (goodCert == certs.at(c)) {
-      return true;
+      QDateTime now (QDateTime::currentDateTime ());
+      return (goodCert.effectiveDate() <= now
+          && now <= goodCert.expiryDate ()) ;
+    }
+  }
+  return false;
+}
+
+bool
+PickCert::HaveGoodSavedCert (const QList <QSslCertificate> & clist,
+                            QSslCertificate & pickedCert)
+{
+  QDateTime now (QDateTime::currentDateTime());
+  QList<QSslCertificate>::const_iterator  cit;
+  for (cit = clist.begin() ; cit != clist.end (); cit++) {
+    if (cit->effectiveDate() <= now
+        && now <= cit->expiryDate()) {
+      QString nick;
+      if (CertStore::IF().RemoteNick (cit->toPem(), nick)) {
+        pickedCert = *cit;
+        return true;
+      }
     }
   }
   return false;

@@ -461,8 +461,25 @@ CertStore::StoreRemote (const QString &nick, const QByteArray &pem)
   QSqlQuery qry (certDB);
   qry.prepare (qryString);
   qry.bindValue (0, QVariant (nick));
-  qry.bindValue (1, QVariant (pem));
+  qry.bindValue (1, QVariant (QString (pem)));
   qry.exec ();
+}
+
+bool
+CertStore::RemoteNick (QByteArray  pem, QString & nick)
+{
+  QString qryString = QString ("select ident from remotecerts "
+                      "where pemcert = \"%1\"").arg (QString(pem));
+  QSqlQuery query (certDB);
+  bool ok = query.exec (qryString);
+qDebug () << " query good " << ok << " for RemoteNick " << QString(pem).left (40);
+  if (ok && query.next()) {
+    nick = query.value (0).toString();
+qDebug () << " found nick " << nick;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void

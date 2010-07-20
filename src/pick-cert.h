@@ -59,6 +59,8 @@ private:
 
   void Display (int index);
   bool StillGood ();
+  bool HaveGoodSavedCert (const QList <QSslCertificate> & clist,
+                            QSslCertificate & pickedCert);
 
   Ui_CertCandidate      ui;
   Ui_SaveName           saveUi;

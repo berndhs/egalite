@@ -65,6 +65,7 @@ public:
   QStringList NameList ();
   QString     ContactAddress (QString id);
   QStringList ContactList ();
+  bool        RemoteNick (QByteArray pem, QString & nick);
 
 public slots:
 
