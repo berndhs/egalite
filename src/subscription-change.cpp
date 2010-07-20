@@ -34,11 +34,21 @@ SubscriptionChange::SubscriptionChange (QWidget *parent)
   connect (ui.ignoreButton, SIGNAL (clicked ()), this, SLOT (Ignore ()));
 }
 
+void
+SubscriptionChange::SetButtonEnable (bool enable)
+{
+  ui.allowButton->setEnabled (enable);
+  ui.denyButton->setEnabled (enable);
+  ui.ignoreButton->setEnabled (true);   // can always ignore
+}
+
 void 
 SubscriptionChange::RemoteAskChange  (QXmppClient * client, 
                                 const QXmppPresence & presence)
 {
   xclient = client;
+  request = presence;
+  SetButtonEnable (request.type() == QXmppPresence::Subscribe);
   QStringList  parts = presence.to().split ('/',QString::SkipEmptyParts);
   ui.ownId->setPlainText (parts.at(0));
   parts = presence.from ().split ('/',QString::SkipEmptyParts);
@@ -76,8 +86,22 @@ SubscriptionChange::PresenceTypeMessage (QXmppPresence::Type t)
 }
 
 void
+SubscriptionChange::Reply (QXmppPresence::Type t)
+{
+  QXmppPresence  answer;
+  answer.setTo (request.from());
+  answer.setType (t);
+  if (xclient) {
+    xclient->sendPacket (answer);
+  }
+}
+
+void
 SubscriptionChange::Allow ()
 {
+  if (request.type() == QXmppPresence::Subscribe) {
+    Reply (QXmppPresence::Subscribed);
+  }
   xclient = 0;
   accept ();
 }
@@ -85,6 +109,9 @@ SubscriptionChange::Allow ()
 void
 SubscriptionChange::Deny ()
 {
+  if (request.type() == QXmppPresence::Subscribe) {
+    Reply (QXmppPresence::Unsubscribed);
+  }
   xclient = 0;
   reject ();
 }

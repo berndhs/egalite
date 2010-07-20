@@ -73,7 +73,7 @@ DChatMain::DChatMain (QWidget *parent)
   debugTimer->start (10 * 1000); // 15 secs
   xmppTimer = new QTimer (this);
   connect (xmppTimer, SIGNAL (timeout()), this, SLOT (XmppPoll ()));
-  xmppTimer->start (15 * 1000); // 15 secs
+  xmppTimer->start (15 * 60 * 1000); // 15 mins
   announceHeartbeat = new QTimer (this);
   connect (announceHeartbeat, SIGNAL (timeout()), this, SLOT (AnnounceMe()));
   announceHeartbeat->start (1000*60*2); // 2 minutes
@@ -504,6 +504,8 @@ DChatMain::XPresenceChange (const QXmppPresence & presence)
 {
   QXmppPresence::Type   presType = presence.type ();
   QXmppPresence::Status status = presence.status();
+qDebug () << " receive presence form " << presence.from () << " to "
+          << presence.to () << " type " << PresenceTypeString (presType);
   if (presType == QXmppPresence::Available 
       || presType == QXmppPresence::Unavailable) {
     UpdateState (presence.to(), presence.from(), status);
@@ -751,8 +753,8 @@ DChatMain::AddContact (QString id,
 void
 DChatMain::XmppConnected ()
 {
-  AnnounceMe ();
   XmppPoll ();
+  AnnounceMe ();
 }
 
 void
@@ -780,7 +782,25 @@ void
 DChatMain::XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq)
 {
   Q_UNUSED (disIq);
-  qDebug () << " received Discovery Iq ";
+  QXmppIq::Type  iqtype = disIq.type ();
+  QString msg;
+  switch (iqtype) {
+  case QXmppIq::Error:
+     msg = "Error";
+     break;
+  case QXmppIq::Get:
+     msg = "Get";
+     break;
+   case QXmppIq::Set:
+     msg = "Set";
+     break;
+   case QXmppIq::Result:
+     msg = "Result";
+     break;
+   default:
+     msg = "Bad IQ type";
+  }
+  qDebug () << " received Discovery Iq type " << msg;
 }
 
 void

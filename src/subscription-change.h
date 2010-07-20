@@ -48,8 +48,11 @@ private slots:
 private:
 
   QString PresenceTypeMessage (QXmppPresence::Type t);
+  void    Reply (QXmppPresence::Type t);
+  void    SetButtonEnable (bool enable);
 
   QXmppClient    * xclient;
+  QXmppPresence    request;
 
   Ui_SubscriptionChange    ui;
 };
