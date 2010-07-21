@@ -43,8 +43,8 @@ namespace egalite
 /** \brief CertStore keep track of SSL identities defined by certificates, and
   *  keep track of contact addresses for direct contacts.
   *
-  * This serves as a storage container. It also has a gui edit facility.
-  * It is a Singleton.
+  * This serves as a Singleton storage container. It also has a gui edit facility.
+  * 
   */
 
 class CertStore : public QObject
@@ -57,7 +57,10 @@ public:
   static CertStore & IF();
   static CertStore * Object();
 
-  /** \brief Init - load from cert storage file. */
+  /** \brief Load identity cert data and connect to parent Widget.
+    * Only the first call to Init does anything, any additional calls are 
+    * ignored.
+    */
   void Init (QWidget *parentWidget = 0);
 
   CertRecord  Cert (QString id);

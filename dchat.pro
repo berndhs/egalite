@@ -65,6 +65,7 @@ FORMS = \
         ui/helpwin.ui \
         ui/subscription.ui \
         ui/save-as.ui \
+        ui/simple-password.ui \
 
 
 SOURCES = src/main.cpp \
@@ -85,6 +86,7 @@ SOURCES = src/main.cpp \
         src/helpview.cpp \
         src/link-mangle.cpp \
         src/subscription-change.cpp \
+        src/simple-pass.cpp \
 
 
 
@@ -108,6 +110,7 @@ HEADERS = \
         src/helpview.h \
         src/link-mangle.h \
         src/subscription-change.h \
+        src/simple-pass.h \
 
 
 

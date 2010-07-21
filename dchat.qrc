@@ -43,7 +43,7 @@
   <file alias="user-online.png">images/64x64/status/user-online.png</file>
 </qresource>
 <qresource prefix="/schemas">
-  <file alias="certificates.sql">schemafiles/certificates.sql</file>
+  <file alias="identities.sql">schemafiles/identities.sql</file>
   <file alias="uniqueident.sql">schemafiles/uniqueident.sql</file>
   <file alias="directcontacts.sql">schemafiles/directcontacts.sql</file>
   <file alias="uniquenick.sql">schemafiles/uniquenick.sql</file>

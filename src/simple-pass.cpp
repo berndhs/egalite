@@ -1,6 +1,3 @@
-#ifndef CERT_TYPES_H
-#define CERT_TYPES_H
-
 /****************************************************************
  * This file is distributed under the following license:
  *
@@ -18,47 +15,48 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include <QString>
-#include <map>
+#include "simple-pass.h"
 
 namespace egalite
 {
 
-class CertRecord 
+SimplePass::SimplePass (QWidget *parent)
+  :QDialog (parent)
 {
-public:
+  setupUi (this);
+  connect (okButton, SIGNAL (clicked()), this, SLOT (Ok()));
+  connect (cancelButton, SIGNAL (clicked()), this, SLOT (Cancel()));
+}
 
-   CertRecord (QString id, QString pa, QString pk, QString c)
-      :ident (id), password (pa), privateKey (pk), cert (c) {}
+QString
+SimplePass::GetPassword (QString purpose)
+{
+  purposeLabel->setText (purpose);
+  passwordEdit->clear ();
+  int yes = exec ();
+  if (yes == 1) {
+    return passwordEdit->text();
+  } else {
+    return QString ();
+  }
+}
 
-   CertRecord ():ident(""),privateKey(""), cert (""){}
+void
+SimplePass::Ok ()
+{
+  done (1);
+}
 
-   QString Id () { return ident; }
-   QString Password () { return password; }
-   QString Key () { return privateKey; }
-   QString Cert () { return cert; }
-
-   void SetId (QString s) { ident = s; }
-   void SetPassword (QString s) { password = s; }
-   void SetKey (QString s) { privateKey = s; }
-   void SetCert (QString s) { cert = s; }
-
-private:
-
-    QString    ident;
-    QString    password;
-    QString    privateKey;
-    QString    cert;
-
-};
-
-typedef std::map <QString, CertRecord> CertMap;
-typedef std::map <QString, QString>    ContactAddrMap;
+void
+SimplePass::Cancel ()
+{
+  passwordEdit->clear ();
+  done (0);
+}
 
 } // namespace
 
-#endif

@@ -1,5 +1,5 @@
-#ifndef CERT_TYPES_H
-#define CERT_TYPES_H
+#ifndef SIMPLE_PASS_H
+#define SIMPLE_PASS_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -22,42 +22,27 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include <QString>
-#include <map>
+#include "ui_simple-password.h"
 
 namespace egalite
 {
 
-class CertRecord 
+class SimplePass : public QDialog, public Ui_SimplePass
 {
+Q_OBJECT
+
 public:
 
-   CertRecord (QString id, QString pa, QString pk, QString c)
-      :ident (id), password (pa), privateKey (pk), cert (c) {}
+  SimplePass (QWidget * parent=0);
 
-   CertRecord ():ident(""),privateKey(""), cert (""){}
+  QString GetPassword (QString purpose);
 
-   QString Id () { return ident; }
-   QString Password () { return password; }
-   QString Key () { return privateKey; }
-   QString Cert () { return cert; }
+public slots:
 
-   void SetId (QString s) { ident = s; }
-   void SetPassword (QString s) { password = s; }
-   void SetKey (QString s) { privateKey = s; }
-   void SetCert (QString s) { cert = s; }
-
-private:
-
-    QString    ident;
-    QString    password;
-    QString    privateKey;
-    QString    cert;
+  void Ok ();
+  void Cancel ();
 
 };
-
-typedef std::map <QString, CertRecord> CertMap;
-typedef std::map <QString, QString>    ContactAddrMap;
 
 } // namespace
 

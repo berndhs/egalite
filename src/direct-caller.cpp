@@ -22,6 +22,7 @@
 #include "deliberate.h"
 #include "direct-caller.h"
 #include "pick-cert.h"
+#include "simple-pass.h"
 #include "symmetric-socket.h"
 #include <QDebug>
 #include <QApplication>
@@ -52,7 +53,11 @@ DirectCaller::Setup (CertRecord & certRec, int remotePort, QString localNick)
 {
   localName = localNick;
   publicPort = remotePort;
-  QString pass ("enkhuizen");
+  QString pass = certRec.Password ();
+  if (pass.length() == 0) {
+    SimplePass  getPass (parentWidget);
+    pass = getPass.GetPassword (tr("Certificate Password:"));
+  }
   key = QSslKey (certRec.Key().toAscii(),QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
   cert = QSslCertificate (certRec.Cert().toAscii());

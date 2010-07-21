@@ -1,1 +1,1 @@
-CREATE UNIQUE INDEX "uniqueident" on certificates (ident ASC);
+CREATE UNIQUE INDEX "uniqueident" on identities (ident ASC);

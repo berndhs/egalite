@@ -63,7 +63,7 @@ CertStore::CertStore ()
    viewDetails (false),
    lastDirUsed ("")
 {
-  dbElementList << "certificates"
+  dbElementList << "identities"
                 << "uniqueident"
                 << "directcontacts"
                 << "uniquenick"
@@ -143,6 +143,7 @@ CertStore::CertDialog ()
   }
   uiCert.keyEdit->clear ();
   uiCert.certEdit->clear ();
+  uiCert.passwordEdit->clear ();
   certDialog->exec ();
 }
 
@@ -361,6 +362,7 @@ CertStore::SaveIdent ()
     identListModel->appendRow (editItem);
   }
   currentRec.SetId (id);
+  currentRec.SetPassword (uiCert.passwordEdit->text ());
   currentRec.SetKey (uiCert.keyEdit->toPlainText ());
   currentRec.SetCert (uiCert.certEdit->toPlainText ());
   homeCertMap [id] = currentRec;
@@ -379,17 +381,19 @@ void
 CertStore::ReadDB ()
 {
   QSqlQuery certQuery (certDB);
-  certQuery.exec (QString ("select * from certificates"));
+  certQuery.exec (QString ("select * from identities"));
   int identNdx = certQuery.record().indexOf ("ident");
+  int passNdx  = certQuery.record().indexOf ("password");
   int keyNdx   = certQuery.record().indexOf ("privatekey");
   int certNdx  = certQuery.record().indexOf ("pemcert");
-  QString ident,key,cert;
+  QString ident,password,key,cert;
   homeCertMap.clear ();
   while (certQuery.next()) {
     ident = certQuery.value (identNdx).toString();
+    password = certQuery.value (passNdx).toString();
     key   = certQuery.value (keyNdx).toString();
     cert  = certQuery.value (certNdx).toString();
-    CertRecord rec (ident, key, cert);
+    CertRecord rec (ident, password, key, cert);
     homeCertMap.insert (std::pair<QString,CertRecord>(ident,rec));
   }
 
@@ -413,16 +417,17 @@ CertStore::WriteCerts (const QString filename)
   CheckDBComplete (filename);
   CertMap::iterator  certit;
   CertRecord  certRec;
-  QString  qryString ("insert or replace into certificates "
-                       " (ident, privatekey, pemcert) "
-                       " values (?, ?, ?)");
+  QString  qryString ("insert or replace into identities "
+                       " (ident, password, privatekey, pemcert) "
+                       " values (?, ?, ?, ?)");
   for (certit = homeCertMap.begin(); certit != homeCertMap.end(); certit++ ) {
     certRec = certit->second;
     QSqlQuery qry (certDB);
     qry.prepare (qryString);
-    qry.bindValue (0,QVariant (certRec.Id()));
-    qry.bindValue (1,QVariant (certRec.Key()));
-    qry.bindValue (2,QVariant (certRec.Cert()));
+    qry.bindValue (0,QVariant (certRec.Id ()));
+    qry.bindValue (1,QVariant (certRec.Password ()));
+    qry.bindValue (2,QVariant (certRec.Key ()));
+    qry.bindValue (3,QVariant (certRec.Cert ()));
     qry.exec ();
   }
 }
