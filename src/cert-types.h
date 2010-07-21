@@ -56,8 +56,33 @@ private:
 
 };
 
+class ContactHost
+{
+public:
+
+  ContactHost (QString id, QString ad, int pt)
+    :ident (id), addr (ad), port (pt) {}
+  ContactHost ()
+    :ident (""), addr ("::1"), port (0) {}
+
+  QString Id () { return ident; }
+  QString Address () { return addr; }
+  int     Port () { return port; }
+
+  void SetId (QString i) { ident = i; }
+  void SetAddress (QString a) { addr = a; }
+  void SetPort (int p) { port = p; }
+
+private:
+
+  QString ident;
+  QString addr;
+  int     port;
+  
+};
+
 typedef std::map <QString, CertRecord> CertMap;
-typedef std::map <QString, QString>    ContactAddrMap;
+typedef std::map <QString, ContactHost>    ContactHostMap;
 
 } // namespace
 

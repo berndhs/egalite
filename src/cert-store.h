@@ -67,6 +67,7 @@ public:
   bool        HaveCert (QString id);
   QStringList NameList ();
   QString     ContactAddress (QString id);
+  int         ContactPort    (QString id);
   QStringList ContactList ();
   bool        RemoteNick (QByteArray pem, QString & nick);
 
@@ -116,16 +117,16 @@ private:
   QDialog         *contactDialog;
   QString          dbFileName;
   CertMap          homeCertMap;
-  ContactAddrMap   contactAddrMap;
+  ContactHostMap   contactHostMap;
   QSqlDatabase     certDB;
   QString          conName;
   CertRecord       currentRec;
   QSslCertificate  currentCert;
   bool             viewDetails;
 
-  QStandardItemModel  *identListModel;
+  QStandardItemModel  *identityModel;
   QStandardItem       *editItem;
-  QStandardItemModel  *addressModel;
+  QStandardItemModel  *contactModel;
 
   QStringList     dbElementList;
 

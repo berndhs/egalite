@@ -112,10 +112,10 @@ CertStore::Init (QWidget *parentWidget)
   contactDialog = new QDialog (parentWidget);
   uiContact.setupUi (contactDialog);
   Connect ();
-  identListModel = new QStandardItemModel (certDialog);
-  uiCert.identList->setModel (identListModel);
-  addressModel = new QStandardItemModel (contactDialog);
-  uiContact.addressTable->setModel (addressModel);
+  identityModel = new QStandardItemModel (certDialog);
+  uiCert.identList->setModel (identityModel);
+  contactModel = new QStandardItemModel (contactDialog);
+  uiContact.addressTable->setModel (contactModel);
   dbFileName =  QDesktopServices::storageLocation 
               (QDesktopServices::DataLocation)
               + QDir::separator()
@@ -134,12 +134,12 @@ CertStore::Init (QWidget *parentWidget)
 void
 CertStore::CertDialog ()
 {
-  identListModel->clear ();
+  identityModel->clear ();
   CertMap::iterator  certit;
   for (certit = homeCertMap.begin(); certit != homeCertMap.end(); certit++) {
     QStandardItem *item = new QStandardItem (certit->first);
     item->setEditable (false);
-    identListModel->appendRow (item);
+    identityModel->appendRow (item);
   }
   uiCert.keyEdit->clear ();
   uiCert.certEdit->clear ();
@@ -176,12 +176,19 @@ CertStore::Cert (QString id)
 QString
 CertStore::ContactAddress (QString id)
 {
-  ContactAddrMap::const_iterator addrit = contactAddrMap.find (id);
-  if (addrit != contactAddrMap.end()) {
-    return addrit->second;
+  ContactHostMap::iterator addrit = contactHostMap.find (id);
+  if (addrit != contactHostMap.end()) {
+    return addrit->second.Address();
   } else {
     return QString ("::1");
   }
+}
+
+int
+CertStore::ContactPort (QString id)
+{
+  Q_UNUSED (id);
+  return 0;
 }
 
 QStringList
@@ -199,8 +206,8 @@ QStringList
 CertStore::ContactList ()
 {
   QStringList list;
-  ContactAddrMap::const_iterator addrit;
-  for (addrit = contactAddrMap.begin (); addrit != contactAddrMap.end ();
+  ContactHostMap::const_iterator addrit;
+  for (addrit = contactHostMap.begin (); addrit != contactHostMap.end ();
        addrit++) {
     list << addrit->first;
   }
@@ -210,11 +217,13 @@ CertStore::ContactList ()
 void
 CertStore::NewContact ()
 {
-  int newRow = addressModel->rowCount ();
+  int newRow = contactModel->rowCount ();
   QStandardItem *item = new QStandardItem (tr("New Contact"));
-  addressModel->setItem (newRow, 0, item);
-  item = new QStandardItem (tr("0::1"));
-  addressModel->setItem (newRow, 1, item);
+  contactModel->setItem (newRow, 0, item);
+  item = new QStandardItem (tr("::1"));
+  contactModel->setItem (newRow, 1, item);
+  item = new QStandardItem (tr("0"));
+  contactModel->setItem (newRow, 2, item);
 }
 
 void
@@ -222,7 +231,7 @@ CertStore::DeleteContact ()
 {
   QModelIndex current = uiContact.addressTable->currentIndex ();
   int row = current.row ();
-  addressModel->removeRow (row);
+  contactModel->removeRow (row);
   RefreshContactMap ();
 }
 
@@ -276,7 +285,7 @@ CertStore::SaveContacts ()
 void
 CertStore::SelectItem (const QModelIndex &index)
 {
-  editItem = identListModel->itemFromIndex (index);
+  editItem = identityModel->itemFromIndex (index);
   if (editItem) { 
     currentRec = homeCertMap[editItem->text()];
     uiCert.nameEdit->setText (currentRec.Id());
@@ -359,14 +368,14 @@ CertStore::SaveIdent ()
   bool isnew = (certit == homeCertMap.end());
   if (isnew) {
     editItem = new QStandardItem (id);
-    identListModel->appendRow (editItem);
+    identityModel->appendRow (editItem);
   }
   currentRec.SetId (id);
   currentRec.SetPassword (uiCert.passwordEdit->text ());
   currentRec.SetKey (uiCert.keyEdit->toPlainText ());
   currentRec.SetCert (uiCert.certEdit->toPlainText ());
   homeCertMap [id] = currentRec;
-  QModelIndex index = identListModel->indexFromItem (editItem);
+  QModelIndex index = identityModel->indexFromItem (editItem);
   uiCert.identList->scrollTo (index);
   SelectItem (index);
 }
@@ -401,12 +410,15 @@ CertStore::ReadDB ()
   contactQuery.exec (QString ("select * from directcontacts"));
   int nickNdx = contactQuery.record().indexOf ("nick");
   int addrNdx = contactQuery.record().indexOf ("address");
+  int portNdx = contactQuery.record().indexOf ("port");
   QString nick, addr;
-  contactAddrMap.clear ();
+  int     port;
+  contactHostMap.clear ();
   while (contactQuery.next()) {
     nick = contactQuery.value (nickNdx).toString();
     addr = contactQuery.value (addrNdx).toString();
-    contactAddrMap [nick] = addr;
+    port = contactQuery.value (portNdx).toInt ();
+    contactHostMap [nick] = ContactHost (nick, addr, port);
   }
 }
 
@@ -438,20 +450,23 @@ CertStore::WriteContacts (const QString filename)
 
   RefreshContactMap ();
   CheckDBComplete (filename);
-  ContactAddrMap::iterator  addrit;
+  ContactHostMap::iterator  addrit;
   QString nick, addr;
+  int     port;
   QString  qryString ("insert or replace into directcontacts "
-                       " (nick, address) "
-                       " values (?, ?)");
-  for (addrit = contactAddrMap.begin(); 
-       addrit != contactAddrMap.end(); 
+                       " (nick, address, port) "
+                       " values (?, ?, ?)");
+  for (addrit = contactHostMap.begin(); 
+       addrit != contactHostMap.end(); 
        addrit++ ) {
     QSqlQuery qry (certDB);
     qry.prepare (qryString);
     nick = addrit->first;
-    addr = addrit->second;
+    addr = addrit->second.Address();
+    port = addrit->second.Port ();
     qry.bindValue (0,QVariant (nick));
     qry.bindValue (1,QVariant (addr));
+    qry.bindValue (2,QVariant (port));
     qry.exec ();
   }
 }
@@ -490,39 +505,53 @@ qDebug () << " found nick " << nick;
 void
 CertStore::RefreshContactModel ()
 {
-  addressModel->clear ();
-  ContactAddrMap::iterator addrit;
-  QStandardItem  *nickItem, *addrItem;
+  contactModel->clear ();
+  QStringList labels ;
+  labels << tr ("Name")
+         << tr ("Address")
+         << tr ("Port");
+  contactModel->setHorizontalHeaderLabels (labels);
+qDebug () << " headers set to " << labels;
+  ContactHostMap::iterator addrit;
+  QStandardItem  *nickItem, *addrItem, *portItem;
   int row (0);
-  for (addrit = contactAddrMap.begin (), row=0; 
-       addrit != contactAddrMap.end();
+  for (addrit = contactHostMap.begin (), row=0; 
+       addrit != contactHostMap.end();
        addrit++, row++) {
     nickItem = new QStandardItem (addrit->first);
-    addrItem = new QStandardItem (addrit->second);
-    addressModel->setItem (row,0,nickItem);
-    addressModel->setItem (row,1,addrItem);
+    addrItem = new QStandardItem (addrit->second.Address());
+    portItem = new QStandardItem (QString::number (addrit->second.Port()));
+    contactModel->setItem (row,0,nickItem);
+    contactModel->setItem (row,1,addrItem);
+    contactModel->setItem (row,2,portItem);
   }
 }
 
 void
 CertStore::RefreshContactMap ()
 {
-  contactAddrMap.clear ();
+  contactHostMap.clear ();
   int row(0);
-  QStandardItem *nickItem, *addrItem;
+  QStandardItem *nickItem, *addrItem, *portItem;
   QString        nick,      addr;
-  int numrows = addressModel->rowCount ();
+  int            port (0);
+  int numrows = contactModel->rowCount ();
   for (row = 0; row<numrows; row++) { 
-    nickItem = addressModel->item (row,0);
+    nickItem = contactModel->item (row,0);
     if (nickItem) {
       nick = nickItem->text ();
     }
-    addrItem = addressModel->item (row, 1);
+    addrItem = contactModel->item (row, 1);
     if (addrItem) {
       addr = addrItem->text ();
     }
+    portItem = contactModel->item (row, 2);
+    if (portItem) {
+      port = portItem->text().toInt ();
+    }
     if (nickItem && addrItem) {
-      contactAddrMap [nick] = addr;
+      ContactHost remoteHost (nick, addr, port);
+      contactHostMap [nick] = remoteHost;
     }
   }
 }

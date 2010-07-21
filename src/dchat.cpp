@@ -107,6 +107,13 @@ DChatMain::Run ()
 void
 DChatMain::SetupListener ()
 {
+  QString ownAddress ("0::1");
+  ownAddress = Settings().value ("direct/address",ownAddress).toString();
+  Settings().setValue ("direct/address",ownAddress);
+
+  publicPort = Settings().value ("direct/publicport",publicPort).toInt ();
+  Settings().setValue ("direct/publicport",publicPort);
+
   directIdentity = Settings().value ("direct/identity",directIdentity).toString();
   Settings().setValue ("direct/identity",directIdentity);
   DirectListener * listen (0);
@@ -116,9 +123,7 @@ DChatMain::SetupListener ()
   } else {
     listen = inDirect [directIdentity];
   }
-  QString ownAddress ("0::1");
-  ownAddress = Settings().value ("direct/address",ownAddress).toString();
-  Settings().setValue ("direct/address",ownAddress);
+
   if (CertStore::IF().HaveCert (directIdentity)) {
     CertRecord hostCert = CertStore::IF().Cert (directIdentity);
     QString pass = hostCert.Password ();
@@ -150,8 +155,6 @@ DChatMain::SetSettings ()
   server = Settings().value ("network/server",server).toString();
   Settings().setValue ("network/server",server);
 
-  publicPort = Settings().value ("network/publicport",publicPort).toInt ();
-  Settings().setValue ("network/publicport",publicPort);
   
   iconSize = QString ("22x22");
   iconSize = Settings ().value ("style/iconsize",iconSize).toString();
@@ -260,7 +263,7 @@ void
 DChatMain::AnnounceMe ()
 {
   QXmppPresence::Status status (QXmppPresence::Status::Online,
-                      QString ("testing Egalite"));
+                      QString ("Égalité!"));
   QXmppPresence pres (QXmppPresence::Available, status);
   if (xclient) {
     xclient->setClientPresence (pres);
@@ -392,6 +395,10 @@ DChatMain::CallDirect ()
   }
   QString dest = pickString.Choice ();
   QString destaddr = CertStore::IF().ContactAddress (dest);
+  int destPort = CertStore::IF().ContactPort (dest);
+  if (destPort == 0) {
+    destPort = publicPort;
+  }
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
 
