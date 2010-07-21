@@ -109,11 +109,11 @@ void
 DChatMain::SetupListener ()
 {
   QString ownAddress ("0::1");
-  ownAddress = Settings().value ("direct/address",ownAddress).toString();
-  Settings().setValue ("direct/address",ownAddress);
+  ownAddress = Settings().value ("direct/listenAddress",ownAddress).toString();
+  Settings().setValue ("direct/listenAddress",ownAddress);
 
-  publicPort = Settings().value ("direct/publicport",publicPort).toInt ();
-  Settings().setValue ("direct/publicport",publicPort);
+  publicPort = Settings().value ("direct/listenPort",publicPort).toInt ();
+  Settings().setValue ("direct/listenPort",publicPort);
 
   directIdentity = Settings().value ("direct/identity",directIdentity).toString();
   Settings().setValue ("direct/identity",directIdentity);
@@ -156,15 +156,15 @@ DChatMain::SetSettings ()
   server = Settings().value ("network/server",server).toString();
   Settings().setValue ("network/server",server);
 
-  defaultPort = Settings().value ("direct/defaultport",defaultPort).toInt ();
-  Settings().setValue ("direct/defaultport",defaultPort);
+  defaultPort = Settings().value ("direct/defaultPort",defaultPort).toInt ();
+  Settings().setValue ("direct/defaultPort",defaultPort);
   
   iconSize = QString ("22x22");
-  iconSize = Settings ().value ("style/iconsize",iconSize).toString();
-  Settings().setValue ("style/iconsize",iconSize);
+  iconSize = Settings ().value ("style/iconSize",iconSize).toString();
+  Settings().setValue ("style/iconSize",iconSize);
   QString iconDir = QString (":/icons");
-  iconDir = Settings().value ("style/icondir",iconDir).toString ();
-  Settings().setValue ("style/icondir",iconDir);
+  iconDir = Settings().value ("style/iconDir",iconDir).toString ();
+  Settings().setValue ("style/iconDir",iconDir);
   iconPath = iconDir;
   iconPath.append ('/');
   iconPath.append (iconSize);
@@ -266,7 +266,7 @@ void
 DChatMain::AnnounceMe ()
 {
   QXmppPresence::Status status (QXmppPresence::Status::Online,
-                      QString ("Égalité!"));
+                      QString ("Egalite!"));
   QXmppPresence pres (QXmppPresence::Available, status);
   if (xclient) {
     xclient->setClientPresence (pres);
