@@ -107,20 +107,20 @@ DChatMain::Run ()
 void
 DChatMain::SetupListener ()
 {
-  directHost = Settings().value ("direct/host",directHost).toString();
-  Settings().setValue ("direct/host",directHost);
+  directIdentity = Settings().value ("direct/identity",directIdentity).toString();
+  Settings().setValue ("direct/identity",directIdentity);
   DirectListener * listen (0);
-  if (inDirect.find (directHost) == inDirect.end ()) {
+  if (inDirect.find (directIdentity) == inDirect.end ()) {
     listen = new DirectListener (this);
-    inDirect [directHost] = listen;
+    inDirect [directIdentity] = listen;
   } else {
-    listen = inDirect [directHost];
+    listen = inDirect [directIdentity];
   }
   QString ownAddress ("0::1");
   ownAddress = Settings().value ("direct/address",ownAddress).toString();
   Settings().setValue ("direct/address",ownAddress);
-  if (CertStore::IF().HaveCert (directHost)) {
-    CertRecord hostCert = CertStore::IF().Cert (directHost);
+  if (CertStore::IF().HaveCert (directIdentity)) {
+    CertRecord hostCert = CertStore::IF().Cert (directIdentity);
     QString pass = hostCert.Password ();
     if (pass.length() == 0) {
       SimplePass  getPass (this);
@@ -129,10 +129,12 @@ DChatMain::SetupListener ()
     QSslKey skey (hostCert.Key().toAscii(),QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
     QSslCertificate scert (hostCert.Cert().toAscii());
-    listen->Init (directHost, skey, scert);
+    listen->Init (directIdentity, skey, scert);
     listen->Listen (QHostAddress (ownAddress),publicPort);
 qDebug () << " listen at " << QHostAddress (ownAddress) << " port " << publicPort;
-  }  
+  } else {
+qDebug () << " cannot listen for identity " << directIdentity;
+  }
   connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
   connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),

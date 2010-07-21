@@ -138,7 +138,7 @@ private:
   QXmppClient   *xclient;
   QXmppConfiguration  xmppConfig;
   int           publicPort;
-  QString       directHost;
+  QString       directIdentity;
   QString       user;
   QString       xmppUser;
   QString       server;
