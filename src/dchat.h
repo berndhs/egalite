@@ -104,6 +104,7 @@ private slots:
 private:
 
   void    SetSettings ();
+  void    SetupListener ();
   void    Connect ();
   bool    GetPass ();
   void    CallDirectFrom (QString nick);
@@ -137,6 +138,7 @@ private:
   QXmppClient   *xclient;
   QXmppConfiguration  xmppConfig;
   int           publicPort;
+  QString       directHost;
   QString       user;
   QString       xmppUser;
   QString       server;

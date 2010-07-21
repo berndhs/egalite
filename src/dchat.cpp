@@ -24,6 +24,7 @@
 #include "delib-debug.h"
 #include "deliberate.h"
 #include "version.h"
+#include "simple-pass.h"
 #include <QDebug>
 #include "ui_getpassword.h"
 #include <QXmppConfiguration.h>
@@ -100,20 +101,12 @@ DChatMain::Run ()
                  << tr("Login");
   contactModel.setHorizontalHeaderLabels (contactHeaders);
   show ();
+  SetupListener ();
 }
 
 void
-DChatMain::SetSettings ()
+DChatMain::SetupListener ()
 {
-  user = Settings().value ("network/user", user).toString();
-  Settings().setValue ("network/user",user);
-  server = Settings().value ("network/server",server).toString();
-  Settings().setValue ("network/server",server);
-
-  publicPort = Settings().value ("network/publicport",publicPort).toInt ();
-  Settings().setValue ("network/publicport",publicPort);
-  
-  QString directHost ("");
   directHost = Settings().value ("direct/host",directHost).toString();
   Settings().setValue ("direct/host",directHost);
   DirectListener * listen (0);
@@ -128,7 +121,12 @@ DChatMain::SetSettings ()
   Settings().setValue ("direct/address",ownAddress);
   if (CertStore::IF().HaveCert (directHost)) {
     CertRecord hostCert = CertStore::IF().Cert (directHost);
-    QString pass ("enkhuizen");
+    QString pass = hostCert.Password ();
+qDebug () << " listener host " << directHost << " pass " << pass;
+    if (pass.length() == 0) {
+      SimplePass  getPass (this);
+      pass = getPass.GetPassword (tr("Listener Password:"));
+    }
     QSslKey key (hostCert.Key().toAscii(),QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
     QSslCertificate scert (hostCert.Cert().toAscii());
@@ -139,6 +137,20 @@ DChatMain::SetSettings ()
            this, SLOT (GetRaw (const QByteArray&)));
   connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),
            this, SLOT (ConnectDirect (SymmetricSocket *, QString)));
+
+}
+
+void
+DChatMain::SetSettings ()
+{
+  user = Settings().value ("network/user", user).toString();
+  Settings().setValue ("network/user",user);
+  server = Settings().value ("network/server",server).toString();
+  Settings().setValue ("network/server",server);
+
+  publicPort = Settings().value ("network/publicport",publicPort).toInt ();
+  Settings().setValue ("network/publicport",publicPort);
+  
   iconSize = QString ("22x22");
   iconSize = Settings ().value ("style/iconsize",iconSize).toString();
   Settings().setValue ("style/iconsize",iconSize);
