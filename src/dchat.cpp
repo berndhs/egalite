@@ -59,6 +59,7 @@ DChatMain::DChatMain (QWidget *parent)
    subscriptionDialog (this),
    xclient (0),
    publicPort (29999),
+   defaultPort (29999),
    passdial (0),
    callnum (0),
    debugTimer (0),
@@ -155,6 +156,8 @@ DChatMain::SetSettings ()
   server = Settings().value ("network/server",server).toString();
   Settings().setValue ("network/server",server);
 
+  defaultPort = Settings().value ("direct/defaultport",defaultPort).toInt ();
+  Settings().setValue ("direct/defaultport",defaultPort);
   
   iconSize = QString ("22x22");
   iconSize = Settings ().value ("style/iconsize",iconSize).toString();
@@ -397,13 +400,13 @@ DChatMain::CallDirect ()
   QString destaddr = CertStore::IF().ContactAddress (dest);
   int destPort = CertStore::IF().ContactPort (dest);
   if (destPort == 0) {
-    destPort = publicPort;
+    destPort = defaultPort;
   }
   callnum++;
   DirectCaller * newcall = new DirectCaller (this);
 
   if (newcall) {
-    newcall->Setup (outCert, publicPort, originNick);
+    newcall->Setup (outCert, destPort, originNick);
     outDirect[callnum] = newcall;
 qDebug () << " start direct connect " << callnum << " call " << newcall;
     newcall->ConnectAddress (destaddr, dest, callnum);
