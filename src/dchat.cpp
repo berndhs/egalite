@@ -73,7 +73,7 @@ DChatMain::DChatMain (QWidget *parent)
   debugTimer->start (10 * 1000); // 15 secs
   xmppTimer = new QTimer (this);
   connect (xmppTimer, SIGNAL (timeout()), this, SLOT (XmppPoll ()));
-  xmppTimer->start (15 * 60 * 1000); // 15 mins
+  xmppTimer->start (1 * 60 * 1000); // 1 mins
   announceHeartbeat = new QTimer (this);
   connect (announceHeartbeat, SIGNAL (timeout()), this, SLOT (AnnounceMe()));
   announceHeartbeat->start (1000*60*2); // 2 minutes
@@ -122,16 +122,16 @@ DChatMain::SetupListener ()
   if (CertStore::IF().HaveCert (directHost)) {
     CertRecord hostCert = CertStore::IF().Cert (directHost);
     QString pass = hostCert.Password ();
-qDebug () << " listener host " << directHost << " pass " << pass;
     if (pass.length() == 0) {
       SimplePass  getPass (this);
       pass = getPass.GetPassword (tr("Listener Password:"));
     }
-    QSslKey key (hostCert.Key().toAscii(),QSsl::Rsa,
+    QSslKey skey (hostCert.Key().toAscii(),QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
     QSslCertificate scert (hostCert.Cert().toAscii());
-    listen->Init (directHost, key, scert);
+    listen->Init (directHost, skey, scert);
     listen->Listen (QHostAddress (ownAddress),publicPort);
+qDebug () << " listen at " << QHostAddress (ownAddress) << " port " << publicPort;
   }  
   connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
