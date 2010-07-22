@@ -30,8 +30,6 @@
 #include <QHostAddress>
 #include <QTimer>
 
-using namespace deliberate;
-
 namespace egalite
 {
 

@@ -27,6 +27,9 @@
 #include <QSettings>
 #include <QStyle>
 #include <QStyleFactory>
+#include <QTranslator>
+#include <QLocale>
+#include <QTextCodec>
 #include "delib-debug.h"
 #include "cmdoptions.h"
 #include "deliberate.h"
@@ -73,9 +76,13 @@ main (int argc, char* argv[])
   deliberate::SetStyle (settings);
 
   QApplication  app (argc,argv);
+  QString locale = QLocale::system().name();
+  QTranslator  translate;
+  translate.load (QString ("egalite_") + locale);
+  QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
 
   deliberate::CmdOptions  opts ("Egalite");
-  opts.AddSoloOption ("debug","D","show Debug log window");
+  opts.AddSoloOption ("debug","D",QObject::tr("show Debug log window"));
 
   deliberate::UseMyOwnMessageHandler ();
 

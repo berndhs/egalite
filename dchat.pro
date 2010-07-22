@@ -18,6 +18,10 @@ MAKEFILE = MakeDChat
 TARGET = bin/egalite
 CONFIG += debug
 
+TRANSLATIONS += egalite_fr.ts
+
+CODEFORTR = UTF-8
+
 message ("generating MAKEFILE as $$MAKEFILE")
 QT += core gui network xml xmlpatterns sql webkit
 

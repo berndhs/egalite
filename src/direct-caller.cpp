@@ -35,7 +35,6 @@
 #include <QSsl>
 #include <QFile>
 
-using namespace deliberate;
 
 namespace egalite
 {
