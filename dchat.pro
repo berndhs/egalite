@@ -23,13 +23,18 @@ QT += core gui network xml xmlpatterns sql webkit
 
 unix {
   message ("Applying Unix settings")
-  INCLUDEPATH += /usr/local/include/qxmpp
+  INCLUDEPATH += /usr/include/qxmpp
   DEFINES += DELIBERATE_DEBUG=1
-  exists ("/usr/local/lib64") {
-    LIBS += -L/usr/local/lib64 -lQXmppClient
-  } else { 
-    LIBS += -L/usr/local/lib -lQXmppClient
-  }
+  LIBS += -lQXmppClient
+#
+# use the code below if QXmpp is installed in /usr/local
+#  INCLUDEPATH += /usr/local/include/qxmpp
+#  exists ("/usr/local/lib64") {
+#    LIBS += -L/usr/local/lib64 -lQXmppClient
+#  } else { 
+#    LIBS += -L/usr/local/lib -lQXmppClient
+#  }
+#
 }
 
 win32 {
