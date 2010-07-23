@@ -69,6 +69,42 @@ findqmake () {
     fi
   fi
 }
+find_lrelease () {
+
+  LREL=`which lrelease`
+  LREL4=`which lrelease-qt4`
+
+  if [ -z $LREL ] 
+  then
+    RES3="0"
+  else
+    RES3=`$LREL -version`
+  fi
+  if [ -z $LREL4 ]
+  then
+    RES4="0"
+  else
+    RES4=`$LREL4 -version`
+  fi
+
+  LRMATCH3=`expr match "$RES3" 'lrelease version 4.'`
+  LRMATCH4=`expr match "$RES4" 'lrelease version 4.'`
+
+  LRELEASE="lrelease"
+
+  if [ $LRMATCH3 -eq 19 ]
+  then
+    LRELEASE=$LREL
+  else
+    if [ $LRMATCH4 -eq 19 ]
+    then
+      LRELEASE=$LREL4
+    else
+      echo "cannot find LRELEASE for Qt4"
+      exit 1
+    fi
+  fi
+}
 
 #
 # function to tell the user about options
@@ -145,6 +181,7 @@ else
   # check what qmake is called on this system
   #
   findqmake
+  find_lrelease
 fi
 
 #
@@ -161,6 +198,7 @@ echo "PREFIX=${PREFIX}" >> Makefile
 echo "DESTDIR=\${PREFIX}/bin" >> Makefile
 echo "QMAKE = $QMAKE" >> Makefile
 echo "MAKE = ${MAKE_PROGRAM}" >> Makefile
+echo "LRELEASE = ${LRELEASE}" >> Makefile
 #
 # next concatenate the Makefile.in content
 #

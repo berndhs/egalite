@@ -19,6 +19,7 @@ TOP_MAKEFILE = Makefile
 TARGETS = bin/egalite
 
 all: $(MAKEFILE)
+	$(LRELEASE) $(PRO_FILE)
 	$(MAKE) -f $(MAKEFILE) all
 
 clean: $(MAKEFILE) FORCE
