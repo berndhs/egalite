@@ -15,6 +15,10 @@
   <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
   <file alias="helpman.html">helpfiles/helpman.html</file>
 </qresource>
+<qresource prefix="/help" lang="fr">
+  <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
+  <file alias="helpman.html">helpfiles/helpman_fr.html</file>
+</qresource>
 <qresource prefix="/translate">
   <file alias="egalite_fr.qm">translate/egalite_fr.qm</file>
 </qresource>
