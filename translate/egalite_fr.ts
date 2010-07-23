@@ -6,32 +6,32 @@
     <message>
         <location filename="../ui/cert-candidate.ui" line="14"/>
         <source>Certificate Candidates</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Candidat au certificat</translation>
     </message>
     <message>
         <location filename="../ui/cert-candidate.ui" line="28"/>
         <source>Accept 1 Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Accepter une fois</translation>
     </message>
     <message>
         <location filename="../ui/cert-candidate.ui" line="35"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Suivant</translation>
     </message>
     <message>
         <location filename="../ui/cert-candidate.ui" line="42"/>
         <source>Reject All</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout Refuser</translation>
     </message>
     <message>
         <location filename="../ui/cert-candidate.ui" line="49"/>
         <source>Accept + Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Accepter et mémoriser</translation>
     </message>
     <message>
         <location filename="../ui/cert-candidate.ui" line="56"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Précédent</translation>
     </message>
 </context>
 <context>
@@ -44,17 +44,17 @@
     <message>
         <location filename="../ui/cert-store.ui" line="48"/>
         <source>Identity</source>
-        <translation type="unfinished"></translation>
+        <translation>Identité</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="62"/>
         <source>Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Clef</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="79"/>
         <source>SSL Certificate / Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Détails du certificat SSL</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="86"/>
@@ -64,38 +64,38 @@
     <message>
         <location filename="../ui/cert-store.ui" line="105"/>
         <source>New Identity</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvelle identité</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="112"/>
         <source>Save Identity</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer l&apos;identité</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="119"/>
         <source>Delete Identity</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer l&apos;identité</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="130"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="137"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="146"/>
         <location filename="../ui/cert-store.ui" line="153"/>
         <source>Load from File</source>
-        <translation type="unfinished"></translation>
+        <translation>Charger depuis un fichier</translation>
     </message>
     <message>
         <location filename="../ui/cert-store.ui" line="167"/>
         <source>Save Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer le mot de passe:</translation>
     </message>
 </context>
 <context>
@@ -103,7 +103,8 @@
     <message>
         <location filename="../ui/chat-box.ui" line="14"/>
         <source>Direct Chat</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>What does direct exactly mean ?</translatorcomment>
+        <translation type="unfinished">Communication directe</translation>
     </message>
 </context>
 <context>
@@ -116,12 +117,12 @@
     <message>
         <location filename="../ui/chat-content.ui" line="37"/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>Déconnecter</translation>
     </message>
     <message>
         <location filename="../ui/chat-content.ui" line="47"/>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer</translation>
     </message>
 </context>
 <context>
@@ -129,17 +130,17 @@
     <message>
         <location filename="../ui/config-edit.ui" line="20"/>
         <source>Preference Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Préférences</translation>
     </message>
     <message>
         <location filename="../ui/config-edit.ui" line="41"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location filename="../ui/config-edit.ui" line="54"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -152,22 +153,22 @@
     <message>
         <location filename="../ui/contact-edit.ui" line="41"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location filename="../ui/contact-edit.ui" line="54"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter</translation>
     </message>
     <message>
         <location filename="../ui/contact-edit.ui" line="61"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau</translation>
     </message>
     <message>
         <location filename="../ui/contact-edit.ui" line="68"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer</translation>
     </message>
 </context>
 <context>
@@ -175,18 +176,18 @@
     <message utf8="true">
         <location filename="../ui/dchat.ui" line="14"/>
         <source>Égalité!</source>
-        <translation type="unfinished"></translation>
+        <translation>Égalité!</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="27"/>
         <source>Connect-Direct</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion directe</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="34"/>
         <location filename="../ui/dchat.ui" line="125"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="84"/>
@@ -196,12 +197,12 @@
     <message>
         <location filename="../ui/dchat.ui" line="92"/>
         <source>Identities</source>
-        <translation type="unfinished"></translation>
+        <translation>Identités</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="99"/>
         <source>Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Contacts</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="106"/>
@@ -211,17 +212,17 @@
     <message>
         <location filename="../ui/dchat.ui" line="120"/>
         <source>Log In</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="130"/>
         <source>Accounts</source>
-        <translation type="unfinished"></translation>
+        <translation>Comptes</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="135"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Préférences</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="140"/>
@@ -233,27 +234,27 @@
         <location filename="../ui/dchat.ui" line="145"/>
         <location filename="../ui/dchat.ui" line="155"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="160"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Propriétés</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="165"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>Information</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="170"/>
         <source>Manual</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuel</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="175"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation>License</translation>
     </message>
 </context>
 <context>
@@ -261,32 +262,32 @@
     <message>
         <location filename="../ui/getpassword.ui" line="14"/>
         <source>Enter Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion</translation>
     </message>
     <message>
         <location filename="../ui/getpassword.ui" line="24"/>
         <source>User Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom d&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../ui/getpassword.ui" line="34"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur</translation>
     </message>
     <message>
         <location filename="../ui/getpassword.ui" line="44"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <location filename="../ui/getpassword.ui" line="60"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../ui/getpassword.ui" line="67"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -294,27 +295,28 @@
     <message>
         <location filename="../ui/helpwin.ui" line="14"/>
         <source>Egalite Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Aide d&apos;Égalité</translation>
     </message>
     <message>
         <location filename="../ui/helpwin.ui" line="26"/>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Suivant</translation>
     </message>
     <message>
         <location filename="../ui/helpwin.ui" line="33"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Précédent</translation>
     </message>
     <message>
         <location filename="../ui/helpwin.ui" line="40"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer</translation>
     </message>
     <message>
         <location filename="../ui/helpwin.ui" line="63"/>
         <source>about:blank</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>i&apos;m not sure i have to translate this</translatorcomment>
+        <translation>about:blank</translation>
     </message>
 </context>
 <context>
@@ -322,27 +324,27 @@
     <message>
         <location filename="../ui/DebugLog.ui" line="14"/>
         <source>Debug Message Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Messages de debug</translation>
     </message>
     <message>
         <location filename="../ui/DebugLog.ui" line="22"/>
         <source>Start Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Journaliser</translation>
     </message>
     <message>
         <location filename="../ui/DebugLog.ui" line="29"/>
         <source>Stop Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêter</translation>
     </message>
     <message>
         <location filename="../ui/DebugLog.ui" line="36"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer</translation>
     </message>
     <message>
         <location filename="../ui/DebugLog.ui" line="43"/>
         <source>Save Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer</translation>
     </message>
 </context>
 <context>
@@ -350,17 +352,17 @@
     <message>
         <location filename="../ui/pick-string.ui" line="14"/>
         <source>Pick Identity</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisir une identité</translation>
     </message>
     <message>
         <location filename="../ui/pick-string.ui" line="40"/>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion</translation>
     </message>
     <message>
         <location filename="../ui/pick-string.ui" line="53"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -368,65 +370,65 @@
     <message>
         <location filename="../src/cmdoptions.cpp" line="20"/>
         <source>help</source>
-        <translation type="unfinished"></translation>
+        <translation>Aide</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="21"/>
         <source>h</source>
-        <translation type="unfinished"></translation>
+        <translation>h</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="22"/>
         <source>version</source>
-        <translation type="unfinished"></translation>
+        <translation>version</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="23"/>
         <source>v</source>
-        <translation type="unfinished"></translation>
+        <translation>v</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="32"/>
         <source>Give help message and exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche le message d&apos;aide et quitte</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="35"/>
         <source>Give version and exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche la version et quitte</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="48"/>
         <source>:</source>
-        <translation type="unfinished"></translation>
+        <translation>:</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="50"/>
         <source>		</source>
-        <translation type="unfinished"></translation>
+        <translation>		</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="53"/>
         <source>--</source>
-        <translation type="unfinished"></translation>
+        <translation>--</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="54"/>
         <source> ( -</source>
-        <translation type="unfinished"></translation>
+        <translation>( -</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="55"/>
         <source>) </source>
-        <translation type="unfinished"></translation>
+        <translation>)</translation>
     </message>
     <message>
         <location filename="../src/cmdoptions.cpp" line="57"/>
         <source> value  </source>
-        <translation type="unfinished"></translation>
+        <translation>valeur </translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="85"/>
+        <location filename="../src/main.cpp" line="89"/>
         <source>show Debug log window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -441,17 +443,17 @@
     <message>
         <location filename="../ui/save-as.ui" line="24"/>
         <source>Save As:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer sous:</translation>
     </message>
     <message>
         <location filename="../ui/save-as.ui" line="43"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location filename="../ui/save-as.ui" line="50"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -459,22 +461,22 @@
     <message>
         <location filename="../ui/simple-password.ui" line="14"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <location filename="../ui/simple-password.ui" line="24"/>
         <source>Certificate Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe du certificat:</translation>
     </message>
     <message>
         <location filename="../ui/simple-password.ui" line="40"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Valider</translation>
     </message>
     <message>
         <location filename="../ui/simple-password.ui" line="47"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -482,47 +484,48 @@
     <message>
         <location filename="../ui/socket-display.ui" line="14"/>
         <source>Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion</translation>
     </message>
     <message>
         <location filename="../ui/socket-display.ui" line="38"/>
         <source>Local</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Locale</translation>
     </message>
     <message>
         <location filename="../ui/socket-display.ui" line="74"/>
         <source>Remote</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Distant</translation>
     </message>
     <message>
         <location filename="../ui/socket-display.ui" line="110"/>
         <source>What</source>
+        <translatorcomment>i don&apos;t know what is waited in that field</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/socket-display.ui" line="131"/>
         <source>State</source>
-        <translation type="unfinished"></translation>
+        <translation>Pays</translation>
     </message>
     <message>
         <location filename="../ui/socket-display.ui" line="141"/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>adresse</translation>
     </message>
     <message>
         <location filename="../ui/socket-display.ui" line="155"/>
         <source>Valid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Validité</translation>
     </message>
     <message>
         <location filename="../ui/socket-display.ui" line="172"/>
         <source>Encrypted</source>
-        <translation type="unfinished"></translation>
+        <translation>Encryption</translation>
     </message>
     <message>
         <location filename="../ui/socket-display.ui" line="219"/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>Déconnecter</translation>
     </message>
 </context>
 <context>
@@ -530,32 +533,32 @@
     <message>
         <location filename="../ui/subscription.ui" line="14"/>
         <source>Visibility Request</source>
-        <translation type="unfinished"></translation>
+        <translation>Demande d&apos;ajout au contacts</translation>
     </message>
     <message>
         <location filename="../ui/subscription.ui" line="24"/>
         <source>You:</source>
-        <translation type="unfinished"></translation>
+        <translation>Moi:</translation>
     </message>
     <message>
         <location filename="../ui/subscription.ui" line="31"/>
         <source>They:</source>
-        <translation type="unfinished"></translation>
+        <translation>Eux:</translation>
     </message>
     <message>
         <location filename="../ui/subscription.ui" line="50"/>
         <source>Allow</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoriser</translation>
     </message>
     <message>
         <location filename="../ui/subscription.ui" line="57"/>
         <source>Deny</source>
-        <translation type="unfinished"></translation>
+        <translation>Refuser</translation>
     </message>
     <message>
         <location filename="../ui/subscription.ui" line="64"/>
         <source>Ignore</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorer</translation>
     </message>
 </context>
 <context>
@@ -661,7 +664,7 @@
     <message>
         <location filename="../src/cert-store.cpp" line="355"/>
         <source>New Identity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nouvelle identité</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="510"/>
@@ -671,7 +674,7 @@
     <message>
         <location filename="../src/cert-store.cpp" line="511"/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">adresse</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="512"/>
@@ -739,7 +742,7 @@
     <message>
         <location filename="../src/dchat.cpp" line="570"/>
         <source>pres-error</source>
-        <translation type="unfinished">erreur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dchat.cpp" line="572"/>
@@ -822,7 +825,7 @@
     <message>
         <location filename="../src/direct-caller.cpp" line="58"/>
         <source>Certificate Password:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mot de passe du certificat:</translation>
     </message>
 </context>
 <context>
@@ -898,8 +901,7 @@
     <message>
         <location filename="../src/subscription-change.cpp" line="66"/>
         <source>pres-error</source>
-        <translatorcomment>this is just for testing, please fix</translatorcomment>
-        <translation>erreur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/subscription-change.cpp" line="68"/>
