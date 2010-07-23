@@ -2,6 +2,22 @@
 <qresource>
   <file alias="dchatlogo.png">images/e6.png</file>
 </qresource>
+<qresource prefix="/schemas">
+  <file alias="identities.sql">schemafiles/identities.sql</file>
+  <file alias="uniqueident.sql">schemafiles/uniqueident.sql</file>
+  <file alias="directcontacts.sql">schemafiles/directcontacts.sql</file>
+  <file alias="uniquenick.sql">schemafiles/uniquenick.sql</file>
+  <file alias="remotecerts.sql">schemafiles/remotecerts.sql</file>
+  <file alias="uniqueremote.sql">schemafiles/uniqueremote.sql</file>
+  <file alias="uniqueremotecert.sql">schemafiles/uniqueremotecert.sql</file>
+</qresource>
+<qresource prefix="/help">
+  <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
+  <file alias="helpman.html">helpfiles/helpman.html</file>
+</qresource>
+<qresource prefix="/translate">
+  <file alias="egalite_fr.qm">translate/egalite_fr.qm</file>
+</qresource>
 <qresource prefix="icons/16x16/status">
   <file alias="user-away-extended.png">images/16x16/status/user-away-extended.png</file>
   <file alias="user-away.png">images/16x16/status/user-away.png</file>
@@ -41,19 +57,6 @@
   <file alias="user-invisible.png">images/64x64/status/user-invisible.png</file>
   <file alias="user-offline.png">images/64x64/status/user-offline.png</file>
   <file alias="user-online.png">images/64x64/status/user-online.png</file>
-</qresource>
-<qresource prefix="/schemas">
-  <file alias="identities.sql">schemafiles/identities.sql</file>
-  <file alias="uniqueident.sql">schemafiles/uniqueident.sql</file>
-  <file alias="directcontacts.sql">schemafiles/directcontacts.sql</file>
-  <file alias="uniquenick.sql">schemafiles/uniquenick.sql</file>
-  <file alias="remotecerts.sql">schemafiles/remotecerts.sql</file>
-  <file alias="uniqueremote.sql">schemafiles/uniqueremote.sql</file>
-  <file alias="uniqueremotecert.sql">schemafiles/uniqueremotecert.sql</file>
-</qresource>
-<qresource prefix="/help">
-  <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
-  <file alias="helpman.html">helpfiles/helpman.html</file>
 </qresource>
 </RCC>
 

@@ -78,9 +78,13 @@ main (int argc, char* argv[])
   QApplication  app (argc,argv);
   QString locale = QLocale::system().name();
   QTranslator  translate;
-  translate.load (QString ("egalite_") + locale);
+  QString xlateFile (QString ("egalite_") + locale);
+  QString langDir (":/translate");
+  qDebug () << " translate file name " << xlateFile;
+  bool found = translate.load (xlateFile, langDir);
+  qDebug () << " translate file found " << found;
   QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
-
+  app.installTranslator (&translate);
   deliberate::CmdOptions  opts ("Egalite");
   opts.AddSoloOption ("debug","D",QObject::tr("show Debug log window"));
 

@@ -17,8 +17,9 @@ TEMPLATE = app
 MAKEFILE = MakeDChat
 TARGET = bin/egalite
 CONFIG += debug
-
-TRANSLATIONS += egalite_fr.ts
+TRANS_DIR = translate
+TRANSLATIONS += $$TRANS_DIR/egalite_fr.ts
+message ("translations in $$TRANS_DIR/")
 
 CODEFORTR = UTF-8
 
