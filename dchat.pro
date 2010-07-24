@@ -97,6 +97,8 @@ SOURCES = src/main.cpp \
         src/link-mangle.cpp \
         src/subscription-change.cpp \
         src/simple-pass.cpp \
+        src/contact-list-model.cpp \
+        src/xegal-client.cpp \
 
 
 
@@ -121,6 +123,8 @@ HEADERS = \
         src/link-mangle.h \
         src/subscription-change.h \
         src/simple-pass.h \
+        src/contact-list-model.h \
+        src/xegal-client.h \
 
 
 

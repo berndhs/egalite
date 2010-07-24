@@ -23,19 +23,19 @@
  ****************************************************************/
 #include "ui_dchat.h"
 #include <QMainWindow>
-#include <QXmppClient.h>
 #include <QXmppConfiguration.h>
 #include <QXmppPresence.h>
 #include <QXmppIq.h>
 #include <QXmppDiscoveryIq.h>
 #include <QDomElement>
-#include <QStandardItemModel>
+#include "contact-list-model.h"
 
 #include "config-edit.h"
 #include "cert-store.h"
 #include "server-contact.h"
 #include "helpview.h"
 #include "subscription-change.h"
+#include "xegal-client.h"
 
 #include <map>
 
@@ -107,6 +107,7 @@ private:
   void    SetupListener ();
   void    Connect ();
   bool    GetPass ();
+  void    Poll (QXmppClient * xclient);
   void    CallDirectFrom (QString nick);
   QString StatusName (QXmppPresence::Status::Type stype);
   QIcon   StatusIcon (QXmppPresence::Status::Type stype);
@@ -129,13 +130,12 @@ private:
   Ui_DChatMain    ui;
   QApplication   *pApp;
 
-  QStandardItemModel  contactModel;
+  ContactListModel  contactListModel;
 
   ConfigEdit            configEdit;
   deliberate::HelpView  helpView;
   SubscriptionChange    subscriptionDialog;
 
-  QXmppClient   *xclient;
   QXmppConfiguration  xmppConfig;
   int           publicPort;
   int           defaultPort;
@@ -154,8 +154,9 @@ private:
   QString      iconSize;
 
 
+  std::map <QString, XEgalClient*>    xclientMap;
   std::map <QString, DirectListener*> inDirect;
-  std::map <int, DirectCaller*>   outDirect;
+  std::map <int, DirectCaller*>       outDirect;
 
   ChatMap directChats;
   ChatMap serverChats;

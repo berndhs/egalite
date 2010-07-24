@@ -53,11 +53,10 @@ namespace egalite {
 DChatMain::DChatMain (QWidget *parent)
   :QMainWindow (parent),
    pApp (0),
-   contactModel (this),
+   contactListModel (this),
    configEdit (this),
    helpView (this),
    subscriptionDialog (this),
-   xclient (0),
    publicPort (29999),
    defaultPort (29999),
    passdial (0),
@@ -67,7 +66,7 @@ DChatMain::DChatMain (QWidget *parent)
    announceHeartbeat (0)
 {
   ui.setupUi (this);
-  ui.contactView->setModel (&contactModel);
+  ui.contactView->setModel (&contactListModel);
   Connect ();
   debugTimer = new QTimer (this);
   connect (debugTimer, SIGNAL (timeout()), this, SLOT (DebugCheck()));
@@ -78,6 +77,7 @@ DChatMain::DChatMain (QWidget *parent)
   announceHeartbeat = new QTimer (this);
   connect (announceHeartbeat, SIGNAL (timeout()), this, SLOT (AnnounceMe()));
   announceHeartbeat->start (1000*60*2); // 2 minutes
+  xclientMap.clear ();
 }
 
 void
@@ -97,10 +97,11 @@ DChatMain::Run ()
   CertStore::IF().Init (this);
   SetSettings ();
   QStringList contactHeaders;
-  contactHeaders << tr("Status")
+  contactHeaders << tr("Account")
+                 << tr("Status")
                  << tr("Name")
                  << tr("Login");
-  contactModel.setHorizontalHeaderLabels (contactHeaders);
+  contactListModel.setHorizontalHeaderLabels (contactHeaders);
   show ();
   SetupListener ();
 }
@@ -216,18 +217,24 @@ DChatMain::EditSettings ()
 void
 DChatMain::Login ()
 {
+  QString oldUser = user;
   if (GetPass()) {
+    XEgalClient * xclient = xclientMap[user];
     if (!xclient) {
-      xclient = new QXmppClient (this);
+      xclient = new XEgalClient (this);
+    }
+    if (xclient->isConnected ()) {
+      xclient->disconnect ();
     }
     QXmppConfiguration & xconfig = xclient->getConfiguration();
     xconfig.setResource ("Egalite.");
     xclient->connectToServer (server,user, password);
+    xclientMap[user] = xclient;
     xmppUser = user;
     connect (xclient, SIGNAL (messageReceived  (const QXmppMessage  &)),
              this, SLOT (GetMessage (const QXmppMessage &)));
-    connect (xclient, SIGNAL (error (QXmppClient::Error)),
-             this, SLOT (XmppError (QXmppClient::Error)));
+    connect (xclient, SIGNAL (error (XEgalClient::Error)),
+             this, SLOT (XmppError (XEgalClient::Error)));
     connect (xclient, SIGNAL (presenceReceived (const QXmppPresence &)),
              this, SLOT (XPresenceChange (const QXmppPresence &)));
     connect (xclient, SIGNAL (connected ()), 
@@ -268,8 +275,8 @@ DChatMain::AnnounceMe ()
   QXmppPresence::Status status (QXmppPresence::Status::Online,
                       QString ("Egalite!"));
   QXmppPresence pres (QXmppPresence::Available, status);
-  if (xclient) {
-    xclient->setClientPresence (pres);
+  if (xclientMap[user]) {
+    xclientMap[user]->setClientPresence (pres);
   }
 }
 
@@ -316,16 +323,16 @@ DChatMain::PassCancel ()
 }
 
 void
-DChatMain::XmppError (QXmppClient::Error err)
+DChatMain::XmppError (XEgalClient::Error err)
 {
   switch (err) {
-  case QXmppClient::SocketError: 
+  case XEgalClient::SocketError: 
     qDebug () << " xmpp socket error";
     break;
-  case QXmppClient::KeepAliveError:
+  case XEgalClient::KeepAliveError:
     qDebug () << " xmpp keep alive arror";
     break;
-  case QXmppClient::XmppStreamError:
+  case XEgalClient::XmppStreamError:
     qDebug () << " xmpp stream error";
     break;
   }
@@ -369,10 +376,10 @@ DChatMain::Send (const QXmppMessage & msg)
 {
 qDebug () << " DChat Main send xmpp";
   QXmppMessage outMsg (msg);
-  if (xclient) {
+  if (xclientMap[user]) {
     QStringList parts = outMsg.to().split("/");
     outMsg.setTo (parts.at(0));
-    xclient->sendMessage (outMsg.to(), outMsg.body());
+    xclientMap[user]->sendMessage (outMsg.to(), outMsg.body());
   }
 }
 
@@ -503,64 +510,6 @@ DChatMain::ClearCall (int callid)
   }
 }
 
-void
-DChatMain::PickedItem (const QModelIndex &index)
-{
-  qDebug () << " picked model item " << index;
-  QMap <int, QVariant> itemData = contactModel.itemData (index);
-  qDebug () << " item data: " << itemData;
-  int row = index.row ();
-  QStandardItem *nameCell = contactModel.item (row,1);
-  QStandardItem *resoCell = contactModel.item (row,2);
-  if (nameCell) {
-    QString  target (nameCell->text());
-    if (resoCell) {
-      target.append ("/");
-      target.append (resoCell->text());
-    }
-    StartServerChat (target);
-  }
-}
-
-void
-DChatMain::XPresenceChange (const QXmppPresence & presence)
-{
-  QXmppPresence::Type   presType = presence.type ();
-  QXmppPresence::Status status = presence.status();
-qDebug () << " receive presence form " << presence.from () << " to "
-          << presence.to () << " type " << PresenceTypeString (presType);
-  if (presType == QXmppPresence::Available 
-      || presType == QXmppPresence::Unavailable) {
-    UpdateState (presence.to(), presence.from(), status);
-  } else {
-    subscriptionDialog.RemoteAskChange (xclient, presence);
-  }
-}
-
-void
-DChatMain::UpdateState (const QString & ownId,
-                        const QString & remoteId, 
-                        const QXmppPresence::Status & status)
-{
-  QXmppPresence::Status::Type stype = status.type ();
-  QString statusText = status.statusText (); 
-  QStringList parts = remoteId.split ('/',QString::SkipEmptyParts);
-  QString id = parts.at(0);
-  QString resource;
-  if (parts.size () > 1) {
-    resource = parts.at(1);
-  }
-  ContactMap::iterator contactit = serverContacts.find (remoteId);
-  if (contactit != serverContacts.end()) {
-    if (contactit->second) {
-      SetStatus (contactit->second->modelRow, stype, statusText);
-      contactit->second->recentlySeen = true;
-    }
-  } else {
-    parts = ownId.split ('/', QString::SkipEmptyParts);
-    AddContact (id, resource, parts.at(0), stype, statusText);
-  }
-}
 
 QString
 DChatMain::PresenceTypeString (QXmppPresence::Type t)
@@ -645,73 +594,18 @@ DChatMain::FlushStaleContacts (ContactMap & contacts,
   }
 }
 
-void 
-DChatMain::SetStatus (int row, 
-                      QXmppPresence::Status::Type stype,
-                      QString statusText)
-{
-  QStandardItem * stateItem = contactModel.item (row,0);
-  if (stateItem == 0) {
-    stateItem = new QStandardItem;
-    contactModel.setItem (row,0,stateItem);
-  }
-  if (statusText.length() == 0) {
-    statusText = StatusName (stype);
-  }
-  stateItem->setIcon (StatusIcon (stype));
-  stateItem->setText (statusText);
-  
-qDebug () << " did set status row " << row << " text " << stateItem->text();
-}
-
-QString
-DChatMain::StatusName (QXmppPresence::Status::Type stype)
-{
-  switch (stype) {
-  case QXmppPresence::Status::Offline: 
-    return tr ("-");
-  case QXmppPresence::Status::Online:
-    return tr ("On");
-  case QXmppPresence::Status::Away:
-    return tr ("away");
-  case QXmppPresence::Status::XA:
-    return tr ("XA");
-  case QXmppPresence::Status::DND:
-    return tr ("DND");
-  case QXmppPresence::Status::Chat:
-    return tr ("Chatty");
-  case QXmppPresence::Status::Invisible:
-    return tr ("Hiding");
-  default:
-    return tr ("?");
-  }
-}
-
-QIcon
-DChatMain::StatusIcon (QXmppPresence::Status::Type stype)
-{
-  switch (stype) {
-  case QXmppPresence::Status::Offline: 
-    return QIcon (iconPath + QString ("user-offline.png"));
-  case QXmppPresence::Status::Online:
-    return QIcon (iconPath + QString("user-online.png"));
-  case QXmppPresence::Status::Away:
-    return QIcon (iconPath + QString ("user-away.png"));
-  case QXmppPresence::Status::XA:
-    return QIcon(iconPath + QString ("user-away-extended.png"));
-  case QXmppPresence::Status::DND:
-    return QIcon (iconPath + QString ("user-busy.png"));
-  case QXmppPresence::Status::Chat:
-    return QIcon(iconPath + QString ("user-online.png"));
-  case QXmppPresence::Status::Invisible:
-    return QIcon(iconPath + QString ("user-invisible"));
-  default:
-    return QIcon();
-  }
-}
-
 void
 DChatMain::XmppPoll ()
+{
+  std::map <QString, XEgalClient*> :: iterator mapit;
+  for (mapit = xclientMap.begin (); mapit != xclientMap.end (); mapit++) {
+    Poll (mapit->second);
+  }
+}
+
+
+void
+DChatMain::Poll (XEgalClient * xclient)
 {
   QStringList  contactJids;
   if (xclient == 0) {
@@ -724,7 +618,7 @@ DChatMain::XmppPoll ()
   QString thisUser = xmppConfig.user ();
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
-    QStringList resources = xclient->getRoster().getResources (id);
+    QStringList resources = xclientMap[user]->getRoster().getResources (id);
     QString res;
     QStringList::const_iterator   rit;
     for (rit = resources.begin (); rit != resources.end (); rit++) {
@@ -747,89 +641,9 @@ DChatMain::XmppPoll ()
 }
 
 void
-DChatMain::AddContact (QString id, 
-                       QString res, 
-                       QString friendOf,
-                       QXmppPresence::Status::Type stype,
-                       QString statusText)
-{
-  ServerContact * newContact = new ServerContact;
-  newContact->name = id;
-  newContact->state = QString("?");
-  newContact->friendOf = friendOf,
-  newContact->resource = res;
-  newContact->recentlySeen = true;
-  QStandardItem * nameItem = new QStandardItem (newContact->name);
-  QStandardItem * stateItem = new QStandardItem (newContact->state);
-  QStandardItem * resourceItem = new QStandardItem (newContact->resource);
-  QList <QStandardItem*> row;
-  row << stateItem;
-  row << nameItem;
-  row << resourceItem;
-  contactModel.appendRow (row);
-  newContact->modelRow = stateItem->row ();
-  SetStatus (newContact->modelRow, stype, statusText);
-  QString  bigId = id + QString("/") + res;
-  serverContacts [bigId] = newContact;
-}
-
-void
-DChatMain::XmppConnected ()
-{
-  XmppPoll ();
-  AnnounceMe ();
-}
-
-void
-DChatMain::XmppDisconnected ()
-{
-  qDebug () << " xmpp client disconnected";
-}
-
-void
-DChatMain::XmppElementReceived (const QDomElement & elt, bool & handled)
-{
-  qDebug () << " received DOM elt from xclient ";
-  qDebug () << elt.tagName();
-  handled = false;
-}
-
-void
-DChatMain::XmppIqReceived (const QXmppIq & iq)
-{
-  Q_UNUSED (iq);
-  qDebug () << " received IQ ";
-}
-
-void
-DChatMain::XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq)
-{
-  Q_UNUSED (disIq);
-  QXmppIq::Type  iqtype = disIq.type ();
-  QString msg;
-  switch (iqtype) {
-  case QXmppIq::Error:
-     msg = "Error";
-     break;
-  case QXmppIq::Get:
-     msg = "Get";
-     break;
-   case QXmppIq::Set:
-     msg = "Set";
-     break;
-   case QXmppIq::Result:
-     msg = "Result";
-     break;
-   default:
-     msg = "Bad IQ type";
-  }
-  qDebug () << " received Discovery Iq type " << msg;
-}
-
-void
 DChatMain::DebugCheck ()
 {
-  if (!xclient) {
+  if (!xclientMap[user]) {
     qDebug () <<" DEBUG: no xclient";
   }
 }
