@@ -20,6 +20,10 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include "contact-list-model.h"
+#include "deliberate.h"
+#include <QDebug>
+
+using namespace deliberate;
 
 namespace egalite
 {
@@ -27,6 +31,21 @@ namespace egalite
 ContactListModel::ContactListModel (QObject *parent)
   :QStandardItemModel (parent)
 {
+}
+
+void
+ContactListModel::Setup ()
+{
+  iconSize = QString ("22x22");
+  iconSize = Settings ().value ("style/iconSize",iconSize).toString();
+  Settings().setValue ("style/iconSize",iconSize);
+  QString iconDir = QString (":/icons");
+  iconDir = Settings().value ("style/iconDir",iconDir).toString ();
+  Settings().setValue ("style/iconDir",iconDir);
+  iconPath = iconDir;
+  iconPath.append ('/');
+  iconPath.append (iconSize);
+  iconPath.append ("/status/");
 }
 
 void
@@ -113,76 +132,7 @@ ContactListModel::StatusIcon (QXmppPresence::Status::Type stype)
 }
 
 void
-ContactListModel::XmppConnected ()
-{
-  XmppPoll ();
-  AnnounceMe ();
-}
-
-void
-ContactListModel::XmppDisconnected ()
-{
-  qDebug () << " xmpp client disconnected";
-}
-
-void
-ContactListModel::XmppElementReceived (const QDomElement & elt, bool & handled)
-{
-  qDebug () << " received DOM elt from xclient ";
-  qDebug () << elt.tagName();
-  handled = false;
-}
-
-void
-ContactListModel::XmppIqReceived (const QXmppIq & iq)
-{
-  Q_UNUSED (iq);
-  qDebug () << " received IQ ";
-}
-
-
-void
-ContactListModel::XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq)
-{
-  Q_UNUSED (disIq);
-  QXmppIq::Type  iqtype = disIq.type ();
-  QString msg;
-  switch (iqtype) {
-  case QXmppIq::Error:
-     msg = "Error";
-     break;
-  case QXmppIq::Get:
-     msg = "Get";
-     break;
-   case QXmppIq::Set:
-     msg = "Set";
-     break;
-   case QXmppIq::Result:
-     msg = "Result";
-     break;
-   default:
-     msg = "Bad IQ type";
-  }
-  qDebug () << " received Discovery Iq type " << msg;
-}
-
-void
-ContactListModel::XPresenceChange (const QXmppPresence & presence)
-{
-  QXmppPresence::Type   presType = presence.type ();
-  QXmppPresence::Status status = presence.status();
-qDebug () << " receive presence form " << presence.from () << " to "
-          << presence.to () << " type " << PresenceTypeString (presType);
-  if (presType == QXmppPresence::Available 
-      || presType == QXmppPresence::Unavailable) {
-    UpdateState (presence.to(), presence.from(), status);
-  } else {
-    subscriptionDialog.RemoteAskChange (xclientMap[user], presence);
-  }
-}
-
-void
-DChatMain::UpdateState (const QString & ownId,
+ContactListModel::UpdateState (const QString & ownId,
                         const QString & remoteId, 
                         const QXmppPresence::Status & status)
 {
@@ -207,11 +157,11 @@ DChatMain::UpdateState (const QString & ownId,
 }
 
 void
-DChatMain::AddContact (QString id, 
-                       QString res, 
-                       QString friendOf,
+ContactListModel::AddContact (const QString & id, 
+                       const QString & res, 
+                       const QString & friendOf,
                        QXmppPresence::Status::Type stype,
-                       QString statusText)
+                       const QString & statusText)
 {
   ServerContact * newContact = new ServerContact;
   newContact->name = id;
@@ -226,7 +176,7 @@ DChatMain::AddContact (QString id,
   row << stateItem;
   row << nameItem;
   row << resourceItem;
-  contactModel.appendRow (row);
+  appendRow (row);
   newContact->modelRow = stateItem->row ();
   SetStatus (newContact->modelRow, stype, statusText);
   QString  bigId = id + QString("/") + res;

@@ -96,6 +96,7 @@ DChatMain::Run ()
   }
   CertStore::IF().Init (this);
   SetSettings ();
+  contactListModel.Setup ();
   QStringList contactHeaders;
   contactHeaders << tr("Account")
                  << tr("Status")
@@ -160,16 +161,6 @@ DChatMain::SetSettings ()
   defaultPort = Settings().value ("direct/defaultPort",defaultPort).toInt ();
   Settings().setValue ("direct/defaultPort",defaultPort);
   
-  iconSize = QString ("22x22");
-  iconSize = Settings ().value ("style/iconSize",iconSize).toString();
-  Settings().setValue ("style/iconSize",iconSize);
-  QString iconDir = QString (":/icons");
-  iconDir = Settings().value ("style/iconDir",iconDir).toString ();
-  Settings().setValue ("style/iconDir",iconDir);
-  iconPath = iconDir;
-  iconPath.append ('/');
-  iconPath.append (iconSize);
-  iconPath.append ("/status/");
 }
 
 void
@@ -605,48 +596,85 @@ DChatMain::XmppPoll ()
 
 
 void
-DChatMain::Poll (XEgalClient * xclient)
-{
-  QStringList  contactJids;
-  if (xclient == 0) {
-    return;
-  }
-  contactJids = xclient->getRoster().getRosterBareJids();
-  xmppConfig = xclient->getConfiguration ();
-  ResetContactSeen (serverContacts);
-  QStringList::const_iterator stit;
-  QString thisUser = xmppConfig.user ();
-  for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
-    QString id = *stit;
-    QStringList resources = xclientMap[user]->getRoster().getResources (id);
-    QString res;
-    QStringList::const_iterator   rit;
-    for (rit = resources.begin (); rit != resources.end (); rit++) {
-      res = *rit;
-      QString bigId = id + QString("/") + res;
-      QXmppPresence pres = xclient->getRoster().getPresence (id,res);
-      QXmppPresence::Status::Type stype = pres.status().type ();
-
-      ContactMap::iterator contactit = serverContacts.find (bigId);
-      if (contactit == serverContacts.end ()) {
-        AddContact (id, res, thisUser, stype, pres.status().statusText());
-      } else {
-        SetStatus (contactit->second->modelRow, 
-                   stype, pres.status().statusText());
-        contactit->second->recentlySeen = true;
-      }
-    } 
-  }
-  FlushStaleContacts (serverContacts, contactModel);
-}
-
-void
 DChatMain::DebugCheck ()
 {
   if (!xclientMap[user]) {
     qDebug () <<" DEBUG: no xclient";
   }
 }
+
+void
+DChatMain::XPresenceChange (const QXmppPresence & presence)
+{
+  QXmppPresence::Type   presType = presence.type ();
+  QXmppPresence::Status status = presence.status();
+qDebug () << " receive presence form " << presence.from () << " to "
+          << presence.to () << " type " << PresenceTypeString (presType);
+  if (presType == QXmppPresence::Available 
+      || presType == QXmppPresence::Unavailable) {
+    contactListModel.UpdateState (presence.to(), presence.from(), status);
+  } else {
+    subscriptionDialog.RemoteAskChange (xclientMap[user], presence);
+  }
+}
+
+void
+DChatMain::XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq)
+{
+  Q_UNUSED (disIq);
+  QXmppIq::Type  iqtype = disIq.type ();
+  QString msg;
+  switch (iqtype) {
+  case QXmppIq::Error:
+     msg = "Error";
+     break;
+  case QXmppIq::Get:
+     msg = "Get";
+     break;
+   case QXmppIq::Set:
+     msg = "Set";
+     break;
+   case QXmppIq::Result:
+     msg = "Result";
+     break;
+   default:
+     msg = "Bad IQ type";
+  }
+  qDebug () << " received Discovery Iq type " << msg;
+}
+void
+DChatMain::XmppElementReceived (const QDomElement & elt, bool & handled)
+{
+  qDebug () << " received DOM elt from xclient ";
+  qDebug () << elt.tagName();
+  handled = false;
+}
+
+void
+DChatMain::XmppIqReceived (const QXmppIq & iq)
+{
+  Q_UNUSED (iq);
+  qDebug () << " received IQ ";
+}
+
+
+void
+DChatMain::XmppConnected ()
+{
+  XmppPoll ();
+  AnnounceMe ();
+}
+
+void
+DChatMain::XmppDisconnected ()
+{
+  qDebug () << " xmpp client disconnected";
+}
+
+
+#include "stash"
+
+
 
 } // namespace
 

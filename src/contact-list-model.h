@@ -23,6 +23,8 @@
  ****************************************************************/
 
 #include <QStandardItemModel>
+#include <QXmppPresence.h>
+#include "server-contact.h"
 
 namespace egalite
 {
@@ -35,26 +37,40 @@ public:
 
   ContactListModel (QObject * parent=0);
 
+  void Setup ();
+
   void AddAccount (const QString & id);  /// when logging in call this
   void RemoveAccount (const QString & id);
   void UpdateState (const QString & ownId,
                     const QString & remoteId,
                     const QXmppPresence::Status & status);
+  void AddContact (const QString & accountId,  /// who are we
+                   const QString & remoteId,   /// who is our friend
+                   const QString & loginId,    /// where is friend logged in
+                   QXmppPresence::Status::Type  stype, /// on/off/sleeping
+                   const QString & statusText);
+  void    SetStatus (int row, 
+                     QXmppPresence::Status::Type stype,
+                     QString statusText);
 
   
+public slots:
+
+  void PickedItem (const QModelIndex & index );
+
 signals:
 
   void StartServerChat (QString target);
 
 private:
 
+  QString StatusName (QXmppPresence::Status::Type stype);
+  QIcon   StatusIcon (QXmppPresence::Status::Type stype);
 
-  void AddContact (const QString & accountId,  /// who are we
-                   const QString & remoteId,   /// who is our friend
-                   const QString & loginId,    /// where is friend logged in
-                   const QXmppPresence::Status::Type  stype, /// on/off/sleeping
-                   const QString & statusText);
+  QString      iconPath;
+  QString      iconSize;
 
+  ContactMap serverContacts;
 
 };
 

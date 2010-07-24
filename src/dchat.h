@@ -92,7 +92,6 @@ private slots:
   void ClearDirect (SymmetricSocket *direct);
   void XmppPoll ();
   void DebugCheck ();
-  void PickedItem (const QModelIndex & index );
   void XmppError (QXmppClient::Error err);
   void AnnounceMe ();
   void XmppConnected ();
@@ -107,25 +106,12 @@ private:
   void    SetupListener ();
   void    Connect ();
   bool    GetPass ();
-  void    Poll (QXmppClient * xclient);
+  void    Poll (XEgalClient * xclient);
   void    CallDirectFrom (QString nick);
-  QString StatusName (QXmppPresence::Status::Type stype);
-  QIcon   StatusIcon (QXmppPresence::Status::Type stype);
-  void    SetStatus (int row, 
-                     QXmppPresence::Status::Type stype,
-                     QString statusText);
-  void    AddContact (QString id, 
-                      QString res, 
-                      QString friendOf,
-                      QXmppPresence::Status::Type stype,
-                      QString statusText);
   void    ResetContactSeen (ContactMap & contacts);
   void    FlushStaleContacts (ContactMap & contacts,
                               QStandardItemModel & model);
   QString PresenceTypeString (QXmppPresence::Type t);
-  void    UpdateState (const QString & ownId,
-                       const QString & remoteId, 
-                       const QXmppPresence::Status & status);
 
   Ui_DChatMain    ui;
   QApplication   *pApp;
@@ -150,9 +136,6 @@ private:
   QTimer       *xmppTimer;
   QTimer       *announceHeartbeat;
 
-  QString      iconPath;
-  QString      iconSize;
-
 
   std::map <QString, XEgalClient*>    xclientMap;
   std::map <QString, DirectListener*> inDirect;
@@ -161,7 +144,6 @@ private:
   ChatMap directChats;
   ChatMap serverChats;
 
-  ContactMap serverContacts;
 };
 
 } // namespace

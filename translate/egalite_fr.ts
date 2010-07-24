@@ -694,7 +694,7 @@
     <name>egalite::DChatMain</name>
     <message>
         <location filename="../src/dchat.cpp" line="100"/>
-        <location filename="../src/dchat.cpp" line="428"/>
+        <location filename="../src/dchat.cpp" line="438"/>
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
@@ -714,108 +714,108 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="385"/>
+        <location filename="../src/dchat.cpp" line="395"/>
         <source>Choose Direct Identity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="394"/>
+        <location filename="../src/dchat.cpp" line="404"/>
         <source>Choose Destination</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="427"/>
+        <location filename="../src/dchat.cpp" line="437"/>
         <source>direct </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="433"/>
-        <location filename="../src/dchat.cpp" line="458"/>
+        <location filename="../src/dchat.cpp" line="443"/>
+        <location filename="../src/dchat.cpp" line="468"/>
         <source>Chat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="453"/>
+        <location filename="../src/dchat.cpp" line="463"/>
         <source>Xmpp </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="570"/>
+        <location filename="../src/dchat.cpp" line="580"/>
         <source>pres-error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="572"/>
+        <location filename="../src/dchat.cpp" line="582"/>
         <source>Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="574"/>
+        <location filename="../src/dchat.cpp" line="584"/>
         <source>Not Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="576"/>
+        <location filename="../src/dchat.cpp" line="586"/>
         <source>Want to Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="578"/>
+        <location filename="../src/dchat.cpp" line="588"/>
         <source>Done Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="580"/>
+        <location filename="../src/dchat.cpp" line="590"/>
         <source>Want to Un-Subscribe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="582"/>
+        <location filename="../src/dchat.cpp" line="592"/>
         <source>Done Un-Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="584"/>
+        <location filename="../src/dchat.cpp" line="594"/>
         <source>Probe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="672"/>
+        <location filename="../src/dchat.cpp" line="682"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="674"/>
+        <location filename="../src/dchat.cpp" line="684"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="676"/>
+        <location filename="../src/dchat.cpp" line="686"/>
         <source>away</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="678"/>
+        <location filename="../src/dchat.cpp" line="688"/>
         <source>XA</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="680"/>
+        <location filename="../src/dchat.cpp" line="690"/>
         <source>DND</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="682"/>
+        <location filename="../src/dchat.cpp" line="692"/>
         <source>Chatty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="684"/>
+        <location filename="../src/dchat.cpp" line="694"/>
         <source>Hiding</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="686"/>
+        <location filename="../src/dchat.cpp" line="696"/>
         <source>?</source>
         <translation type="unfinished"></translation>
     </message>
