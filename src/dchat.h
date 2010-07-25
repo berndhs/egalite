@@ -37,6 +37,7 @@
 #include "subscription-change.h"
 #include "xegal-client.h"
 #include "ui_getpassword.h"
+#include "ui_request-subscribe.h"
 
 #include <map>
 
@@ -87,6 +88,8 @@ private slots:
   void Login ();
   void Logout ();
   void EditSettings ();
+  void RequestSubscribe ();
+  void DoRequestSubscribe ();
   void CallDirect ();
   void ClearCall (int callid);
   void ConnectDirect (SymmetricSocket *direct, QString localNick);
@@ -117,9 +120,10 @@ private:
                               QStandardItemModel & model);
   QString PresenceTypeString (QXmppPresence::Type t);
 
-  Ui_DChatMain    ui;
-  Ui_GetString  passui;
-  QApplication   *pApp;
+  Ui_DChatMain          ui;
+  Ui_GetString          passui;
+  Ui_RequestSubscribe   reqSubUi;
+  QApplication         *pApp;
 
   ContactListModel  contactListModel;
 
@@ -136,6 +140,7 @@ private:
   QString       server;
   QString       password;
   QDialog      *passdial;
+  QDialog      *subscribeDial;
   int           callnum;
   QTimer       *debugTimer;
   QTimer       *xmppTimer;

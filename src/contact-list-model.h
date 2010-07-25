@@ -82,7 +82,6 @@ private:
 
   bool         discardOfflines;
 
-  //std::map <QString, ContactMap> serverContacts;
 
 };
 

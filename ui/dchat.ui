@@ -89,6 +89,7 @@
     </property>
     <addaction name="contactDirectAction"/>
     <addaction name="contactServerAction"/>
+    <addaction name="actionRequest"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -167,6 +168,11 @@
   <action name="actionLog_Out">
    <property name="text">
     <string>Log Out</string>
+   </property>
+  </action>
+  <action name="actionRequest">
+   <property name="text">
+    <string>Request</string>
    </property>
   </action>
  </widget>

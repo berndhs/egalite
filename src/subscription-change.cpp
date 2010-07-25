@@ -71,7 +71,7 @@ SubscriptionChange::PresenceTypeMessage (QXmppPresence::Type t)
     case QXmppPresence::Subscribe:
       return tr ("Want to Subscribe to be notified about your presence status");
     case QXmppPresence::Subscribed:
-      return tr ("Deny/discontinue notifying you about their presence status");
+      return tr ("Have allowed subscription about their presence status");
     case QXmppPresence::Unsubscribe:
       return tr ("Want to Un-Subscribe from notifications "
                   "about your presence status");

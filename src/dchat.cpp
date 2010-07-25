@@ -59,6 +59,7 @@ DChatMain::DChatMain (QWidget *parent)
    publicPort (29999),
    defaultPort (29999),
    passdial (0),
+   subscribeDial (0),
    callnum (0),
    debugTimer (0),
    xmppTimer (0),
@@ -196,6 +197,8 @@ DChatMain::Connect ()
            this, SLOT (Manual ()));
   connect (ui.actionAbout, SIGNAL (triggered()),
            this, SLOT (About ()));
+  connect (ui.actionRequest, SIGNAL (triggered ()),
+           this, SLOT (RequestSubscribe ()));
   connect (&contactListModel, SIGNAL (StartServerChat (QString)),
            this, SLOT (StartServerChat (QString)));
   connect (&contactListModel, SIGNAL (NewAccountIndex (QModelIndex)),
@@ -216,7 +219,6 @@ DChatMain::Login ()
   QString oldUser = user;
   if (GetPass()) {
     XEgalClient * xclient = xclientMap[user];
-qDebug () << " old user " << oldUser << " new user " << user << " xclient " << xclient;
     if (!xclient) {
       xclient = new XEgalClient (this);
       contactListModel.AddAccount (user);
@@ -449,6 +451,53 @@ DChatMain::Logout ()
     delete xclient;
   }
   xclientMap.erase (expired);
+}
+
+void
+DChatMain::RequestSubscribe ()
+{
+  PickString   pickString (this);
+  QStringList  choiceList;
+  std::map <QString, XEgalClient*>::iterator xit;
+  for (xit = xclientMap.begin(); xit != xclientMap.end(); xit++) {
+    choiceList << xit->first;
+  }
+  pickString.SetTitle (tr("Request Subscription from Account"));
+  int choice = pickString.Pick (choiceList);
+  if (choice != 1) {
+    return;
+  }
+  QString from = pickString.Choice ();
+  if (subscribeDial == 0) {
+    subscribeDial = new QDialog (this);
+    reqSubUi.setupUi (subscribeDial);
+    connect (reqSubUi.requestButton, SIGNAL (clicked()),
+             this, SLOT (DoRequestSubscribe()));
+    connect (reqSubUi.cancelButton, SIGNAL (clicked()),
+             subscribeDial, SLOT(reject()));
+  }
+  reqSubUi.fromAccount->setText (from);
+  reqSubUi.toAccount->clear ();
+  subscribeDial->show ();
+}
+
+void
+DChatMain::DoRequestSubscribe ()
+{
+  if (subscribeDial) {
+    QString toAccount = reqSubUi.toAccount->text();
+    QString fromAccount = reqSubUi.fromAccount->text();
+    int done(0);
+    if (xclientMap.find (fromAccount) != xclientMap.end()) {
+      QXmppClient * xclient = xclientMap[fromAccount];
+      QXmppPresence  request;
+      request.setTo (toAccount);
+      request.setType (QXmppPresence::Subscribe);
+      xclient->sendPacket (request);
+      done = 1;
+    }
+    subscribeDial->done (done);
+  }
 }
 
 void

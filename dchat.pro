@@ -76,6 +76,7 @@ FORMS = \
         ui/subscription.ui \
         ui/save-as.ui \
         ui/simple-password.ui \
+        ui/request-subscribe.ui \
 
 
 SOURCES = src/main.cpp \
