@@ -37,7 +37,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Connect</string>
+    <string>Choose</string>
    </property>
   </widget>
   <widget class="QPushButton" name="cancelButton">

@@ -54,14 +54,10 @@ ContactListModel::Setup ()
 void
 ContactListModel::PickedItem (const QModelIndex &index)
 {
-  qDebug () << " picked model item " << index << " row " << index.row() << " col " <<  index.column();
-  int row = index.row ();
   QStandardItem * item = itemFromIndex (index);
-qDebug () << " item is " << item << " tag " << item->data() << " text " << item->text();
   if (item) {
     if (item->data().toString() == nameTag) {
       QString target (item->text());
-qDebug () << " pick target found as " << target;
       emit StartServerChat (target);
     }
   }
@@ -193,7 +189,13 @@ ContactListModel::AddAccount (const QString & id)
 void
 ContactListModel::RemoveAccount (const QString & id)
 {
-#warning "missing function implementation for ContactListModel::RemoveAccount"
+  QStandardItem * deadAccount = FindAccountGroup (id);
+  if (deadAccount) {
+     int row = deadAccount->row ();
+     if (row >= 0) {
+       removeRow (row);
+     }
+  }
 }
 
 void
@@ -227,7 +229,7 @@ ContactListModel::AddContact (const QString & id,
 }
 
 QStandardItem *
-ContactListModel::FindAccountGroup (QString accountName)
+ContactListModel::FindAccountGroup (QString accountName, bool makeit)
 {
   int nrows = rowCount ();
   QStandardItem * rowHead;
@@ -240,10 +242,14 @@ ContactListModel::FindAccountGroup (QString accountName)
     }
   }
   // not found - make a new one
-  rowHead = new QStandardItem (accountName);
-  rowHead->setData (QString("accounthead"));
-  appendRow (rowHead);
-  return rowHead;
+  if (makeit) {
+    rowHead = new QStandardItem (accountName);
+    rowHead->setData (QString("accounthead"));
+    appendRow (rowHead);
+    return rowHead;
+  } else {
+    return 0;
+  }
 }
 
 

@@ -65,7 +65,7 @@ signals:
 
 private:
 
-  QStandardItem * FindAccountGroup (QString accountName);
+  QStandardItem * FindAccountGroup (QString accountName, bool makeit=true);
   QString StatusName (QXmppPresence::Status::Type stype);
   QIcon   StatusIcon (QXmppPresence::Status::Type stype);
 

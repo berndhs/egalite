@@ -85,6 +85,7 @@ private slots:
   void PassOK ();
   void PassCancel ();
   void Login ();
+  void Logout ();
   void EditSettings ();
   void CallDirect ();
   void ClearCall (int callid);

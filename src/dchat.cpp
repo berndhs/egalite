@@ -182,6 +182,8 @@ DChatMain::Connect ()
            this, SLOT (EditSettings ()));
   connect (ui.actionLog_In, SIGNAL (triggered()),
            this, SLOT (Login()));
+  connect (ui.actionLog_Out, SIGNAL (triggered()),
+           this, SLOT (Logout()));
   connect (ui.actionDirect, SIGNAL (triggered()),
            CertStore::Object(), SLOT (CertDialog ()));
   connect (ui.contactDirectAction, SIGNAL (triggered()),
@@ -418,6 +420,31 @@ qDebug () << " start direct connect " << callnum << " call " << newcall;
     connect (newcall, SIGNAL (ConnectionReady (SymmetricSocket*, QString)),
              this, SLOT (ConnectDirect (SymmetricSocket*, QString)));
   }
+}
+
+void
+DChatMain::Logout ()
+{
+  PickString   pickString (this);
+  QStringList  choiceList;
+  std::map <QString, XEgalClient*>::iterator xit;
+  for (xit = xclientMap.begin(); xit != xclientMap.end(); xit++) {
+    choiceList << xit->first;
+  }
+  pickString.SetTitle (tr("Choose Account to Log Out"));
+  int choice = pickString.Pick (choiceList);
+  if (choice != 1) {
+    return;
+  }
+  QString expired = pickString.Choice();
+  contactListModel.RemoveAccount (expired);
+  XEgalClient * xclient = xclientMap [expired];
+  if (xclient) {
+    xclient->disconnect ();
+    disconnect (xclient, 0,0,0);
+    delete xclient;
+  }
+  xclientMap.erase (expired);
 }
 
 void
