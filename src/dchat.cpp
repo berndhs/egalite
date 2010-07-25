@@ -26,7 +26,6 @@
 #include "version.h"
 #include "simple-pass.h"
 #include <QDebug>
-#include "ui_getpassword.h"
 #include <QXmppConfiguration.h>
 #include <QXmppMessage.h>
 #include <QXmppRoster.h>
@@ -98,8 +97,7 @@ DChatMain::Run ()
   SetSettings ();
   contactListModel.Setup ();
   QStringList contactHeaders;
-  contactHeaders << tr("Account")
-                 << tr("Status")
+  contactHeaders << tr("Status")
                  << tr("Name")
                  << tr("Login");
   contactListModel.setHorizontalHeaderLabels (contactHeaders);
@@ -189,13 +187,15 @@ DChatMain::Connect ()
   connect (ui.contactDirectAction, SIGNAL (triggered()),
            CertStore::Object(), SLOT (ContactDialog ()));
   connect (ui.contactView, SIGNAL (activated (const QModelIndex &)),
-           this, SLOT (PickedItem (const QModelIndex &)));
+           &contactListModel, SLOT (PickedItem (const QModelIndex &)));
   connect (ui.actionLicense, SIGNAL (triggered()),
            this, SLOT (License()));
   connect (ui.actionManual, SIGNAL (triggered()),
            this, SLOT (Manual ()));
   connect (ui.actionAbout, SIGNAL (triggered()),
            this, SLOT (About ()));
+  connect (&contactListModel, SIGNAL (StartServerChat (QString)),
+           this, SLOT (StartServerChat (QString)));
 }
 
 void
@@ -211,16 +211,15 @@ DChatMain::Login ()
   QString oldUser = user;
   if (GetPass()) {
     XEgalClient * xclient = xclientMap[user];
+qDebug () << " old user " << oldUser << " new user " << user << " xclient " << xclient;
     if (!xclient) {
       xclient = new XEgalClient (this);
-    }
-    if (xclient->isConnected ()) {
-      xclient->disconnect ();
+      contactListModel.AddAccount (user);
+      xclientMap[user] = xclient;
     }
     QXmppConfiguration & xconfig = xclient->getConfiguration();
     xconfig.setResource ("Egalite.");
     xclient->connectToServer (server,user, password);
-    xclientMap[user] = xclient;
     xmppUser = user;
     connect (xclient, SIGNAL (messageReceived  (const QXmppMessage  &)),
              this, SLOT (GetMessage (const QXmppMessage &)));
@@ -276,9 +275,8 @@ DChatMain::GetPass ()
 {
   if (passdial == 0) {
     passdial = new QDialog (this);
+    passui.setupUi (passdial);
   }
-  Ui_GetString  passui;
-  passui.setupUi (passdial);
   passui.userText->setText (user);
   passui.serverText->setText (server);
   passui.passwordText->setText ("");
@@ -291,8 +289,13 @@ DChatMain::GetPass ()
     server = passui.serverText->text ();
     Settings().setValue ("network/user",user);
     Settings().setValue ("network/server",server);
+qDebug () << " GetPass new     +++++++++++++++++++++ ";
+qDebug () << " new user " << user << " server " << server;
+qDebug () << " userText " << passui.userText->text ();
+qDebug () << " serverText " << passui.serverText->text ();
     return true;
   } else {
+qDebug () << " GetPass no change ------------------- ";
     return false;
   }
 }

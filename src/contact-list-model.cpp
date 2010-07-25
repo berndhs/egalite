@@ -29,7 +29,10 @@ namespace egalite
 {
 
 ContactListModel::ContactListModel (QObject *parent)
-  :QStandardItemModel (parent)
+  :QStandardItemModel (parent),
+   nameTag ("remoteName"),
+   resTag ("resource"),
+   stateTag ("state")
 {
 }
 
@@ -51,38 +54,67 @@ ContactListModel::Setup ()
 void
 ContactListModel::PickedItem (const QModelIndex &index)
 {
-  qDebug () << " picked model item " << index;
+  qDebug () << " picked model item " << index << " row " << index.row() << " col " <<  index.column();
   int row = index.row ();
-  QStandardItem *nameCell = item (row,1);
-  QStandardItem *resoCell = item (row,2);
-  if (nameCell) {
-    QString  target (nameCell->text());
-    if (resoCell) {
-      target.append ("/");
-      target.append (resoCell->text());
+  QStandardItem * item = itemFromIndex (index);
+qDebug () << " item is " << item << " tag " << item->data() << " text " << item->text();
+  if (item) {
+    if (item->data().toString() == nameTag) {
+      QString target (item->text());
+qDebug () << " pick target found as " << target;
+      emit StartServerChat (target);
     }
-    emit StartServerChat (target);
   }
 }
     
 
-void 
-ContactListModel::SetStatus (int row, 
-                      QXmppPresence::Status::Type stype,
-                      QString statusText)
+bool 
+ContactListModel::SetStatus (const QString & ownId,
+                             const QString & remoteId,
+                             const QString & resource,
+                            QXmppPresence::Status::Type stype,
+                             const QString & statusText)
 {
-  QStandardItem * stateItem = item (row,0);
-  if (stateItem == 0) {
-    stateItem = new QStandardItem;
-    setItem (row,0,stateItem);
+  QStandardItem * accountHead = FindAccountGroup (ownId);
+  QStandardItem * stateItem;
+  QStandardItem * chase;
+  bool  nameFound, resourceFound;
+  QModelIndex  accIndex;
+  accIndex = indexFromItem (accountHead);
+  if (hasChildren (accIndex)) {
+    int row;
+    int nrows = accountHead->rowCount ();
+    int ncols = accountHead->columnCount ();
+    for (row = 0; row < nrows; row++) {
+      stateItem = 0;
+      nameFound = false;
+      resourceFound = false;
+      for (int col = 0; col < ncols; col++) {
+        chase = accountHead->child (row, col);
+        if (!chase) {
+          continue;
+        }
+        QString tag = chase->data().toString();
+        if (tag == nameTag && chase->text () == remoteId) {
+          nameFound = true;
+        } else if (tag == resTag && chase->text () == resource) {
+          resourceFound = true;
+        } else if (tag == stateTag) {
+          stateItem = chase;
+        }
+      }
+      if (nameFound && resourceFound && stateItem) { // in this row
+        QString stext (statusText);
+        if (stext.length() == 0) {
+          stext = StatusName (stype);
+        }
+        stateItem->setText (stext);
+        stateItem->setIcon (StatusIcon (stype));
+        return true;
+      }
+    }
   }
-  if (statusText.length() == 0) {
-    statusText = StatusName (stype);
-  }
-  stateItem->setIcon (StatusIcon (stype));
-  stateItem->setText (statusText);
-  
-qDebug () << " did set status row " << row << " text " << stateItem->text();
+  return false;
 }
 
 QString
@@ -139,21 +171,29 @@ ContactListModel::UpdateState (const QString & ownId,
   QXmppPresence::Status::Type stype = status.type ();
   QString statusText = status.statusText (); 
   QStringList parts = remoteId.split ('/',QString::SkipEmptyParts);
-  QString id = parts.at(0);
-  QString resource;
+  QString remoteJid = parts.at(0);
+  QString remoteResource;
   if (parts.size () > 1) {
-    resource = parts.at(1);
+    remoteResource = parts.at(1);
   }
-  ContactMap::iterator contactit = serverContacts.find (remoteId);
-  if (contactit != serverContacts.end()) {
-    if (contactit->second) {
-      SetStatus (contactit->second->modelRow, stype, statusText);
-      contactit->second->recentlySeen = true;
-    }
-  } else {
-    parts = ownId.split ('/', QString::SkipEmptyParts);
-    AddContact (id, resource, parts.at(0), stype, statusText);
+  parts = ownId.split ('/',QString::SkipEmptyParts);
+  QString ownJid = parts.at(0);
+  bool old =  SetStatus (ownJid, remoteJid, remoteResource, stype, statusText);
+  if (!old) {
+    AddContact (remoteJid, remoteResource, ownId, stype, statusText);
   }
+}
+
+void
+ContactListModel::AddAccount (const QString & id)
+{
+  FindAccountGroup (id);
+}
+
+void
+ContactListModel::RemoveAccount (const QString & id)
+{
+#warning "missing function implementation for ContactListModel::RemoveAccount"
 }
 
 void
@@ -163,24 +203,47 @@ ContactListModel::AddContact (const QString & id,
                        QXmppPresence::Status::Type stype,
                        const QString & statusText)
 {
-  ServerContact * newContact = new ServerContact;
-  newContact->name = id;
-  newContact->state = QString("?");
-  newContact->friendOf = friendOf,
-  newContact->resource = res;
-  newContact->recentlySeen = true;
-  QStandardItem * nameItem = new QStandardItem (newContact->name);
-  QStandardItem * stateItem = new QStandardItem (newContact->state);
-  QStandardItem * resourceItem = new QStandardItem (newContact->resource);
+  QStringList parts = friendOf.split ('/',QString::SkipEmptyParts);
+  QString ownId = parts.at(0);
+  QStandardItem * groupItem = FindAccountGroup (ownId);
+  QStandardItem * nameItem = new QStandardItem (id);
+  nameItem->setData (nameTag);
+  QStandardItem * stateItem = new QStandardItem (QString("?"));
+  stateItem->setData (stateTag);
+  QStandardItem * resourceItem = new QStandardItem (res);
+  resourceItem->setData (resTag);
   QList <QStandardItem*> row;
   row << stateItem;
   row << nameItem;
   row << resourceItem;
-  appendRow (row);
-  newContact->modelRow = stateItem->row ();
-  SetStatus (newContact->modelRow, stype, statusText);
+  groupItem->appendRow (row);
+  QString stext (statusText);
+  if (stext.length() == 0) {
+    stext = StatusName (stype);
+  }
+  stateItem->setText (stext);
+  stateItem->setIcon (StatusIcon (stype));
   QString  bigId = id + QString("/") + res;
-  serverContacts [bigId] = newContact;
+}
+
+QStandardItem *
+ContactListModel::FindAccountGroup (QString accountName)
+{
+  int nrows = rowCount ();
+  QStandardItem * rowHead;
+  for (int r = 0; r< nrows; r++) {
+    rowHead = item (r,0);
+    if (rowHead) {
+      if (rowHead->text () == accountName) {
+        return rowHead;
+      }
+    }
+  }
+  // not found - make a new one
+  rowHead = new QStandardItem (accountName);
+  rowHead->setData (QString("accounthead"));
+  appendRow (rowHead);
+  return rowHead;
 }
 
 

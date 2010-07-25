@@ -36,6 +36,7 @@
 #include "helpview.h"
 #include "subscription-change.h"
 #include "xegal-client.h"
+#include "ui_getpassword.h"
 
 #include <map>
 
@@ -114,6 +115,7 @@ private:
   QString PresenceTypeString (QXmppPresence::Type t);
 
   Ui_DChatMain    ui;
+  Ui_GetString  passui;
   QApplication   *pApp;
 
   ContactListModel  contactListModel;

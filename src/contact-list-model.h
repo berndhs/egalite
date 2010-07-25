@@ -24,7 +24,6 @@
 
 #include <QStandardItemModel>
 #include <QXmppPresence.h>
-#include "server-contact.h"
 
 namespace egalite
 {
@@ -49,9 +48,11 @@ public:
                    const QString & loginId,    /// where is friend logged in
                    QXmppPresence::Status::Type  stype, /// on/off/sleeping
                    const QString & statusText);
-  void    SetStatus (int row, 
+  bool SetStatus (const QString & ownId,
+                  const QString & remoteId,
+                  const QString & resource,
                      QXmppPresence::Status::Type stype,
-                     QString statusText);
+                  const QString & statusText);
 
   
 public slots:
@@ -64,13 +65,18 @@ signals:
 
 private:
 
+  QStandardItem * FindAccountGroup (QString accountName);
   QString StatusName (QXmppPresence::Status::Type stype);
   QIcon   StatusIcon (QXmppPresence::Status::Type stype);
 
   QString      iconPath;
   QString      iconSize;
 
-  ContactMap serverContacts;
+  QString      nameTag;
+  QString      resTag;
+  QString      stateTag;
+
+  //std::map <QString, ContactMap> serverContacts;
 
 };
 
