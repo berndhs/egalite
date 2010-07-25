@@ -469,7 +469,7 @@ Q_UNUSED (localNick);
              sock, SLOT (SendData (const QByteArray&)));
     connect (sock, SIGNAL (ReceiveData (const QByteArray&)),
              newCont, SLOT (Incoming (const QByteArray&)));
-    connect (newCont, SIGNAL (Disconnect ()),
+    connect (newCont, SIGNAL (Disconnect (QString)),
              sock, SLOT (Close()));
     connect (sock, SIGNAL (Exiting(SymmetricSocket *)), 
              this, SLOT (ClearDirect (SymmetricSocket *)));
