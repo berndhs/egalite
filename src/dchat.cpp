@@ -342,6 +342,9 @@ DChatMain::GetMessage (const QXmppMessage & msg)
   QString msgtext = pattern.arg(from).arg(to).arg(body);
   qDebug () << " message from " << from << " to " << to << 
                " is " << body;
+  if (body.length() == 0) {
+    return;
+  }
   if (serverChats.find (from) != serverChats.end()) {
     serverChats[from]->Incoming (msg);
   } else {
@@ -464,9 +467,18 @@ DChatMain::StartServerChat (QString remoteName)
            this, SLOT (Send (const QXmppMessage&)));
   connect (newChat, SIGNAL (HandoffIncoming (const QXmppMessage&)),
             newCont, SLOT (Incoming (const QXmppMessage&)));
-  connect (newCont, SIGNAL (Disconnect()),
-            newChat, SLOT (Close ()));
+  connect (newCont, SIGNAL (Disconnect(QString)),
+            this, SLOT (CloseServerChat (QString)));
   newChat->Run ();
+}
+
+void
+DChatMain::CloseServerChat (QString remoteName)
+{
+  if (serverChats.find(remoteName) != serverChats.end()) {
+    serverChats [remoteName]->Close();
+    serverChats.erase (remoteName);
+  }
 }
 
 void

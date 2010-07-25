@@ -90,6 +90,7 @@ private slots:
   void ClearCall (int callid);
   void ConnectDirect (SymmetricSocket *direct, QString localNick);
   void StartServerChat (QString remoteName);
+  void CloseServerChat (QString remoteName);
   void ClearDirect (SymmetricSocket *direct);
   void XmppPoll ();
   void DebugCheck ();

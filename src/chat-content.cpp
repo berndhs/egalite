@@ -121,7 +121,7 @@ void
 ChatContent::EndChat ()
 {
 qDebug () << " EndChat called";
-  emit Disconnect ();
+  emit Disconnect (remoteName);
 }
 
 void
