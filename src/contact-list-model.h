@@ -62,12 +62,16 @@ public slots:
 signals:
 
   void StartServerChat (QString target);
+  void NewAccountIndex (QModelIndex newIndex);
 
 private:
 
   QStandardItem * FindAccountGroup (QString accountName, bool makeit=true);
   QString StatusName (QXmppPresence::Status::Type stype);
   QIcon   StatusIcon (QXmppPresence::Status::Type stype);
+  void RemoveContact (const QString & ownId,
+                      const QString & remoteId,
+                      const QString & resource);
 
   QString      iconPath;
   QString      iconSize;
@@ -75,6 +79,8 @@ private:
   QString      nameTag;
   QString      resTag;
   QString      stateTag;
+
+  bool         discardOfflines;
 
   //std::map <QString, ContactMap> serverContacts;
 

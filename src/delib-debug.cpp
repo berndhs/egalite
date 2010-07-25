@@ -36,21 +36,21 @@ void MyOwnMessageOutput (QtMsgType type, const char* msg)
 #if DELIBERATE_DEBUG
   switch (type) {
   case QtDebugMsg:
-    if (staticLog && staticLog->IsUsingGui()) {
+    if (staticLog) {
       staticLog->Log ("Qt Debug: ", msg);
     } else {
       cout << "Qt Debug: " << msg << endl;
     }
     break;
   case QtWarningMsg:
-    if (staticLog && staticLog->IsUsingGui()) {
+    if (staticLog) {
       staticLog->Log ("Qt Warn: ", msg);
     } else {
       cout << "Qt Warn: " << msg << endl;
     }
     break;
   case QtCriticalMsg:
-    if (staticLog && staticLog->IsUsingGui()) {
+    if (staticLog) {
       staticLog->Log ("Qt Critical: ", msg);
     } else {
       cout << "Qt Critical: " << msg << endl;
@@ -58,7 +58,7 @@ void MyOwnMessageOutput (QtMsgType type, const char* msg)
     break;
   case QtFatalMsg:
     cout << "Qt Fatal: " << msg << endl;
-    if (staticLog && staticLog->IsUsingGui()) {
+    if (staticLog) {
       staticLog->Log ("Qt Fatal: ", msg);
     } else {
       cout << "Qt Fatal: " << msg << endl;
@@ -67,7 +67,7 @@ void MyOwnMessageOutput (QtMsgType type, const char* msg)
     break;
   default:
     cout << " unknown Qt msg type: " << msg << endl;
-    if (staticLog && staticLog->IsUsingGui()) {
+    if (staticLog) {
       staticLog->Log ("Qt Debug: ", msg);
     } else {
       cout << "Qt Debug: " << msg << endl;
@@ -192,12 +192,14 @@ DebugLog::closeEvent (QCloseEvent *event)
 bool
 DebugLog::Log (const char* msg)
 {
-  if (isLogging) {
+  if (isLogging && useGui) {
     logBox->append (QString(msg));
     update ();
   }
   if (logToFile) {
     logFile.write (QByteArray (msg));
+    logFile.write ("\n");
+    logFile.flush ();
   }
   return isLogging;
 }
@@ -206,12 +208,14 @@ bool
 DebugLog::Log (const char* kind, const char* msg)
 {
   QString realMessage (QString(kind) + " - " + QString(msg));
-  if (isLogging) {
+  if (isLogging && useGui) {
     logBox->append (QString(kind) + " - " + QString(msg));
     update ();
   }
   if (logToFile) {
     logFile.write (realMessage.toUtf8());
+    logFile.write ("\n");
+    logFile.flush ();
   }
   return isLogging;
 }
@@ -236,6 +240,9 @@ DebugLog::LogToFile (QString filename)
   logFile.setFileName (filename);
   bool isopen = logFile.open (QFile::WriteOnly);
   logToFile = isopen;
+
+  cout << " log to file " << filename.toStdString() << endl;
+  cout << " log file open is " << isopen << endl;
 }
 
 } // namespace

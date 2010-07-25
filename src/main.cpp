@@ -107,7 +107,11 @@ main (int argc, char* argv[])
   bool showDebug = opts.SeenOpt ("debug");
 
   deliberate::StartDebugLog (showDebug);
-  
+  if (opts.SeenOpt ("logdebug")) {
+    QString logfile ("/dev/null");
+    opts.SetStringOpt ("logdebug",logfile);
+    deliberate::StartFileLog (logfile);
+  }
 
   /** the real main program starts here */
 

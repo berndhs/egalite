@@ -198,6 +198,8 @@ DChatMain::Connect ()
            this, SLOT (About ()));
   connect (&contactListModel, SIGNAL (StartServerChat (QString)),
            this, SLOT (StartServerChat (QString)));
+  connect (&contactListModel, SIGNAL (NewAccountIndex (QModelIndex)),
+           this, SLOT (ExpandAccountView (QModelIndex)));
 }
 
 void
@@ -205,6 +207,7 @@ DChatMain::EditSettings ()
 {
   configEdit.Exec ();
   SetSettings ();
+  contactListModel.Setup ();
 }
 
 void
@@ -729,7 +732,7 @@ DChatMain::Poll (XEgalClient * xclient)
 
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
-    QStringList resources = xclientMap[user]->getRoster().getResources (id);
+    QStringList resources = xclient->getRoster().getResources (id);
     QString res;
     QStringList::const_iterator   rit;
     if (resources.size () == 0) {
@@ -746,6 +749,11 @@ DChatMain::Poll (XEgalClient * xclient)
   }
 }
 
+void
+DChatMain::ExpandAccountView (QModelIndex accountIndex)
+{
+  ui.contactView->expand (accountIndex);
+}
 
 
 } // namespace

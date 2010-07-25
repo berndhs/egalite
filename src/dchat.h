@@ -102,6 +102,7 @@ private slots:
   void XmppElementReceived (const QDomElement & elt, bool & handled);
   void XmppIqReceived (const QXmppIq & iq);
   void XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq);
+  void ExpandAccountView (QModelIndex accountIndex);
 
 private:
 
