@@ -6,7 +6,7 @@
 #//  Copyright (C) 2010 - Bernd H Stramm 
 #//
 #// This program is distributed under the terms of 
-#// the GNU General Public License version 3 
+#// the GNU General Public License version 2 
 #//
 #// This software is distributed in the hope that it will be useful, 
 #// but WITHOUT ANY WARRANTY; without even the implied warranty 
@@ -18,8 +18,7 @@ MAKEFILE = MakeDChat
 TOP_MAKEFILE = Makefile
 TARGETS = bin/egalite
 
-all: $(MAKEFILE)
-	$(LRELEASE) $(PRO_FILE)
+all: $(MAKEFILE) translations
 	$(MAKE) -f $(MAKEFILE) all
 
 clean: $(MAKEFILE) FORCE
@@ -44,6 +43,9 @@ qmake:
 
 $(MAKEFILE): $(PRO_FILE)
 	$(QMAKE) $(PRO_FILE) -o $(MAKEFILE)
+
+translations:
+	$(LRELEASE) $(PRO_FILE)
 
 FORCE:
 

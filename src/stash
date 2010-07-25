@@ -1,45 +1,6 @@
 #warning "Entering Stashed Code Section"
 
 
-void
-DChatMain::Poll (XEgalClient * xclient)
-{
-#if 0
-  QStringList  contactJids;
-  if (xclient == 0) {
-    return;
-  }
-  contactJids = xclient->getRoster().getRosterBareJids();
-  xmppConfig = xclient->getConfiguration ();
-  ResetContactSeen (serverContacts);
-  QStringList::const_iterator stit;
-  QString thisUser = xmppConfig.user ();
-  for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
-    QString id = *stit;
-    QStringList resources = xclientMap[user]->getRoster().getResources (id);
-    QString res;
-    QStringList::const_iterator   rit;
-    for (rit = resources.begin (); rit != resources.end (); rit++) {
-      res = *rit;
-      QString bigId = id + QString("/") + res;
-      QXmppPresence pres = xclient->getRoster().getPresence (id,res);
-      QXmppPresence::Status::Type stype = pres.status().type ();
-
-      ContactMap::iterator contactit = serverContacts.find (bigId);
-      if (contactit == serverContacts.end ()) {
-        contactListModel.AddContact (id, res, thisUser, 
-                                     stype, pres.status().statusText());
-      } else {
-        contactListModel.SetStatus (contactit->second->modelRow, 
-                   stype, pres.status().statusText());
-        contactit->second->recentlySeen = true;
-      }
-    } 
-  }
-  FlushStaleContacts (serverContacts, contactListModel);
-#endif
-}
-
 
 #warning "End of Stached Code Section"
 

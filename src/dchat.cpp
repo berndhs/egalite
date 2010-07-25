@@ -72,7 +72,7 @@ DChatMain::DChatMain (QWidget *parent)
   debugTimer->start (10 * 1000); // 15 secs
   xmppTimer = new QTimer (this);
   connect (xmppTimer, SIGNAL (timeout()), this, SLOT (XmppPoll ()));
-  xmppTimer->start (1 * 60 * 1000); // 1 mins
+  xmppTimer->start (30 * 1000); // 1/2 mins
   announceHeartbeat = new QTimer (this);
   connect (announceHeartbeat, SIGNAL (timeout()), this, SLOT (AnnounceMe()));
   announceHeartbeat->start (1000*60*2); // 2 minutes
@@ -714,7 +714,40 @@ DChatMain::XmppDisconnected ()
 }
 
 
-#include "stash"
+void
+DChatMain::Poll (XEgalClient * xclient)
+{
+  QStringList  contactJids;
+  if (xclient == 0) {
+    return;
+  }
+  contactJids = xclient->getRoster().getRosterBareJids();
+  xmppConfig = xclient->getConfiguration ();
+  QStringList::const_iterator stit;
+  QString thisUser = xmppConfig.jidBare ();
+qDebug () << " Roster Poll ------------";
+qDebug () << " config data:";
+qDebug () << " user " << xmppConfig.user ();
+qDebug () << " host " << xmppConfig.host ();
+qDebug () << " port " << xmppConfig.port ();
+qDebug () << " domain " << xmppConfig.domain ();
+qDebug () << " jid " << xmppConfig.jid ();
+qDebug () << " jidBare " << xmppConfig.jidBare ();
+
+  for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
+    QString id = *stit;
+    QStringList resources = xclientMap[user]->getRoster().getResources (id);
+    QString res;
+    QStringList::const_iterator   rit;
+    for (rit = resources.begin (); rit != resources.end (); rit++) {
+      res = *rit;
+      QString bigId = id + QString("/") + res;
+      QXmppPresence pres = xclient->getRoster().getPresence (id,res);
+      QXmppPresence::Status status = pres.status();
+      contactListModel.UpdateState (thisUser, bigId, status);
+    } 
+  }
+}
 
 
 

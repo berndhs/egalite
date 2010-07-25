@@ -118,7 +118,7 @@ ContactListModel::StatusName (QXmppPresence::Status::Type stype)
 {
   switch (stype) {
   case QXmppPresence::Status::Offline: 
-    return tr ("-");
+    return tr ("offline");
   case QXmppPresence::Status::Online:
     return tr ("On");
   case QXmppPresence::Status::Away:
@@ -171,6 +171,10 @@ ContactListModel::UpdateState (const QString & ownId,
   QString remoteResource;
   if (parts.size () > 1) {
     remoteResource = parts.at(1);
+  }
+  if (remoteResource.length() < 1) { // not really online anywhere
+    stype = QXmppPresence::Status::Offline;
+    statusText = tr("not found");
   }
   parts = ownId.split ('/',QString::SkipEmptyParts);
   QString ownJid = parts.at(0);
