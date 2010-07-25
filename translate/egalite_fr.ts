@@ -185,76 +185,86 @@
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="34"/>
-        <location filename="../ui/dchat.ui" line="125"/>
+        <location filename="../ui/dchat.ui" line="115"/>
         <source>Quit</source>
         <translation>Quitter</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="84"/>
+        <location filename="../ui/dchat.ui" line="72"/>
         <source>File</source>
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="92"/>
+        <location filename="../ui/dchat.ui" line="81"/>
         <source>Identities</source>
         <translation>Identités</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="99"/>
+        <location filename="../ui/dchat.ui" line="88"/>
         <source>Contacts</source>
         <translation>Contacts</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="106"/>
+        <location filename="../ui/dchat.ui" line="96"/>
         <source>Help...</source>
         <translation>Aide...</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="120"/>
+        <location filename="../ui/dchat.ui" line="110"/>
         <source>Log In</source>
         <translation>Connexion</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="130"/>
+        <location filename="../ui/dchat.ui" line="120"/>
         <source>Accounts</source>
         <translation>Comptes</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="135"/>
+        <location filename="../ui/dchat.ui" line="125"/>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
     <message>
+        <location filename="../ui/dchat.ui" line="130"/>
         <location filename="../ui/dchat.ui" line="140"/>
-        <location filename="../ui/dchat.ui" line="150"/>
         <source>Direct</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ui/dchat.ui" line="135"/>
         <location filename="../ui/dchat.ui" line="145"/>
-        <location filename="../ui/dchat.ui" line="155"/>
         <source>Server</source>
         <translation>Serveur</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="160"/>
+        <location filename="../ui/dchat.ui" line="150"/>
         <source>Settings</source>
         <translation>Propriétés</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="165"/>
+        <location filename="../ui/dchat.ui" line="155"/>
         <source>About</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="170"/>
+        <location filename="../ui/dchat.ui" line="160"/>
         <source>Manual</source>
         <translation>Manuel</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="175"/>
+        <location filename="../ui/dchat.ui" line="165"/>
         <source>License</source>
         <translation>License</translation>
+    </message>
+    <message>
+        <location filename="../ui/dchat.ui" line="170"/>
+        <source>Log Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/dchat.ui" line="175"/>
+        <source>Request</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -356,8 +366,12 @@
     </message>
     <message>
         <location filename="../ui/pick-string.ui" line="40"/>
+        <source>Choose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Connect</source>
-        <translation>Connexion</translation>
+        <translation type="obsolete">Connexion</translation>
     </message>
     <message>
         <location filename="../ui/pick-string.ui" line="53"/>
@@ -431,6 +445,39 @@
         <location filename="../src/main.cpp" line="89"/>
         <source>show Debug log window</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="90"/>
+        <source>write Debug log to file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RequestSubscribe</name>
+    <message>
+        <location filename="../ui/request-subscribe.ui" line="14"/>
+        <source>Request Subscription</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/request-subscribe.ui" line="24"/>
+        <source>Your Account:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/request-subscribe.ui" line="38"/>
+        <source>Request Subscription to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/request-subscribe.ui" line="50"/>
+        <source>Request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/request-subscribe.ui" line="57"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
     </message>
 </context>
 <context>
@@ -564,12 +611,12 @@
 <context>
     <name>deliberate::DebugLog</name>
     <message>
-        <location filename="../src/delib-debug.cpp" line="198"/>
+        <location filename="../src/delib-debug.cpp" line="226"/>
         <source>Save Log File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/delib-debug.cpp" line="200"/>
+        <location filename="../src/delib-debug.cpp" line="228"/>
         <source>Text Files (*.log *.txt );; All Files (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -691,132 +738,150 @@
     </message>
 </context>
 <context>
-    <name>egalite::DChatMain</name>
+    <name>egalite::ContactListModel</name>
     <message>
-        <location filename="../src/dchat.cpp" line="100"/>
-        <location filename="../src/dchat.cpp" line="438"/>
-        <source>Status</source>
+        <location filename="../src/contact-list-model.cpp" line="169"/>
+        <source>offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="101"/>
-        <source>Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="102"/>
-        <source>Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="133"/>
-        <source>Listener Password:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="395"/>
-        <source>Choose Direct Identity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="404"/>
-        <source>Choose Destination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="437"/>
-        <source>direct </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="443"/>
-        <location filename="../src/dchat.cpp" line="468"/>
-        <source>Chat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="463"/>
-        <source>Xmpp </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="580"/>
-        <source>pres-error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="582"/>
-        <source>Available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="584"/>
-        <source>Not Available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="586"/>
-        <source>Want to Subscribed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="588"/>
-        <source>Done Subscribed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="590"/>
-        <source>Want to Un-Subscribe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="592"/>
-        <source>Done Un-Subscribed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="594"/>
-        <source>Probe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="682"/>
-        <source>-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dchat.cpp" line="684"/>
+        <location filename="../src/contact-list-model.cpp" line="171"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="686"/>
+        <location filename="../src/contact-list-model.cpp" line="173"/>
         <source>away</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="688"/>
+        <location filename="../src/contact-list-model.cpp" line="175"/>
         <source>XA</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="690"/>
+        <location filename="../src/contact-list-model.cpp" line="177"/>
         <source>DND</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="692"/>
+        <location filename="../src/contact-list-model.cpp" line="179"/>
         <source>Chatty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="694"/>
+        <location filename="../src/contact-list-model.cpp" line="181"/>
         <source>Hiding</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="696"/>
+        <location filename="../src/contact-list-model.cpp" line="183"/>
         <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contact-list-model.cpp" line="225"/>
+        <source>not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>egalite::DChatMain</name>
+    <message>
+        <location filename="../src/dchat.cpp" line="101"/>
+        <location filename="../src/dchat.cpp" line="512"/>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="102"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="103"/>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="134"/>
+        <source>Listener Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="397"/>
+        <source>Choose Direct Identity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="406"/>
+        <source>Choose Destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="440"/>
+        <source>Choose Account to Log Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="465"/>
+        <source>Request Subscription from Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="511"/>
+        <source>direct </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="517"/>
+        <location filename="../src/dchat.cpp" line="542"/>
+        <source>Chat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="537"/>
+        <source>Xmpp </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="605"/>
+        <source>pres-error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="607"/>
+        <source>Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="609"/>
+        <source>Not Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="611"/>
+        <source>Want to Subscribed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="613"/>
+        <source>Done Subscribed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="615"/>
+        <source>Want to Un-Subscribe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="617"/>
+        <source>Done Un-Subscribed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dchat.cpp" line="619"/>
+        <source>Probe</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -920,7 +985,7 @@
     </message>
     <message>
         <location filename="../src/subscription-change.cpp" line="74"/>
-        <source>Deny/discontinue notifying you about their presence status</source>
+        <source>Have allowed subscription about their presence status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
