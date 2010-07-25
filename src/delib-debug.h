@@ -56,6 +56,7 @@
 
 #include <QDebug>
 #include <QCloseEvent>
+#include <QFile>
 
 namespace deliberate
 {
@@ -63,6 +64,7 @@ namespace deliberate
 void UseMyOwnMessageHandler ();
 
 void StartDebugLog (bool gui=true);
+void StartFileLog (QString filename);
 void StopDebugLog ();
 bool DebugLogRecording ();
 
@@ -76,6 +78,9 @@ public:
 
   DebugLog (QWidget * parent);
   DebugLog ();
+  ~DebugLog ();
+
+  void LogToFile (QString filename);
 
   bool Log (const char * msg);
   bool Log (const char * kind, const char * msg);
@@ -112,6 +117,8 @@ private:
 
   bool  isLogging;
   bool  useGui;
+  bool  logToFile;
+  QFile logFile;
 
 };
 

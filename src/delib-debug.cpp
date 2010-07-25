@@ -107,6 +107,16 @@ StartDebugLog (bool gui)
 }
 
 void
+StartFileLog (QString filename)
+{
+  if (staticLog == 0) {
+    staticLog = new DebugLog ;
+  }
+  staticLog->StartLogging ();
+  staticLog->LogToFile (filename);
+}
+
+void
 StopDebugLog ()
 {
   if (staticLog) {
@@ -128,7 +138,8 @@ DebugLogRecording ()
 
 DebugLog::DebugLog ()
   :QDialog(0),
-   isLogging (false)
+   isLogging (false),
+   logToFile (false)
 {
   setupUi (this);
   Connect ();
@@ -137,11 +148,17 @@ DebugLog::DebugLog ()
 
 DebugLog::DebugLog (QWidget * parent)
   :QDialog (parent),
-   isLogging (false)
+   isLogging (false),
+   logToFile (false)
 {
   setupUi (this);
   Connect ();
   hide ();
+}
+
+DebugLog::~DebugLog ()
+{
+  logFile.close ();
 }
 
 void
@@ -179,15 +196,22 @@ DebugLog::Log (const char* msg)
     logBox->append (QString(msg));
     update ();
   }
+  if (logToFile) {
+    logFile.write (QByteArray (msg));
+  }
   return isLogging;
 }
 
 bool
 DebugLog::Log (const char* kind, const char* msg)
 {
+  QString realMessage (QString(kind) + " - " + QString(msg));
   if (isLogging) {
     logBox->append (QString(kind) + " - " + QString(msg));
     update ();
+  }
+  if (logToFile) {
+    logFile.write (realMessage.toUtf8());
   }
   return isLogging;
 }
@@ -204,6 +228,14 @@ DebugLog::SaveLog ()
     file.write (logBox->toPlainText().toLocal8Bit());
     file.close ( );
   }
+}
+
+void
+DebugLog::LogToFile (QString filename)
+{
+  logFile.setFileName (filename);
+  bool isopen = logFile.open (QFile::WriteOnly);
+  logToFile = isopen;
 }
 
 } // namespace

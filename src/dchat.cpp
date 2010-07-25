@@ -239,6 +239,7 @@ qDebug () << " old user " << oldUser << " new user " << user << " xclient " << x
              this, SLOT (XmppIqReceived (const QXmppIq &)));
     connect (xclient, SIGNAL (discoveryIqReceived (const QXmppDiscoveryIq &)),
              this, SLOT (XmppDiscoveryIqReceived (const QXmppDiscoveryIq &)));
+    Poll (xclient);
   }
 }
 
@@ -725,20 +726,16 @@ DChatMain::Poll (XEgalClient * xclient)
   xmppConfig = xclient->getConfiguration ();
   QStringList::const_iterator stit;
   QString thisUser = xmppConfig.jidBare ();
-qDebug () << " Roster Poll ------------";
-qDebug () << " config data:";
-qDebug () << " user " << xmppConfig.user ();
-qDebug () << " host " << xmppConfig.host ();
-qDebug () << " port " << xmppConfig.port ();
-qDebug () << " domain " << xmppConfig.domain ();
-qDebug () << " jid " << xmppConfig.jid ();
-qDebug () << " jidBare " << xmppConfig.jidBare ();
 
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
     QStringList resources = xclientMap[user]->getRoster().getResources (id);
     QString res;
     QStringList::const_iterator   rit;
+    if (resources.size () == 0) {
+      contactListModel.UpdateState (thisUser, id, 
+                                  QXmppPresence::Status::Offline);
+    }
     for (rit = resources.begin (); rit != resources.end (); rit++) {
       res = *rit;
       QString bigId = id + QString("/") + res;

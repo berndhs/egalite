@@ -47,8 +47,12 @@ bool WantHelp ();
 bool WantVersion ();
 
 void AddStrOption  (const QString longName, 
-                    const QString shortname, 
+                    const QString shortName, 
                     const QString msg);
+void AddStringOption (const QString longName, 
+                    const QString shortName, 
+                    const QString msg)
+                    { AddStrOption (longName, shortName, msg); }
 void AddIntOption  (const QString longName, 
                     const QString shortname, 
                     const QString msg);

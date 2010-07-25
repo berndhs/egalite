@@ -87,6 +87,7 @@ main (int argc, char* argv[])
   app.installTranslator (&translate);
   deliberate::CmdOptions  opts ("Egalite");
   opts.AddSoloOption ("debug","D",QObject::tr("show Debug log window"));
+  opts.AddStringOption ("logdebug","L",QObject::tr("write Debug log to file"));
 
   deliberate::UseMyOwnMessageHandler ();
 
