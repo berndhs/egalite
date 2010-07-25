@@ -75,6 +75,7 @@ private slots:
 
   void Send ();
   void EndChat ();
+  void SaveContent ();
 
 signals:
 

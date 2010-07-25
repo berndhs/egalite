@@ -29,6 +29,8 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include <QFileDialog>
+
 namespace egalite
 {
 
@@ -38,13 +40,14 @@ ChatContent::ChatContent (QWidget *parent)
 {
   ui.setupUi (this);
 
-  ui.quitButton->setDefault (false);
-  ui.sendButton->setDefault (true);  /// send when Return pressed
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
   connect (ui.textHistory, SIGNAL (anchorClicked (const QUrl&)),
           this, SLOT (HandleAnchor (const QUrl&)));
+  connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (SaveContent()));
   ui.quitButton->setDefault (false);
+  ui.saveButton->setDefault (false);
+  ui.sendButton->setDefault (true);  /// send when Return pressed
 }
 
 void
@@ -63,6 +66,20 @@ void
 ChatContent::SetLocalName (const QString & name)
 {
   localName = name;
+}
+
+
+void
+ChatContent::SaveContent ()
+{
+  QString filename = QFileDialog::getSaveFileName (this, 
+                      tr ("Save Chat Content"));
+  if (filename.length () > 0) {
+    QFile file (filename);
+    file.open (QFile::WriteOnly);
+    file.write (ui.textHistory->toPlainText ().toUtf8());
+    file.close ();
+  }
 }
 
 void
