@@ -8,3 +8,25 @@ This is an almost server-less chat.
 Chats are done over ssl sockets directly between two peers.
 Servers can be used for discovery to establish the direct ssl socket.
 
+
+== Build and Install ==
+
+To build Egalite, you must first install QXmpp.
+For your convenience, the egalite project provides
+a fork of QXmpp that you can install as a shared library.
+
+After installing QXmpp, build ealite as usual:
+
+$ cd /where/you/unpacked/egalite
+$ ./configure
+$ make
+
+This will put an excutable in the bin/ directory.
+You can run this as bin/egalite
+Or you can do
+
+# make install
+
+and egalite will be installed in your /usr/local/bin, or /usr/bin,
+or whatever you specified as prefix in the configure command.
+

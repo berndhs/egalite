@@ -353,12 +353,14 @@ DChatMain::GetMessage (const QXmppMessage & msg)
   if (body.length() == 0) {
     return;
   }
-  if (serverChats.find (from) != serverChats.end()) {
-    serverChats[from]->Incoming (msg);
+  QStringList partsFrom = from.split('/');
+  QString remoteId = partsFrom.at(0);
+  if (serverChats.find (remoteId) != serverChats.end()) {
+    serverChats[remoteId]->Incoming (msg);
   } else {
-    StartServerChat (from);
-    if (serverChats.find (from) != serverChats.end()) {
-      serverChats[from]->Incoming (msg);
+    StartServerChat (remoteId);
+    if (serverChats.find (remoteId) != serverChats.end()) {
+      serverChats[remoteId]->Incoming (msg);
     }
   }
 }
@@ -533,6 +535,7 @@ Q_UNUSED (localNick);
 void
 DChatMain::StartServerChat (QString remoteName)
 {
+qDebug () << " starting new server chat for remote " << remoteName;
   ChatBox * newChat = new ChatBox (this);
   newChat->SetTitle (tr("Xmpp ") + remoteName);
   ChatContent * newCont = new ChatContent (this);
@@ -622,63 +625,7 @@ DChatMain::PresenceTypeString (QXmppPresence::Type t)
   }
 }
 
-void
-DChatMain::ResetContactSeen (ContactMap & contacts)
-{
-  ContactMap::iterator  contactit;
-  for (contactit = contacts.begin (); 
-       contactit != contacts.end ();
-       contactit ++) {
-    if (contactit->second) {
-      contactit->second->recentlySeen = false;
-    }
-  }
-}
 
-void
-DChatMain::FlushStaleContacts (ContactMap & contacts, 
-                               QStandardItemModel & model)
-{
-  // determine outdated rows and remove them
-  std::set <int> staleRows;
-  std::set <QString> staleContacts;
-  ContactMap::iterator  contactit;
-  for (contactit = contacts.begin (); 
-       contactit != contacts.end ();
-       contactit ++) {
-    if (contactit->second) {
-      if (!(contactit->second->recentlySeen)) {
-        staleRows.insert (contactit->second->modelRow);
-        staleContacts.insert (contactit->second->name 
-                              + QString("/")
-                              + contactit->second->resource);
-      }
-    }
-  }  
-  std::set <int>::const_reverse_iterator  rowrit;
-  for (rowrit = staleRows.rbegin(); rowrit != staleRows.rend(); rowrit++) {
-    model.removeRows (*rowrit, 1);
-  }
-  // recalculate row numbers
-  int nrows = model.rowCount();
-  QStandardItem * nameItem, * resourceItem (0);
-  for (int r=0; r<nrows; r++) {
-    nameItem = model.item (r,1);
-    resourceItem = model.item (r,2);
-    if (nameItem && resourceItem) {
-      QString bigId = nameItem->text () + QString ("/") + resourceItem->text();
-      contactit = contacts.find (bigId);
-      if (contactit != contacts.end()) {
-        contactit->second->modelRow = r;
-      }
-    }
-  }
-  std::set <QString>::const_iterator bigIdIt;
-  for (bigIdIt = staleContacts.begin (); bigIdIt != staleContacts.end();
-       bigIdIt++) {
-    contacts.erase (*bigIdIt);
-  }
-}
 
 void
 DChatMain::XmppPoll ()

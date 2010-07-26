@@ -115,9 +115,6 @@ private:
   bool    GetPass ();
   void    Poll (XEgalClient * xclient);
   void    CallDirectFrom (QString nick);
-  void    ResetContactSeen (ContactMap & contacts);
-  void    FlushStaleContacts (ContactMap & contacts,
-                              QStandardItemModel & model);
   QString PresenceTypeString (QXmppPresence::Type t);
 
   Ui_DChatMain          ui;
