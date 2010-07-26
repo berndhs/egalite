@@ -47,6 +47,9 @@ bool IsMaemo ();
 
 bool IsFingerInterface ();
 
+bool IsIp6Address (QString addr);
+bool IsIp4Address (QString addr);
+
 void Rot1 (QByteArray & data, const QByteArray & key);
 void Rot2 (QByteArray & data, const QByteArray & key);
 }

@@ -423,7 +423,7 @@ DChatMain::CallDirect ()
     newcall->Setup (outCert, destPort, originNick);
     outDirect[callnum] = newcall;
 qDebug () << " start direct connect " << callnum << " call " << newcall;
-    newcall->ConnectAddress (destaddr, dest, callnum);
+    newcall->Connect (destaddr, dest, callnum);
     connect (newcall, SIGNAL (Finished (int)), this, SLOT (ClearCall (int)));
     connect (newcall, SIGNAL (ConnectionReady (SymmetricSocket*, QString)),
              this, SLOT (ConnectDirect (SymmetricSocket*, QString)));

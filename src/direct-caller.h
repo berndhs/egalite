@@ -55,7 +55,7 @@ public:
   DirectCaller (QWidget *parent = 0);
 
   void Setup (CertRecord & certRec, int remotePort, QString localNick);
-  void Connect (QString otherHost, int callid);
+  void Connect (QString otherHost, QString name, int callid);
   void ConnectAddress (QString addr, QString name, int callid);
   void Hangup ();
   QString Party (); /// who is on the other side

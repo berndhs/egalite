@@ -22,6 +22,8 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
  
+#include <QStringList>
+
 namespace deliberate {
 
 QTextStream & StdOut ()
@@ -93,6 +95,35 @@ Rot2 (QByteArray &data, const QByteArray &key)
     int k = c % len;
     data[c] = (cc ^ key[k]);
   }
+}
+
+bool
+IsIp6Address (QString addr)
+{
+  bool isnum (false);
+  QStringList parts = addr.split (':',QString::SkipEmptyParts);
+  for (int p = 0; p < parts.size(); p++) {
+    int i = parts.at(p).toUInt (&isnum, 16);
+    if (!isnum) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+bool
+IsIp4Address (QString addr)
+{
+  bool isnum (false);
+  QStringList parts = addr.split ('.',QString::SkipEmptyParts);
+  for (int p = 0; p < parts.size(); p++) {
+    int i = parts.at(p).toUInt (&isnum, 10);
+    if (!isnum) {
+      return false;
+    }
+  }
+  return true;
 }
 
 

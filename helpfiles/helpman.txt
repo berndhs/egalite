@@ -5,6 +5,31 @@ v0.1, July 2010
 
 *Egalite* is a instant messenger program.
 
+It provides server-based chat and presence for XMPP compatible servers, such as jabber and google talk, and many others.
+
+*Egalite* also provides direct chat over SSL sockets without server interaction.
+
+== Server (Xmpp) Chat ==
+
+For server chat, the people you chat with are identified by their user name on a server, and the server name. For example, alice.smith@gmail.com or bobjones@jabber.org.
+
+== Direct Chat ==
+
+For direct chat, the people you chat with are identified by an SSL certificate. Since there is no server, there are no user names and server names.
+
+=== Certificates ===
+
+Egalite requires that the end points of a direct chat present SSL certificates.
+These certificates can be read from files, or pasted. In either case, they must
+be in PEM format.
+
+You can make your own SSL certificates with many available tools. 
+Some examples are
+
+* Openssl (http://openssl.org)
+* TinyCA or tinyca2 (http://tinyca.sm-zone.net)
+* qcatool2 (http://delta.affinix.com/qca)
+
 == Configuration ==
 
 === Icons ===

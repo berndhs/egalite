@@ -89,15 +89,22 @@ DirectCaller::Local ()
 
 
 void
-DirectCaller::Connect (QString otherHost, int callid)
+DirectCaller::Connect (QString otherHost, QString name, int callid)
 {
   myCallid = callid;
   party = otherHost;
-  QHostInfo hinfo = QHostInfo::fromName (otherHost);
-  QHostAddress hostAddress = hinfo.addresses().first ();
+  QString addrString;
+  if (deliberate::IsIp6Address (otherHost) 
+     || deliberate::IsIp4Address (otherHost)) {
+    addrString = otherHost;
+  } else {
+    QHostInfo hinfo = QHostInfo::fromName (otherHost);
+    QHostAddress hostAddress = hinfo.addresses().first ();
+    addrString  = hostAddress.toString();
+  }
 qDebug () << " before connectToHost, have local cert " << clientSock->Socket()->localCertificate();
-  clientSock->connectToHostEncrypted (otherHost, publicPort,
-                                      hinfo.hostName(),
+  clientSock->connectToHostEncrypted (addrString, publicPort,
+                                      name,
                                       QSslSocket::ReadWrite);
 
 }

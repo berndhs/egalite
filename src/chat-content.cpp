@@ -111,7 +111,6 @@ ChatContent::Incoming (const QXmppMessage & msg)
                                    LinkMangle::HttpExp (),
                                    LinkMangle::HttpAnchor);
   ui.textHistory->append (cookedText);
-qDebug () << " emit activity " << this;
   emit Activity (this);
 }
 
