@@ -40,13 +40,15 @@ ChatContent::ChatContent (QWidget *parent)
 {
   ui.setupUi (this);
 
-  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
+  connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (SaveContent()));
+  connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.textHistory, SIGNAL (anchorClicked (const QUrl&)),
           this, SLOT (HandleAnchor (const QUrl&)));
-  connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (SaveContent()));
   ui.quitButton->setDefault (false);
   ui.saveButton->setDefault (false);
+  ui.quitButton->setAutoDefault (false);
+  ui.saveButton->setAutoDefault (false);
   ui.sendButton->setDefault (true);  /// send when Return pressed
 }
 
@@ -146,5 +148,6 @@ ChatContent::HandleAnchor (const QUrl & url)
 {
   QDesktopServices::openUrl (url);
 }
+
 
 } // namespace
