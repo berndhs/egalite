@@ -30,6 +30,16 @@ Some examples are
 * TinyCA or tinyca2 (http://tinyca.sm-zone.net)
 * qcatool2 (http://delta.affinix.com/qca)
 
+=== Direct Addresses ===
+
+When connecting a direct chat, you need to specify the *address* that the remote 
+end of the chat will be at. 
+
+These addresses are stored as *direct contacts*. 
+
+You can specify the address as an IP numberical address (IPv4 or IPv6), or as 
+a host name for the DNS service your computer (or device) uses.
+
 == Configuration ==
 
 === Icons ===
