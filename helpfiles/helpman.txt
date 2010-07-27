@@ -15,20 +15,7 @@ For server chat, the people you chat with are identified by their user name on a
 
 == Direct Chat ==
 
-For direct chat, the end points of a chat are specified by *identity* and 
-*address*. 
-
-An *itentity* corresponds to a person, and is veified by an SSL certificate.
-
-An *address* corresponds to a communication port on a computer or other
-communications device, such as a phone, netbook or tablet.
-
-In order to be connected to incoming chat from other people, your Egalite 
-must *listen* for incoming connections. To do this, you need to start a listener.
-
-A *listener* is a pair of *address* and *identity*. The address specifies 
-where to reach you for direct chat, and the identity specifies who you are for 
-purposes of this address.
+For direct chat, the people you chat with are identified by an SSL certificate. Since there is no server, there are no user names and server names.
 
 === Certificates ===
 
