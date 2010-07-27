@@ -45,7 +45,7 @@ public:
 
   void Init (QString certHost, QString pass);
   void Init (QString iname, QSslKey ikey, QSslCertificate icert);
-  void Listen (const QHostAddress & addr, int port);
+  void Listen (const QString & thisHost, int port);
 
   bool TakeSocket (SymmetricSocket * sock);
 

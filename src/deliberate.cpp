@@ -103,7 +103,7 @@ IsIp6Address (QString addr)
   bool isnum (false);
   QStringList parts = addr.split (':',QString::SkipEmptyParts);
   for (int p = 0; p < parts.size(); p++) {
-    int i = parts.at(p).toUInt (&isnum, 16);
+    parts.at(p).toUInt (&isnum, 16);
     if (!isnum) {
       return false;
     }
@@ -117,8 +117,11 @@ IsIp4Address (QString addr)
 {
   bool isnum (false);
   QStringList parts = addr.split ('.',QString::SkipEmptyParts);
+  if (parts.size() != 4) {
+    return false;
+  }
   for (int p = 0; p < parts.size(); p++) {
-    int i = parts.at(p).toUInt (&isnum, 10);
+    parts.at(p).toUInt (&isnum, 10);
     if (!isnum) {
       return false;
     }

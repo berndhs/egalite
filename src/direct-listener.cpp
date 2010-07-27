@@ -21,8 +21,10 @@
 
 #include "direct-listener.h"
 #include "symmetric-socket.h"
+#include "deliberate.h"
 #include <QFile>
 #include <QSslConfiguration>
+#include <QHostInfo>
 
 namespace egalite
 {
@@ -41,9 +43,20 @@ DirectListener::~DirectListener ()
 }
 
 void
-DirectListener::Listen (const QHostAddress &addr, int port)
+DirectListener::Listen (const QString &thisHost, int port)
 {
+  QHostAddress addr;
+  if (deliberate::IsIp6Address (thisHost) 
+     || deliberate::IsIp4Address (thisHost)) {
+    addr = QHostAddress (thisHost);
+  } else {
+    QHostInfo hinfo = QHostInfo::fromName (thisHost);
+qDebug () << " host info for " << thisHost;
+qDebug () << " first address " << hinfo.addresses();
+    addr = hinfo.addresses().first ();
+  }
   listen (addr,port);
+qDebug () << " listen at " << addr << " port " << port;
 }
 
 void

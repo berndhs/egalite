@@ -137,8 +137,7 @@ DChatMain::SetupListener ()
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
     QSslCertificate scert (hostCert.Cert().toAscii());
     listen->Init (directIdentity, skey, scert);
-    listen->Listen (QHostAddress (ownAddress),publicPort);
-qDebug () << " listen at " << QHostAddress (ownAddress) << " port " << publicPort;
+    listen->Listen (ownAddress, publicPort);
   } else {
 qDebug () << " cannot listen for identity " << directIdentity;
   }
