@@ -25,6 +25,8 @@
 #include <QFile>
 #include <QSslConfiguration>
 #include <QHostInfo>
+#include <QMessageBox>
+#include <QTimer>
 
 namespace egalite
 {
@@ -56,8 +58,22 @@ qDebug () << " host info for " << thisHost;
 qDebug () << " first address " << hinfo.addresses();
     addr = hinfo.addresses().first ();
   }
-  listen (addr,port);
+  bool good = listen (addr,port);
 qDebug () << " listen at " << addr << " port " << port;
+  if (!good) {
+    QMessageBox  cantListen ;
+    QString msg (tr("Cannot listen at ") + addr.toString() 
+                 + QString(" port %1").arg (port));
+    cantListen.setText (msg);
+    QString longMsg;
+    longMsg += tr("The Listener specified as\n");
+    longMsg += thisHost;
+    longMsg += tr("\nwas resolved to address\n");
+    longMsg += addr.toString();
+    cantListen.setDetailedText (longMsg);
+    QTimer::singleShot (30000, &cantListen, SLOT (accept()));
+    cantListen.exec ();
+  }
 }
 
 void
