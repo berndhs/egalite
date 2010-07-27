@@ -45,7 +45,7 @@ DirectListener::~DirectListener ()
   }
 }
 
-void
+bool
 DirectListener::Listen (const QString &thisHost, int port)
 {
   QHostAddress addr;
@@ -56,7 +56,10 @@ DirectListener::Listen (const QString &thisHost, int port)
     QHostInfo hinfo = QHostInfo::fromName (thisHost);
 qDebug () << " host info for " << thisHost;
 qDebug () << " first address " << hinfo.addresses();
-    addr = hinfo.addresses().first ();
+    QList<QHostAddress> addrList = hinfo.addresses();
+    if (!addrList.isEmpty()) {
+      addr = hinfo.addresses().first ();
+    }
   }
   bool good = listen (addr,port);
 qDebug () << " listen at " << addr << " port " << port;
@@ -74,6 +77,7 @@ qDebug () << " listen at " << addr << " port " << port;
     QTimer::singleShot (30000, &cantListen, SLOT (accept()));
     cantListen.exec ();
   }
+  return good;
 }
 
 void

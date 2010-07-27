@@ -132,13 +132,14 @@ DChatMain::StartListener (QString ownAddress,
                           int     publicPort)
 {
   DirectListener * listen (0);
+  bool             isListening (false);
   if (inDirect.find (ownAddress) == inDirect.end ()) {
     listen = new DirectListener (this);
     inDirect [ownAddress] = listen;
   } else {
     listen = inDirect [ownAddress];
   }
-
+  
   if (CertStore::IF().HaveCert (directIdentity)) {
     CertRecord hostCert = CertStore::IF().Cert (directIdentity);
     QString pass = hostCert.Password ();
@@ -151,14 +152,22 @@ DChatMain::StartListener (QString ownAddress,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
     QSslCertificate scert (hostCert.Cert().toAscii());
     listen->Init (directIdentity, skey, scert);
-    listen->Listen (ownAddress, publicPort);
+    isListening = listen->Listen (ownAddress, publicPort);
   } else {
 qDebug () << " cannot listen for identity " << directIdentity;
   }
-  connect (listen, SIGNAL (Receive (const QByteArray &)),
+  if (isListening) {
+    connect (listen, SIGNAL (Receive (const QByteArray &)),
            this, SLOT (GetRaw (const QByteArray&)));
-  connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),
+    connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),
            this, SLOT (ConnectDirect (SymmetricSocket *, QString)));
+  } else {
+    if (listen) {
+      disconnect (listen, 0,0,0);
+      inDirect.erase (ownAddress);
+      delete listen;
+    }
+  }
 }
 
 void
