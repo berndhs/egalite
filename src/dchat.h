@@ -87,6 +87,8 @@ private slots:
   void PassCancel ();
   void Login ();
   void Logout ();
+  void ListenerAdd ();
+  void ListenerDrop ();
   void EditSettings ();
   void RequestSubscribe ();
   void DoRequestSubscribe ();
@@ -116,6 +118,9 @@ private:
   void    Poll (XEgalClient * xclient);
   void    CallDirectFrom (QString nick);
   QString PresenceTypeString (QXmppPresence::Type t);
+  void    StartListener (QString ownAddress, 
+                         QString directIdentity, 
+                         int     publicPort);
 
   Ui_DChatMain          ui;
   Ui_GetString          passui;

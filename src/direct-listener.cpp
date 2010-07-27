@@ -35,6 +35,7 @@ DirectListener::DirectListener (QObject *parent)
 
 DirectListener::~DirectListener ()
 {
+  Close ();
   SocketList::iterator sockit;
   for (sockit = sockets.begin(); sockit != sockets.end(); sockit++) {
     (*sockit)->Done();
@@ -57,6 +58,12 @@ qDebug () << " first address " << hinfo.addresses();
   }
   listen (addr,port);
 qDebug () << " listen at " << addr << " port " << port;
+}
+
+void
+DirectListener::Close ()
+{
+  close (); 
 }
 
 void
@@ -108,7 +115,10 @@ void
 DirectListener::IsReady (SymmetricSocket * sock)
 {
   qDebug () << " Listener socket ready " << sock;
-  emit SocketReady (sock, mName);
+  bool isMine = TakeSocket (sock);
+  if (isMine) {
+    emit SocketReady (sock, mName);
+  }
 }
 
 bool

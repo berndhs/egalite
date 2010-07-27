@@ -77,6 +77,7 @@ FORMS = \
         ui/save-as.ui \
         ui/simple-password.ui \
         ui/request-subscribe.ui \
+        ui/start-listener.ui \
 
 
 SOURCES = src/main.cpp \
@@ -100,6 +101,7 @@ SOURCES = src/main.cpp \
         src/simple-pass.cpp \
         src/contact-list-model.cpp \
         src/xegal-client.cpp \
+        src/add-listener.cpp \
 
 
 
@@ -126,6 +128,7 @@ HEADERS = \
         src/simple-pass.h \
         src/contact-list-model.h \
         src/xegal-client.h \
+        src/add-listener.h \
 
 
 

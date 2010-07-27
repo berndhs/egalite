@@ -75,6 +75,8 @@
     <addaction name="actionQuit"/>
     <addaction name="actionSettings"/>
     <addaction name="actionLog_Out"/>
+    <addaction name="actionAdd_Listener"/>
+    <addaction name="actionDrop_Listener"/>
    </widget>
    <widget class="QMenu" name="menuIdentities">
     <property name="title">
@@ -173,6 +175,16 @@
   <action name="actionRequest">
    <property name="text">
     <string>Request</string>
+   </property>
+  </action>
+  <action name="actionAdd_Listener">
+   <property name="text">
+    <string>Add Listener</string>
+   </property>
+  </action>
+  <action name="actionDrop_Listener">
+   <property name="text">
+    <string>Drop Listener</string>
    </property>
   </action>
  </widget>

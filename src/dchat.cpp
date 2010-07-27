@@ -44,6 +44,7 @@
 #include "chat-box.h"
 #include "chat-content.h"
 #include "server-contact.h"
+#include "add-listener.h"
 
 using namespace deliberate;
 
@@ -109,21 +110,33 @@ DChatMain::Run ()
 void
 DChatMain::SetupListener ()
 {
-  QString ownAddress ("0::1");
+  QString ownAddress ("::1");
   ownAddress = Settings().value ("direct/listenAddress",ownAddress).toString();
   Settings().setValue ("direct/listenAddress",ownAddress);
-
+  if (ownAddress.length () < 1) {
+qDebug () << " config has no listener";
+    return;
+  }
   publicPort = Settings().value ("direct/listenPort",publicPort).toInt ();
   Settings().setValue ("direct/listenPort",publicPort);
 
   directIdentity = Settings().value ("direct/identity",directIdentity).toString();
   Settings().setValue ("direct/identity",directIdentity);
+
+  StartListener (ownAddress, directIdentity, publicPort);
+}
+
+void
+DChatMain::StartListener (QString ownAddress, 
+                          QString directIdentity, 
+                          int     publicPort)
+{
   DirectListener * listen (0);
-  if (inDirect.find (directIdentity) == inDirect.end ()) {
+  if (inDirect.find (ownAddress) == inDirect.end ()) {
     listen = new DirectListener (this);
-    inDirect [directIdentity] = listen;
+    inDirect [ownAddress] = listen;
   } else {
-    listen = inDirect [directIdentity];
+    listen = inDirect [ownAddress];
   }
 
   if (CertStore::IF().HaveCert (directIdentity)) {
@@ -145,7 +158,45 @@ qDebug () << " cannot listen for identity " << directIdentity;
            this, SLOT (GetRaw (const QByteArray&)));
   connect (listen, SIGNAL (SocketReady (SymmetricSocket *, QString)),
            this, SLOT (ConnectDirect (SymmetricSocket *, QString)));
+}
 
+void
+DChatMain::ListenerAdd ()
+{
+  PickString  picker (this);
+  picker.SetTitle (tr("Pick Identity for Listener"));
+  QStringList list = CertStore::IF().NameList ();
+  int picked = picker.Pick (list);
+  if (picked) {
+    QString ident = picker.Choice();
+    AddListener  Al (this);
+    if (Al.SelectStart (ident)) {
+      StartListener (Al.Address(), ident, Al.Port());
+    }
+  }
+}
+
+void
+DChatMain::ListenerDrop ()
+{
+  PickString  picker (this);
+  picker.SetTitle (tr("Pick Listener to Drop"));
+  QStringList  list;
+  std::map <QString, DirectListener*>::const_iterator lit;
+  for (lit = inDirect.begin(); lit != inDirect.end(); lit++) {
+    list << lit->first;
+  }
+  QString choice;
+  int picked = picker.Pick (list);
+  if (picked) {
+    choice = picker.Choice ();
+    if (inDirect.find (choice) != inDirect.end()) {
+      DirectListener * closeThis = inDirect[choice];
+      closeThis->Close ();
+      //delete inDirect [choice];
+      inDirect.erase (choice);
+    }
+  }
 }
 
 void
@@ -184,6 +235,10 @@ DChatMain::Connect ()
            this, SLOT (Login()));
   connect (ui.actionLog_Out, SIGNAL (triggered()),
            this, SLOT (Logout()));
+  connect (ui.actionAdd_Listener, SIGNAL (triggered()),
+           this, SLOT (ListenerAdd ()));
+  connect (ui.actionDrop_Listener, SIGNAL (triggered()),
+           this, SLOT (ListenerDrop ()));
   connect (ui.actionDirect, SIGNAL (triggered()),
            CertStore::Object(), SLOT (CertDialog ()));
   connect (ui.contactDirectAction, SIGNAL (triggered()),
