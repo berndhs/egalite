@@ -103,6 +103,7 @@ DirectCaller::Connect (QString otherHost, QString name, int callid)
     addrString  = hostAddress.toString();
   }
 qDebug () << " before connectToHost, have local cert " << clientSock->Socket()->localCertificate();
+qDebug () << " try to connect with " << addrString;
   clientSock->connectToHostEncrypted (addrString, publicPort,
                                       name,
                                       QSslSocket::ReadWrite);

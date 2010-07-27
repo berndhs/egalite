@@ -229,7 +229,7 @@ void
 SymmetricSocket::EncryptDone ()
 {
   qDebug () << " SYMMETRIC encrypt done " << this;
-  ui.dataLine->setText (tr("Ready"));
+  ui.dataLine->setText ("Ready");
   checkTimer->stop ();
   checkTimer->start (1000);
   emit Ready (this);
@@ -358,13 +358,13 @@ SymmetricSocket::SaveCertRequest (const QString & name, const QByteArray & pem)
 void
 SymmetricSocket::TimerReport ()
 {
-  ui.addressLine->setText (QString("0x")+QString::number(qulonglong (sock),16));
   if (sock) {
-    ui.stateLine->setText (QString::number (int(sock->state())));
     ui.validBar->setValue (sock->isValid() ? 1 : 0);
     ui.encryptedBar->setValue (sock->isEncrypted() ? 1 : 0);
     ui.remoteAddress->setText (sock->peerAddress().toString());
+    ui.remotePort->setText (QString::number(sock->peerPort()));
     ui.localAddress->setText (sock->localAddress().toString());
+    ui.localPort->setText (QString::number (sock->localPort()));
   }
 }
 
