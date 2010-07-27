@@ -77,7 +77,28 @@ qDebug () << " listen at " << addr << " port " << port;
     QTimer::singleShot (30000, &cantListen, SLOT (accept()));
     cantListen.exec ();
   }
+  hostName = thisHost;
+  hostAddress = addr.toString();
+  hostPort = port;
   return good;
+}
+
+QString
+DirectListener::HostName ()
+{
+  return hostName;
+}
+
+QString
+DirectListener::Address ()
+{
+  return hostAddress;
+}
+
+int
+DirectListener::Port ()
+{
+  return hostPort;
 }
 
 void

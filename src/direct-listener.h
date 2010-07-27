@@ -50,6 +50,10 @@ public:
 
   bool TakeSocket (SymmetricSocket * sock);
 
+  QString  HostName ();
+  QString  Address  ();
+  int      Port ();
+
 public slots:
 
   void IsReady (SymmetricSocket *sock);
@@ -75,6 +79,10 @@ private:
   QSslCertificate  mCert;
   QSslKey          mKey;
   QString          mName;
+
+  QString          hostName;
+  QString          hostAddress;
+  int              hostPort;
 
 } ;
 
