@@ -144,7 +144,8 @@ DChatMain::StartListener (QString ownAddress,
     QString pass = hostCert.Password ();
     if (pass.length() == 0) {
       SimplePass  getPass (this);
-      pass = getPass.GetPassword (tr("Listener Password:"));
+      pass = getPass.GetPassword (tr("Listener Password for ")
+                                   + directIdentity);
     }
     QSslKey skey (hostCert.Key().toAscii(),QSsl::Rsa,
                 QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
