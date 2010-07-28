@@ -305,6 +305,7 @@ CertStore::SelectIdentity (const QModelIndex &index)
     uiEditCert.nameEdit->setText (currentRec.Id());
     uiEditCert.keyEdit->setPlainText (currentRec.Key ());
     uiEditCert.certEdit->setPlainText (currentRec.Cert ());
+    uiEditCert.passwordEdit->setText (currentRec.Password ());
     currentCert = QSslCertificate (currentRec.Cert().toAscii());
     viewDetails = false;
     uiEditCert.changeViewButton->setEnabled (true);
