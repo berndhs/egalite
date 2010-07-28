@@ -30,7 +30,8 @@
 #include <QStringList>
 #include <QModelIndex>
 #include <QSslCertificate>
-#include "ui_cert-store.h"
+#include "ui_cert-edit.h"
+#include "ui_list-direct.h"
 #include "ui_contact-edit.h"
 #include "cert-types.h"
 
@@ -84,6 +85,7 @@ private slots:
   void SaveCerts ();
   void NewIdent ();
   void SaveIdent ();
+  void EditIdent (bool isnew = false);
   void ShowCertDetails (bool showCooked);
   void LoadKey ();
   void LoadCert ();
@@ -92,7 +94,7 @@ private slots:
   void NewContact ();
   void DeleteContact ();
 
-  void SelectItem (const QModelIndex &index);
+  void SelectIdentity (const QModelIndex &index);
   void ToggleView ();
 
 private:
@@ -111,8 +113,10 @@ private:
 
   QString ElementType (QString name);
 
-  Ui_CertStore     uiCert;
-  QDialog         *certDialog;
+  Ui_ListIdentity  uiListCert;
+  QDialog         *certListDialog;
+  Ui_EditCertEntry uiEditCert;
+  QDialog         *certEditDialog;
   Ui_ContactEdit   uiContact;
   QDialog         *contactDialog;
   QString          dbFileName;
@@ -123,6 +127,7 @@ private:
   CertRecord       currentRec;
   QSslCertificate  currentCert;
   bool             viewDetails;
+  QModelIndex      currentIdentity;
 
   QStandardItemModel  *identityModel;
   QStandardItem       *editItem;

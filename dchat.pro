@@ -67,7 +67,6 @@ FORMS = \
         ui/config-edit.ui \
         ui/socket-display.ui \
         ui/cert-candidate.ui \
-        ui/cert-store.ui \
         ui/contact-edit.ui \
         ui/pick-string.ui \
         ui/chat-box.ui \
@@ -78,6 +77,8 @@ FORMS = \
         ui/simple-password.ui \
         ui/request-subscribe.ui \
         ui/start-listener.ui \
+        ui/list-direct.ui \
+        ui/cert-edit.ui \
 
 
 SOURCES = src/main.cpp \
