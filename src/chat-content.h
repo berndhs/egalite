@@ -97,6 +97,7 @@ private:
   QString          localName;
   Mode             chatMode;
   QString          dateMask;
+  QString          chatLine;
 };
 
 } // namespace

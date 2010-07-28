@@ -38,7 +38,8 @@ namespace egalite
 ChatContent::ChatContent (QWidget *parent)
   :QDialog (parent),
    chatMode (ChatModeRaw),
-   dateMask ("yy-MM-dd hh:mm:ss")
+   dateMask ("yy-MM-dd hh:mm:ss"),
+   chatLine (tr("(%1) <b style=\"font-size:small; color:blue;\">%2</b>: %3")) 
 {
   ui.setupUi (this);
 
@@ -76,8 +77,11 @@ void
 ChatContent::Start ()
 {
   dateMask = deliberate::Settings().value ("style/dateformat",dateMask)
-                                   .toString();
+                                   .toString ();
   deliberate::Settings().setValue ("style/dateformat",dateMask);
+  chatLine = deliberate::Settings().value ("style/chatline",chatLine)
+                                   .toString ();
+  deliberate::Settings().setValue ("style/chatline",chatLine);
 }
 
 void
@@ -125,9 +129,10 @@ ChatContent::Incoming (const QXmppMessage & msg)
     return;
   }
   QDateTime  now = QDateTime::currentDateTime();
-  QString pattern (tr("(%3) <b>%1</b>: %2"));
-  QString msgtext = pattern.arg(from).arg(body)
-                           .arg (now.toString (dateMask));
+  QString msgtext = chatLine.arg (now.toString (dateMask))
+                           .arg(from)
+                           .arg(body)
+                            ;
   QString cookedText = LinkMangle::Anchorize (msgtext,
                                    LinkMangle::HttpExp (),
                                    LinkMangle::HttpAnchor);
