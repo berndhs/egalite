@@ -407,6 +407,8 @@ CertStore::SaveIdent ()
   QModelIndex index = identityModel->indexFromItem (editItem);
   uiListCert.identList->scrollTo (index);
   SelectIdentity (index);
+  CheckDBComplete (dbFileName);
+  WriteCert (currentRec);
 }
 
 void
@@ -458,19 +460,25 @@ CertStore::WriteCerts (const QString filename)
   CheckDBComplete (filename);
   CertMap::iterator  certit;
   CertRecord  certRec;
+  for (certit = homeCertMap.begin(); certit != homeCertMap.end(); certit++ ) {
+    certRec = certit->second;
+    WriteCert (certRec);
+  }
+}
+
+void
+CertStore::WriteCert (CertRecord certRec)
+{
   QString  qryString ("insert or replace into identities "
                        " (ident, password, privatekey, pemcert) "
                        " values (?, ?, ?, ?)");
-  for (certit = homeCertMap.begin(); certit != homeCertMap.end(); certit++ ) {
-    certRec = certit->second;
-    QSqlQuery qry (certDB);
-    qry.prepare (qryString);
-    qry.bindValue (0,QVariant (certRec.Id ()));
-    qry.bindValue (1,QVariant (certRec.Password ()));
-    qry.bindValue (2,QVariant (certRec.Key ()));
-    qry.bindValue (3,QVariant (certRec.Cert ()));
-    qry.exec ();
-  }
+  QSqlQuery qry (certDB);
+  qry.prepare (qryString);
+  qry.bindValue (0,QVariant (certRec.Id ()));
+  qry.bindValue (1,QVariant (certRec.Password ()));
+  qry.bindValue (2,QVariant (certRec.Key ()));
+  qry.bindValue (3,QVariant (certRec.Cert ()));
+  qry.exec ();
 }
 
 void

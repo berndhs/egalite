@@ -103,6 +103,7 @@ private:
 
   void Connect ();
   void ReadDB ();
+  void WriteCert (CertRecord certRec);
   void WriteCerts (const QString filename);
   void WriteContacts (const QString filename);
   void CheckExists (const QString filename);
