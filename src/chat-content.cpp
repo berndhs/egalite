@@ -1,4 +1,5 @@
 
+#include "deliberate.h"
 #include "chat-content.h"
 #include <QXmppMessage.h>
 #include <QXmlStreamWriter>
@@ -36,7 +37,8 @@ namespace egalite
 
 ChatContent::ChatContent (QWidget *parent)
   :QDialog (parent),
-   chatMode (ChatModeRaw)
+   chatMode (ChatModeRaw),
+   dateMask ("yy-MM-dd hh:mm:ss")
 {
   ui.setupUi (this);
 
@@ -68,6 +70,25 @@ void
 ChatContent::SetLocalName (const QString & name)
 {
   localName = name;
+}
+
+void
+ChatContent::Start ()
+{
+  dateMask = deliberate::Settings().value ("style/dateformat",dateMask)
+                                   .toString();
+  deliberate::Settings().setValue ("style/dateformat",dateMask);
+}
+
+void
+ChatContent::Start (Mode mode,
+              const QString & remoteName,
+              const QString & localName)
+{
+  SetMode (mode);
+  SetRemoteName (remoteName);
+  SetLocalName (localName);
+  Start ();
 }
 
 
@@ -106,7 +127,7 @@ ChatContent::Incoming (const QXmppMessage & msg)
   QDateTime  now = QDateTime::currentDateTime();
   QString pattern (tr("(%3) <b>%1</b>: %2"));
   QString msgtext = pattern.arg(from).arg(body)
-                           .arg (now.toString (Qt::DefaultLocaleShortDate));
+                           .arg (now.toString (dateMask));
   QString cookedText = LinkMangle::Anchorize (msgtext,
                                    LinkMangle::HttpExp (),
                                    LinkMangle::HttpAnchor);
