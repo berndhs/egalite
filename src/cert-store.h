@@ -85,6 +85,7 @@ private slots:
   void SaveCerts ();
   void NewIdent ();
   void SaveIdent ();
+  void DeleteIdent ();
   void EditIdent (bool isnew = false);
   void ShowCertDetails (bool showCooked);
   void LoadKey ();
@@ -104,6 +105,7 @@ private:
   void Connect ();
   void ReadDB ();
   void WriteCert (CertRecord certRec);
+  void DeleteCert (QString id);
   void WriteCerts (const QString filename);
   void WriteContacts (const QString filename);
   void CheckExists (const QString filename);

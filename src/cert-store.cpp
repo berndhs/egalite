@@ -94,6 +94,8 @@ CertStore::Connect ()
            this, SLOT (LoadKey ()));
   connect (uiEditCert.loadCertButton , SIGNAL (clicked()), 
            this, SLOT (LoadCert ()));
+  connect (uiEditCert.deleteButton, SIGNAL (clicked()),
+           this, SLOT (DeleteIdent ()));
 
   connect (uiContact.exitButton, SIGNAL (clicked()), 
            contactDialog, SLOT (accept ()));
@@ -410,6 +412,30 @@ CertStore::SaveIdent ()
   SelectIdentity (index);
   CheckDBComplete (dbFileName);
   WriteCert (currentRec);
+}
+
+void
+CertStore::DeleteIdent ()
+{
+  QString name = uiEditCert.nameEdit->text ();
+  CertMap::iterator certit = homeCertMap.find (name);
+  bool isnew = (certit == homeCertMap.end ());
+  if (!isnew) {
+    homeCertMap.erase (name);
+  }
+  CheckDBComplete (dbFileName);
+  DeleteCert (name);
+  certEditDialog->accept ();
+}
+
+void
+CertStore::DeleteCert (QString id)
+{
+  QSqlQuery  delQuery (certDB);
+  QString    delString (QString
+                        ("delete from identities where ident = \"%1\"")
+                        .arg (id));
+  delQuery.exec (delString);
 }
 
 void
