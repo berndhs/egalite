@@ -62,6 +62,11 @@ public:
   void SetRemoteName (const QString & name);
   void SetLocalName  (const QString & name);
 
+  void Start (Mode mode,
+              const QString & remoteName,
+              const QString & localName);
+  void Start ();
+
   QString RemoteName () { return remoteName; }
   QString LocalName () { return localName; }
 
@@ -91,6 +96,8 @@ private:
   QString          remoteName;
   QString          localName;
   Mode             chatMode;
+  QString          dateMask;
+  QString          chatLine;
 };
 
 } // namespace

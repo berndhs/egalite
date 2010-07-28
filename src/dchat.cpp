@@ -577,9 +577,9 @@ Q_UNUSED (localNick);
     newChat->SetTitle (tr("direct ") + localNick);
     newChat->Add (sock->Dialog(),tr("Status")); 
     ChatContent * newCont = new ChatContent (this);
-    newCont->SetMode (ChatContent::ChatModeRaw);
-    newCont->SetRemoteName (sock->RemoteName());
-    newCont->SetLocalName (sock->LocalName());
+    newCont->Start (ChatContent::ChatModeRaw,
+                    sock->RemoteName(),
+                    sock->LocalName());
     newChat->Add (newCont,tr("Chat"));
     directChats [other] = newChat;
     connect (newCont, SIGNAL (Activity (QWidget*)),
@@ -616,6 +616,7 @@ qDebug () << " starting new server chat for remote " << remoteName;
             newCont, SLOT (Incoming (const QXmppMessage&)));
   connect (newCont, SIGNAL (Disconnect(QString)),
             this, SLOT (CloseServerChat (QString)));
+  newCont->Start ();
   newChat->Run ();
 }
 

@@ -44,7 +44,7 @@ qmake:
 $(MAKEFILE): $(PRO_FILE)
 	$(QMAKE) $(PRO_FILE) -o $(MAKEFILE)
 
-translations:
+translations: FORCE
 	$(LRELEASE) $(PRO_FILE)
 
 FORCE:

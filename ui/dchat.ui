@@ -72,9 +72,9 @@
      <string>File</string>
     </property>
     <addaction name="actionLog_In"/>
+    <addaction name="actionLog_Out"/>
     <addaction name="actionQuit"/>
     <addaction name="actionSettings"/>
-    <addaction name="actionLog_Out"/>
     <addaction name="actionAdd_Listener"/>
     <addaction name="actionDrop_Listener"/>
     <addaction name="actionActive_Listener"/>

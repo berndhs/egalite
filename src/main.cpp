@@ -76,18 +76,20 @@ main (int argc, char* argv[])
   deliberate::SetStyle (settings);
 
   QApplication  app (argc,argv);
+
   QString locale = QLocale::system().name();
   QTranslator  translate;
   QString xlateFile (QString ("egalite_") + locale);
   QString langDir (":/translate");
-  qDebug () << " translate file name " << xlateFile;
   bool found = translate.load (xlateFile, langDir);
-  qDebug () << " translate file found " << found;
   QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
   app.installTranslator (&translate);
+
   deliberate::CmdOptions  opts ("Egalite");
   opts.AddSoloOption ("debug","D",QObject::tr("show Debug log window"));
   opts.AddStringOption ("logdebug","L",QObject::tr("write Debug log to file"));
+  opts.AddStringOption ("lang","l",
+                   QObject::tr("language (2-letter lower case)"));
 
   deliberate::UseMyOwnMessageHandler ();
 
@@ -113,6 +115,17 @@ main (int argc, char* argv[])
     deliberate::StartFileLog (logfile);
   }
 
+  if (opts.SeenOpt ("lang")) {
+    QString newlocale (locale);
+    opts.SetStringOpt ("lang",newlocale);
+    if (newlocale != locale) {   
+      QString xlateFile (QString ("egalite_") + newlocale);
+      QString langDir (":/translate");
+      bool found = translate.load (xlateFile, langDir);
+      QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
+      app.installTranslator (&translate);
+    }
+  }
   /** the real main program starts here */
 
   egalite::DChatMain  chatmain;
