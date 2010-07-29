@@ -556,10 +556,8 @@ CertStore::RemoteNick (QByteArray  pem, QString & nick)
                       "where pemcert = \"%1\"").arg (QString(pem));
   QSqlQuery query (certDB);
   bool ok = query.exec (qryString);
-qDebug () << " query good " << ok << " for RemoteNick " << QString(pem).left (40);
   if (ok && query.next()) {
     nick = query.value (0).toString();
-qDebug () << " found nick " << nick;
     return true;
   } else {
     return false;

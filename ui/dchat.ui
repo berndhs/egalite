@@ -107,7 +107,6 @@
    <addaction name="menuContacts"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLog_In">
    <property name="text">
     <string>Log In</string>
