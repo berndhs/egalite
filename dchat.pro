@@ -31,6 +31,8 @@ unix {
   INCLUDEPATH += /usr/include/qxmpp
   DEFINES += DELIBERATE_DEBUG=1
   LIBS += -lQXmppClient
+  INCLUDEPATH += /usr/include/QtCrypto
+  LIBS += -lqca
 #
 # use the code below if QXmpp is installed in /usr/local
 #  INCLUDEPATH += /usr/local/include/qxmpp
@@ -79,6 +81,7 @@ FORMS = \
         ui/start-listener.ui \
         ui/list-direct.ui \
         ui/cert-edit.ui \
+        ui/cert-input.ui \
 
 
 SOURCES = src/main.cpp \
@@ -103,6 +106,7 @@ SOURCES = src/main.cpp \
         src/contact-list-model.cpp \
         src/xegal-client.cpp \
         src/add-listener.cpp \
+        src/cert-generate.cpp \
 
 
 
@@ -130,6 +134,7 @@ HEADERS = \
         src/contact-list-model.h \
         src/xegal-client.h \
         src/add-listener.h \
+        src/cert-generate.h \
 
 
 

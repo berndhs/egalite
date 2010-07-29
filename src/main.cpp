@@ -30,6 +30,8 @@
 #include <QTranslator>
 #include <QLocale>
 #include <QTextCodec>
+#include <QtCrypto>
+#include <QDebug>
 #include "delib-debug.h"
 #include "cmdoptions.h"
 #include "deliberate.h"
@@ -75,7 +77,15 @@ main (int argc, char* argv[])
 
   deliberate::SetStyle (settings);
 
+  QCA::Initializer  qcaInit;
   QApplication  app (argc,argv);
+  QCA::scanForPlugins ();
+  // We need to ensure that we have certificate handling support
+  if ( !QCA::isSupported( "cert" ) ) {
+    qDebug() << "Sorry, no PKI certificate support" ;
+  } else {
+    qDebug () << " cert support available ";
+  }
 
   QString locale = QLocale::system().name();
   QTranslator  translate;

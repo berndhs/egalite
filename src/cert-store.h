@@ -41,6 +41,9 @@ class QStandardItem;
 namespace egalite
 {
 
+
+class CertGenerate;
+
 /** \brief CertStore keep track of SSL identities defined by certificates, and
   *  keep track of contact addresses for direct contacts.
   *
@@ -62,7 +65,7 @@ public:
     * Only the first call to Init does anything, any additional calls are 
     * ignored.
     */
-  void Init (QWidget *parentWidget = 0);
+  void Init (QWidget *parent = 0);
 
   CertRecord  Cert (QString id);
   bool        HaveCert (QString id);
@@ -79,6 +82,7 @@ public slots:
   /** \brief ContactDialog - gui to add/remove/edit contact addresses. */
   void ContactDialog ();
   void StoreRemote (const QString & nick, const QByteArray & pem);
+  void CreateCertificate ();
 
 private slots:
 
@@ -98,6 +102,9 @@ private slots:
   void SelectIdentity (const QModelIndex &index);
   void ToggleView ();
 
+  void StartNewCert (QString name, QString pass, 
+                     QString keyPEM, QString certPEM);
+
 private:
 
   CertStore ();
@@ -116,12 +123,14 @@ private:
 
   QString ElementType (QString name);
 
+  QWidget         *parentWidget;
   Ui_ListIdentity  uiListCert;
   QDialog         *certListDialog;
   Ui_EditCertEntry uiEditCert;
   QDialog         *certEditDialog;
   Ui_ContactEdit   uiContact;
   QDialog         *contactDialog;
+  CertGenerate    *certGenerate;
   QString          dbFileName;
   CertMap          homeCertMap;
   ContactHostMap   contactHostMap;

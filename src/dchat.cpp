@@ -253,6 +253,8 @@ DChatMain::Connect ()
            CertStore::Object(), SLOT (CertDialog ()));
   connect (ui.contactDirectAction, SIGNAL (triggered()),
            CertStore::Object(), SLOT (ContactDialog ()));
+  connect (ui.actionCreate, SIGNAL (activated()),    
+           CertStore::Object(), SLOT (CreateCertificate()));
   connect (ui.contactView, SIGNAL (activated (const QModelIndex &)),
            &contactListModel, SLOT (PickedItem (const QModelIndex &)));
   connect (ui.actionLicense, SIGNAL (triggered()),
@@ -341,6 +343,7 @@ DChatMain::AnnounceMe ()
     xclientMap[user]->setClientPresence (pres);
   }
 }
+
 
 bool
 DChatMain::GetPass ()

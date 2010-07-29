@@ -22,6 +22,7 @@
 
 #include "cert-store.h"
 #include "deliberate.h"
+#include "cert-generate.h"
 
 #include <QDesktopServices>
 #include <QStandardItemModel>
@@ -61,6 +62,8 @@ CertStore::Object ()
 
 CertStore::CertStore ()
   :QObject (0),
+   parentWidget (0),
+   certGenerate (0),
    viewDetails (false),
    lastDirUsed ("")
 {
@@ -104,23 +107,30 @@ CertStore::Connect ()
   connect (uiContact.newButton, SIGNAL (clicked()),
            this, SLOT (NewContact ()));
   connect (uiContact.deleteButton, SIGNAL (clicked()),
-           this, SLOT (DeleteContact ()));
+           this, SLOT (DeleteContact ()));  
+  connect (certGenerate, SIGNAL (NewCertificate(QString,QString,
+                                                QString,QString)),
+           this, SLOT (StartNewCert (QString,QString, 
+                                     QString, QString)));
+
 }
 
 void
-CertStore::Init (QWidget *parentWidget)
+CertStore::Init (QWidget *parent)
 {
   bool initDone (false);
   if (initDone) {
     return;
   }
   initDone = true;
+  parentWidget = parent;
   certListDialog = new QDialog (parentWidget);
   uiListCert.setupUi (certListDialog);
   certEditDialog = new QDialog (parentWidget);
   uiEditCert.setupUi (certEditDialog);
   contactDialog = new QDialog (parentWidget);
   uiContact.setupUi (contactDialog);
+  certGenerate = new CertGenerate (parentWidget);
   Connect ();
   identityModel = new QStandardItemModel (certEditDialog);
   uiListCert.identList->setModel (identityModel);
@@ -141,7 +151,13 @@ CertStore::Init (QWidget *parentWidget)
   ReadDB ();
 }
 
-
+void
+CertStore::CreateCertificate ()
+{
+  if (certGenerate == 0) {
+  }
+  certGenerate->Dialog ();
+}
 
 void
 CertStore::CertDialog ()
@@ -249,6 +265,28 @@ CertStore::DeleteContact ()
   int row = current.row ();
   contactModel->removeRow (row);
   RefreshContactMap ();
+}
+
+void
+CertStore::StartNewCert (QString name, 
+                         QString pass, 
+                         QString keyPEM, 
+                         QString certPEM)
+{
+  CertRecord newCR (name, pass, keyPEM, certPEM);
+  currentRec = newCR;
+  WriteCert (newCR);
+  uiEditCert.nameEdit->setText (name);
+  uiEditCert.keyEdit->setPlainText (keyPEM);
+  uiEditCert.certEdit->setPlainText (certPEM);
+  uiEditCert.passwordEdit->setText (pass);
+  currentCert = QSslCertificate (currentRec.Cert().toAscii());
+  viewDetails = true;
+  uiEditCert.changeViewButton->setEnabled (true);
+  ShowCertDetails (viewDetails);
+  if (certEditDialog) {
+    certEditDialog->show();
+  }
 }
 
 void
@@ -573,7 +611,6 @@ CertStore::RefreshContactModel ()
          << tr ("Address")
          << tr ("Port");
   contactModel->setHorizontalHeaderLabels (labels);
-qDebug () << " headers set to " << labels;
   ContactHostMap::iterator addrit;
   QStandardItem  *nickItem, *addrItem, *portItem;
   int row (0);
