@@ -286,6 +286,7 @@ void
 CertGenerate::UseNow ()
 {
   done (1);
+qDebug () << " new cert PEM " << newcertPEM.left(100);
   emit NewCertificate (stringDataMap[tagCN],
                        password,
                        newkeyPEM,

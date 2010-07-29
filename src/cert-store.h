@@ -94,6 +94,8 @@ private slots:
   void ShowCertDetails (bool showCooked);
   void LoadKey ();
   void LoadCert ();
+  void PasteKey ();
+  void PasteCert ();
 
   void SaveContacts ();
   void NewContact ();

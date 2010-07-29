@@ -33,6 +33,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QDateTime>
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 
 using namespace deliberate;
@@ -99,6 +101,10 @@ CertStore::Connect ()
            this, SLOT (LoadCert ()));
   connect (uiEditCert.deleteButton, SIGNAL (clicked()),
            this, SLOT (DeleteIdent ()));
+  connect (uiEditCert.pasteKeyButton, SIGNAL (clicked()),
+           this, SLOT (PasteKey ()));
+  connect (uiEditCert.pasteCertButton, SIGNAL (clicked()),
+           this, SLOT (PasteCert ()));
 
   connect (uiContact.exitButton, SIGNAL (clicked()), 
            contactDialog, SLOT (accept ()));
@@ -275,6 +281,7 @@ CertStore::StartNewCert (QString name,
 {
   CertRecord newCR (name, pass, keyPEM, certPEM);
   currentRec = newCR;
+qDebug () << " incoming new Cert Rec cert " << currentRec.Cert().left(120);
   WriteCert (newCR);
   uiEditCert.nameEdit->setText (name);
   uiEditCert.keyEdit->setPlainText (keyPEM);
@@ -442,8 +449,6 @@ CertStore::SaveIdent ()
   }
   currentRec.SetId (id);
   currentRec.SetPassword (uiEditCert.passwordEdit->text ());
-  currentRec.SetKey (uiEditCert.keyEdit->toPlainText ());
-  currentRec.SetCert (uiEditCert.certEdit->toPlainText ());
   homeCertMap [id] = currentRec;
   QModelIndex index = identityModel->indexFromItem (editItem);
   uiListCert.identList->scrollTo (index);
@@ -464,6 +469,28 @@ CertStore::DeleteIdent ()
   CheckDBComplete (dbFileName);
   DeleteCert (name);
   certEditDialog->accept ();
+}
+
+void
+CertStore::PasteKey ()
+{
+  QClipboard * clip = QApplication::clipboard();
+  if (clip) {
+    QString key = clip->text();
+    currentRec.SetKey (key);
+    uiEditCert.keyEdit->setPlainText (key);
+  }
+}
+
+void
+CertStore::PasteCert ()
+{
+  QClipboard * clip = QApplication::clipboard();
+  if (clip) {
+    QString cert = clip->text();
+    currentRec.SetCert (cert);
+    ShowCertDetails (viewDetails);
+  }
 }
 
 void
