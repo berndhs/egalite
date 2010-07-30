@@ -344,13 +344,12 @@ DChatMain::About ()
 void
 DChatMain::AnnounceMe ()
 {
-  QXmppPresence::Status status (QXmppPresence::Status::Online,
-                      QString ("Egalite!"));
-  QXmppPresence pres (QXmppPresence::Available, status);
   std::map <QString, XEgalClient*> :: iterator xit;
   for (xit = xclientMap.begin(); xit != xclientMap.end(); xit++) {
     if (xit->second) {
-      xit->second->setClientPresence (pres);
+      xit->second->Announce (QXmppPresence::Available,
+                             QXmppPresence::Status::Online,
+                             QString ("Egalite!"));
     }
   }
 }
@@ -527,7 +526,7 @@ DChatMain::Logout ()
   contactListModel.RemoveAccount (expired);
   XEgalClient * xclient = xclientMap [expired];
   if (xclient) {
-    xclient->disconnect ();
+    xclient->Disconnect ();
     disconnect (xclient, 0,0,0);
     delete xclient;
   }

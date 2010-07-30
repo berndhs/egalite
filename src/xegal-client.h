@@ -35,6 +35,13 @@ public:
   XEgalClient (QObject *parent =0,
                QString user = QString());
 
+  ~XEgalClient ();
+
+  void Disconnect ();
+  void Announce (QXmppPresence::Type  newState,
+                 QXmppPresence::Status::Type subStatus,
+                 QString  message);
+
 public slots:
 
   void PresenceChange (const QXmppPresence & presence);

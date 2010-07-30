@@ -36,6 +36,31 @@ XEgalClient::XEgalClient (QObject *parent, QString user)
            this, SLOT (PresenceChange (const QXmppPresence &)));
 }
 
+XEgalClient::~XEgalClient ()
+{
+  Disconnect ();
+}
+
+void
+XEgalClient::Disconnect ()
+{
+  if (isConnected()) {
+    Announce (QXmppPresence::Unavailable, 
+              QXmppPresence::Status::Offline,
+              tr("Logged Off"));
+    disconnect ();
+  }
+}
+
+void
+XEgalClient::Announce (QXmppPresence::Type  newType,
+                       QXmppPresence::Status::Type  subStatus,
+                       QString  message)
+{
+  QXmppPresence::Status status (subStatus, message);
+  QXmppPresence   pres (newType, status);
+  setClientPresence (pres);
+}
 
 void
 XEgalClient::PresenceChange (const QXmppPresence & presence)
