@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>408</width>
-    <height>488</height>
+    <width>405</width>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,6 +59,18 @@
    </item>
    <item row="1" column="0">
     <widget class="QPlainTextEdit" name="keyEdit">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>40</width>
+       <height>40</height>
+      </size>
+     </property>
      <property name="acceptDrops">
       <bool>false</bool>
      </property>
@@ -119,6 +131,18 @@
    </item>
    <item row="4" column="0">
     <widget class="QPlainTextEdit" name="certEdit">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>40</width>
+       <height>40</height>
+      </size>
+     </property>
      <property name="acceptDrops">
       <bool>false</bool>
      </property>
