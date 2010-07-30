@@ -29,6 +29,7 @@
 #include <QXmppConfiguration.h>
 #include <QXmppMessage.h>
 #include <QXmppRoster.h>
+#include <QXmppRosterIq.h>
 #include <QXmppPresence.h>
 #include <QString>
 #include <QByteArray>
@@ -74,7 +75,7 @@ DChatMain::DChatMain (QWidget *parent)
   debugTimer->start (10 * 1000); // 15 secs
   xmppTimer = new QTimer (this);
   connect (xmppTimer, SIGNAL (timeout()), this, SLOT (XmppPoll ()));
-  xmppTimer->start (30 * 1000); // 1/2 mins
+  xmppTimer->start (4* 30 * 1000); // 1/2 mins * 4 == 2 mins
   announceHeartbeat = new QTimer (this);
   connect (announceHeartbeat, SIGNAL (timeout()), this, SLOT (AnnounceMe()));
   announceHeartbeat->start (1000*60*2); // 2 minutes
@@ -99,9 +100,8 @@ DChatMain::Run ()
   SetSettings ();
   contactListModel.Setup ();
   QStringList contactHeaders;
-  contactHeaders << tr("Status")
-                 << tr("Name")
-                 << tr("Login");
+  contactHeaders << tr("Login")
+                 << tr("Name");
   contactListModel.setHorizontalHeaderLabels (contactHeaders);
   show ();
   SetupListener ();
@@ -133,12 +133,7 @@ DChatMain::StartListener (QString ownAddress,
 {
   DirectListener * listen (0);
   bool             isListening (false);
-  if (inDirect.find (ownAddress) == inDirect.end ()) {
-    listen = new DirectListener (this);
-    inDirect [ownAddress] = listen;
-  } else {
-    listen = inDirect [ownAddress];
-  }
+  bool             wantStart (true);
   
   if (CertStore::IF().HaveCert (directIdentity)) {
     CertRecord hostCert = CertStore::IF().Cert (directIdentity);
@@ -147,12 +142,21 @@ DChatMain::StartListener (QString ownAddress,
       SimplePass  getPass (this);
       pass = getPass.GetPassword (tr("Listener Password for ")
                                    + directIdentity);
+      wantStart = getPass.GotPassword ();
     }
-    QSslKey skey (hostCert.Key().toAscii(),QSsl::Rsa,
-                QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
-    QSslCertificate scert (hostCert.Cert().toAscii());
-    listen->Init (directIdentity, skey, scert);
-    isListening = listen->Listen (ownAddress, publicPort);
+    if (wantStart) {
+      if (inDirect.find (ownAddress) == inDirect.end ()) {
+        listen = new DirectListener (this);
+        inDirect [ownAddress] = listen;
+      } else {
+        listen = inDirect [ownAddress];
+      }
+      QSslKey skey (hostCert.Key().toAscii(),QSsl::Rsa,
+                  QSsl::Pem, QSsl::PrivateKey, pass.toUtf8());
+      QSslCertificate scert (hostCert.Cert().toAscii());
+      listen->Init (directIdentity, skey, scert);
+      isListening = listen->Listen (ownAddress, publicPort);
+    }
   } else {
 qDebug () << " cannot listen for identity " << directIdentity;
   }
@@ -286,7 +290,7 @@ DChatMain::Login ()
   if (GetPass()) {
     XEgalClient * xclient = xclientMap[user];
     if (!xclient) {
-      xclient = new XEgalClient (this);
+      xclient = new XEgalClient (this, user);
       contactListModel.AddAccount (user);
       xclientMap[user] = xclient;
     }
@@ -298,12 +302,16 @@ DChatMain::Login ()
              this, SLOT (GetMessage (const QXmppMessage &)));
     connect (xclient, SIGNAL (error (XEgalClient::Error)),
              this, SLOT (XmppError (XEgalClient::Error)));
-    connect (xclient, SIGNAL (presenceReceived (const QXmppPresence &)),
-             this, SLOT (XPresenceChange (const QXmppPresence &)));
     connect (xclient, SIGNAL (connected ()), 
              this, SLOT (XmppConnected ()));
     connect (xclient, SIGNAL (disconnected ()),
              this, SLOT (XmppDisconnected ()));
+    connect (xclient, SIGNAL (UpdateState (QString, QString, QString, 
+                                          QXmppPresence::Status)),
+             this, SLOT (XUpdateState (QString, QString, QString, 
+                                          QXmppPresence::Status)));
+    connect (xclient, SIGNAL (ChangeRequest (QString, QXmppPresence::Status)),
+             this, SLOT (XChangeRequest (QString, QXmppPresence::Status)));
     connect (xclient, SIGNAL (elementReceived (const QDomElement &, bool &)),
              this, SLOT (XmppElementReceived (const QDomElement &, bool &)));
     connect (xclient, SIGNAL (iqReceived (const QXmppIq &)),
@@ -339,8 +347,11 @@ DChatMain::AnnounceMe ()
   QXmppPresence::Status status (QXmppPresence::Status::Online,
                       QString ("Egalite!"));
   QXmppPresence pres (QXmppPresence::Available, status);
-  if (xclientMap[user]) {
-    xclientMap[user]->setClientPresence (pres);
+  std::map <QString, XEgalClient*> :: iterator xit;
+  for (xit = xclientMap.begin(); xit != xclientMap.end(); xit++) {
+    if (xit->second) {
+      xit->second->setClientPresence (pres);
+    }
   }
 }
 
@@ -444,16 +455,17 @@ DChatMain::GetRaw (const QByteArray &data)
 qDebug () << " received raw message " << data;
 }
 
-
 void
 DChatMain::Send (const QXmppMessage & msg)
 {
-qDebug () << " DChat Main send xmpp";
   QXmppMessage outMsg (msg);
-  if (xclientMap[user]) {
-    QStringList parts = outMsg.to().split("/");
-    outMsg.setTo (parts.at(0));
-    xclientMap[user]->sendMessage (outMsg.to(), outMsg.body());
+  QStringList parts = outMsg.to().split("/");
+  QString toUser = parts.at(0);
+  outMsg.setTo (toUser);
+  parts = outMsg.from().split("/");
+  QString fromUser = parts.at(0);
+  if (xclientMap[fromUser]) {
+    xclientMap[fromUser]->sendMessage (outMsg.to(), outMsg.body());
   }
 }
 
@@ -708,24 +720,26 @@ DChatMain::XmppPoll ()
 void
 DChatMain::DebugCheck ()
 {
-  if (!xclientMap[user]) {
+  int nclients = xclientMap.size();
+  if (nclients < 1) {
     qDebug () <<" DEBUG: no xclient";
   }
 }
 
+
 void
-DChatMain::XPresenceChange (const QXmppPresence & presence)
+DChatMain::XChangeRequest (QString login, QXmppPresence presence)
 {
-  QXmppPresence::Type   presType = presence.type ();
-  QXmppPresence::Status status = presence.status();
-qDebug () << " receive presence form " << presence.from () << " to "
-          << presence.to () << " type " << PresenceTypeString (presType);
-  if (presType == QXmppPresence::Available 
-      || presType == QXmppPresence::Unavailable) {
-    contactListModel.UpdateState (presence.to(), presence.from(), status);
-  } else {
-    subscriptionDialog.RemoteAskChange (xclientMap[user], presence);
-  }
+  subscriptionDialog.RemoteAskChange (xclientMap[login], presence);
+}
+
+void
+DChatMain::XUpdateState (QString remoteName, 
+                         QString ownId,
+                         QString remoteId,
+                         QXmppPresence::Status status)
+{
+  contactListModel.UpdateState (remoteName, ownId, remoteId, status);
 }
 
 void
@@ -785,30 +799,36 @@ DChatMain::XmppDisconnected ()
 void
 DChatMain::Poll (XEgalClient * xclient)
 {
+qDebug () << " polling " << xclient;
   QStringList  contactJids;
   if (xclient == 0) {
     return;
   }
-  contactJids = xclient->getRoster().getRosterBareJids();
+  QXmppRoster & roster = xclient->getRoster();
+  contactJids = roster.getRosterBareJids();
   xmppConfig = xclient->getConfiguration ();
   QStringList::const_iterator stit;
   QString thisUser = xmppConfig.jidBare ();
 
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
-    QStringList resources = xclient->getRoster().getResources (id);
+    QStringList resources = roster.getResources (id);
     QString res;
+    QXmppRoster::QXmppRosterEntry entry = roster.getRosterEntry (id);
+    QString remoteName = entry.name();
+qDebug () << " id " << id << " is " << remoteName;
     QStringList::const_iterator   rit;
     if (resources.size () == 0) {
-      contactListModel.UpdateState (thisUser, id, 
-                                  QXmppPresence::Status::Offline);
+qDebug () << " setting offline " << id << " for user " << thisUser;
+      contactListModel.UpdateState (remoteName, thisUser, id, 
+                                  QXmppPresence::Status::Offline, true);
     }
     for (rit = resources.begin (); rit != resources.end (); rit++) {
       res = *rit;
       QString bigId = id + QString("/") + res;
-      QXmppPresence pres = xclient->getRoster().getPresence (id,res);
+      QXmppPresence pres = roster.getPresence (id,res);
       QXmppPresence::Status status = pres.status();
-      contactListModel.UpdateState (thisUser, bigId, status);
+      contactListModel.UpdateState (remoteName, thisUser, bigId, status);
     } 
   }
 }

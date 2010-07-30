@@ -36,11 +36,16 @@ public:
   SimplePass (QWidget * parent=0);
 
   QString GetPassword (QString purpose);
+  bool    GotPassword ();
 
 public slots:
 
   void Ok ();
   void Cancel ();
+
+private:
+
+  bool gotPassword;
 
 };
 

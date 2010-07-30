@@ -32,7 +32,25 @@ Q_OBJECT
 
 public:
 
-  XEgalClient (QObject *parent =0);
+  XEgalClient (QObject *parent =0,
+               QString user = QString());
+
+public slots:
+
+  void PresenceChange (const QXmppPresence & presence);
+
+signals:
+
+  void UpdateState (QString remoteName, 
+               QString ownId,
+               QString remoteId,
+               QXmppPresence::Status status);
+  void ChangeRequest (QString ownId,
+                 QXmppPresence presence);
+
+private:
+
+  QString  thisUser;
 
 };
 

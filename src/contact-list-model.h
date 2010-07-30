@@ -23,6 +23,8 @@
  ****************************************************************/
 
 #include <QStandardItemModel>
+#include <QColor>
+#include <QTimer>
 #include <QXmppPresence.h>
 
 namespace egalite
@@ -37,27 +39,36 @@ public:
   ContactListModel (QObject * parent=0);
 
   void Setup ();
-
-  void AddAccount (const QString & id);  /// when logging in call this
+  /** when logging in call AddAccount */
+  void AddAccount (const QString & id);  
   void RemoveAccount (const QString & id);
-  void UpdateState (const QString & ownId,
+  void UpdateState (const QString & remoteName,
+                    const QString & ownId,
                     const QString & remoteId,
-                    const QXmppPresence::Status & status);
-  void AddContact (const QString & accountId,  /// who are we
-                   const QString & remoteId,   /// who is our friend
-                   const QString & loginId,    /// where is friend logged in
-                   QXmppPresence::Status::Type  stype, /// on/off/sleeping
+                    const QXmppPresence::Status & status,
+                    bool  allResources=false);
+  void AddContact (const QString & accountId  /** who are they */  ,
+                   const QString & remoteName /** who is their name */  ,
+                   const QString & res        /** resource tag */ ,
+                   const QString & friendOf   /** who is friend on this end */ ,
+                   QXmppPresence::Status::Type  stype /** on/off/sleeping */ ,
                    const QString & statusText);
   bool SetStatus (const QString & ownId,
                   const QString & remoteId,
                   const QString & resource,
                      QXmppPresence::Status::Type stype,
-                  const QString & statusText);
+                  const QString & statusText,
+                  bool  allResources=false);
 
   
 public slots:
 
   void PickedItem (const QModelIndex & index );
+  void HighlightStatus ();
+
+private slots:
+
+  void HighlightContactStatus (QStandardItem * item);
 
 signals:
 
@@ -66,12 +77,19 @@ signals:
 
 private:
 
-  QStandardItem * FindAccountGroup (QString accountName, bool makeit=true);
+  QStandardItem * FindAccountGroup (QString accountName, 
+                                    bool makeit=true    /// create if not there
+                                  );
+  QStandardItem * FindContactGroup (QStandardItem * accountHead,
+                                    QString         contactJid,
+                                    bool            makeit=true);
   QString StatusName (QXmppPresence::Status::Type stype);
   QIcon   StatusIcon (QXmppPresence::Status::Type stype);
+  bool    IsOnline   (QXmppPresence::Status::Type stype);
   void RemoveContact (const QString & ownId,
                       const QString & remoteId,
-                      const QString & resource);
+                      const QString & resource,
+                      bool  allResources=false);
 
   QString      iconPath;
   QString      iconSize;
@@ -79,9 +97,15 @@ private:
   QString      nameTag;
   QString      resTag;
   QString      stateTag;
+  QString      nickTag;
 
   bool         discardOfflines;
+  QColor       presentColor;
+  QColor       absentColor;
+  QTimer       cleanTimer;
 
+  static int   tagData;
+  static int   statusData;
 
 };
 

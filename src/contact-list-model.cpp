@@ -28,12 +28,19 @@ using namespace deliberate;
 namespace egalite
 {
 
+int ContactListModel::tagData ( Qt::UserRole + 1 );
+int ContactListModel::statusData ( Qt::UserRole + 2);
+
 ContactListModel::ContactListModel (QObject *parent)
   :QStandardItemModel (parent),
    nameTag ("remoteName"),
    resTag ("resource"),
    stateTag ("state"),
-   discardOfflines (true)
+   nickTag ("nick"),
+   discardOfflines (true),
+   presentColor (Qt::blue),
+   absentColor (Qt::black),
+   cleanTimer (this)
 {
 }
 
@@ -53,6 +60,19 @@ ContactListModel::Setup ()
   discardOfflines = Settings().value ("network/hideOffline",discardOfflines)
                               .toBool ();
   Settings().setValue ("network/hideOffline",discardOfflines);
+  QVariant color = Settings().value ("style/presentColor",presentColor);
+  if (color.canConvert<QColor> ()) {
+    presentColor = color.value<QColor>();                       
+  }
+  Settings().setValue ("style/presentColor",presentColor);
+  color = Settings().value ("style/absentColor",absentColor);
+  if (color.canConvert<QColor> ()) {
+    absentColor = color.value<QColor>();
+  }
+  Settings().setValue ("style/absentColor",absentColor);
+  cleanTimer.stop ();
+  connect (&cleanTimer, SIGNAL (timeout()), this, SLOT (HighlightStatus()));
+  cleanTimer.start (10000);
 }
 
 void
@@ -60,7 +80,7 @@ ContactListModel::PickedItem (const QModelIndex &index)
 {
   QStandardItem * item = itemFromIndex (index);
   if (item) {
-    if (item->data().toString() == nameTag) {
+    if (item->data(tagData).toString() == nameTag) {
       QString target (item->text());
       emit StartServerChat (target);
     }
@@ -73,43 +93,44 @@ ContactListModel::SetStatus (const QString & ownId,
                              const QString & remoteId,
                              const QString & resource,
                             QXmppPresence::Status::Type stype,
-                             const QString & statusText)
+                             const QString & statusText,
+                             bool  allResources)
 {
   QStandardItem * accountHead = FindAccountGroup (ownId);
+  QStandardItem * contactHead = FindContactGroup (accountHead, remoteId);
+  if (contactHead == 0) { // data structure is corrupted if this happens
+    return false;
+  }
   QStandardItem * stateItem;
   QStandardItem * chase;
-  bool  nameFound, resourceFound;
-  QModelIndex  accIndex;
-  accIndex = indexFromItem (accountHead);
-  if (hasChildren (accIndex)) {
+  bool resourceFound;
+  if (contactHead->hasChildren()) {
     int row;
-    int nrows = accountHead->rowCount ();
-    int ncols = accountHead->columnCount ();
+    int nrows = contactHead->rowCount ();
+    int ncols = contactHead->columnCount ();
     for (row = 0; row < nrows; row++) {
       stateItem = 0;
-      nameFound = false;
       resourceFound = false;
       for (int col = 0; col < ncols; col++) {
-        chase = accountHead->child (row, col);
+        chase = contactHead->child (row, col);
         if (!chase) {
           continue;
         }
-        QString tag = chase->data().toString();
-        if (tag == nameTag && chase->text () == remoteId) {
-          nameFound = true;
-        } else if (tag == resTag && chase->text () == resource) {
+        QString tag = chase->data(tagData).toString();
+        if (tag == resTag && (allResources || chase->text () == resource)) {
           resourceFound = true;
         } else if (tag == stateTag) {
           stateItem = chase;
         }
       }
-      if (nameFound && resourceFound && stateItem) { // in this row
+      if (resourceFound && stateItem) { // in this row
         QString stext (statusText);
         if (stext.length() == 0) {
           stext = StatusName (stype);
         }
         stateItem->setText (stext);
         stateItem->setIcon (StatusIcon (stype));
+        stateItem->setData (IsOnline (stype),statusData);
         return true;
       }
     }
@@ -120,46 +141,47 @@ ContactListModel::SetStatus (const QString & ownId,
 void
 ContactListModel::RemoveContact (const QString & ownId,
                                  const QString & remoteId,
-                                 const QString & resource)
+                                 const QString & resource,
+                                 bool  allResources)
 {  
-  QStandardItem * accountHead = FindAccountGroup (ownId);
- 
-  bool nameFound, resourceFound;
-  QModelIndex accIndex;
-  accIndex = indexFromItem (accountHead);
-  if (!hasChildren (accIndex)) {   // not there anyway, return
-    return;
-  }
+  bool resourceFound;
   int row;
   QStandardItem * chase;
-  QStandardItem * nameItem;
+  QStandardItem * accountHead = FindAccountGroup (ownId);
+ 
+  QStandardItem * nameItem = FindContactGroup (accountHead, remoteId);
+  if (!nameItem) { // not here, can't remove
+    return;
+  }
   QStandardItem * stateItem;
-  for (row = 0; row < accountHead->rowCount (); row++) {
-    nameFound = false;
-    resourceFound == false;
-    for (int col = 0; col < accountHead->columnCount (); col++) {
-      chase = accountHead->child (row, col);
+  for (row = 0; row < nameItem->rowCount (); row++) {
+    resourceFound = false;
+    for (int col = 0; col < nameItem->columnCount (); col++) {
+      chase = nameItem->child (row, col);
       if (!chase) {
         continue;
       }
-      QString tag = chase->data().toString();
-      if (tag == nameTag && chase->text () == remoteId) {
-        nameFound = true;
-        nameItem = chase;
-      } else if (tag == resTag && chase->text () == resource) {
+      QString tag = chase->data(tagData).toString();
+      if (tag == resTag && (allResources || chase->text () == resource)) {
         resourceFound = true;
       } else if (tag == stateTag) {
         stateItem = chase;
       }
     }
-    if (nameFound && resourceFound) { // in this row
- qDebug () << " remove row " << row << " with name " << nameItem->text();
- qDebug () << " which has state " << stateItem->text ();
-      accountHead->removeRow (row);
+    if (resourceFound) { // in this row
+      nameItem->removeRow (row);
+      if (!nameItem->hasChildren()) {  // we removed the last one
+        int ownRow = nameItem->row ();
+        if (ownRow >= 0) {
+          nameItem = 0;
+          accountHead->removeRow (ownRow);
+        }
+      }
       return;
     }
   }
 }
+
 
 QString
 ContactListModel::StatusName (QXmppPresence::Status::Type stype)
@@ -207,10 +229,31 @@ ContactListModel::StatusIcon (QXmppPresence::Status::Type stype)
   }
 }
 
+bool
+ContactListModel::IsOnline (QXmppPresence::Status::Type stype)
+{
+  switch (stype) {
+  case QXmppPresence::Status::Offline: 
+    return false;
+  case QXmppPresence::Status::Online:
+  case QXmppPresence::Status::Away:
+  case QXmppPresence::Status::XA:
+  case QXmppPresence::Status::DND:
+  case QXmppPresence::Status::Chat:
+    return true;
+  case QXmppPresence::Status::Invisible:
+    return false;
+  default:
+    return false;
+  }
+}
+
 void
-ContactListModel::UpdateState (const QString & ownId,
+ContactListModel::UpdateState (const QString &remoteName,
+                        const QString & ownId,
                         const QString & remoteId, 
-                        const QXmppPresence::Status & status)
+                        const QXmppPresence::Status & status,
+                        bool  allResources)
 {
   QXmppPresence::Status::Type stype = status.type ();
   QString statusText = status.statusText (); 
@@ -227,11 +270,13 @@ ContactListModel::UpdateState (const QString & ownId,
   parts = ownId.split ('/',QString::SkipEmptyParts);
   QString ownJid = parts.at(0);
   if (discardOfflines && stype == QXmppPresence::Status::Offline) {
-    RemoveContact (ownJid, remoteJid, remoteResource);
+    RemoveContact (ownJid, remoteJid, remoteResource, allResources);
   } else {
-    bool old =  SetStatus (ownJid, remoteJid, remoteResource, stype, statusText);
+    bool old =  SetStatus (ownJid, remoteJid, remoteResource, 
+                           stype, statusText, allResources);
     if (!old) {
-      AddContact (remoteJid, remoteResource, ownId, stype, statusText);
+      AddContact (remoteJid, remoteName, remoteResource, 
+                  ownId, stype, statusText);
     }
   }
 }
@@ -258,6 +303,7 @@ ContactListModel::RemoveAccount (const QString & id)
 
 void
 ContactListModel::AddContact (const QString & id, 
+                       const QString & remoteName,
                        const QString & res, 
                        const QString & friendOf,
                        QXmppPresence::Status::Type stype,
@@ -266,25 +312,79 @@ ContactListModel::AddContact (const QString & id,
   QStringList parts = friendOf.split ('/',QString::SkipEmptyParts);
   QString ownId = parts.at(0);
   QStandardItem * groupItem = FindAccountGroup (ownId);
-  QStandardItem * nameItem = new QStandardItem (id);
-  nameItem->setData (nameTag);
+  QStandardItem * nameItem = FindContactGroup (groupItem, id);
+  if (!nameItem) {
+    return;
+  }
+
+  // add nick 
+  QStandardItem * nickItem = groupItem->child (nameItem->row(), 1);
+  if (nickItem) {
+    nickItem->setText (remoteName);
+  }
+  
+  // add resources and state 
   QStandardItem * stateItem = new QStandardItem (QString("?"));
-  stateItem->setData (stateTag);
+  stateItem->setData (stateTag, tagData);
   QStandardItem * resourceItem = new QStandardItem (res);
-  resourceItem->setData (resTag);
+  resourceItem->setData (resTag, tagData);
   QList <QStandardItem*> row;
   row << stateItem;
-  row << nameItem;
   row << resourceItem;
-  groupItem->appendRow (row);
+  nameItem->appendRow (row);
   QString stext (statusText);
   if (stext.length() == 0) {
     stext = StatusName (stype);
   }
   stateItem->setText (stext);
   stateItem->setIcon (StatusIcon (stype));
-  QString  bigId = id + QString("/") + res;
+  stateItem->setData (IsOnline (stype), statusData);
 }
+
+
+void
+ContactListModel::HighlightStatus ()
+{
+  QStandardItem * accountHead, *contactHead;
+  int nrows = rowCount ();
+  for (int row = 0; row < nrows; row++) {
+    accountHead = item (row, 0);
+    if (accountHead) {
+      int narows = accountHead->rowCount();
+      for (int arow = 0; arow < narows; arow++) {
+        contactHead = accountHead->child (arow,0);
+        if (contactHead) {
+          HighlightContactStatus (contactHead);
+        }
+      }
+    }
+  }
+}
+
+void
+ContactListModel::HighlightContactStatus (QStandardItem *item)
+{
+  bool isOnline (false);
+  if (item) {
+    QStandardItem * chase;
+    int nrows = item->rowCount ();
+    int ncols = item->columnCount ();
+    for (int row = 0; row < nrows; row++) {
+      for (int col = 0; col < ncols; col++) {
+        chase = item->child (row,col);
+        if (chase && (chase->data(tagData).toString() == stateTag)) {
+          isOnline |= chase->data(statusData).toBool ();
+        }
+      }
+    }
+    if (isOnline) {
+      item->setForeground (QBrush (presentColor));
+    } else {
+      item->setForeground (QBrush (absentColor));
+    }
+  }
+}
+  
 
 QStandardItem *
 ContactListModel::FindAccountGroup (QString accountName, bool makeit)
@@ -302,12 +402,52 @@ ContactListModel::FindAccountGroup (QString accountName, bool makeit)
   // not found - make a new one
   if (makeit) {
     rowHead = new QStandardItem (accountName);
-    rowHead->setData (QString("accounthead"));
+    rowHead->setData (QString("accounthead"), tagData);
     appendRow (rowHead);
     return rowHead;
   } else {
     return 0;
   }
+}
+
+QStandardItem *
+ContactListModel::FindContactGroup (QStandardItem * accountHead,
+                                    QString         contactJid,
+                                    bool            makeit)
+{
+  if (!accountHead) {
+    return 0;
+  }
+  int row(0);
+  QStandardItem * chase;
+  if (accountHead->hasChildren()) {
+    for (row = 0; row < accountHead->rowCount(); row++) {
+      for (int col = 0; col < accountHead->columnCount(); col++) {
+        chase = accountHead->child (row,col);
+        if (!chase) {
+          continue;
+        }
+        QString tag = chase->data(tagData).toString();
+        if (tag == nameTag) {
+          if (chase->text() == contactJid) {
+            return chase;
+          }
+        }
+      }
+    }
+  }
+  if (makeit) {
+    QStandardItem * nameItem = new QStandardItem (contactJid);
+    QStandardItem * nickItem = new QStandardItem (QString("?"));
+    nameItem->setData (nameTag, tagData);
+    nickItem->setData (nickTag, tagData);
+    QList<QStandardItem*> newItems;
+    newItems << nameItem << nickItem;
+    accountHead->appendRow (newItems);
+    return nameItem;
+  } else {
+    return 0;
+  } 
 }
 
 

@@ -21,13 +21,37 @@
  ****************************************************************/
 
 #include "xegal-client.h"
+#include <QXmppPresence.h>
+#include <QXmppRoster.h>
+#include <QXmppRosterIq.h>
 
 namespace egalite
 {
 
-XEgalClient::XEgalClient (QObject *parent)
-  :QXmppClient (parent)
+XEgalClient::XEgalClient (QObject *parent, QString user)
+  :QXmppClient (parent),
+   thisUser (user)
 {
+  connect (this, SIGNAL (presenceReceived (const QXmppPresence &)),
+           this, SLOT (PresenceChange (const QXmppPresence &)));
+}
+
+
+void
+XEgalClient::PresenceChange (const QXmppPresence & presence)
+{
+  QXmppPresence::Type   presType = presence.type ();
+  QXmppPresence::Status status = presence.status();
+  QStringList parts = presence.from().split('/');
+  QString from = parts.at(0);
+  if (presType == QXmppPresence::Available 
+      || presType == QXmppPresence::Unavailable
+      || presType == QXmppPresence::Error) {
+    QString fromName = getRoster().getRosterEntry(from).name();
+    emit UpdateState (fromName, presence.to(), presence.from(), status);
+  } else {
+    emit ChangeRequest (thisUser, presence);
+  }
 }
 
 } // namespace

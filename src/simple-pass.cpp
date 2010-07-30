@@ -45,15 +45,23 @@ SimplePass::GetPassword (QString purpose)
   }
 }
 
+bool
+SimplePass::GotPassword ()
+{
+  return gotPassword;
+}
+
 void
 SimplePass::Ok ()
 {
+  gotPassword = true;
   done (1);
 }
 
 void
 SimplePass::Cancel ()
 {
+  gotPassword = false;
   passwordEdit->clear ();
   done (0);
 }

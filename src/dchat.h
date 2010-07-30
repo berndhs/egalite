@@ -75,8 +75,6 @@ public slots:
   void Quit ();
   void GetMessage (const QXmppMessage  & msg);
   void GetRaw (const QByteArray &data);
-  void Send (const QXmppMessage & msg);
-  void XPresenceChange (const QXmppPresence & 	presence );
 
 private slots:
 
@@ -100,11 +98,17 @@ private slots:
   void ClearDirect (SymmetricSocket *direct);
   void XmppPoll ();
   void DebugCheck ();
+  void Send (const QXmppMessage & msg);
   void XmppError (QXmppClient::Error err);
   void AnnounceMe ();
   void XmppConnected ();
   void XmppDisconnected ();
   void XmppElementReceived (const QDomElement & elt, bool & handled);
+  void XChangeRequest (QString name, QXmppPresence presence);
+  void XUpdateState (QString remoteName, 
+                     QString ownId,
+                     QString remoteId,
+                     QXmppPresence::Status status);
   void XmppIqReceived (const QXmppIq & iq);
   void XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq);
   void ExpandAccountView (QModelIndex accountIndex);
