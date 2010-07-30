@@ -15,7 +15,8 @@ To build Egalite, you must first install QXmpp.
 For your convenience, the egalite project provides
 a fork of QXmpp that you can install as a shared library.
 
-After installing QXmpp, build ealite as usual:
+After installing QXmpp, build ealite as usual, assuming you
+have the Prerequisites (see below):
 
 $ cd /where/you/unpacked/egalite
 $ ./configure
@@ -29,4 +30,18 @@ Or you can do
 
 and egalite will be installed in your /usr/local/bin, or /usr/bin,
 or whatever you specified as prefix in the configure command.
+
+
+== Prerequisites ==
+
+You need:
+
+g++ (that's gcc/c++)
+Qt4.6 devel or later
+  - this includes qmake and lrelease
+QCA2-devel
+QCA-ossl  (don't need devel of this)
+
+the exact naming of these may vary depending on your system.
+
 
