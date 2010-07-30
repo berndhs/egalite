@@ -351,10 +351,14 @@ ContactListModel::HighlightStatus ()
     accountHead = item (row, 0);
     if (accountHead) {
       int narows = accountHead->rowCount();
-      for (int arow = 0; arow < narows; arow++) {
+      for (int arow = narows-1; arow >= 0; arow--) {
         contactHead = accountHead->child (arow,0);
         if (contactHead) {
-          HighlightContactStatus (contactHead);
+          if (discardOfflines && (!contactHead->hasChildren())) {
+            accountHead->removeRow (arow); 
+          } else {
+            HighlightContactStatus (contactHead);
+          }
         }
       }
     }
