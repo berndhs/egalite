@@ -31,6 +31,7 @@
 #include <QLocale>
 #include <QTextCodec>
 #include <QtCrypto>
+#include <QXmppLogger.h>
 #include <QDebug>
 #include "delib-debug.h"
 #include "cmdoptions.h"
@@ -119,10 +120,17 @@ main (int argc, char* argv[])
   bool showDebug = opts.SeenOpt ("debug");
 
   deliberate::StartDebugLog (showDebug);
-  if (opts.SeenOpt ("logdebug")) {
+  bool logDebug = opts.SeenOpt ("logdebug");
+  if (logDebug) {
     QString logfile ("/dev/null");
     opts.SetStringOpt ("logdebug",logfile);
     deliberate::StartFileLog (logfile);
+  }
+  QXmppLogger * xlogger = QXmppLogger::getLogger();
+  if (showDebug || logDebug) {
+    xlogger->setLoggingType (QXmppLogger::FileLogging);
+  } else {
+    xlogger->setLoggingType (QXmppLogger::NoLogging);
   }
 
   if (opts.SeenOpt ("lang")) {
