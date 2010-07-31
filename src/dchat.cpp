@@ -36,6 +36,8 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QModelIndex>
+#include <QXmlStreamWriter>
+#include <QDateTime>
 #include <set>
 
 #include "direct-listener.h"
@@ -312,8 +314,6 @@ DChatMain::Login ()
                                           QXmppPresence::Status)));
     connect (xclient, SIGNAL (ChangeRequest (QString, QXmppPresence::Status)),
              this, SLOT (XChangeRequest (QString, QXmppPresence::Status)));
-    connect (xclient, SIGNAL (elementReceived (const QDomElement &, bool &)),
-             this, SLOT (XmppElementReceived (const QDomElement &, bool &)));
     connect (xclient, SIGNAL (iqReceived (const QXmppIq &)),
              this, SLOT (XmppIqReceived (const QXmppIq &)));
     connect (xclient, SIGNAL (discoveryIqReceived (const QXmppDiscoveryIq &)),
@@ -778,6 +778,10 @@ DChatMain::XmppIqReceived (const QXmppIq & iq)
 {
   Q_UNUSED (iq);
   qDebug () << " received IQ ";
+  QByteArray msgbytes;
+  QXmlStreamWriter  dump (&msgbytes);
+  iq.toXml (&dump);
+  qDebug () << " uncooked IQ: " << msgbytes;
 }
 
 
@@ -798,7 +802,8 @@ DChatMain::XmppDisconnected ()
 void
 DChatMain::Poll (XEgalClient * xclient)
 {
-qDebug () << " polling " << xclient;
+qDebug () << " polling " << xclient << " at " 
+          << QDateTime::currentDateTime().toString();
   QStringList  contactJids;
   if (xclient == 0) {
     return;
