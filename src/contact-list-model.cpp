@@ -104,6 +104,7 @@ ContactListModel::SetStatus (const QString & ownId,
   QStandardItem * stateItem;
   QStandardItem * chase;
   bool resourceFound;
+  bool foundOne (false);
   if (contactHead->hasChildren()) {
     int row;
     int nrows = contactHead->rowCount ();
@@ -131,11 +132,11 @@ ContactListModel::SetStatus (const QString & ownId,
         stateItem->setText (stext);
         stateItem->setIcon (StatusIcon (stype));
         stateItem->setData (IsOnline (stype),statusData);
-        return true;
+        foundOne = true;
       }
     }
   }
-  return false;
+  return foundOne;
 }
 
 void
