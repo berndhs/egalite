@@ -47,7 +47,7 @@ XEgalClient::Disconnect ()
   if (isConnected()) {
     Announce (QXmppPresence::Unavailable, 
               QXmppPresence::Status::Offline,
-              tr("Logged Off"));
+              tr("Logging Off"));
     disconnect ();
   }
 }
@@ -73,6 +73,10 @@ XEgalClient::PresenceChange (const QXmppPresence & presence)
       || presType == QXmppPresence::Unavailable
       || presType == QXmppPresence::Error) {
     QString fromName = getRoster().getRosterEntry(from).name();
+    if (presType == QXmppPresence::Unavailable
+      || presType == QXmppPresence::Error) {
+      status = QXmppPresence::Status::Offline;
+    }
     emit UpdateState (fromName, presence.to(), presence.from(), status);
   } else {
     emit ChangeRequest (thisUser, presence);
