@@ -30,16 +30,16 @@ unix {
   message ("Applying Unix settings")
   INCLUDEPATH += /usr/include/qxmpp
   DEFINES += DELIBERATE_DEBUG=1
-  LIBS += -lQXmppClient
+  LIBS += -lqxmppclient
   INCLUDEPATH += /usr/include/QtCrypto
   LIBS += -lqca
 #
 # use the code below if QXmpp is installed in /usr/local
 #  INCLUDEPATH += /usr/local/include/qxmpp
 #  exists ("/usr/local/lib64") {
-#    LIBS += -L/usr/local/lib64 -lQXmppClient
+#    LIBS += -L/usr/local/lib64 -lqxmppclient
 #  } else { 
-#    LIBS += -L/usr/local/lib -lQXmppClient
+#    LIBS += -L/usr/local/lib -lQqxmppclient
 #  }
 #
 }
