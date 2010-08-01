@@ -54,7 +54,10 @@ static QRegExp HttpExp ();
 static QString Anchorize (const QString &text, QRegExp regular, 
                          void (*anchorFunc)(QString&, QString));
 
-static void HttpAnchor (QString & anchor, QString  ref);
+/** insert a string (ref) into an html anchor pattern */
+static void HttpAnchor (QString & anchor /** the result */ ,
+                        QString  ref     /** the text to decorate */
+                       );
 #if 0
 static void TwitAtAnchor (QString & anchor , QString  ref);
 static void TwitHashAnchor (QString & anchor, QString ref);

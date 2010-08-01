@@ -72,8 +72,8 @@ public:
 
 public slots:
 
-  void Incoming (const QByteArray &data);
-  void Incoming (const QXmppMessage &msg);
+  void Incoming (const QByteArray &data, bool isLocal=false);
+  void Incoming (const QXmppMessage &msg, bool isLocal=false);
   void HandleAnchor (const QUrl & url);
 
 private slots:
@@ -98,6 +98,10 @@ private:
   Mode             chatMode;
   QString          dateMask;
   QString          chatLine;
+  QString          localLine;
+  QString          remoteLine;
+  QString          localHtmlColor;
+  QString          remoteHtmlColor;
 };
 
 } // namespace

@@ -39,7 +39,10 @@ ChatContent::ChatContent (QWidget *parent)
   :QDialog (parent),
    chatMode (ChatModeRaw),
    dateMask ("yy-MM-dd hh:mm:ss"),
-   chatLine (tr("(%1) <b style=\"font-size:small; color:blue;\">%2</b>: %3")) 
+   chatLine (tr("(%1) <b style=\"font-size:small; "
+                 "color:@color@;\">%2</b>: %3")),
+   localHtmlColor ("blue"),
+   remoteHtmlColor ("red")
 {
   ui.setupUi (this);
 
@@ -82,6 +85,20 @@ ChatContent::Start ()
   chatLine = deliberate::Settings().value ("style/chatline",chatLine)
                                    .toString ();
   deliberate::Settings().setValue ("style/chatline",chatLine);
+  localHtmlColor = deliberate::Settings().value ("style/localColor",
+                                    localHtmlColor)
+                                   .toString ();
+  deliberate::Settings().setValue ("style/localColor",localHtmlColor);
+  remoteHtmlColor = deliberate::Settings().value ("style/remoteColor",
+                                    remoteHtmlColor)
+                                   .toString ();
+  deliberate::Settings().setValue ("style/remoteColor",remoteHtmlColor);
+  localLine = chatLine;
+  localLine.replace (QString("@color@"),localHtmlColor);
+  remoteLine = chatLine;
+  remoteLine.replace (QString("@color@"),remoteHtmlColor);
+qDebug () << " local line " << localLine;
+qDebug () << " remote line " << remoteLine;
 }
 
 void
@@ -110,17 +127,17 @@ ChatContent::SaveContent ()
 }
 
 void
-ChatContent::Incoming (const QByteArray & data)
+ChatContent::Incoming (const QByteArray & data, bool isLocal)
 {
   QDomDocument msgDoc;
   msgDoc.setContent (data);
   QXmppMessage msg;
   msg.parse (msgDoc.documentElement());
-  Incoming (msg);
+  Incoming (msg, isLocal);
 }
 
 void
-ChatContent::Incoming (const QXmppMessage & msg)
+ChatContent::Incoming (const QXmppMessage & msg, bool isLocal)
 {
   QString from = msg.from ();
   QString to   = msg.to ();
@@ -129,9 +146,10 @@ ChatContent::Incoming (const QXmppMessage & msg)
     return;
   }
   QDateTime  now = QDateTime::currentDateTime();
-  QString msgtext = chatLine.arg (now.toString (dateMask))
-                           .arg(from)
-                           .arg(body)
+  QString msgtext = (isLocal ? localLine : remoteLine)
+                           .arg (now.toString (dateMask))
+                           .arg (from)
+                           .arg (body)
                             ;
   QString cookedText = LinkMangle::Anchorize (msgtext,
                                    LinkMangle::HttpExp (),
@@ -158,7 +176,7 @@ ChatContent::Send ()
     emit Outgoing (msg);
   }
   /// be optimistic and report what we just sent as being echoed back
-  Incoming (msg);
+  Incoming (msg, true);
 }
 
 void
