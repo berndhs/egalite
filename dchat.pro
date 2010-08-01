@@ -30,7 +30,7 @@ unix {
   message ("Applying Unix settings")
   INCLUDEPATH += /usr/include/qxmpp
   DEFINES += DELIBERATE_DEBUG=1
-  LIBS += -lQXmppClient1
+  LIBS += -lQXmppClient
   INCLUDEPATH += /usr/include/QtCrypto
   LIBS += -lqca
 #
