@@ -21,6 +21,7 @@
  ****************************************************************/
 #include "contact-list-model.h"
 #include "deliberate.h"
+#include <QTreeView>
 #include <QDebug>
 
 using namespace deliberate;
@@ -33,11 +34,12 @@ int ContactListModel::statusData ( Qt::UserRole + 2);
 
 ContactListModel::ContactListModel (QObject *parent)
   :QStandardItemModel (parent),
+   view (0),
    nameTag ("remoteName"),
    resTag ("resource"),
    stateTag ("state"),
    nickTag ("nick"),
-   discardOfflines (true),
+   discardOfflines (false),
    presentColor (Qt::blue),
    absentColor (Qt::black),
    cleanTimer (this)
@@ -45,8 +47,9 @@ ContactListModel::ContactListModel (QObject *parent)
 }
 
 void
-ContactListModel::Setup ()
+ContactListModel::Setup (QTreeView *pView)
 {
+  view = pView;
   iconSize = QString ("22x22");
   iconSize = Settings ().value ("style/iconSize",iconSize).toString();
   Settings().setValue ("style/iconSize",iconSize);
@@ -57,9 +60,9 @@ ContactListModel::Setup ()
   iconPath.append ('/');
   iconPath.append (iconSize);
   iconPath.append ("/status/");
-  discardOfflines = Settings().value ("network/hideOffline",discardOfflines)
+  hideOfflines = Settings().value ("network/hideOffline",hideOfflines)
                               .toBool ();
-  Settings().setValue ("network/hideOffline",discardOfflines);
+  Settings().setValue ("network/hideOffline",hideOfflines);
   QVariant color = Settings().value ("style/presentColor",presentColor);
   if (color.canConvert<QColor> ()) {
     presentColor = color.value<QColor>();                       
@@ -381,6 +384,13 @@ ContactListModel::HighlightContactStatus (QStandardItem *item)
           isOnline |= chase->data(statusData).toBool ();
         }
       }
+    }
+    bool hidden = hideOfflines && !isOnline;
+    int contactRow = item->row();
+    QStandardItem * parentItem = item->parent();
+    QModelIndex parentIndex = indexFromItem (parentItem);
+    if (view) {
+      view->setRowHidden (contactRow, parentIndex, hidden);
     }
     if (isOnline) {
       item->setForeground (QBrush (presentColor));

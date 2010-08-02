@@ -27,6 +27,8 @@
 #include <QTimer>
 #include <QXmppPresence.h>
 
+class QTreeView;
+
 namespace egalite
 {
 
@@ -38,7 +40,7 @@ public:
 
   ContactListModel (QObject * parent=0);
 
-  void Setup ();
+  void Setup (QTreeView * pView);
   /** when logging in call AddAccount */
   void AddAccount (const QString & id);  
   void RemoveAccount (const QString & id);
@@ -60,6 +62,10 @@ public:
                   const QString & statusText,
                   bool  allResources=false);
 
+  bool DiscardOfflines ()            { return discardOfflines; }
+  void setDiscardOfflines (bool dis) { discardOfflines = dis; }
+  bool HideOfflines ()               { return hideOfflines; }
+  void setHideOfflines (bool hide)   { hideOfflines = hide; }
   
 public slots:
 
@@ -91,6 +97,8 @@ private:
                       const QString & resource,
                       bool  allResources=false);
 
+  QTreeView    *view;
+
   QString      iconPath;
   QString      iconSize;
 
@@ -106,6 +114,7 @@ private:
 
   static int   tagData;
   static int   statusData;
+  bool         hideOfflines;
 
 };
 

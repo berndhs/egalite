@@ -100,7 +100,7 @@ DChatMain::Run ()
   }
   CertStore::IF().Init (this);
   SetSettings ();
-  contactListModel.Setup ();
+  contactListModel.Setup (ui.contactView);
   QStringList contactHeaders;
   contactHeaders << tr("Login")
                  << tr("Name");
@@ -282,7 +282,8 @@ DChatMain::EditSettings ()
 {
   configEdit.Exec ();
   SetSettings ();
-  contactListModel.Setup ();
+  contactListModel.Setup (ui.contactView);
+  QTimer::singleShot (500, this, SLOT (XmppPoll ()));
 }
 
 void
@@ -318,7 +319,7 @@ DChatMain::Login ()
              this, SLOT (XmppIqReceived (const QXmppIq &)));
     connect (xclient, SIGNAL (discoveryIqReceived (const QXmppDiscoveryIq &)),
              this, SLOT (XmppDiscoveryIqReceived (const QXmppDiscoveryIq &)));
-    Poll (xclient);
+    QTimer::singleShot (2500, this, SLOT (XmppPoll ()));
   }
 }
 
@@ -713,6 +714,7 @@ DChatMain::XmppPoll ()
   for (mapit = xclientMap.begin (); mapit != xclientMap.end (); mapit++) {
     Poll (mapit->second);
   }
+  contactListModel.HighlightStatus ();
 }
 
 
