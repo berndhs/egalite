@@ -134,8 +134,10 @@ SymmetricSocket::connectToHostEncrypted ( const QString & hostName,
                                 QSslSocket::OpenMode mode)
 {
 qDebug () << " connect encrypted with " << sock;
+qDebug () << " hostName " << hostName << " and peerName " << sslPeerName;
   if (sock) {
-    sock->connectToHostEncrypted (hostName, port, sslPeerName, mode);
+    //sock->connectToHostEncrypted (hostName, port, sslPeerName, mode);
+    sock->connectToHostEncrypted (hostName, port,  mode);
   }
 }
 
