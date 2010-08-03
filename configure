@@ -159,7 +159,6 @@ case $ac_option in
   *)
    echo "Bad option " $ac_option " " $ac_optarg
    usage
-   exit 1
    shift
    ;;
   esac
