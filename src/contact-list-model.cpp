@@ -74,7 +74,7 @@ ContactListModel::Setup (QTreeView *pView)
   }
   Settings().setValue ("style/absentColor",absentColor);
   cleanTimer.stop ();
-  connect (&cleanTimer, SIGNAL (timeout()), this, SLOT (HighlightStatus()));
+  connect (&cleanTimer, SIGNAL (timeout()), this, SLOT (CleanModel()));
   cleanTimer.start (10000);
 }
 
@@ -185,7 +185,6 @@ ContactListModel::RemoveContact (const QString & ownId,
     }
   }
 }
-
 
 QString
 ContactListModel::StatusName (QXmppPresence::Status::Type stype)
@@ -344,6 +343,58 @@ ContactListModel::AddContact (const QString & id,
   stateItem->setIcon (StatusIcon (stype));
   stateItem->setData (IsOnline (stype), statusData);
 }
+
+void
+ContactListModel::CleanModel ()
+{
+  PruneOffline ();
+  HighlightStatus ();
+}
+
+void
+ContactListModel::PruneOffline ()
+{
+  QStandardItem * accountHead, *contactHead;
+  int nrows = rowCount ();
+  for (int row = 0; row < nrows; row++) {
+    accountHead = item (row, 0);
+    if (accountHead) {
+      int narows = accountHead->rowCount();
+      for (int arow = narows-1; arow >= 0; arow--) {
+        contactHead = accountHead->child (arow,0);
+        PruneOffline (contactHead);
+      }
+    }
+  }
+}
+
+void
+ContactListModel::PruneOffline (QStandardItem * contactGroup)
+{
+  if (!contactGroup) { // not here, can't remove
+    return;
+  }
+  QStandardItem  *chase;
+  bool  isOnline;
+  int nrows = contactGroup->rowCount ();
+  for (int row = row < nrows -1; row>=0; row--) {
+    isOnline = false;
+    for (int col = 0; col < contactGroup->columnCount (); col++) {
+      chase = contactGroup->child (row, col);
+      if (!chase) {
+        continue;
+      }
+      QString tag = chase->data(tagData).toString();
+      if (tag == stateTag) {
+        isOnline |= chase->data(statusData).toBool ();
+      }
+    }
+    if (!isOnline) {   
+      contactGroup->removeRow (row);
+    }
+  }
+}
+
 
 
 void

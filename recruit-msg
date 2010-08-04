@@ -1,0 +1,17 @@
+I have a nice little open source project that could use a few more good people. Not too many, just two to five.
+
+It is a chat program that uses IPv6 to establish direct channels between people, so that their conversations are not store in servers. Other nice things can also result from direct connections, that will be explored.
+
+The program also does standard XMPP chat using normal servers, like Jabber or Google talk. 
+
+This is *not* intended for the file sharing crowd, and it is not intended to establish anonymous chat servers. It is instead intended for people who sometimes want to chat with privacy that servers don't provide, and for people who want to connect without their partner being signed up to the same service.
+
+The project is hosted at http://sourceforge.net/projects/egalite where you can take a quick look.
+
+The project could use some developers for Linux, C++ and Qt stuff. Windows could be helpful too. This is for desktops and mobiles, MeeGo is the first mobile choice.
+
+Also valuable could be some testers who are comfortable running and installing pre-beta software.
+
+The current state of the project is pretty good. The basic functions are all working, connectsions can be connected, chat messages are passed and all that. More features will be added, and more user friendly administration is being added as well. Keeping lists of contacts (sort of like a phone book), all the normal preferences and all that.
+
+You can contact me directly or on the sourceforge.net site.
