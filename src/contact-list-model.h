@@ -70,6 +70,7 @@ public:
 public slots:
 
   void PickedItem (const QModelIndex & index );
+  void CleanModel ();
   void HighlightStatus ();
 
 private slots:
@@ -89,6 +90,9 @@ private:
   QStandardItem * FindContactGroup (QStandardItem * accountHead,
                                     QString         contactJid,
                                     bool            makeit=true);
+  void  PruneOffline ();
+  void  PruneOffline (QStandardItem * contactGroup);
+
   QString StatusName (QXmppPresence::Status::Type stype);
   QIcon   StatusIcon (QXmppPresence::Status::Type stype);
   bool    IsOnline   (QXmppPresence::Status::Type stype);
