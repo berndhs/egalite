@@ -44,7 +44,7 @@ install: all FORCE
 	install -m 0755 -p $(TARGETS) $(DESTDIR)
 
 install_deb: install
-	install -d $(DESTOP_DIR)
+	install -d $(DESKTOP_DIR)
 	install -m 0644 -p $(DESKTOP_FILE) $(DESKTOP_DIR)
 	install -d $(ICON_DIR)
 	install -m 0644 -p $(ICON_FILE) $(ICON_DIR)
