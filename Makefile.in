@@ -17,6 +17,10 @@ PRO_FILE = dchat.pro
 MAKEFILE = MakeDChat
 TOP_MAKEFILE = Makefile
 TARGETS = bin/egalite
+DESKTOP_FILE = egalite.desktop
+DESKTOP_DIR = /usr/share/applications
+ICON_FILE = egalite.png
+ICON_DIR = /usr/share/pixmaps
 
 all: $(MAKEFILE) translations
 	$(MAKE) -f $(MAKEFILE) all
@@ -38,6 +42,13 @@ release: $(MAKEFILE) FORCE
 install: all FORCE
 	install -d $(DESTDIR)
 	install -m 0755 -p $(TARGETS) $(DESTDIR)
+
+install_deb: install
+	install -d $(DESTOP_DIR)
+	install -m 0644 -p $(DESKTOP_FILE) $(DESKTOP_DIR)
+	install -d $(ICON_DIR)
+	install -m 0644 -p $(ICON_FILE) $(ICON_DIR)
+	
 
 qmake: 
 	$(QMAKE) $(PRO_FILE) -o $(MAKEFILE)
