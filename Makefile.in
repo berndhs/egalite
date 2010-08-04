@@ -36,6 +36,7 @@ release: $(MAKEFILE) FORCE
 	$(MAKE) -f $(MAKEFILE) release
 
 install: all FORCE
+	install -d $(DESTDIR)
 	install -m 0755 -p $(TARGETS) $(DESTDIR)
 
 qmake: 
