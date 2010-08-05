@@ -1,15 +1,17 @@
 #!/bin/bash
 
 NAME=egalite
-VERSION=0.1.0
-PACKAGEDIR=${HOME}/packaging/dchat
+VERSION=0.1.1
+PACKDIR=${HOME}/packaging/dchat
 
 makearchive.sh ${NAME}-${VERSION} master
-cp ${NAME}-${VERSION}.tar.gz ${PACKAGEDIR}
-ls -l ${PACKAGEDIR}/${NAME}-${VERSION}.tar.gz
+cp ${NAME}-${VERSION}.tar.gz ${PACKDIR}
+echo ${NAME} > ${PACKDIR}/pack-name
+echo ${VERSION} > ${PACKDIR}/pack-version
+ls -l ${PACKDIR}/${NAME}-${VERSION}.tar.gz
 
 if [ x$1 == "xmake" ]
 then
-  cd ${PACKAGEDIR}
+  cd ${PACKDIR}
   make
 fi

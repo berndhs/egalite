@@ -34,6 +34,7 @@
 #include <QSslCipher>
 #include <QSsl>
 #include <QFile>
+#include "delib-debug.h"
 
 
 namespace egalite
@@ -107,7 +108,6 @@ qDebug () << " try to connect with " << addrString;
   clientSock->connectToHostEncrypted (addrString, publicPort,
                                       name,
                                       QSslSocket::ReadWrite);
-
 }
 
 void

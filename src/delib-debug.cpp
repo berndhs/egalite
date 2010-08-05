@@ -5,6 +5,8 @@
 #include <QPoint>
 #include <QFile>
 #include <QFileDialog>
+#include <QTimer>
+#include <QMessageBox>
 
 //
 //  Copyright (C) 2010 - Bernd H Stramm
@@ -186,6 +188,7 @@ DebugLog::quit ()
 void
 DebugLog::closeEvent (QCloseEvent *event)
 {
+  Q_UNUSED (event)
   Close ();
 }
 
@@ -244,5 +247,33 @@ DebugLog::LogToFile (QString filename)
   cout << " log to file " << filename.toStdString() << endl;
   cout << " log file open is " << isopen << endl;
 }
+
+int
+Hang (int msec, const QString & message)
+{
+  QMessageBox  box;
+  box.setText (message);
+  box.setStandardButtons (QMessageBox::Ok 
+                        | QMessageBox::Cancel
+                        | QMessageBox::Abort);
+  if (msec > 0) {
+    QTimer::singleShot (msec, &box, SLOT (reject()));
+  }
+  int response = box.exec ();
+qDebug () << " Hang box result " << response;
+  switch (response) {
+  case QMessageBox::Ok:
+    return 1;
+  case QMessageBox::Cancel:
+    return 0;
+  case QMessageBox::Abort:
+    abort ();
+    break;
+  default:
+    break;
+  }
+  return 0;
+}
+
 
 } // namespace

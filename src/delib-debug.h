@@ -70,6 +70,10 @@ bool DebugLogRecording ();
 
 void MyOwnMessageOutput (QtMsgType type, const char* msg);
 
+int Hang (int msec = -1, const QString & message = QString("Hanging"));
+
+/** \brief DebugLog - Facilities for displaying and storing a log */
+
 class DebugLog : public QDialog, public Ui_LogDialog
 {
   Q_OBJECT

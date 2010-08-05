@@ -27,6 +27,7 @@
 #include <QHostInfo>
 #include <QMessageBox>
 #include <QTimer>
+#include "delib-debug.h"
 
 namespace egalite
 {
