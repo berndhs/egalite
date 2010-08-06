@@ -149,6 +149,7 @@ main (int argc, char* argv[])
   egalite::DChatMain  chatmain;
 
   chatmain.Init (&app);
+  app.setWindowIcon (chatmain.windowIcon());
 
   chatmain.Run ();
   return app.exec ();

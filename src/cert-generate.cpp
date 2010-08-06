@@ -5,6 +5,7 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QDebug>
 
 
@@ -82,6 +83,12 @@ CertGenerate::FillMap (std::map <QString, QString> & data,
 void
 CertGenerate::Dialog ()
 {
+  if ( ! QCA::isSupported ("cert")) {
+    QMessageBox nosupport;
+    nosupport.setText (tr("Your System does not support generating certificates"));
+    nosupport.exec ();
+    return;
+  }
   ui.certEdit->hide();
   ui.exportButton->hide();
   ui.usenowButton->hide();
