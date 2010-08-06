@@ -35,6 +35,8 @@
 #include <QDateTime>
 #include <QApplication>
 #include <QClipboard>
+#include <QMessageBox>
+#include <QTimer>
 #include <QDebug>
 
 using namespace deliberate;
@@ -585,6 +587,7 @@ CertStore::WriteContacts (const QString filename)
   QString  qryString ("insert or replace into directcontacts "
                        " (nick, address, port) "
                        " values (?, ?, ?)");
+  bool allOk (true);
   for (addrit = contactHostMap.begin(); 
        addrit != contactHostMap.end(); 
        addrit++ ) {
@@ -596,8 +599,16 @@ CertStore::WriteContacts (const QString filename)
     qry.bindValue (0,QVariant (nick));
     qry.bindValue (1,QVariant (addr));
     qry.bindValue (2,QVariant (port));
-    qry.exec ();
+    allOk &= qry.exec ();
   }
+  QMessageBox  okbox;
+  if (allOk) {
+    okbox.setText (tr("All Contacts Upadated in Database"));
+  } else {
+    okbox.setText (tr("Warning: Problem Saving Contacts !"));
+  }
+  QTimer::singleShot (15000, &okbox, SLOT (accept()));
+  okbox.exec ();
 }
 
 void
