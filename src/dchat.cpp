@@ -484,14 +484,30 @@ DChatMain::CallDirect ()
   CertRecord outCert = CertStore::IF().Cert (originNick);
   
   choiceList = CertStore::IF().ContactList ();
+  QString newDest = tr (" --- New Destination --- ");
+  choiceList << newDest;
   pickString.SetTitle (tr("Choose Destination"));
   choice = pickString.Pick (choiceList);
   if (choice != 1) {
     return;
   }
   QString dest = pickString.Choice ();
-  QString destaddr = CertStore::IF().ContactAddress (dest);
-  int destPort = CertStore::IF().ContactPort (dest);
+  QString destaddr;
+  int     destPort (0);
+  bool    wantConnect (false);
+  if (dest == newDest) {
+    SimplePass  getDest (this);
+    destaddr = getDest.GetPlainString (tr("Direct Connect Destination"),
+                                   tr("Enter Destination Address or URL"));
+    wantConnect = getDest.GotPlainString ();
+  } else {
+    destaddr = CertStore::IF().ContactAddress (dest);
+    destPort = CertStore::IF().ContactPort (dest);
+    wantConnect = true;
+  }
+  if (!wantConnect) {
+    return;
+  }
   if (destPort == 0) {
     destPort = defaultPort;
   }

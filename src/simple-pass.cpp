@@ -36,7 +36,22 @@ QString
 SimplePass::GetPassword (QString purpose)
 {
   purposeLabel->setText (purpose);
+  passwordEdit->setEchoMode (QLineEdit::Password);
   passwordEdit->clear ();
+  int yes = exec ();
+  if (yes == 1) {
+    return passwordEdit->text();
+  } else {
+    return QString ();
+  }
+}
+
+QString
+SimplePass::GetPlainString (QString title, QString purpose)
+{
+  setWindowTitle (title);
+  purposeLabel->setText (purpose);
+  passwordEdit->setEchoMode (QLineEdit::Normal);
   int yes = exec ();
   if (yes == 1) {
     return passwordEdit->text();
@@ -51,10 +66,18 @@ SimplePass::GotPassword ()
   return gotPassword;
 }
 
+bool
+SimplePass::GotPlainString ()
+{
+  return gotPlain;
+}
+
 void
 SimplePass::Ok ()
 {
-  gotPassword = true;
+  QLineEdit::EchoMode mode = passwordEdit->echoMode ();
+  gotPassword = (mode == QLineEdit::Password);
+  gotPlain =    (mode == QLineEdit::Normal);
   done (1);
 }
 
@@ -62,6 +85,7 @@ void
 SimplePass::Cancel ()
 {
   gotPassword = false;
+  gotPlain = false;
   passwordEdit->clear ();
   done (0);
 }

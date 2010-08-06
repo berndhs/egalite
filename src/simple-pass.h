@@ -27,6 +27,9 @@
 namespace egalite
 {
 
+
+/** \brief Get a password or a plain string from the user */
+
 class SimplePass : public QDialog, public Ui_SimplePass
 {
 Q_OBJECT
@@ -36,7 +39,9 @@ public:
   SimplePass (QWidget * parent=0);
 
   QString GetPassword (QString purpose);
+  QString GetPlainString (QString title, QString purpose);
   bool    GotPassword ();
+  bool    GotPlainString ();
 
 public slots:
 
@@ -46,6 +51,7 @@ public slots:
 private:
 
   bool gotPassword;
+  bool gotPlain;
 
 };
 
