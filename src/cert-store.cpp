@@ -603,7 +603,7 @@ CertStore::WriteContacts (const QString filename)
   }
   QMessageBox  okbox;
   if (allOk) {
-    okbox.setText (tr("All Contacts Upadated in Database"));
+    okbox.setText (tr("All Contacts Updated in Database"));
   } else {
     okbox.setText (tr("Warning: Problem Saving Contacts !"));
   }

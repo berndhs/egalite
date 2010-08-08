@@ -17,6 +17,8 @@ CertGenerate::CertGenerate (QWidget *parent)
    showCooked (false)  
 {
   ui.setupUi (this);
+  QStringList headers;
+  headers << tr("Data Field") << tr ("Content");
   tagCN = tr("1.Common Name");
   tagEmail = tr("2.e-mail");
   tagCountry = tr("3.Country");
@@ -34,6 +36,7 @@ CertGenerate::CertGenerate (QWidget *parent)
   stringDataMap[tagUnit]       = QString ("");
   stringDataMap[tagDays]       = QString ("365");
   stringDataModel = new QStandardItemModel (this);
+  stringDataModel->setHorizontalHeaderLabels (headers);
   FillModel (stringDataModel, stringDataMap);
   ui.dataTable->setModel (stringDataModel);
   connect (ui.generateButton, SIGNAL (clicked()), this, SLOT (Generate ()));
@@ -112,7 +115,7 @@ CertGenerate::Generate ()
   FillMap (stringDataMap, stringDataModel);
 
   ui.certEdit->clear ();
-  ui.certEdit->appendPlainText (QString("generating RSA private key"));
+  ui.certEdit->appendPlainText (tr("generating RSA private key"));
   update ();
   genTimer = new QTimer (this);
   connect (genTimer, SIGNAL (timeout()), this, SLOT (GenTimeout()));
@@ -222,7 +225,7 @@ CertGenerate::ShowCertDetails ()
               .arg(cert.effectiveDate().toString ())
         << tr("Valid to: %1")
               .arg(cert.expiryDate().toString ())
-        << tr("Currently valid: %1").arg ((cert.isValid() ? "Yes" : "No"))
+        << tr("Currently valid: %1").arg ((cert.isValid() ? tr("Yes") : tr("No")))
         << QString("------------")
         << tr("Issuer Organization: %1")
               .arg(cert.issuerInfo(QSslCertificate::Organization))
