@@ -37,12 +37,8 @@ Egalite requires that the end points of a direct chat present SSL certificates.
 These certificates can be read from files, or pasted. In either case, they must
 be in PEM format.
 
-You can make your own SSL certificates with many available tools. 
-Some examples are
-
-* Openssl (http://openssl.org)
-* TinyCA or tinyca2 (http://tinyca.sm-zone.net)
-* qcatool2 (http://delta.affinix.com/qca)
+Egalite allows you to create self-signed certificates for the purpose 
+of direct chat.
 
 === Direct Addresses ===
 
