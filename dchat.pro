@@ -17,6 +17,7 @@ TEMPLATE = app
 MAKEFILE = MakeDChat
 TARGET = bin/egalite
 CONFIG += debug
+CONFIG += crypto
 TRANS_DIR = translate
 TRANSLATIONS += $$TRANS_DIR/egalite_fr.ts $$TRANS_DIR/egalite_de.ts
 message ("translations in $$TRANS_DIR/")
@@ -28,11 +29,21 @@ QT += core gui network xml xmlpatterns sql webkit
 
 unix {
   message ("Applying Unix settings")
-  INCLUDEPATH += /usr/include/qxmpp
+  !include ( options.pri ) {
+    INCLUDEPATH += /usr/include/qxmpp
+    LIBS += -lqxmppclient
+    message ("Now options.pri, using default $$INCLUDEPATH")
+  } else {
+    INCLUDEPATH += $$QXMPPBASE/include/qxmpp
+    exists ("$$QXMPPBASE/lib64") {
+      LIBS += -L$QXMPPBASE/lib64 -lqxmppclient
+    } else { 
+      LIBS += -L$QXMPPBASE/lib -lQqxmppclient
+    }
+  }
   DEFINES += DELIBERATE_DEBUG=1
-  LIBS += -lqxmppclient
-  INCLUDEPATH += /usr/include/QtCrypto
-  LIBS += -lqca
+#  INCLUDEPATH += /usr/include/QtCrypto
+#  LIBS += -lqca
 #
 # use the code below if QXmpp is installed in /usr/local
 #  INCLUDEPATH += /usr/local/include/qxmpp
