@@ -1101,7 +1101,7 @@
 <context>
     <name>egalite::DChatMain</name>
     <message>
-        <location filename="../src/dchat.cpp" line="609"/>
+        <location filename="../src/dchat.cpp" line="610"/>
         <source>Status</source>
         <translation type="unfinished">Condition</translation>
     </message>
@@ -1116,108 +1116,108 @@
         <translation type="unfinished">nom de connexion</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="145"/>
+        <location filename="../src/dchat.cpp" line="146"/>
         <source>Listener Password for </source>
         <translation type="unfinished">mot de passe d&apos;écouteur </translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="183"/>
+        <location filename="../src/dchat.cpp" line="184"/>
         <source>Pick Identity for Listener</source>
         <translation type="unfinished">Choisissez l&apos;identité de l&apos;écouteur</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="199"/>
+        <location filename="../src/dchat.cpp" line="200"/>
         <source>Pick Listener to Drop</source>
         <translation type="unfinished">Choisir l&apos;écouteur supprimer</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="478"/>
+        <location filename="../src/dchat.cpp" line="479"/>
         <source>Choose Direct Identity</source>
         <translation type="unfinished">Choisissez l&apos;identité direct</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="487"/>
+        <location filename="../src/dchat.cpp" line="488"/>
         <source> --- New Destination --- </source>
         <translation type="unfinished">--- Nouvelle Destination ---</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="489"/>
+        <location filename="../src/dchat.cpp" line="490"/>
         <source>Choose Destination</source>
         <translation type="unfinished">Choisissez une destination</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="500"/>
+        <location filename="../src/dchat.cpp" line="501"/>
         <source>Direct Connect Destination</source>
         <translation type="unfinished">Destination de la connexion directe</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="501"/>
+        <location filename="../src/dchat.cpp" line="502"/>
         <source>Enter Destination Address or URL</source>
         <translation type="unfinished">Entrez l&apos;adresse de destination ou l&apos;URL</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="537"/>
+        <location filename="../src/dchat.cpp" line="538"/>
         <source>Choose Account to Log Out</source>
         <translation type="unfinished">Choisissez le compte à déconnecter</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="562"/>
+        <location filename="../src/dchat.cpp" line="563"/>
         <source>Request Subscription from Account</source>
         <translation type="unfinished">Demander un abonnement à partir du compte</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="608"/>
+        <location filename="../src/dchat.cpp" line="609"/>
         <source>direct </source>
         <translation type="unfinished">direct</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="614"/>
-        <location filename="../src/dchat.cpp" line="640"/>
+        <location filename="../src/dchat.cpp" line="615"/>
+        <location filename="../src/dchat.cpp" line="641"/>
         <source>Chat</source>
         <translation type="unfinished">conversation</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="635"/>
+        <location filename="../src/dchat.cpp" line="636"/>
         <source>Xmpp </source>
         <translation type="unfinished">Xmpp</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="704"/>
+        <location filename="../src/dchat.cpp" line="705"/>
         <source>pres-error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="706"/>
+        <location filename="../src/dchat.cpp" line="707"/>
         <source>Available</source>
         <translation type="unfinished">Disponible</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="708"/>
+        <location filename="../src/dchat.cpp" line="709"/>
         <source>Not Available</source>
         <translation type="unfinished">Non disponible</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="710"/>
+        <location filename="../src/dchat.cpp" line="711"/>
         <source>Want to Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="712"/>
+        <location filename="../src/dchat.cpp" line="713"/>
         <source>Done Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="714"/>
+        <location filename="../src/dchat.cpp" line="715"/>
         <source>Want to Un-Subscribe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="716"/>
+        <location filename="../src/dchat.cpp" line="717"/>
         <source>Done Un-Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="718"/>
+        <location filename="../src/dchat.cpp" line="719"/>
         <source>Probe</source>
         <translation type="unfinished"></translation>
     </message>
