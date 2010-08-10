@@ -114,8 +114,9 @@ usage () {
    echo "$0 [OPTIONS]"
    echo
    echo "Options:"
-   echo "--help            Show this help message and quit"
-   echo "--prefix=PREFIX   Install into PREFIX [${PREFIX}]"
+   echo "--help             Show this help message and quit"
+   echo "--prefix=PREFIX    Install into PREFIX [${PREFIX}]"
+   echo "--qxmppbase=QXDIR  qxmpp base directory [${QXMPP_BASE}]"
    echo
 }
 
@@ -126,6 +127,7 @@ usage () {
 
 COPYRIGHT=" Copyright (C) 2010 Bernd Stramm"
 PREFIX=/usr
+QXMPP_BASE=/usr
 OPTIONS_FILE=options.pri
 
 # 
@@ -154,6 +156,10 @@ case $ac_option in
    ;;
   --prefix)
    PREFIX=$ac_optarg
+   $ac_shift
+   ;;
+  --qxmppbase)
+   QXMPP_BASE=$ac_optarg
    $ac_shift
    ;;
   *)
@@ -198,6 +204,7 @@ echo "DESTDIR=\${PREFIX}/bin" >> Makefile
 echo "QMAKE = $QMAKE" >> Makefile
 echo "MAKE = ${MAKE_PROGRAM}" >> Makefile
 echo "LRELEASE = ${LRELEASE}" >> Makefile
+echo "QXMPP_BASE = ${QXMPP_BASE}" > ${OPTIONS_FILE}
 #
 # next concatenate the Makefile.in content
 #
@@ -209,5 +216,6 @@ cat Makefile.in >> Makefile
 echo ""
 echo "qmake is                  " $QMAKE
 echo "Installation prefix is    " $PREFIX
+echo "Qxmpp base dir is         " $QXMPP_BASE
 echo "Now you can build with    " $MAKE_PROGRAM
 

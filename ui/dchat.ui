@@ -75,7 +75,6 @@
     <addaction name="actionLog_Out"/>
     <addaction name="actionAdd_Listener"/>
     <addaction name="actionDrop_Listener"/>
-    <addaction name="actionActive_Listener"/>
     <addaction name="actionSettings"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -84,7 +83,6 @@
      <string>Identities</string>
     </property>
     <addaction name="actionDirect"/>
-    <addaction name="actionServer"/>
     <addaction name="actionCreate"/>
    </widget>
    <widget class="QMenu" name="menuContacts">
@@ -92,7 +90,6 @@
      <string>Contacts</string>
     </property>
     <addaction name="contactDirectAction"/>
-    <addaction name="contactServerAction"/>
     <addaction name="actionRequest"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -133,19 +130,9 @@
     <string>Direct</string>
    </property>
   </action>
-  <action name="actionServer">
-   <property name="text">
-    <string>Server</string>
-   </property>
-  </action>
   <action name="contactDirectAction">
    <property name="text">
     <string>Direct</string>
-   </property>
-  </action>
-  <action name="contactServerAction">
-   <property name="text">
-    <string>Server</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -186,11 +173,6 @@
   <action name="actionDrop_Listener">
    <property name="text">
     <string>Drop Listener</string>
-   </property>
-  </action>
-  <action name="actionActive_Listener">
-   <property name="text">
-    <string>Active Listener</string>
    </property>
   </action>
   <action name="actionCreate">

@@ -107,6 +107,7 @@ DChatMain::Run ()
   contactListModel.setHorizontalHeaderLabels (contactHeaders);
   show ();
   SetupListener ();
+  Settings().sync ();
 }
 
 void
