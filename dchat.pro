@@ -34,13 +34,14 @@ unix {
     LIBS += -lqxmppclient
     message ("Now options.pri, using default $$INCLUDEPATH")
   } else {
-    INCLUDEPATH += $$QXMPPBASE/include/qxmpp
-    exists ("$$QXMPPBASE/lib64") {
-      LIBS += -L$QXMPPBASE/lib64 -lqxmppclient
+    INCLUDEPATH += $$QXMPP_BASE/include/qxmpp
+    exists ("$$QXMPP_BASE/lib64") {
+      LIBS += -L$$QXMPP_BASE/lib64 -lqxmppclient
     } else { 
-      LIBS += -L$QXMPPBASE/lib -lQqxmppclient
+      LIBS += -L$$QXMPP_BASE/lib -lqxmppclient
     }
   }
+  message ("include path: $$INCLUDEPATH")
   DEFINES += DELIBERATE_DEBUG=1
 #  INCLUDEPATH += /usr/include/QtCrypto
 #  LIBS += -lqca
