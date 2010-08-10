@@ -247,17 +247,17 @@
     <message>
         <location filename="../ui/dchat.ui" line="183"/>
         <source>Add Listener</source>
-        <translation>Horcher Starten</translation>
+        <translation>Empfänger Starten</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="188"/>
         <source>Drop Listener</source>
-        <translation>Horcher Abstellen</translation>
+        <translation>Empfänger Abstellen</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="193"/>
         <source>Active Listener</source>
-        <translation>Aktiver Horcher</translation>
+        <translation>Aktiver Empfänger</translation>
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="198"/>
@@ -655,7 +655,7 @@
     <message>
         <location filename="../ui/start-listener.ui" line="14"/>
         <source>Start Listener</source>
-        <translation>Horcher Starten</translation>
+        <translation>Empfänger Starten</translation>
     </message>
     <message>
         <location filename="../ui/start-listener.ui" line="26"/>
@@ -774,7 +774,7 @@
     <message>
         <location filename="../src/cert-generate.cpp" line="28"/>
         <source>7.Oranization Unit</source>
-        <translation>7.Organisations-Teil</translation>
+        <translation>7.Organisationseinheit</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="29"/>
@@ -942,7 +942,7 @@
     <message>
         <location filename="../src/cert-store.cpp" line="383"/>
         <source>Subunit: %1</source>
-        <translation>Organisations-Teil: %1</translation>
+        <translation>Organisationseinheit: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="385"/>
@@ -982,7 +982,7 @@
     <message>
         <location filename="../src/cert-store.cpp" line="400"/>
         <source>Issuer Unit Name: %1</source>
-        <translation>Ausgeber Organisations-Teil: %1</translation>
+        <translation>Ausgeber Organisationseinheit: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="402"/>
@@ -1111,17 +1111,17 @@
     <message>
         <location filename="../src/dchat.cpp" line="146"/>
         <source>Listener Password for </source>
-        <translation>Horcher Passwort für </translation>
+        <translation>Empfänger Passwort für </translation>
     </message>
     <message>
         <location filename="../src/dchat.cpp" line="184"/>
         <source>Pick Identity for Listener</source>
-        <translation>Auswahl Horcher-Identität</translation>
+        <translation>Auswahl Empfänger-Identität</translation>
     </message>
     <message>
         <location filename="../src/dchat.cpp" line="200"/>
         <source>Pick Listener to Drop</source>
-        <translation>Auswahl Horcher abzuschalten</translation>
+        <translation>Auswahl Empfänger abzuschalten</translation>
     </message>
     <message>
         <location filename="../src/dchat.cpp" line="479"/>
@@ -1239,7 +1239,7 @@
         <location filename="../src/direct-listener.cpp" line="73"/>
         <source>The Listener specified as
 </source>
-        <translation>Der Horcher angegeben als
+        <translation>Der Empfänger angegeben als
 </translation>
     </message>
     <message>
@@ -1261,7 +1261,7 @@ was resolved to address
     <message>
         <location filename="../src/pick-cert.cpp" line="172"/>
         <source>Subunit: %1</source>
-        <translation>Organisations-Teil: %1</translation>
+        <translation>Organisationseinheit: %1</translation>
     </message>
     <message>
         <location filename="../src/pick-cert.cpp" line="174"/>
@@ -1296,7 +1296,7 @@ was resolved to address
     <message>
         <location filename="../src/pick-cert.cpp" line="188"/>
         <source>Issuer Unit Name: %1</source>
-        <translation>Ausgeber Organisations-Teil: %1</translation>
+        <translation>Ausgeber Organisationseinheit: %1</translation>
     </message>
     <message>
         <location filename="../src/pick-cert.cpp" line="190"/>
