@@ -21,6 +21,7 @@
 </qresource>
 <qresource prefix="/translate">
   <file alias="egalite_fr.qm">translate/egalite_fr.qm</file>
+  <file alias="egalite_de.qm">translate/egalite_de.qm</file>
 </qresource>
 <qresource prefix="icons/16x16/status">
   <file alias="user-away-extended.png">images/16x16/status/user-away-extended.png</file>
