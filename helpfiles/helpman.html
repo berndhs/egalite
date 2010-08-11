@@ -393,13 +393,15 @@ div#toc a:visited { color: blue; }
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph"><p><strong>Egalite</strong> is a instant messenger program.</p></div>
-<div class="paragraph"><p>It provides server-based chat and presence for XMPP compatible servers, such as jabber and google talk, and many others.</p></div>
+<div class="paragraph"><p>It provides server-based chat and presence for XMPP compatible servers,
+such as jabber and google talk, and many others.</p></div>
 <div class="paragraph"><p><strong>Egalite</strong> also provides direct chat over SSL sockets without server interaction.</p></div>
 </div>
 </div>
 <h2 id="_server_xmpp_chat">Server (Xmpp) Chat</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>For server chat, the people you chat with are identified by their user name on a server, and the server name. For example, <a href="mailto:alice.smith@gmail.com">alice.smith@gmail.com</a> or <a href="mailto:bobjones@jabber.org">bobjones@jabber.org</a>.</p></div>
+<div class="paragraph"><p>For server chat, the people you chat with are identified by their user name
+on a server, and the server name. For example, <a href="mailto:alice.smith@gmail.com">alice.smith@gmail.com</a> or <a href="mailto:bobjones@jabber.org">bobjones@jabber.org</a>.</p></div>
 </div>
 <h2 id="_direct_chat">Direct Chat</h2>
 <div class="sectionbody">
@@ -410,7 +412,8 @@ div#toc a:visited { color: blue; }
 <div class="paragraph"><p>An <strong>address</strong> corresponds to a communication port on a computer or other
 communications device, such as a phone, netbook or tablet.</p></div>
 <div class="paragraph"><p>In order to be connected to incoming chat from other people, your Egalite
-must <strong>listen</strong> for incoming connections. To do this, you need to start a listener.</p></div>
+must <strong>listen</strong> for incoming connections. To do this, you need to start a
+listener.</p></div>
 <div class="paragraph"><p>A <strong>listener</strong> is a pair of <strong>address</strong> and <strong>identity</strong>. The address specifies
 where to reach you for direct chat, and the identity specifies who you are for
 purposes of this address.</p></div>
@@ -428,25 +431,56 @@ use the menu item <strong>Identities&#8594;Create Certificate</strong>.
 <p>
 The other user&#8217;s IP address, as a literal numerical address, or as a URL
 that <strong>your</strong> system can resolve. This is called a <strong>direct contact</strong>. You can
-choose from your list of direct contacts (<strong>Contacts&#8594;Direct</strong>), or you can enter the information when starting the connection.
+choose from your list of direct contacts (<strong>Contacts&#8594;Direct</strong>), or you can
+enter the information when starting the connection.
 </p>
 </li>
 </ul></div>
 <h3 id="_accepting_direct_connections">Accepting Direct Connections</h3><div style="clear:left"></div>
-<div class="paragraph"><p>For other users to connect with Egalite on your computer/device, a <strong>listener</strong> has
+<div class="paragraph"><p>For other users to connect with Egalite on your computer/device,
+a <strong>listener</strong> has
 to be active. For this purpose, you need to have an <strong>identity</strong>, which is a SSL
 certificate. You can create one with <strong>Itentities&#8594;Create Certificate</strong> and
 use it later.</p></div>
-<div class="paragraph"><p>To start listening for incoming direct connections, use <strong>File&#8594;Add Listener</strong>. This
+<div class="paragraph"><p>To start listening for incoming direct connections, use <strong>File&#8594;Add Listener</strong>.
+This
 will start a dialog which allows you to select an identity (which you created
 earlier), and then a address to listen on.</p></div>
-<div class="paragraph"><p>The listener address is one that your computer/device makes visible to the outside
+<div class="paragraph"><p>The listener address is one that your computer/device makes visible
+to the outside
 world. The <em>outside world</em> here can be the entire internet, or a local network
-that your computer is visible on.</p></div>
+that your computer is visible on. See <strong>Obtaining Listener Addresses</strong> below for
+more.</p></div>
 <div class="paragraph"><p>As usual, you can enter the address as a numerical IP address, or as a URL.</p></div>
+<h3 id="_obtaining_listener_addresses">Obtaining Listener Addresses</h3><div style="clear:left"></div>
+<div class="paragraph"><p>To accept direct connection to your computer/device from outside you local
+network, you need an address that is visible to the rest of the world, and
+that will accept connections. The listener acts like a server for these
+connections.</p></div>
+<div class="paragraph"><p>Many ISPs restrict small customers behind NAT from accepting any such
+connections, others require special configuration. There are many ways
+of accepting incoming connections on an external IP address.</p></div>
+<div class="paragraph"><p>One way is to acquire an IPv6 address. This is very convenient, and in the
+reasonably near future most businesses will have to deal with IPv6 for reasons
+completely unrelated to chat applications.</p></div>
+<div class="paragraph"><p>Some ISPs provide IPv6 addresses to their customers. This is the best way
+if it is available to you. If not, IPv6 addresses are available for free
+from <em>tunnel brokers</em>. Which service is best for you depends
+on your geographic location. You can check this web page
+<a href="http://en.wikipedia.org/wiki/List_of_IPv6_tunnel_brokers">http://en.wikipedia.org/wiki/List_of_IPv6_tunnel_brokers</a>,
+and services like <a href="http://www.sixxs.net">SixXS</a>,
+<a href="http://www.he.net">Hurricane Electric</a>,
+<a href="http://gogonet.gogo6.com">Gogo6/Freenet6</a>. Check your ISP
+and the internet for your local availability.</p></div>
+<h3 id="_mixing_ipv6_and_ipv4">Mixing IPv6 and IPv4</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Egalite can listen to, as well as connect to, IPv6 and IPv4 addresses. With
+separate listeners, some can listen on IPv4 while others listen on IPv5.</p></div>
+<div class="paragraph"><p>The only mix that does not work is different types of addresses on the same
+connection - both ends must be of the same address type.</p></div>
 <h3 id="_certificates">Certificates</h3><div style="clear:left"></div>
 <div class="paragraph"><p>Egalite requires that the end points of a direct chat present SSL certificates.
-These certificates can be generated by Egalite, or read from PEM format files, or pasted in PEM format.</p></div>
+These certificates can be generated by Egalite, or read from PEM format
+files, or pasted in PEM format.</p></div>
 <div class="paragraph"><p>Egalite allows you to create self-signed certificates for the purpose
 of direct chat using the menu item <strong>Itentities&#8594;Create Certificate</strong>.</p></div>
 <h3 id="_direct_addresses">Direct Addresses</h3><div style="clear:left"></div>
@@ -516,7 +550,7 @@ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</p></div>
 <div id="footer">
 <div id="footer-text">
 Version 0.1.2<br />
-Last updated 2010-08-09 19:28:53 EDT
+Last updated 2010-08-10 19:57:19 EDT
 </div>
 </div>
 </body>
