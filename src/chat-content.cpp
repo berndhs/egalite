@@ -116,8 +116,15 @@ ChatContent::Start (Mode mode,
 void
 ChatContent::SaveContent ()
 {
+  QString defaultFilePat ("%1-%2.log");
+  QStringList  parts = remoteName.split (QRegExp("[ @/]"));
+  QDateTime  now = QDateTime::currentDateTime();
+  QString defaultName = defaultFilePat
+                          .arg (parts.at(0))
+                          .arg (now.toString(tr("yy-MM-dd-hhmmss")));
   QString filename = QFileDialog::getSaveFileName (this, 
-                      tr ("Save Chat Content"));
+                      tr ("Save Chat Content"),
+                      defaultName);
   if (filename.length () > 0) {
     QFile file (filename);
     file.open (QFile::WriteOnly);
