@@ -163,7 +163,7 @@
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="34"/>
-        <location filename="../ui/dchat.ui" line="118"/>
+        <location filename="../ui/dchat.ui" line="115"/>
         <source>Quit</source>
         <translation>Beenden</translation>
     </message>
@@ -173,94 +173,91 @@
         <translation>Datei</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="84"/>
+        <location filename="../ui/dchat.ui" line="83"/>
         <source>Identities</source>
         <translation>Identität</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="92"/>
+        <location filename="../ui/dchat.ui" line="90"/>
         <source>Contacts</source>
         <translation>Kontakte</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="100"/>
+        <location filename="../ui/dchat.ui" line="97"/>
         <source>Help...</source>
         <translation>Hilfe...</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="113"/>
+        <location filename="../ui/dchat.ui" line="110"/>
         <source>Log In</source>
         <translation>Anmelden</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="123"/>
+        <location filename="../ui/dchat.ui" line="120"/>
         <source>Accounts</source>
         <translation>Konten</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="128"/>
+        <location filename="../ui/dchat.ui" line="125"/>
         <source>Preferences</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="133"/>
-        <location filename="../ui/dchat.ui" line="143"/>
+        <location filename="../ui/dchat.ui" line="130"/>
+        <location filename="../ui/dchat.ui" line="135"/>
         <source>Direct</source>
         <translation>Direkt</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="138"/>
-        <location filename="../ui/dchat.ui" line="148"/>
         <source>Server</source>
-        <translation>Server</translation>
+        <translation type="obsolete">Server</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="153"/>
+        <location filename="../ui/dchat.ui" line="140"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="158"/>
+        <location filename="../ui/dchat.ui" line="145"/>
         <source>About</source>
         <translation>Über Égalité!</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="163"/>
+        <location filename="../ui/dchat.ui" line="150"/>
         <source>Manual</source>
         <translation>Handbuch</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="168"/>
+        <location filename="../ui/dchat.ui" line="155"/>
         <source>License</source>
         <translation>Lizenz</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="173"/>
+        <location filename="../ui/dchat.ui" line="160"/>
         <source>Log Out</source>
         <translation>Abmelden</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="178"/>
+        <location filename="../ui/dchat.ui" line="165"/>
         <source>Request</source>
         <translation>Antrag</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="183"/>
+        <location filename="../ui/dchat.ui" line="170"/>
         <source>Add Listener</source>
         <translation>Empfänger Starten</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="188"/>
+        <location filename="../ui/dchat.ui" line="175"/>
         <source>Drop Listener</source>
         <translation>Empfänger Abstellen</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="193"/>
         <source>Active Listener</source>
-        <translation>Aktiver Empfänger</translation>
+        <translation type="obsolete">Aktiver Empfänger</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="198"/>
+        <location filename="../ui/dchat.ui" line="180"/>
         <source>Create Certificate</source>
         <translation>Zertifikat schaffen</translation>
     </message>
@@ -1043,7 +1040,12 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/chat-content.cpp" line="120"/>
+        <location filename="../src/chat-content.cpp" line="124"/>
+        <source>yy-MM-dd-hhmmss</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/chat-content.cpp" line="126"/>
         <source>Save Chat Content</source>
         <translation>Chat Log Speichern</translation>
     </message>
@@ -1254,67 +1256,86 @@ was resolved to address
 <context>
     <name>egalite::PickCert</name>
     <message>
-        <location filename="../src/pick-cert.cpp" line="170"/>
+        <location filename="../src/pick-cert.cpp" line="175"/>
+        <source> Expired !</source>
+        <translation>Abgelaufen !</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="179"/>
+        <source> Not Yet Valid !</source>
+        <translation>Noch nicht gültig !</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="181"/>
         <source>Organization: %1</source>
         <translation>Organisation: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="172"/>
+        <location filename="../src/pick-cert.cpp" line="183"/>
         <source>Subunit: %1</source>
         <translation>Organisationseinheit: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="174"/>
+        <location filename="../src/pick-cert.cpp" line="185"/>
         <source>Country: %1</source>
         <translation>Staat: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="176"/>
+        <location filename="../src/pick-cert.cpp" line="187"/>
         <source>Locality: %1</source>
         <translation>Ort: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="178"/>
+        <location filename="../src/pick-cert.cpp" line="189"/>
         <source>State/Province: %1</source>
         <translation>Provinz/Land/Staat: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="180"/>
+        <location filename="../src/pick-cert.cpp" line="191"/>
         <source>Common Name: %1</source>
         <translation>Gebräuchlier Name: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="183"/>
-        <source>valid until: %1</source>
-        <translation>Gültig bis: %1</translation>
+        <location filename="../src/pick-cert.cpp" line="194"/>
+        <source>valid from:  %1 %2</source>
+        <translation>Gültig von: %1 %2</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="186"/>
+        <location filename="../src/pick-cert.cpp" line="197"/>
+        <source>valid until: %1 %2</source>
+        <translation>Gültig bis: %1 %2</translation>
+    </message>
+    <message>
+        <source>valid until: %1</source>
+        <translation type="obsolete">Gültig bis: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="201"/>
         <source>Issuer Organization: %1</source>
         <translation>Ausgeber Organisation: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="188"/>
+        <location filename="../src/pick-cert.cpp" line="203"/>
         <source>Issuer Unit Name: %1</source>
         <translation>Ausgeber Organisationseinheit: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="190"/>
+        <location filename="../src/pick-cert.cpp" line="205"/>
         <source>Issuer Country: %1</source>
         <translation>Ausgeber Staat: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="192"/>
+        <location filename="../src/pick-cert.cpp" line="207"/>
         <source>Issuer Locality: %1</source>
         <translation>Ausgeber Ort: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="194"/>
+        <location filename="../src/pick-cert.cpp" line="209"/>
         <source>Issuer State/Province: %1</source>
         <translation>Ausgeber Provinz/Land/Staat: %1</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="196"/>
+        <location filename="../src/pick-cert.cpp" line="211"/>
         <source>Issuer Common Name: %1</source>
         <translation>Ausgeber Gebräuchlicher Name: %1</translation>
     </message>

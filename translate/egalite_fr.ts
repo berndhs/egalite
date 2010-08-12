@@ -164,7 +164,7 @@
     </message>
     <message>
         <location filename="../ui/dchat.ui" line="34"/>
-        <location filename="../ui/dchat.ui" line="118"/>
+        <location filename="../ui/dchat.ui" line="115"/>
         <source>Quit</source>
         <translation>Quitter</translation>
     </message>
@@ -174,94 +174,91 @@
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="84"/>
+        <location filename="../ui/dchat.ui" line="83"/>
         <source>Identities</source>
         <translation>Identités</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="92"/>
+        <location filename="../ui/dchat.ui" line="90"/>
         <source>Contacts</source>
         <translation>Contacts</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="100"/>
+        <location filename="../ui/dchat.ui" line="97"/>
         <source>Help...</source>
         <translation>Aide...</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="113"/>
+        <location filename="../ui/dchat.ui" line="110"/>
         <source>Log In</source>
         <translation>Connexion</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="123"/>
+        <location filename="../ui/dchat.ui" line="120"/>
         <source>Accounts</source>
         <translation>Comptes</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="128"/>
+        <location filename="../ui/dchat.ui" line="125"/>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="133"/>
-        <location filename="../ui/dchat.ui" line="143"/>
+        <location filename="../ui/dchat.ui" line="130"/>
+        <location filename="../ui/dchat.ui" line="135"/>
         <source>Direct</source>
         <translation type="unfinished">Direct</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="138"/>
-        <location filename="../ui/dchat.ui" line="148"/>
         <source>Server</source>
-        <translation>Serveur</translation>
+        <translation type="obsolete">Serveur</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="153"/>
+        <location filename="../ui/dchat.ui" line="140"/>
         <source>Settings</source>
         <translation>Propriétés</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="158"/>
+        <location filename="../ui/dchat.ui" line="145"/>
         <source>About</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="163"/>
+        <location filename="../ui/dchat.ui" line="150"/>
         <source>Manual</source>
         <translation>Manuel</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="168"/>
+        <location filename="../ui/dchat.ui" line="155"/>
         <source>License</source>
         <translation>License</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="173"/>
+        <location filename="../ui/dchat.ui" line="160"/>
         <source>Log Out</source>
         <translation type="unfinished">Déconnexion</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="178"/>
+        <location filename="../ui/dchat.ui" line="165"/>
         <source>Request</source>
         <translation type="unfinished">Envoyer la demande</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="183"/>
+        <location filename="../ui/dchat.ui" line="170"/>
         <source>Add Listener</source>
         <translation type="unfinished">Ajouter écouteur</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="188"/>
+        <location filename="../ui/dchat.ui" line="175"/>
         <source>Drop Listener</source>
         <translation type="unfinished">déroulant  écouteur</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="193"/>
         <source>Active Listener</source>
-        <translation type="unfinished">l&apos;écouteur active</translation>
+        <translation type="obsolete">l&apos;écouteur active</translation>
     </message>
     <message>
-        <location filename="../ui/dchat.ui" line="198"/>
+        <location filename="../ui/dchat.ui" line="180"/>
         <source>Create Certificate</source>
         <translation type="unfinished">Créer un certificat</translation>
     </message>
@@ -297,7 +294,7 @@
     <message>
         <location filename="../ui/cert-edit.ui" line="87"/>
         <source>Saved Password:</source>
-        <translation type="unfinished">mot de passe enregistré</translation>
+        <translation type="unfinished">mot de passe enregistré: </translation>
     </message>
     <message>
         <location filename="../ui/cert-edit.ui" line="105"/>
@@ -811,52 +808,52 @@
     <message>
         <location filename="../src/cert-generate.cpp" line="210"/>
         <source>Serial Number: %1</source>
-        <translation type="unfinished">Numéro de série</translation>
+        <translation type="unfinished">Numéro de série: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="212"/>
         <source>Organization: %1</source>
-        <translation type="unfinished">Organisation</translation>
+        <translation type="unfinished">Organisation: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="214"/>
         <source>Subunit: %1</source>
-        <translation type="unfinished">Sous-organisation</translation>
+        <translation type="unfinished">Sous-organisation: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="216"/>
         <source>Country: %1</source>
-        <translation type="unfinished">Pays</translation>
+        <translation type="unfinished">Pays :%1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="218"/>
         <source>Locality: %1</source>
-        <translation type="unfinished">Ville</translation>
+        <translation type="unfinished">Ville: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="220"/>
         <source>State/Province: %1</source>
-        <translation type="unfinished">Province/État</translation>
+        <translation type="unfinished">Province/État: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="222"/>
         <source>Common Name: %1</source>
-        <translation type="unfinished">Nom Commun</translation>
+        <translation type="unfinished">Nom Commun: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="224"/>
         <source>Valid from: %1</source>
-        <translation type="unfinished">Valable à partir de:</translation>
+        <translation type="unfinished">Valable à partir de: :%1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="226"/>
         <source>Valid to: %1</source>
-        <translation type="unfinished">Valable jusqu&apos;au:</translation>
+        <translation type="unfinished">Valable jusqu&apos;au: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="228"/>
         <source>Currently valid: %1</source>
-        <translation type="unfinished">Est actuellement valable:</translation>
+        <translation type="unfinished">Est actuellement valable: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="228"/>
@@ -871,32 +868,32 @@
     <message>
         <location filename="../src/cert-generate.cpp" line="230"/>
         <source>Issuer Organization: %1</source>
-        <translation type="unfinished">Organisation émettrice</translation>
+        <translation type="unfinished">Organisation émettrice: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="232"/>
         <source>Issuer Unit Name: %1</source>
-        <translation type="unfinished">Émission Sous-Organisation</translation>
+        <translation type="unfinished">Émission Sous-Organisation: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="234"/>
         <source>Issuer Country: %1</source>
-        <translation type="unfinished">Pays émetteur</translation>
+        <translation type="unfinished">Pays émetteur: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="236"/>
         <source>Issuer Locality: %1</source>
-        <translation type="unfinished">Ville émetteur</translation>
+        <translation type="unfinished">Ville émetteur: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="238"/>
         <source>Issuer State/Province: %1</source>
-        <translation type="unfinished">Province/État émetteur</translation>
+        <translation type="unfinished">Province/État émetteur: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="240"/>
         <source>Issuer Common Name: %1</source>
-        <translation type="unfinished">Nom commun de l&apos;émetteur</translation>
+        <translation type="unfinished">Nom commun de l&apos;émetteur: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-generate.cpp" line="260"/>
@@ -939,72 +936,72 @@
     <message>
         <location filename="../src/cert-store.cpp" line="381"/>
         <source>Organization: %1</source>
-        <translation type="unfinished">Organisation</translation>
+        <translation type="unfinished">Organisation: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="383"/>
         <source>Subunit: %1</source>
-        <translation type="unfinished">Sous-organisation</translation>
+        <translation type="unfinished">Sous-organisation: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="385"/>
         <source>Country: %1</source>
-        <translation type="unfinished">Pays</translation>
+        <translation type="unfinished">Pays: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="387"/>
         <source>Locality: %1</source>
-        <translation type="unfinished">Ville</translation>
+        <translation type="unfinished">Ville: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="389"/>
         <source>State/Province: %1</source>
-        <translation type="unfinished">Province/État</translation>
+        <translation type="unfinished">Province/État: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="391"/>
         <source>Common Name: %1</source>
-        <translation type="unfinished">Nom Commun</translation>
+        <translation type="unfinished">Nom Commun: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="393"/>
         <source>Valid from: %1</source>
-        <translation type="unfinished">Valable à partir de:</translation>
+        <translation type="unfinished">Valable à partir de: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="395"/>
         <source>Valid to: %1</source>
-        <translation type="unfinished">Valable jusqu&apos;au:</translation>
+        <translation type="unfinished">Valable jusqu&apos;au: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="398"/>
         <source>Issuer Organization: %1</source>
-        <translation type="unfinished">Organisation émettrice</translation>
+        <translation type="unfinished">Organisation émettrice: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="400"/>
         <source>Issuer Unit Name: %1</source>
-        <translation type="unfinished">Émission Sous-Organisation</translation>
+        <translation type="unfinished">Émission Sous-Organisation: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="402"/>
         <source>Issuer Country: %1</source>
-        <translation type="unfinished">Pays émetteur</translation>
+        <translation type="unfinished">Pays émetteur: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="404"/>
         <source>Issuer Locality: %1</source>
-        <translation type="unfinished">Ville émetteur</translation>
+        <translation type="unfinished">Ville émetteur: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="406"/>
         <source>Issuer State/Province: %1</source>
-        <translation type="unfinished">Province/État émetteur</translation>
+        <translation type="unfinished">Province/État émetteur: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="408"/>
         <source>Issuer Common Name: %1</source>
-        <translation type="unfinished">Nom commun de l&apos;émetteur</translation>
+        <translation type="unfinished">Nom commun de l&apos;émetteur: %1</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="424"/>
@@ -1019,7 +1016,7 @@
     <message>
         <location filename="../src/cert-store.cpp" line="608"/>
         <source>Warning: Problem Saving Contacts !</source>
-        <translation type="unfinished">Attention: Problème mise à jour des contacts</translation>
+        <translation type="unfinished">Attention: Problème mise à jour des contacts !</translation>
     </message>
     <message>
         <location filename="../src/cert-store.cpp" line="648"/>
@@ -1045,7 +1042,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/chat-content.cpp" line="120"/>
+        <location filename="../src/chat-content.cpp" line="124"/>
+        <source>yy-MM-dd-hhmmss</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/chat-content.cpp" line="126"/>
         <source>Save Chat Content</source>
         <translation type="unfinished">enregistrer le contenu de la conversation</translation>
     </message>
@@ -1254,69 +1256,84 @@ was resolved to address
 <context>
     <name>egalite::PickCert</name>
     <message>
-        <location filename="../src/pick-cert.cpp" line="170"/>
+        <location filename="../src/pick-cert.cpp" line="175"/>
+        <source> Expired !</source>
+        <translation>périmée !</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="179"/>
+        <source> Not Yet Valid !</source>
+        <translation>pas encore valide!</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="181"/>
         <source>Organization: %1</source>
-        <translation type="unfinished">Organisation</translation>
-    </message>
-    <message>
-        <location filename="../src/pick-cert.cpp" line="172"/>
-        <source>Subunit: %1</source>
-        <translation type="unfinished">Sous-organisation</translation>
-    </message>
-    <message>
-        <location filename="../src/pick-cert.cpp" line="174"/>
-        <source>Country: %1</source>
-        <translation type="unfinished">Pays</translation>
-    </message>
-    <message>
-        <location filename="../src/pick-cert.cpp" line="176"/>
-        <source>Locality: %1</source>
-        <translation type="unfinished">Ville</translation>
-    </message>
-    <message>
-        <location filename="../src/pick-cert.cpp" line="178"/>
-        <source>State/Province: %1</source>
-        <translation type="unfinished">Province/État</translation>
-    </message>
-    <message>
-        <location filename="../src/pick-cert.cpp" line="180"/>
-        <source>Common Name: %1</source>
-        <translation type="unfinished">Nom Commun</translation>
+        <translation>Organisation</translation>
     </message>
     <message>
         <location filename="../src/pick-cert.cpp" line="183"/>
-        <source>valid until: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Subunit: %1</source>
+        <translation>Sous-organisation</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="186"/>
-        <source>Issuer Organization: %1</source>
-        <translation type="unfinished">Organisation émettrice</translation>
+        <location filename="../src/pick-cert.cpp" line="185"/>
+        <source>Country: %1</source>
+        <translation>Pays</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="188"/>
-        <source>Issuer Unit Name: %1</source>
-        <translation type="unfinished">Émission Sous-Organisation</translation>
+        <location filename="../src/pick-cert.cpp" line="187"/>
+        <source>Locality: %1</source>
+        <translation>Ville</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="190"/>
-        <source>Issuer Country: %1</source>
-        <translation type="unfinished">Pays émetteur</translation>
+        <location filename="../src/pick-cert.cpp" line="189"/>
+        <source>State/Province: %1</source>
+        <translation>Province/État</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="192"/>
-        <source>Issuer Locality: %1</source>
-        <translation type="unfinished">Ville émetteur</translation>
+        <location filename="../src/pick-cert.cpp" line="191"/>
+        <source>Common Name: %1</source>
+        <translation>Nom Commun</translation>
     </message>
     <message>
         <location filename="../src/pick-cert.cpp" line="194"/>
-        <source>Issuer State/Province: %1</source>
-        <translation type="unfinished">Province/État émetteur</translation>
+        <source>valid from:  %1 %2</source>
+        <translation>Valable à partir du: %1 %2</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="196"/>
+        <location filename="../src/pick-cert.cpp" line="197"/>
+        <source>valid until: %1 %2</source>
+        <translation>Valable jusqu&apos;au: %1 %2</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="201"/>
+        <source>Issuer Organization: %1</source>
+        <translation>Organisation émettrice</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="203"/>
+        <source>Issuer Unit Name: %1</source>
+        <translation>Émission Sous-Organisation</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="205"/>
+        <source>Issuer Country: %1</source>
+        <translation>Pays émetteur</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="207"/>
+        <source>Issuer Locality: %1</source>
+        <translation>Ville émetteur</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="209"/>
+        <source>Issuer State/Province: %1</source>
+        <translation>Province/État émetteur</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="211"/>
         <source>Issuer Common Name: %1</source>
-        <translation type="unfinished">Nom commun de l&apos;émetteur</translation>
+        <translation>Nom commun de l&apos;émetteur</translation>
     </message>
 </context>
 <context>
