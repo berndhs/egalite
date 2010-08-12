@@ -167,6 +167,17 @@ PickCert::Display (int index)
             .arg (cert.subjectInfo (QSslCertificate::Organization))
             .arg (cert.subjectInfo (QSslCertificate::CommonName)));
   QStringList lines;
+  QDateTime now = QDateTime::currentDateTime ();
+  QDateTime certStop = cert.expiryDate();
+  QDateTime certStart = cert.effectiveDate();
+  QString expired ("");
+  if (now > certStop) {
+    expired = tr(" Expired !");
+  }
+  QString notyet ("");
+  if (now < certStart) {
+    notyet = tr (" Not Yet Valid !");
+  }
   lines << tr("Organization: %1")
               .arg(cert.subjectInfo(QSslCertificate::Organization))
         << tr("Subunit: %1")
@@ -180,8 +191,12 @@ PickCert::Display (int index)
         << tr("Common Name: %1")
               .arg(cert.subjectInfo(QSslCertificate::CommonName))
         << QString("------------")
-        << tr ("valid until: %1")
-              .arg(cert.expiryDate().toString())
+        << tr ("valid from:  %1 %2")
+              .arg (certStart.toString())
+              .arg (notyet)
+        << tr ("valid until: %1 %2")
+              .arg (certStop.toString())
+              .arg (expired)
         << QString("------------")
         << tr("Issuer Organization: %1")
               .arg(cert.issuerInfo(QSslCertificate::Organization))
