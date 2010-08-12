@@ -335,6 +335,8 @@ SymmetricSocket::PickOneCert (const QList <QSslCertificate> & clist)
     pickCert = new PickCert (0,QString("Incoming"));
     connect (pickCert, SIGNAL (SaveRemote (const QString &, const QByteArray &)),
              this, SLOT (SaveCertRequest (const QString &, const QByteArray &)));
+    connect (pickCert, SIGNAL (BlockRemote (const QString &, const QByteArray &)),
+             this, SLOT (SaveBlacklist (const QString &, const QByteArray &)));
   }
   if (pickCert) {
     bool accepted (false);
@@ -354,7 +356,13 @@ SymmetricSocket::PickOneCert (const QList <QSslCertificate> & clist)
 void
 SymmetricSocket::SaveCertRequest (const QString & name, const QByteArray & pem)
 {
-  CertStore::IF().StoreRemote (name, pem);
+  CertStore::IF().StoreWhite (name, pem);
+}
+
+void
+SymmetricSocket::SaveBlacklist  (const QString & name, const QByteArray & pem)
+{
+  CertStore::IF().StoreBlack (name, pem);
 }
 
 void

@@ -48,12 +48,14 @@ private slots:
   void Up ();
   void Down ();
   void Reject ();
+  void RejectStore ();
   void Accept ();
   void AcceptStore ();
 
 signals:
 
   void SaveRemote (const QString & nick, const QByteArray & pem);
+  void BlockRemote (const QString & nick, const QByteArray & pem);
 
 private:
 
@@ -61,6 +63,7 @@ private:
   bool StillGood ();
   bool HaveGoodSavedCert (const QList <QSslCertificate> & clist,
                             QSslCertificate & pickedCert);
+  void EliminateBlack (QList <QSslCertificate> & maybe);
 
   Ui_CertCandidate      ui;
   Ui_SaveName           saveUi;
@@ -68,7 +71,7 @@ private:
 
   QList <QSslCertificate>  certs;
   int                      ndx;
-  QSslCertificate          goodCert;
+  QSslCertificate          currentCert;
   bool                     haveGoodCert;
 
 };

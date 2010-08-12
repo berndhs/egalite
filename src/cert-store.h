@@ -74,6 +74,7 @@ public:
   int         ContactPort    (QString id);
   QStringList ContactList ();
   bool        RemoteNick (QByteArray pem, QString & nick);
+  bool        IsBlocked (QByteArray pem);
 
 public slots:
 
@@ -81,7 +82,8 @@ public slots:
   void CertDialog ();
   /** \brief ContactDialog - gui to add/remove/edit contact addresses. */
   void ContactDialog ();
-  void StoreRemote (const QString & nick, const QByteArray & pem);
+  void StoreWhite (const QString & nick, const QByteArray & pem);
+  void StoreBlack (const QString & nick, const QByteArray & pem);
   void CreateCertificate ();
 
 private slots:
@@ -122,6 +124,12 @@ private:
   void MakeElement (const QString name);
   void RefreshContactMap ();
   void RefreshContactModel ();
+  void StoreCert  (const QString & table,
+                   const QString & nick,
+                   const QByteArray & pem);
+  void RemoveCert (const QString & table,
+                   const QString & nick,
+                   const QByteArray & pem);
 
   QString ElementType (QString name);
 

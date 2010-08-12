@@ -11,6 +11,9 @@
   <file alias="remotecerts.sql">schemafiles/remotecerts.sql</file>
   <file alias="uniqueremote.sql">schemafiles/uniqueremote.sql</file>
   <file alias="uniqueremotecert.sql">schemafiles/uniqueremotecert.sql</file>
+  <file alias="blackcerts.sql">schemafiles/blackcerts.sql</file>
+  <file alias="uniqueblack.sql">schemafiles/uniqueblack.sql</file>
+  <file alias="uniqueblackcert.sql">schemafiles/uniqueblackcert.sql</file>
 </qresource>
 <qresource prefix="/help">
   <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>

@@ -95,6 +95,7 @@ private slots:
   void Disconnected ();
   void EncryptDone ();
   void SaveCertRequest (const QString & name, const QByteArray & pem);
+  void SaveBlacklist   (const QString & name, const QByteArray & pem);
 
 signals:
 

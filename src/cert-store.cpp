@@ -77,7 +77,10 @@ CertStore::CertStore ()
                 << "uniquenick"
                 << "remotecerts"
                 << "uniqueremote"
-                << "uniqueremotecert";
+                << "uniqueremotecert"
+                << "blackcerts"
+                << "uniqueblack"
+                << "uniqueblackcert";
 }
 
 void
@@ -612,18 +615,51 @@ CertStore::WriteContacts (const QString filename)
 }
 
 void
-CertStore::StoreRemote (const QString &nick, const QByteArray &pem)
+CertStore::StoreWhite (const QString &nick, const QByteArray &pem)
 { 
+  StoreCert ("remotecerts", nick, pem);
+  RemoveCert ("blackcerts", nick, pem);
+}
+
+void
+CertStore::StoreBlack (const QString &nick, const QByteArray &pem)
+{ 
+  StoreCert ("blackcerts", nick, pem);
+  RemoveCert ("remotecerts", nick, pem);
+}
+
+void
+CertStore::StoreCert (const QString & table,
+                      const QString & nick,
+                      const QByteArray & pem)
+{
   CheckDBComplete (dbFileName);
-  QString  qryString ("insert or replace into remotecerts "
+  QString  qryString = QString ("insert or replace into %1 "
                        " (ident, pemcert) "
-                       " values (?, ?)");
+                       " values (?, ?)").arg(table);
   QSqlQuery qry (certDB);
   qry.prepare (qryString);
   qry.bindValue (0, QVariant (nick));
   qry.bindValue (1, QVariant (QString (pem)));
   qry.exec ();
 }
+
+void
+CertStore::RemoveCert (const QString & table,
+                       const QString & nick,
+                       const QByteArray & pem)
+{
+  CheckDBComplete (dbFileName);
+  QString  qryString = QString ("delete from %1 "
+                       " where pemcert == \"%2\"")
+                       .arg (table)
+                       .arg (QString(pem));
+  QSqlQuery qry (certDB);
+  bool ok = qry.exec (qryString);
+  qDebug () << " ok " << ok << " when try to remove " << nick << " from " << table;
+  qDebug () << " delete query was " << qryString;
+}
+
 
 bool
 CertStore::RemoteNick (QByteArray  pem, QString & nick)
@@ -638,6 +674,19 @@ CertStore::RemoteNick (QByteArray  pem, QString & nick)
   } else {
     return false;
   }
+}
+
+bool
+CertStore::IsBlocked (QByteArray pem)
+{
+  QString qryString = QString ("select ident from blackcerts "
+                       " where pemcert = \"%1\"").arg (QString(pem));
+  QSqlQuery query (certDB);
+  bool good = query.exec (qryString);
+  if (good && query.next ()) {
+    return true;
+  }
+  return false;
 }
 
 void

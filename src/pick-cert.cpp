@@ -41,6 +41,7 @@ PickCert::PickCert (QWidget * parent, QString title)
   connect (ui.acceptButton, SIGNAL (clicked()), this, SLOT (Accept()));
   connect (ui.storeButton, SIGNAL (clicked()), this, SLOT (AcceptStore()));
   connect (ui.rejectButton, SIGNAL (clicked()), this, SLOT (Reject()));
+  connect (ui.blackButton, SIGNAL (clicked()), this, SLOT (RejectStore()));
   connect (ui.nextButton, SIGNAL (clicked()), this, SLOT (Up()));
   connect (ui.nextButton, SIGNAL (clicked()), this, SLOT (Down()));
 
@@ -56,10 +57,16 @@ PickCert::Pick (const QList <QSslCertificate> & clist,
                  QSslCertificate & pickedCert)
 {
   certs = clist;
+  EliminateBlack (certs);
+  if (certs.size() < 1) {
+    pickedOne = false;
+    haveGoodCert = false;
+    return;
+  }
   if (haveGoodCert) {
     if (StillGood ()) {
       pickedOne = true;
-      pickedCert = goodCert;
+      pickedCert = currentCert;
       return;
     }
     haveGoodCert = false;
@@ -72,15 +79,26 @@ PickCert::Pick (const QList <QSslCertificate> & clist,
   Display (ndx);
   show ();
   int userChoice = exec ();
-  pickedCert = goodCert;
+  pickedCert = currentCert;
   pickedOne = ( userChoice == 1 );
+}
+
+void
+PickCert::EliminateBlack (QList <QSslCertificate> & maybe)
+{
+  int ndx;
+  for (ndx = maybe.size() -1 ; ndx >= 0; ndx--) {
+    if (CertStore::IF().IsBlocked (maybe.at(ndx).toPem())) {
+      maybe.removeAt (ndx);
+    }
+  }
 }
 
 void
 PickCert::Accept ()
 {
   haveGoodCert = true;
-  goodCert = certs.at(ndx);
+  currentCert = certs.at(ndx);
   done (1);
 }
 
@@ -88,14 +106,32 @@ void
 PickCert::AcceptStore ()
 {
   Accept ();
-  saveUi.nickEdit->setText (goodCert.subjectInfo 
+  saveUi.nickEdit->setText (currentCert.subjectInfo 
                                   (QSslCertificate::CommonName));
+  saveDialog.setWindowTitle (tr("Save Direct Authorization"));
   int saveit = saveDialog.exec ();
 qDebug () << "AcceptStore " << saveit << " for " << saveUi.nickEdit->text();
   if (saveit == 1) {
     QString nick = saveUi.nickEdit->text ();
-    QByteArray pem = goodCert.toPem ();
+    QByteArray pem = currentCert.toPem ();
     emit SaveRemote (nick, pem);
+  }
+}
+
+void
+PickCert::RejectStore ()
+{
+  Reject ();
+  saveUi.nickEdit->setText (currentCert.subjectInfo 
+                                  (QSslCertificate::CommonName));
+  saveDialog.setWindowTitle (tr("Block Direct Authorization"));
+  int blockit = saveDialog.exec ();
+qDebug () << "RejectStore " << blockit << " for " << saveUi.nickEdit->text();
+  if (blockit == 1) {
+    QString nick = saveUi.nickEdit->text ();
+    QByteArray pem = currentCert.toPem ();
+    haveGoodCert = false;
+    emit BlockRemote (nick, pem);
   }
 }
 
@@ -104,10 +140,10 @@ PickCert::StillGood ()
 {
   int c;
   for (c=0; c<certs.size(); c++) {
-    if (goodCert == certs.at(c)) {
+    if (currentCert == certs.at(c)) {
       QDateTime now (QDateTime::currentDateTime ());
-      return (goodCert.effectiveDate() <= now
-          && now <= goodCert.expiryDate ()) ;
+      return (currentCert.effectiveDate() <= now
+          && now <= currentCert.expiryDate ()) ;
     }
   }
   return false;
@@ -162,6 +198,7 @@ void
 PickCert::Display (int index)
 {
   QSslCertificate cert = certs.at(index);
+  currentCert = cert;
   QString  toplinePattern ("%1 (%2)");
   ui.certOrgLine->setText (toplinePattern
             .arg (cert.subjectInfo (QSslCertificate::Organization))
