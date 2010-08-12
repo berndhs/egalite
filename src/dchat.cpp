@@ -105,6 +105,13 @@ DChatMain::Run ()
   contactHeaders << tr("Login")
                  << tr("Name");
   contactListModel.setHorizontalHeaderLabels (contactHeaders);
+  QString backPic (":/treeback.png");
+  backPic = Settings().value ("style/background-image",backPic).toString ();
+  Settings().setValue ("style/background-image",backPic);
+  if (backPic.length() > 0) {
+    QString stylePattern  ("QTreeView { background-image: url(%1) }");
+    pApp->setStyleSheet (stylePattern.arg (backPic));
+  }
   show ();
   SetupListener ();
   Settings().sync ();

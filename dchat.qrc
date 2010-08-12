@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
   <file alias="dchatlogo.png">images/e6.png</file>
+  <file alias="treeback.png">images/pale.png</file>
 </qresource>
 <qresource prefix="/schemas">
   <file alias="identities.sql">schemafiles/identities.sql</file>
