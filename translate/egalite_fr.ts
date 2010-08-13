@@ -19,17 +19,26 @@
         <translation>Suivant</translation>
     </message>
     <message>
-        <location filename="../ui/cert-candidate.ui" line="42"/>
-        <source>Reject All</source>
-        <translation>Tout Refuser</translation>
+        <location filename="../ui/cert-candidate.ui" line="56"/>
+        <source>Blacklist</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cert-candidate.ui" line="49"/>
+        <location filename="../ui/cert-candidate.ui" line="63"/>
+        <source>Reject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reject All</source>
+        <translation type="obsolete">Tout Refuser</translation>
+    </message>
+    <message>
+        <location filename="../ui/cert-candidate.ui" line="42"/>
         <source>Accept + Store</source>
         <translation>Accepter et mémoriser</translation>
     </message>
     <message>
-        <location filename="../ui/cert-candidate.ui" line="56"/>
+        <location filename="../ui/cert-candidate.ui" line="49"/>
         <source>Previous</source>
         <translation>Précédent</translation>
     </message>
@@ -909,127 +918,127 @@
 <context>
     <name>egalite::CertStore</name>
     <message>
-        <location filename="../src/cert-store.cpp" line="261"/>
+        <location filename="../src/cert-store.cpp" line="264"/>
         <source>New Contact</source>
         <translation type="unfinished">nouveau contact</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="263"/>
+        <location filename="../src/cert-store.cpp" line="266"/>
         <source>::1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="265"/>
+        <location filename="../src/cert-store.cpp" line="268"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="307"/>
+        <location filename="../src/cert-store.cpp" line="310"/>
         <source>Select Key File</source>
         <translation type="unfinished">sélectionner le fichier clé</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="328"/>
+        <location filename="../src/cert-store.cpp" line="331"/>
         <source>Select Certificate File</source>
         <translation type="unfinished">Sélectionnez le fichier de certificat</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="381"/>
+        <location filename="../src/cert-store.cpp" line="384"/>
         <source>Organization: %1</source>
         <translation type="unfinished">Organisation: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="383"/>
+        <location filename="../src/cert-store.cpp" line="386"/>
         <source>Subunit: %1</source>
         <translation type="unfinished">Sous-organisation: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="385"/>
+        <location filename="../src/cert-store.cpp" line="388"/>
         <source>Country: %1</source>
         <translation type="unfinished">Pays: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="387"/>
+        <location filename="../src/cert-store.cpp" line="390"/>
         <source>Locality: %1</source>
         <translation type="unfinished">Ville: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="389"/>
+        <location filename="../src/cert-store.cpp" line="392"/>
         <source>State/Province: %1</source>
         <translation type="unfinished">Province/État: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="391"/>
+        <location filename="../src/cert-store.cpp" line="394"/>
         <source>Common Name: %1</source>
         <translation type="unfinished">Nom Commun: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="393"/>
+        <location filename="../src/cert-store.cpp" line="396"/>
         <source>Valid from: %1</source>
         <translation type="unfinished">Valable à partir de: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="395"/>
+        <location filename="../src/cert-store.cpp" line="398"/>
         <source>Valid to: %1</source>
         <translation type="unfinished">Valable jusqu&apos;au: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="398"/>
+        <location filename="../src/cert-store.cpp" line="401"/>
         <source>Issuer Organization: %1</source>
         <translation type="unfinished">Organisation émettrice: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="400"/>
+        <location filename="../src/cert-store.cpp" line="403"/>
         <source>Issuer Unit Name: %1</source>
         <translation type="unfinished">Émission Sous-Organisation: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="402"/>
+        <location filename="../src/cert-store.cpp" line="405"/>
         <source>Issuer Country: %1</source>
         <translation type="unfinished">Pays émetteur: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="404"/>
+        <location filename="../src/cert-store.cpp" line="407"/>
         <source>Issuer Locality: %1</source>
         <translation type="unfinished">Ville émetteur: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="406"/>
+        <location filename="../src/cert-store.cpp" line="409"/>
         <source>Issuer State/Province: %1</source>
         <translation type="unfinished">Province/État émetteur: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="408"/>
+        <location filename="../src/cert-store.cpp" line="411"/>
         <source>Issuer Common Name: %1</source>
         <translation type="unfinished">Nom commun de l&apos;émetteur: %1</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="424"/>
+        <location filename="../src/cert-store.cpp" line="427"/>
         <source>New Identity</source>
         <translation type="unfinished">Nouvelle identité</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="606"/>
+        <location filename="../src/cert-store.cpp" line="609"/>
         <source>All Contacts Updated in Database</source>
         <translation type="unfinished">Tous les contacts mis à jour</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="608"/>
+        <location filename="../src/cert-store.cpp" line="611"/>
         <source>Warning: Problem Saving Contacts !</source>
         <translation type="unfinished">Attention: Problème mise à jour des contacts !</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="648"/>
+        <location filename="../src/cert-store.cpp" line="697"/>
         <source>Name</source>
         <translation type="unfinished">Nom</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="649"/>
+        <location filename="../src/cert-store.cpp" line="698"/>
         <source>Address</source>
         <translation type="unfinished">adresse</translation>
     </message>
     <message>
-        <location filename="../src/cert-store.cpp" line="650"/>
+        <location filename="../src/cert-store.cpp" line="699"/>
         <source>Port</source>
         <translation type="unfinished">Numéro de port</translation>
     </message>
@@ -1103,7 +1112,7 @@
 <context>
     <name>egalite::DChatMain</name>
     <message>
-        <location filename="../src/dchat.cpp" line="610"/>
+        <location filename="../src/dchat.cpp" line="617"/>
         <source>Status</source>
         <translation type="unfinished">Condition</translation>
     </message>
@@ -1118,108 +1127,108 @@
         <translation type="unfinished">nom de connexion</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="146"/>
+        <location filename="../src/dchat.cpp" line="153"/>
         <source>Listener Password for </source>
         <translation type="unfinished">mot de passe d&apos;écouteur </translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="184"/>
+        <location filename="../src/dchat.cpp" line="191"/>
         <source>Pick Identity for Listener</source>
         <translation type="unfinished">Choisissez l&apos;identité de l&apos;écouteur</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="200"/>
+        <location filename="../src/dchat.cpp" line="207"/>
         <source>Pick Listener to Drop</source>
         <translation type="unfinished">Choisir l&apos;écouteur supprimer</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="479"/>
+        <location filename="../src/dchat.cpp" line="486"/>
         <source>Choose Direct Identity</source>
         <translation type="unfinished">Choisissez l&apos;identité direct</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="488"/>
+        <location filename="../src/dchat.cpp" line="495"/>
         <source> --- New Destination --- </source>
         <translation type="unfinished">--- Nouvelle Destination ---</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="490"/>
+        <location filename="../src/dchat.cpp" line="497"/>
         <source>Choose Destination</source>
         <translation type="unfinished">Choisissez une destination</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="501"/>
+        <location filename="../src/dchat.cpp" line="508"/>
         <source>Direct Connect Destination</source>
         <translation type="unfinished">Destination de la connexion directe</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="502"/>
+        <location filename="../src/dchat.cpp" line="509"/>
         <source>Enter Destination Address or URL</source>
         <translation type="unfinished">Entrez l&apos;adresse de destination ou l&apos;URL</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="538"/>
+        <location filename="../src/dchat.cpp" line="545"/>
         <source>Choose Account to Log Out</source>
         <translation type="unfinished">Choisissez le compte à déconnecter</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="563"/>
+        <location filename="../src/dchat.cpp" line="570"/>
         <source>Request Subscription from Account</source>
         <translation type="unfinished">Demander un abonnement à partir du compte</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="609"/>
+        <location filename="../src/dchat.cpp" line="616"/>
         <source>direct </source>
         <translation type="unfinished">direct</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="615"/>
-        <location filename="../src/dchat.cpp" line="641"/>
+        <location filename="../src/dchat.cpp" line="622"/>
+        <location filename="../src/dchat.cpp" line="648"/>
         <source>Chat</source>
         <translation type="unfinished">conversation</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="636"/>
+        <location filename="../src/dchat.cpp" line="643"/>
         <source>Xmpp </source>
         <translation type="unfinished">Xmpp</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="705"/>
+        <location filename="../src/dchat.cpp" line="712"/>
         <source>pres-error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="707"/>
+        <location filename="../src/dchat.cpp" line="714"/>
         <source>Available</source>
         <translation type="unfinished">Disponible</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="709"/>
+        <location filename="../src/dchat.cpp" line="716"/>
         <source>Not Available</source>
         <translation type="unfinished">Non disponible</translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="711"/>
+        <location filename="../src/dchat.cpp" line="718"/>
         <source>Want to Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="713"/>
+        <location filename="../src/dchat.cpp" line="720"/>
         <source>Done Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="715"/>
+        <location filename="../src/dchat.cpp" line="722"/>
         <source>Want to Un-Subscribe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="717"/>
+        <location filename="../src/dchat.cpp" line="724"/>
         <source>Done Un-Subscribed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dchat.cpp" line="719"/>
+        <location filename="../src/dchat.cpp" line="726"/>
         <source>Probe</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1256,82 +1265,92 @@ was resolved to address
 <context>
     <name>egalite::PickCert</name>
     <message>
-        <location filename="../src/pick-cert.cpp" line="175"/>
+        <location filename="../src/pick-cert.cpp" line="111"/>
+        <source>Save Direct Authorization</source>
+        <translation type="unfinished">de confiance autorisation directe</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="127"/>
+        <source>Block Direct Authorization</source>
+        <translation type="unfinished">Bloquer permanente</translation>
+    </message>
+    <message>
+        <location filename="../src/pick-cert.cpp" line="212"/>
         <source> Expired !</source>
         <translation>périmée !</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="179"/>
+        <location filename="../src/pick-cert.cpp" line="216"/>
         <source> Not Yet Valid !</source>
         <translation>pas encore valide!</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="181"/>
+        <location filename="../src/pick-cert.cpp" line="218"/>
         <source>Organization: %1</source>
         <translation>Organisation</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="183"/>
+        <location filename="../src/pick-cert.cpp" line="220"/>
         <source>Subunit: %1</source>
         <translation>Sous-organisation</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="185"/>
+        <location filename="../src/pick-cert.cpp" line="222"/>
         <source>Country: %1</source>
         <translation>Pays</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="187"/>
+        <location filename="../src/pick-cert.cpp" line="224"/>
         <source>Locality: %1</source>
         <translation>Ville</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="189"/>
+        <location filename="../src/pick-cert.cpp" line="226"/>
         <source>State/Province: %1</source>
         <translation>Province/État</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="191"/>
+        <location filename="../src/pick-cert.cpp" line="228"/>
         <source>Common Name: %1</source>
         <translation>Nom Commun</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="194"/>
+        <location filename="../src/pick-cert.cpp" line="231"/>
         <source>valid from:  %1 %2</source>
         <translation>Valable à partir du: %1 %2</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="197"/>
+        <location filename="../src/pick-cert.cpp" line="234"/>
         <source>valid until: %1 %2</source>
         <translation>Valable jusqu&apos;au: %1 %2</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="201"/>
+        <location filename="../src/pick-cert.cpp" line="238"/>
         <source>Issuer Organization: %1</source>
         <translation>Organisation émettrice</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="203"/>
+        <location filename="../src/pick-cert.cpp" line="240"/>
         <source>Issuer Unit Name: %1</source>
         <translation>Émission Sous-Organisation</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="205"/>
+        <location filename="../src/pick-cert.cpp" line="242"/>
         <source>Issuer Country: %1</source>
         <translation>Pays émetteur</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="207"/>
+        <location filename="../src/pick-cert.cpp" line="244"/>
         <source>Issuer Locality: %1</source>
         <translation>Ville émetteur</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="209"/>
+        <location filename="../src/pick-cert.cpp" line="246"/>
         <source>Issuer State/Province: %1</source>
         <translation>Province/État émetteur</translation>
     </message>
     <message>
-        <location filename="../src/pick-cert.cpp" line="211"/>
+        <location filename="../src/pick-cert.cpp" line="248"/>
         <source>Issuer Common Name: %1</source>
         <translation>Nom commun de l&apos;émetteur</translation>
     </message>
@@ -1393,7 +1412,7 @@ was resolved to address
         <translation type="unfinished">anonyme</translation>
     </message>
     <message>
-        <location filename="../src/symmetric-socket.cpp" line="346"/>
+        <location filename="../src/symmetric-socket.cpp" line="348"/>
         <source>Connection Refused</source>
         <translation type="unfinished">connexion refusée</translation>
     </message>
