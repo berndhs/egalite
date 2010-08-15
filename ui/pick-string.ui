@@ -55,7 +55,7 @@
    </property>
   </widget>
  </widget>
- <layoutdefault spacing="1" margin="1"/>
+ <layoutdefault spacing="0" margin="0"/>
  <resources>
   <include location="../dchat.qrc"/>
  </resources>
