@@ -39,6 +39,7 @@ ContactListModel::ContactListModel (QObject *parent)
    resTag ("resource"),
    stateTag ("state"),
    nickTag ("nick"),
+   loginTag ("serverLogin"),
    discardOfflines (false),
    presentColor (Qt::blue),
    absentColor (Qt::black),
@@ -85,7 +86,16 @@ ContactListModel::PickedItem (const QModelIndex &index)
   if (item) {
     if (item->data(tagData).toString() == nameTag) {
       QString target (item->text());
-      emit StartServerChat (target);
+      QString serverLogin;
+      QModelIndex parent = index.parent();
+      QStandardItem * parentItem = itemFromIndex (parent);
+      if (parentItem) {
+         if (parentItem->data (tagData).toString() == loginTag) {
+           serverLogin = parentItem->text();
+         }
+      }
+qDebug () << " picked item " << target << " from login " << serverLogin;
+      emit StartServerChat (target, serverLogin);
     }
   }
 }
@@ -468,7 +478,7 @@ ContactListModel::FindAccountGroup (QString accountName, bool makeit)
   // not found - make a new one
   if (makeit) {
     rowHead = new QStandardItem (accountName);
-    rowHead->setData (QString("accounthead"), tagData);
+    rowHead->setData (loginTag, tagData);
     appendRow (rowHead);
     return rowHead;
   } else {

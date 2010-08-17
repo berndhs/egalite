@@ -279,8 +279,8 @@ DChatMain::Connect ()
            this, SLOT (About ()));
   connect (ui.actionRequest, SIGNAL (triggered ()),
            this, SLOT (RequestSubscribe ()));
-  connect (&contactListModel, SIGNAL (StartServerChat (QString)),
-           this, SLOT (StartServerChat (QString)));
+  connect (&contactListModel, SIGNAL (StartServerChat (QString, QString)),
+           this, SLOT (StartServerChat (QString, QString)));
   connect (&contactListModel, SIGNAL (NewAccountIndex (QModelIndex)),
            this, SLOT (ExpandAccountView (QModelIndex)));
 }
@@ -444,7 +444,9 @@ DChatMain::GetMessage (const QXmppMessage & msg)
   if (serverChats.find (remoteId) != serverChats.end()) {
     serverChats[remoteId]->Incoming (msg);
   } else {
-    StartServerChat (remoteId);
+    QStringList partsTo = to.split ('/');
+    QString login = partsTo.at (0);
+    StartServerChat (remoteId, login);
     if (serverChats.find (remoteId) != serverChats.end()) {
       serverChats[remoteId]->Incoming (msg);
     }
@@ -636,15 +638,16 @@ Q_UNUSED (localNick);
 }
 
 void
-DChatMain::StartServerChat (QString remoteName)
+DChatMain::StartServerChat (QString remoteName, QString serverLogin)
 {
 qDebug () << " starting new server chat for remote " << remoteName;
+qDebug () << "                              local  " << serverLogin;
   ChatBox * newChat = new ChatBox (this);
   newChat->SetTitle (tr("Xmpp ") + remoteName);
   ChatContent * newCont = new ChatContent (this);
   newCont->SetMode (ChatContent::ChatModeXmpp);
   newCont->SetRemoteName (remoteName);
-  newCont->SetLocalName (xmppUser);
+  newCont->SetLocalName (serverLogin);
   newChat->Add (newCont, tr("Chat"));
   serverChats [remoteName] = newChat;
   connect (newCont, SIGNAL (Activity (const QWidget*)),

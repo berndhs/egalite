@@ -79,7 +79,7 @@ private slots:
 
 signals:
 
-  void StartServerChat (QString target);
+  void StartServerChat (QString target, QString login);
   void NewAccountIndex (QModelIndex newIndex);
 
 private:
@@ -110,6 +110,7 @@ private:
   QString      resTag;
   QString      stateTag;
   QString      nickTag;
+  QString      loginTag;
 
   bool         discardOfflines;
   QColor       presentColor;
