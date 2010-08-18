@@ -594,12 +594,14 @@ DChatMain::DoRequestSubscribe ()
   if (subscribeDial) {
     QString toAccount = reqSubUi.toAccount->text();
     QString fromAccount = reqSubUi.fromAccount->text();
+qDebug () << " subscribe request from " << fromAccount << " to " << toAccount;
     int done(0);
     if (xclientMap.find (fromAccount) != xclientMap.end()) {
       QXmppClient * xclient = xclientMap[fromAccount];
       QXmppPresence  request;
       request.setTo (toAccount);
       request.setType (QXmppPresence::Subscribe);
+qDebug () << " sending subscribe request with xclient" << xclient;
       xclient->sendPacket (request);
       done = 1;
     }

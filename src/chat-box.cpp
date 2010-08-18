@@ -36,6 +36,9 @@ ChatBox::ChatBox (QWidget *parent)
   :QDialog (parent)
 {
   ui.setupUi (this);
+  Qt::WindowFlags flags = windowFlags ();
+  flags |= (Qt::WindowMinimizeButtonHint | Qt::WindowSystemMenuHint);
+  setWindowFlags (flags);
 }
 
 ChatBox::~ChatBox ()

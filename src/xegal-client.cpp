@@ -69,6 +69,7 @@ XEgalClient::PresenceChange (const QXmppPresence & presence)
   QXmppPresence::Status status = presence.status();
   QStringList parts = presence.from().split('/');
   QString from = parts.at(0);
+qDebug () << " received presence from " << from << " type " << presType;
   if (presType == QXmppPresence::Available 
       || presType == QXmppPresence::Unavailable
       || presType == QXmppPresence::Error) {

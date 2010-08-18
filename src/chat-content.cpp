@@ -56,6 +56,9 @@ ChatContent::ChatContent (QWidget *parent)
   ui.quitButton->setAutoDefault (false);
   ui.saveButton->setAutoDefault (false);
   ui.sendButton->setDefault (true);  /// send when Return pressed
+  Qt::WindowFlags flags = windowFlags ();
+  flags |= (Qt::WindowMinimizeButtonHint | Qt::WindowSystemMenuHint);
+  setWindowFlags (flags);
 }
 
 void

@@ -46,6 +46,9 @@ SymmetricSocket::SymmetricSocket (int socketDescriptor,
 {
   dialog = new QDialog;
   ui.setupUi (dialog);
+  Qt::WindowFlags flags = dialog->windowFlags ();
+  flags |= (Qt::WindowMinimizeButtonHint | Qt::WindowSystemMenuHint);
+  dialog->setWindowFlags (flags);
   dialog->setWindowTitle (tr("Symmetric Socket"));
   checkTimer = new QTimer (this);
   connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
@@ -66,6 +69,9 @@ SymmetricSocket::SymmetricSocket (QSslKey argKey, QSslCertificate argCert)
 {
   dialog = new QDialog;
   ui.setupUi (dialog);
+  Qt::WindowFlags flags = dialog->windowFlags ();
+  flags |= (Qt::WindowMinimizeButtonHint | Qt::WindowSystemMenuHint);
+  dialog->setWindowFlags (flags);
   dialog->setWindowTitle (tr("Symmetric Socket"));
   checkTimer = new QTimer (this);
   connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
