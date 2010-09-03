@@ -149,7 +149,7 @@ HEADERS = \
         src/xegal-client.h \
         src/add-listener.h \
         src/cert-generate.h \
-	src/account-edit.h \ping6 
+	src/account-edit.h \
 
 
 
