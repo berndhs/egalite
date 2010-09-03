@@ -76,6 +76,11 @@ public:
   bool        RemoteNick (QByteArray pem, QString & nick);
   bool        IsBlocked (QByteArray pem);
 
+  bool        SaveAccount (QString jid, QString server, QString pass);
+  bool        RecallAccount (QString jid, QString & server, QString &pass);
+  bool        DeleteAccount (QString jid);
+  QStringList AccountList ();
+
 public slots:
 
   /** \brief CertDialog - gui to add/remove/edit identities. */

@@ -80,7 +80,9 @@ CertStore::CertStore ()
                 << "uniqueremotecert"
                 << "blackcerts"
                 << "uniqueblack"
-                << "uniqueblackcert";
+                << "uniqueblackcert"
+                << "serveraccounts"
+                << "uniquejid";
 }
 
 void
@@ -798,6 +800,70 @@ CertStore::MakeElement (const QString elem)
   qry.prepare (querytext);
   qry.exec ();
 qDebug () << " making " << querytext;
+}
+
+bool
+CertStore::SaveAccount (QString jid, QString server, QString pass)
+{
+  CheckDBComplete (dbFileName);
+  QString saveString ("insert or replace into serveraccounts "
+                             " (jid, server, pass) "
+                             " values (?, ?, ?)");
+  QSqlQuery saveQry (certDB);
+  saveQry.prepare (saveString);
+  saveQry.bindValue (0, QVariant (jid));
+  saveQry.bindValue (1, QVariant (server));
+  saveQry.bindValue (2, QVariant (pass));
+  bool ok =saveQry.exec ();
+  return ok;
+}
+
+bool
+CertStore::RecallAccount (QString jid, QString & server, QString &pass)
+{
+  CheckDBComplete (dbFileName);
+  QSqlQuery readQuery (certDB);
+  QString qryString = QString 
+             ("select * from serveraccounts where jid = \"%1\"")
+             .arg (jid);
+  bool ok =readQuery.exec (qryString);
+  bool gotit (false);
+  if (ok && readQuery.next()) {
+    int serverNdx = readQuery.record().indexOf ("server");
+    int passNdx = readQuery.record().indexOf ("pass");
+    server = readQuery.value (serverNdx).toString ();
+    pass = readQuery.value (passNdx).toString ();
+    gotit = true;
+  }
+  return gotit;
+}
+
+QStringList
+CertStore::AccountList ()
+{
+  CheckDBComplete (dbFileName);
+  QStringList accounts;
+  QSqlQuery listQuery (certDB);
+  listQuery.exec (QString ("select jid from serveraccounts where 1"));
+  int jidNdx = listQuery.record().indexOf ("jid");
+  QString jid;
+  while (listQuery.next()) {
+    jid = listQuery.value(jidNdx).toString ();
+    accounts << jid;
+  }
+  return accounts;
+}
+
+bool
+CertStore::DeleteAccount (QString jid)
+{
+  CheckDBComplete (dbFileName);
+  QSqlQuery  delQuery (certDB);
+  QString    delString (QString
+                        ("delete from serveraccounts where jid = \"%1\"")
+                        .arg (jid));
+  bool del = delQuery.exec (delString);
+  return del;
 }
 
 } // namespace

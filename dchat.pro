@@ -94,6 +94,7 @@ FORMS = \
         ui/list-direct.ui \
         ui/cert-edit.ui \
         ui/cert-input.ui \
+	ui/server-account.ui \
 
 
 SOURCES = src/main.cpp \
@@ -119,6 +120,7 @@ SOURCES = src/main.cpp \
         src/xegal-client.cpp \
         src/add-listener.cpp \
         src/cert-generate.cpp \
+	src/account-edit.cpp \
 
 
 
@@ -147,6 +149,7 @@ HEADERS = \
         src/xegal-client.h \
         src/add-listener.h \
         src/cert-generate.h \
+	src/account-edit.h \ping6 
 
 
 

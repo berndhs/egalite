@@ -85,6 +85,8 @@
     </property>
     <addaction name="actionDirect"/>
     <addaction name="actionCreate"/>
+    <addaction name="separator"/>
+    <addaction name="actionServer"/>
    </widget>
    <widget class="QMenu" name="menuContacts">
     <property name="title">
@@ -179,6 +181,11 @@
   <action name="actionCreate">
    <property name="text">
     <string>Create Certificate</string>
+   </property>
+  </action>
+  <action name="actionServer">
+   <property name="text">
+    <string>Server Accounts</string>
    </property>
   </action>
  </widget>

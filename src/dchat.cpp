@@ -38,6 +38,7 @@
 #include <QModelIndex>
 #include <QXmlStreamWriter>
 #include <QDateTime>
+#include <QMessageBox>
 #include <set>
 
 #include "direct-listener.h"
@@ -60,6 +61,7 @@ DChatMain::DChatMain (QWidget *parent)
    configEdit (this),
    helpView (this),
    subscriptionDialog (this),
+   serverAccountEdit (this),
    publicPort (29999),
    defaultPort (29999),
    passdial (0),
@@ -269,6 +271,8 @@ DChatMain::Connect ()
            CertStore::Object(), SLOT (ContactDialog ()));
   connect (ui.actionCreate, SIGNAL (activated()),    
            CertStore::Object(), SLOT (CreateCertificate()));
+  connect (ui.actionServer, SIGNAL (triggered()),
+           this, SLOT (EditServerLogin ()));
   connect (ui.contactView, SIGNAL (activated (const QModelIndex &)),
            &contactListModel, SLOT (PickedItem (const QModelIndex &)));
   connect (ui.actionLicense, SIGNAL (triggered()),
@@ -367,13 +371,14 @@ DChatMain::AnnounceMe ()
 bool
 DChatMain::GetPass ()
 {
+  bool picked = PickServerAccount (user, server, password);
   if (passdial == 0) {
     passdial = new QDialog (this);
     passui.setupUi (passdial);
   }
   passui.userText->setText (user);
   passui.serverText->setText (server);
-  passui.passwordText->setText ("");
+  passui.passwordText->setText (password);
   connect (passui.okButton, SIGNAL (clicked()), this, SLOT (PassOK()));
   connect (passui.cancelButton, SIGNAL (clicked()), this, SLOT (PassCancel()));
   int haveit = passdial->exec ();
@@ -381,17 +386,34 @@ DChatMain::GetPass ()
     password = passui.passwordText->text ();
     user = passui.userText->text ();
     server = passui.serverText->text ();
-    Settings().setValue ("network/user",user);
-    Settings().setValue ("network/server",server);
-qDebug () << " GetPass new     +++++++++++++++++++++ ";
-qDebug () << " new user " << user << " server " << server;
-qDebug () << " userText " << passui.userText->text ();
-qDebug () << " serverText " << passui.serverText->text ();
     return true;
   } else {
-qDebug () << " GetPass no change ------------------- ";
     return false;
   }
+}
+
+bool
+DChatMain::PickServerAccount (QString &jid, QString &server, QString &pass)
+{
+  PickString  picker (this);
+  picker.move (this->pos());
+  picker.SetTitle (tr("Pick Server Account "));
+  QStringList list = CertStore::IF().AccountList ();
+  QString newAccount (tr ("--- New Account ---"));
+  list << newAccount;
+  int picked = picker.Pick (list);
+  if (picked) {
+    QString ident = picker.Choice();
+    if (ident != newAccount) {
+      jid = ident;
+      return CertStore::IF().RecallAccount (jid, server, pass);
+    } else {
+      jid.clear() ; 
+      server.clear (); 
+      pass.clear ();
+    }
+  }
+  return false;
 }
 
 void
@@ -874,6 +896,12 @@ DChatMain::ExpandAccountView (QModelIndex accountIndex)
   ui.contactView->expand (accountIndex);
 }
 
+
+void
+DChatMain::EditServerLogin ()
+{
+  serverAccountEdit.Exec ();
+}
 
 } // namespace
 

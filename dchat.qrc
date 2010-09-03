@@ -14,6 +14,8 @@
   <file alias="blackcerts.sql">schemafiles/blackcerts.sql</file>
   <file alias="uniqueblack.sql">schemafiles/uniqueblack.sql</file>
   <file alias="uniqueblackcert.sql">schemafiles/uniqueblackcert.sql</file>
+  <file alias="serveraccounts.sql">schemafiles/serveraccounts.sql</file>
+  <file alias="uniquejid.sql">schemafiles/uniquejid.sql</file>
 </qresource>
 <qresource prefix="/help">
   <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>

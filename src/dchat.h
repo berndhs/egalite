@@ -38,6 +38,7 @@
 #include "xegal-client.h"
 #include "ui_getpassword.h"
 #include "ui_request-subscribe.h"
+#include "account-edit.h"
 
 #include <map>
 
@@ -88,6 +89,7 @@ private slots:
   void ListenerAdd ();
   void ListenerDrop ();
   void EditSettings ();
+  void EditServerLogin ();
   void RequestSubscribe ();
   void DoRequestSubscribe ();
   void CallDirect ();
@@ -121,6 +123,7 @@ private:
   bool    GetPass ();
   void    Poll (XEgalClient * xclient);
   void    CallDirectFrom (QString nick);
+  bool    PickServerAccount (QString &jid, QString &server, QString &pass);
   QString PresenceTypeString (QXmppPresence::Type t);
   void    StartListener (QString ownAddress, 
                          QString directIdentity, 
@@ -136,6 +139,7 @@ private:
   ConfigEdit            configEdit;
   deliberate::HelpView  helpView;
   SubscriptionChange    subscriptionDialog;
+  AccountEdit           serverAccountEdit;
 
   QXmppConfiguration  xmppConfig;
   int           publicPort;
