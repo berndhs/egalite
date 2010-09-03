@@ -809,11 +809,13 @@ CertStore::SaveAccount (QString jid, QString server, QString pass)
   QString saveString ("insert or replace into serveraccounts "
                              " (jid, server, pass) "
                              " values (?, ?, ?)");
+  QByteArray  bpass (pass.toUtf8());
+  deliberate::Rot1 (bpass,jid.toUtf8());
   QSqlQuery saveQry (certDB);
   saveQry.prepare (saveString);
   saveQry.bindValue (0, QVariant (jid));
   saveQry.bindValue (1, QVariant (server));
-  saveQry.bindValue (2, QVariant (pass));
+  saveQry.bindValue (2, QVariant (bpass));
   bool ok =saveQry.exec ();
   return ok;
 }
@@ -828,13 +830,16 @@ CertStore::RecallAccount (QString jid, QString & server, QString &pass)
              .arg (jid);
   bool ok =readQuery.exec (qryString);
   bool gotit (false);
+  QByteArray bpass;
   if (ok && readQuery.next()) {
     int serverNdx = readQuery.record().indexOf ("server");
     int passNdx = readQuery.record().indexOf ("pass");
     server = readQuery.value (serverNdx).toString ();
-    pass = readQuery.value (passNdx).toString ();
+    bpass = readQuery.value (passNdx).toByteArray ();
     gotit = true;
   }
+  deliberate::Rot2 (bpass, jid.toUtf8());
+  pass = QString::fromUtf8(bpass.data());
   return gotit;
 }
 
