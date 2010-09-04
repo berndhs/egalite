@@ -4,6 +4,8 @@
 #include <QXmppMessage.h>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
+#include <QDomElement>
+#include <QDomText>
 #include <QRegExp>
 #include <QDesktopServices>
 #include <QDebug>
@@ -139,11 +141,18 @@ ChatContent::SaveContent ()
 void
 ChatContent::Incoming (const QByteArray & data, bool isLocal)
 {
-  QDomDocument msgDoc;
-  msgDoc.setContent (data);
-  QXmppMessage msg;
-  msg.parse (msgDoc.documentElement());
-  Incoming (msg, isLocal);
+  QDomDocument doc;
+  doc.setContent (data);
+  QDomElement root = doc.documentElement();
+  if (root.tagName() == "message") { 
+    QXmppMessage msg;
+    msg.parse (root);
+    Incoming (msg, isLocal);
+  } else if (root.tagName() == "Egalite") {
+    ExtractXmpp (root, isLocal); 
+  } else {
+    qDebug () << " invalid tag " << root.tagName();
+  }
 }
 
 void
@@ -181,12 +190,46 @@ ChatContent::Send ()
     QByteArray outbuf ("<?xml version='1.0'>");
     QXmlStreamWriter out (&outbuf);
     msg.toXml (&out);
+    MakeDirectMessage (outbuf);
     emit Outgoing (outbuf);
   } else if (chatMode == ChatModeXmpp) {
     emit Outgoing (msg);
   }
   /// be optimistic and report what we just sent as being echoed back
   Incoming (msg, true);
+}
+
+void
+ChatContent::MakeDirectMessage (QByteArray & raw)
+{
+  qDebug () << " sending " << raw;
+  QDomDocument directDoc ("Egalite");
+  QDomElement root = directDoc.createElement ("Egalite");
+  directDoc.appendChild (root);
+  QDomElement msg = directDoc.createElement ("cmd");
+  msg.setAttribute ("op","xmpp");
+  msg.setAttribute ("type","message");
+  root.appendChild (msg);
+  QDomText txt = directDoc.createTextNode (raw);
+  msg.appendChild (txt);
+  raw = directDoc.toString().toUtf8();
+}
+
+void
+ChatContent::ExtractXmpp (QDomElement & msg, bool isLocal)
+{
+  QDomElement body = msg.firstChildElement ();
+  QString opcode = body.attribute ("op",QString("badop"));
+qDebug () << " incoming message op " << opcode;
+  if (opcode == "xmpp") {
+    QByteArray msgtext = body.text ().toUtf8();
+qDebug () << " encapsulated xmpp message is " << msgtext;
+    Incoming (msgtext, isLocal);
+  } else if (opcode == "ctl") {
+    qDebug () << "egalite ctl message received: " 
+              << msg.attribute ("op") 
+              << msg.attribute("type");
+  }
 }
 
 void

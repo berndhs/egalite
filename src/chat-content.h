@@ -29,6 +29,7 @@
 #include <QUrl>
 
 class QXmppMessage;
+class QDomElement;
 
 namespace egalite
 {
@@ -90,6 +91,9 @@ signals:
   void Activity (QWidget * activeWidget);
 
 private:
+
+  void MakeDirectMessage (QByteArray & raw);
+  void ExtractXmpp (QDomElement & msg, bool isLocal);
 
   Ui_ChatContent   ui;
 
