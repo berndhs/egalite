@@ -69,6 +69,14 @@ ChatContent::ChatContent (QWidget *parent)
   setWindowFlags (flags);
 }
 
+
+ChatContent::~ChatContent ()
+{
+  if (heartBeat) {
+    heartBeat->stop ();
+  }
+}
+
 void
 ChatContent::SetMode (Mode mode)
 {
@@ -331,6 +339,9 @@ ChatContent::EndChat ()
 {
 qDebug () << " EndChat called";
   emit Disconnect (remoteName);
+  if (heartBeat) {
+    heartBeat->stop ();
+  }
 }
 
 void

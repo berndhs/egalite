@@ -59,6 +59,7 @@ public:
              };
 
   ChatContent (QWidget * parent=0);
+  ~ChatContent ();
 
   void SetMode (Mode mode);
 

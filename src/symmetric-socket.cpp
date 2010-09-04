@@ -52,7 +52,7 @@ SymmetricSocket::SymmetricSocket (int socketDescriptor,
   dialog->setWindowTitle (tr("Symmetric Socket"));
   checkTimer = new QTimer (this);
   connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
-  checkTimer->start (1000);
+  checkTimer->start (100);
   localName = cert.subjectInfo (QSslCertificate::CommonName);
   dialog->show();
 }
@@ -75,7 +75,7 @@ SymmetricSocket::SymmetricSocket (QSslKey argKey, QSslCertificate argCert)
   dialog->setWindowTitle (tr("Symmetric Socket"));
   checkTimer = new QTimer (this);
   connect (checkTimer, SIGNAL (timeout()), this, SLOT (TimerReport()));
-  checkTimer->start (1000);
+  checkTimer->start (100);
   localName = cert.subjectInfo (QSslCertificate::CommonName);
 #if 0
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Done()));
@@ -240,6 +240,7 @@ SymmetricSocket::EncryptDone ()
   ui.dataLine->setText ("Ready");
   checkTimer->stop ();
   checkTimer->start (10000);
+  TimerReport ();
   emit Ready (this);
 }
 
