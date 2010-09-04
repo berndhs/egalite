@@ -40,6 +40,8 @@ namespace egalite
 ChatContent::ChatContent (QWidget *parent)
   :QDialog (parent),
    chatMode (ChatModeRaw),
+   rcvCount (0),
+   sendCount (0),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -102,8 +104,8 @@ ChatContent::Start ()
   localLine.replace (QString("@color@"),localHtmlColor);
   remoteLine = chatLine;
   remoteLine.replace (QString("@color@"),remoteHtmlColor);
-qDebug () << " local line " << localLine;
-qDebug () << " remote line " << remoteLine;
+  rcvCount = 0;
+  sendCount = 0;
 }
 
 void
@@ -143,12 +145,14 @@ ChatContent::Incoming (const QByteArray & data, bool isLocal)
 {
   QDomDocument doc;
   doc.setContent (data);
+qDebug () << "Incoming Raw " << data;
   QDomElement root = doc.documentElement();
   if (root.tagName() == "message") { 
     QXmppMessage msg;
     msg.parse (root);
     Incoming (msg, isLocal);
   } else if (root.tagName() == "Egalite") {
+    chatMode = ChatModeEmbed;
     ExtractXmpp (root, isLocal); 
   } else {
     qDebug () << " invalid tag " << root.tagName();
@@ -158,10 +162,18 @@ ChatContent::Incoming (const QByteArray & data, bool isLocal)
 void
 ChatContent::Incoming (const QXmppMessage & msg, bool isLocal)
 {
+  rcvCount ++;
+qDebug () << "Receive Count == " << rcvCount << " mode " << chatMode;
   QString from = msg.from ();
   QString to   = msg.to ();
   QString body = msg.body ().trimmed();
   if (body.length() < 1) {
+    if (rcvCount == 1 && chatMode == ChatModeRaw) {
+      /// empty first message -- other end wants Embed mode
+      SendMessage (QString (), true);
+      chatMode = ChatModeEmbed;
+      qDebug () << " Switch to Mode " << chatMode;
+    }
     return;
   }
   QDateTime  now = QDateTime::currentDateTime();
@@ -185,30 +197,49 @@ ChatContent::Send ()
   if (content.length() < 1) {            /// dont send empty messages
     return;
   }
-  QXmppMessage msg (localName,remoteName,content);
-  if (chatMode == ChatModeRaw) {
-    QByteArray outbuf ("<?xml version='1.0'>");
-    QXmlStreamWriter out (&outbuf);
-    msg.toXml (&out);
-    MakeDirectMessage (outbuf);
-    emit Outgoing (outbuf);
-  } else if (chatMode == ChatModeXmpp) {
-    emit Outgoing (msg);
-  }
-  /// be optimistic and report what we just sent as being echoed back
-  Incoming (msg, true);
+  SendMessage (content, false);
 }
 
 void
-ChatContent::MakeDirectMessage (QByteArray & raw)
+ChatContent::SendMessage (const QString & content, bool isControl)
+{
+  if (chatMode == ChatModeRaw &&
+      sendCount == 0 &&
+      !isControl) { // try to go to Embed mode
+    SendMessage (QString(), true);
+  }
+  QXmppMessage msg (localName,remoteName,content);
+  if (chatMode == ChatModeRaw || chatMode == ChatModeEmbed) {
+    QByteArray outbuf ("<?xml version='1.0'>");
+    QXmlStreamWriter out (&outbuf);
+    msg.toXml (&out);
+    if (chatMode == ChatModeEmbed) {
+      EmbedDirectMessage (outbuf);
+    }
+    sendCount++;
+    emit Outgoing (outbuf);
+  } else if (chatMode == ChatModeXmpp) {
+    sendCount++;
+    emit Outgoing (msg);
+  }
+  /// be optimistic and report what we just sent as being echoed back
+  if (!isControl) {
+    Incoming (msg, true);
+  }
+}
+
+void
+ChatContent::EmbedDirectMessage (QByteArray & raw)
 {
   qDebug () << " sending " << raw;
   QDomDocument directDoc ("Egalite");
   QDomElement root = directDoc.createElement ("Egalite");
+  root.setAttribute ("version","0.2");
   directDoc.appendChild (root);
   QDomElement msg = directDoc.createElement ("cmd");
   msg.setAttribute ("op","xmpp");
   msg.setAttribute ("type","message");
+  msg.setAttribute ("num",QString::number(sendCount));
   root.appendChild (msg);
   QDomText txt = directDoc.createTextNode (raw);
   msg.appendChild (txt);

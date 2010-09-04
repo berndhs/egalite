@@ -53,7 +53,8 @@ public:
 
   enum Mode { ChatModeNone = 0, 
                ChatModeRaw  = 1,
-               ChatModeXmpp = 2
+               ChatModeXmpp = 2,
+               ChatModeEmbed = 3
              };
 
   ChatContent (QWidget * parent=0);
@@ -92,14 +93,17 @@ signals:
 
 private:
 
-  void MakeDirectMessage (QByteArray & raw);
+  void EmbedDirectMessage (QByteArray & raw);
   void ExtractXmpp (QDomElement & msg, bool isLocal);
+  void SendMessage (const QString & content, bool isControl=false);
 
   Ui_ChatContent   ui;
 
   QString          remoteName;
   QString          localName;
   Mode             chatMode;
+  quint64          rcvCount;
+  quint64          sendCount;
   QString          dateMask;
   QString          chatLine;
   QString          localLine;
