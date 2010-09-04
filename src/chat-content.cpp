@@ -9,6 +9,8 @@
 #include <QRegExp>
 #include <QDesktopServices>
 #include <QTimer>
+#include <QMessageBox>
+#include <QUuid>
 #include <QDebug>
 #include "link-mangle.h"
 
@@ -46,6 +48,8 @@ ChatContent::ChatContent (QWidget *parent)
    protoVersion (QString()),
    heartPeriod (0),
    heartBeat (0),
+   sendFileWindow (4),
+   sendChunkSize (64),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -57,12 +61,17 @@ ChatContent::ChatContent (QWidget *parent)
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
   connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (SaveContent()));
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
+  connect (ui.sendFileButton, SIGNAL (clicked()), 
+          this, SLOT (StartFileSend ()));
   connect (ui.textHistory, SIGNAL (anchorClicked (const QUrl&)),
           this, SLOT (HandleAnchor (const QUrl&)));
   ui.quitButton->setDefault (false);
   ui.saveButton->setDefault (false);
+  ui.sendFileButton->setDefault (false);
   ui.quitButton->setAutoDefault (false);
   ui.saveButton->setAutoDefault (false);
+  ui.sendFileButton->setAutoDefault (false);
+  ui.sendFileButton->hide();
   ui.sendButton->setDefault (true);  /// send when Return pressed
   Qt::WindowFlags flags = windowFlags ();
   flags |= (Qt::WindowMinimizeButtonHint | Qt::WindowSystemMenuHint);
@@ -72,15 +81,34 @@ ChatContent::ChatContent (QWidget *parent)
 
 ChatContent::~ChatContent ()
 {
+  Stop ();
+}
+
+void
+ChatContent::Stop ()
+{
+  qDebug () << " Chat Content close " << this;
   if (heartBeat) {
     heartBeat->stop ();
   }
+}
+
+bool
+ChatContent::close ()
+{
+  Stop ();
+  return QDialog::close ();
 }
 
 void
 ChatContent::SetMode (Mode mode)
 {
   chatMode = mode;
+  if (chatMode == ChatModeEmbed) {
+    ui.sendFileButton->show ();
+  } else {
+    ui.sendFileButton->hide ();
+  }
 }
 
 void
@@ -148,7 +176,6 @@ ChatContent::SetHeartbeat (int secs)
   }
 }
 
-
 void
 ChatContent::SaveContent ()
 {
@@ -183,7 +210,7 @@ qDebug () << "Incoming Raw " << data;
     IncomingXmpp (msg, isLocal);
   } else if (root.tagName() == "Egalite") {
     SetProtoVersion ("0.2");
-    chatMode = ChatModeEmbed;
+    SetMode (ChatModeEmbed);
     ExtractXmpp (root, isLocal); 
   } else {
     qDebug () << " invalid tag " << root.tagName();
@@ -211,7 +238,7 @@ qDebug () << "Receive Count == " << rcvCount << " mode " << chatMode;
     if (rcvCount == 1 && chatMode == ChatModeRaw) {
       /// empty first message -- other end wants Embed mode
       SendMessage (QString (), true);
-      chatMode = ChatModeEmbed;
+      SetMode (ChatModeEmbed);
       qDebug () << " Switch to Mode " << chatMode;
       ChangeProto (this, "0.2");
     }
@@ -327,6 +354,9 @@ qDebug () << " encapsulated xmpp message is " << msgtext;
     QXmppMessage msg;
     msg.parse (qxmppRoot);
     IncomingXmpp (msg, isLocal);
+  } else if (opcode == "sendfile") {
+    qDebug () << " send file protocol message ";
+    ReceiveSendfileProto (body);
   } else if (opcode == "ctl") {
     qDebug () << "egalite ctl message received: " 
               << msg.attribute ("op") 
@@ -335,19 +365,169 @@ qDebug () << " encapsulated xmpp message is " << msgtext;
 }
 
 void
+ChatContent::ReceiveSendfileProto (QDomElement & msg)
+{
+  QString subop;
+  subop = msg.attribute ("subop");
+  if (subop == "goahead") { 
+    SendfileGoahead (msg);
+  } else if (subop == "deny") {
+    SendfileDeny (msg);
+  } else if (subop == "chunk-ack") {
+    SendfileChunkAck (msg);
+  } else if (subop == "chunk-data") {
+    SendfileChunkData (msg);
+  } else if (subop == "sendreq") {
+    SendfileSendReq (msg);
+  } else if (subop == "rcv-done") {
+    SendfileRcvDone (msg);
+  } else if (subop == "abort") {
+    SendfileAbort (msg);
+  } else {
+    qDebug () << " Unknown subop-code" << subop;
+  }
+}
+
+void
 ChatContent::EndChat ()
 {
 qDebug () << " EndChat called";
   emit Disconnect (remoteName);
-  if (heartBeat) {
-    heartBeat->stop ();
-  }
+  Stop ();
 }
 
 void
 ChatContent::HandleAnchor (const QUrl & url)
 {
   QDesktopServices::openUrl (url);
+}
+
+void
+ChatContent::StartFileSend ()
+{
+  if (chatMode != ChatModeEmbed) {
+    return;
+  }
+  QString defaultName;
+  QString filename = QFileDialog::getOpenFileName (this, 
+                      tr ("Select File to Save"),
+                      defaultName);
+  if (filename.length () > 0) {
+    qDebug () << " selected file name " << filename;
+    XferInfo  info;
+    info.id = QUuid::createUuid ().toString();
+    info.fileSize = 0;
+    info.lastChunkSent = 0;
+    info.lastChunkAck  = 0;
+    QFile * fp =  new QFile (filename);
+    bool isopen = fp ->open (QFile::ReadOnly);
+    info.fileSize = fp->size ();
+    if (isopen) {
+      xferFile [info.id] = fp;
+      xferState [info.id] = info;
+      SendFirstPart (info.id);
+    } else {
+      delete fp;
+      QMessageBox cantOpen (this);
+      cantOpen.setText (tr("Cannot open file %1 to send").arg(filename));
+      QTimer::singleShot (15000, &cantOpen, SLOT (reject()));
+      cantOpen.exec ();
+    }
+  }
+}
+
+void
+ChatContent::SendFirstPart (const QString & id)
+{
+  qDebug () << " supposed to send next part for " << id;
+  QFile * fp = xferFile[id];
+  if (!fp) {
+    return;
+  }
+  XferInfo & info = xferState[id];
+  QDomDocument requestDoc ("Egalite");
+  QDomElement  request = requestDoc.createElement ("Egalite");
+  request.setAttribute ("version", protoVersion);
+  requestDoc.appendChild (request);
+  QDomElement cmd = requestDoc.createElement ("cmd");
+  cmd.setAttribute ("op","sendfile");
+  cmd.setAttribute ("subop","sendreq");
+  cmd.setAttribute ("xferid",id);
+  cmd.setAttribute ("name",fp->fileName());
+  cmd.setAttribute ("size",info.fileSize);
+  request.appendChild (cmd);
+  QByteArray msgbytes = requestDoc.toString().toUtf8 ();
+  emit Outgoing (msgbytes);
+}
+  
+void
+ChatContent::SendNextPart (const QString & id)
+{
+}
+
+void
+ChatContent::IncomingAck (QString xferId, quint64 chunkNum)
+{
+}
+
+void
+ChatContent::SendFinished (const QString & id)
+{
+}
+
+void
+ChatContent::SendChunk (XferInfo & info ,
+                        const QByteArray & data)
+{
+  QDomDocument chunkDoc ("Egalite");
+  QDomElement  chunkRoot = chunkDoc.createElement ("Egalite");
+  chunkRoot.setAttribute ("version", protoVersion);
+  chunkDoc.appendChild (chunkRoot);
+  QDomElement chunk = chunkDoc.createElement ("cmd");
+  chunk.setAttribute ("op","sendfile");
+  chunk.setAttribute ("subop","chunk-data");
+  info.lastChunkSent += 1;
+  chunk.setAttribute ("chunk",QString::number(info.lastChunkSent));
+  QDomText txt = chunkDoc.createTextNode (QString (data));
+  chunk.appendChild (txt);
+  chunkRoot.appendChild (chunk);
+  QByteArray msgbytes = chunkDoc.toString().toUtf8();
+  emit Outgoing (msgbytes);
+}
+
+void 
+ChatContent::SendfileDeny (QDomElement & msg)
+{
+}
+
+void 
+ChatContent::SendfileGoahead (QDomElement & msg)
+{
+}
+
+void 
+ChatContent::SendfileChunkAck (QDomElement & msg)
+{
+}
+
+void 
+ChatContent::SendfileChunkData (QDomElement & msg)
+{
+}
+
+void 
+ChatContent::SendfileSendReq (QDomElement & msg)
+{
+}
+
+void 
+ChatContent::SendfileRcvDone (QDomElement & msg)
+{
+}
+
+void 
+ChatContent::SendfileAbort (QDomElement & msg)
+{
 }
 
 

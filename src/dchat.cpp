@@ -656,6 +656,8 @@ Q_UNUSED (localNick);
              newBox, SLOT (ContentProto (QWidget*, QString)));
     connect (sock, SIGNAL (Exiting(SymmetricSocket *)), 
              this, SLOT (ClearDirect (SymmetricSocket *)));
+    connect (sock, SIGNAL (Exiting(SymmetricSocket *)),
+              newCont, SLOT (Stop ()));
     newBox->Run ();
     newCont->SetProtoVersion ("0.1");
     newCont->SetHeartbeat (60);

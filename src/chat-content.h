@@ -27,6 +27,7 @@
 #include <QDialog>
 #include <QByteArray>
 #include <QUrl>
+#include <QFile>
 
 class QXmppMessage;
 class QDomElement;
@@ -40,6 +41,18 @@ namespace egalite
  * This class knows about displaying text, and grabbing text from 
  * the input area. It doesn't know about how text is sent or received.
  */
+
+class XferInfo {
+public:
+  
+  XferInfo () {}
+  ~XferInfo() {}
+  
+  QString      id;
+  quint64      fileSize;
+  quint64      lastChunkSent;
+  quint64      lastChunkAck;
+};
 
 class ChatContent : public QDialog 
 {
@@ -82,6 +95,9 @@ public slots:
   void IncomingDirect (const QByteArray &data, bool isLocal=false);
   void IncomingXmpp (const QXmppMessage &msg, bool isLocal=false);
   void HandleAnchor (const QUrl & url);
+  void Stop ();
+
+  bool close ();
 
 private slots:
 
@@ -89,6 +105,8 @@ private slots:
   void EndChat ();
   void SaveContent ();
   void Heartbeat ();
+  void StartFileSend ();
+  void IncomingAck (QString xferId, quint64 chunkNum);
 
 signals:
 
@@ -97,13 +115,29 @@ signals:
   void Disconnect (QString remote);
   void Activity (QWidget * activeWidget);
   void ChangeProto (QWidget *, QString newproto);
+  void AckArrived (QString xferId, quint64 chunkNum);
 
 private:
+
+  typedef std::map <QString, XferInfo>   XferStateMap;
+  typedef std::map <QString, QFile*>     XferFileMap;
 
   void EmbedDirectMessage (QByteArray & raw);
   void ExtractXmpp (QDomElement & msg, bool isLocal);
   void SendMessage (const QString & content, bool isControl=false);
   void ModeUpdate ();
+  void SendFirstPart (const QString & id);
+  void SendNextPart (const QString & id);
+  void SendFinished (const QString & id);
+  void SendChunk (XferInfo & info, const QByteArray & data);
+  void ReceiveSendfileProto (QDomElement & msg);
+  void SendfileDeny (QDomElement & msg);
+  void SendfileGoahead (QDomElement & msg);
+  void SendfileChunkAck (QDomElement & msg);
+  void SendfileChunkData (QDomElement & msg);
+  void SendfileSendReq (QDomElement & msg);
+  void SendfileRcvDone (QDomElement & msg);
+  void SendfileAbort (QDomElement & msg);
 
   Ui_ChatContent   ui;
 
@@ -115,6 +149,11 @@ private:
   QString          protoVersion;
   int              heartPeriod;
   QTimer          *heartBeat;
+
+  int              sendFileWindow;
+  int              sendChunkSize;
+  XferStateMap     xferState;
+  XferFileMap      xferFile;
 
   QString          dateMask;
   QString          chatLine;

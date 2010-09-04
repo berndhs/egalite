@@ -1,0 +1,72 @@
+Egalite Direct Protocol
+
+Example messages
+
+<Egalite version="0.2">
+<cmd op="xmpp" num="123" subop="msg">
+xmpp message escaped as text
+</cmd>
+</Egalite>
+
+<Egalite version="0.2">
+<cmd op="ctl" subop="heartbeat" />
+</Egalite>
+
+<Egalite version="0.2">
+<cmd op="sendfile" subop="sendreq" 
+     xferid="unique-id-A0F3B99" 
+     name="file-name with spaces.jpg" 
+     size="12345" />
+</Egalite>
+
+<Egalite version="0.2">
+<cmd op="sendfile" subop="goahead"
+    xferid="unique-id-A0F3B99"
+    />
+</Egalite>
+
+<Egalite version="0.2">
+<cmd op="sendfile" subop="deny"
+    xferid="unique-id-A0F3B899"
+    />
+</Egalite>
+
+<Egalite version="0.2">
+<cmd op="sendfile" subop="chunk-data"
+   chunknum="47"
+   last="y"
+   xferid="unique-id-A0F3B899">
+escaped chunk data
+</cmd>
+
+<Egalite version="0.2">
+<cmd op="sendfile" subop="chunk-ack"
+   chunk="47"
+   xferid="unique-id-A0F3B899" />
+</cmd>
+
+
+<Egalite version="0.2">
+<cmd op="sendfile" subop="snd-done"
+   xferid="unique-id-A0F3B899" />
+</cmd>
+<Egalite version="0.2">
+
+<cmd op="sendfile" subop="rcv-done"
+   xferid="unique-id-A0F3B899" />
+</cmd>
+
+<Egalite version="0.2">
+<cmd op="sendfile" subop="abort"
+   xferid="unique-id-A0F3B899" />
+</cmd>
+
+<Egalite version="0.2">
+<cmd op="sendfile" subop="resend"
+  chunknum="47"
+  xferid="unique-id-A0F3B899" />
+</Egalite>
+
+
+
+    
