@@ -658,7 +658,7 @@ Q_UNUSED (localNick);
              this, SLOT (ClearDirect (SymmetricSocket *)));
     newBox->Run ();
     newCont->SetProtoVersion ("0.1");
-    newCont->SetHeartbeat (20);
+    newCont->SetHeartbeat (60);
     newCont->Start (ChatContent::ChatModeRaw,
                     sock->RemoteName(),
                     sock->LocalName());
