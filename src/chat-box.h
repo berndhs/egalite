@@ -23,6 +23,7 @@
  ****************************************************************/
 
 #include "ui_chat-box.h"
+#include <map>
 
 
 class QXmppMessage;
@@ -54,6 +55,7 @@ public slots:
   void Close ();
   void Incoming (const QXmppMessage &msg);
   void WidgetActivity (QWidget *activeWidget);
+  void ContentProto (QWidget *contentWidget, QString proto);
 
 signals:
 
@@ -61,7 +63,10 @@ signals:
 
 private:
 
+  typedef std::map <QWidget*, QString> TabNameMap;
+
   Ui_ChatBox     ui;
+  TabNameMap     tabName;
 
 };
 

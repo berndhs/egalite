@@ -638,26 +638,30 @@ qDebug () << " have connection with " << sock;
 Q_UNUSED (localNick);
   if (sock) {
     QString other = sock->PeerName();
-    ChatBox * newChat = new ChatBox (this);
-    newChat->SetTitle (tr("direct ") + localNick);
-    newChat->Add (sock->Dialog(),tr("Status")); 
+    ChatBox * newBox = new ChatBox (this);
+    newBox->SetTitle (tr("direct ") + localNick);
+    newBox->Add (sock->Dialog(),tr("Status")); 
     ChatContent * newCont = new ChatContent (this);
-    newCont->Start (ChatContent::ChatModeRaw,
-                    sock->RemoteName(),
-                    sock->LocalName());
-    newChat->Add (newCont,tr("Chat"));
-    directChats [other] = newChat;
+    newBox->Add (newCont,tr("Direct"));
+    directChats [other] = newBox;
     connect (newCont, SIGNAL (Activity (QWidget*)),
-             newChat, SLOT (WidgetActivity (QWidget*)));
+             newBox, SLOT (WidgetActivity (QWidget*)));
     connect (newCont, SIGNAL (Outgoing (const QByteArray&)),
              sock, SLOT (SendData (const QByteArray&)));
     connect (sock, SIGNAL (ReceiveData (const QByteArray&)),
-             newCont, SLOT (Incoming (const QByteArray&)));
+             newCont, SLOT (IncomingDirect (const QByteArray&)));
     connect (newCont, SIGNAL (Disconnect (QString)),
              sock, SLOT (Close()));
+    connect (newCont, SIGNAL (ChangeProto (QWidget*, QString)),
+             newBox, SLOT (ContentProto (QWidget*, QString)));
     connect (sock, SIGNAL (Exiting(SymmetricSocket *)), 
              this, SLOT (ClearDirect (SymmetricSocket *)));
-    newChat->Run ();
+    newBox->Run ();
+    newCont->SetProtoVersion ("0.1");
+    newCont->SetHeartbeat (20);
+    newCont->Start (ChatContent::ChatModeRaw,
+                    sock->RemoteName(),
+                    sock->LocalName());
   }
 }
 
@@ -666,24 +670,28 @@ DChatMain::StartServerChat (QString remoteName, QString serverLogin)
 {
 qDebug () << " starting new server chat for remote " << remoteName;
 qDebug () << "                              local  " << serverLogin;
-  ChatBox * newChat = new ChatBox (this);
-  newChat->SetTitle (tr("Xmpp ") + remoteName);
+  ChatBox * newBox = new ChatBox (this);
+  newBox->SetTitle (tr("Xmpp ") + remoteName);
   ChatContent * newCont = new ChatContent (this);
   newCont->SetMode (ChatContent::ChatModeXmpp);
   newCont->SetRemoteName (remoteName);
   newCont->SetLocalName (serverLogin);
-  newChat->Add (newCont, tr("Chat"));
-  serverChats [remoteName] = newChat;
+  newBox->Add (newCont, tr("Xmpp Chat"));
+  serverChats [remoteName] = newBox;
   connect (newCont, SIGNAL (Activity (const QWidget*)),
-           newChat, SLOT (WidgetActivity (const QWidget*)));
+           newBox, SLOT (WidgetActivity (const QWidget*)));
   connect (newCont, SIGNAL (Outgoing (const QXmppMessage&)),
            this, SLOT (Send (const QXmppMessage&)));
-  connect (newChat, SIGNAL (HandoffIncoming (const QXmppMessage&)),
-            newCont, SLOT (Incoming (const QXmppMessage&)));
+  connect (newBox, SIGNAL (HandoffIncoming (const QXmppMessage&)),
+            newCont, SLOT (IncomingXmpp (const QXmppMessage&)));
   connect (newCont, SIGNAL (Disconnect(QString)),
             this, SLOT (CloseServerChat (QString)));
+  connect (newCont, SIGNAL (ChangeProto (QWidget*, QString)),
+            newBox, SLOT (ContentProto (QWidget*, QString)));
+  newBox->Run ();
+  newCont->SetProtoVersion ("0.1");
+  newCont->SetHeartbeat (0);
   newCont->Start ();
-  newChat->Run ();
 }
 
 void

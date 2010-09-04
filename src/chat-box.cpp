@@ -50,6 +50,7 @@ void
 ChatBox::Add (QWidget *widget, QString title)
 {
   ui.tabWidget->addTab (widget, title);
+  tabName[widget] = title;
 }
 
 void
@@ -98,6 +99,17 @@ void
 ChatBox::Incoming (const QXmppMessage & msg)
 {
   emit HandoffIncoming (msg);
+}
+
+void
+ChatBox::ContentProto (QWidget *contentWidget, QString proto)
+{
+  TabNameMap::iterator  tabIter = tabName.find (contentWidget);
+  if (tabIter != tabName.end()) {
+    int tabNdx = ui.tabWidget->indexOf (contentWidget);
+    QString newLabel (tr("%1 %2").arg (tabIter->second).arg(proto));
+    ui.tabWidget->setTabText (tabNdx, newLabel);
+  }
 }
 
 } // namespace

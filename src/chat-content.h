@@ -30,6 +30,7 @@
 
 class QXmppMessage;
 class QDomElement;
+class QTimer;
 
 namespace egalite
 {
@@ -71,11 +72,14 @@ public:
 
   QString RemoteName () { return remoteName; }
   QString LocalName () { return localName; }
+  QString ProtoVersion () { return protoVersion; }
+  void    SetProtoVersion (QString newProto);
+  void    SetHeartbeat (int secs);
 
 public slots:
 
-  void Incoming (const QByteArray &data, bool isLocal=false);
-  void Incoming (const QXmppMessage &msg, bool isLocal=false);
+  void IncomingDirect (const QByteArray &data, bool isLocal=false);
+  void IncomingXmpp (const QXmppMessage &msg, bool isLocal=false);
   void HandleAnchor (const QUrl & url);
 
 private slots:
@@ -83,6 +87,7 @@ private slots:
   void Send ();
   void EndChat ();
   void SaveContent ();
+  void Heartbeat ();
 
 signals:
 
@@ -90,12 +95,14 @@ signals:
   void Outgoing (const QXmppMessage &msg);
   void Disconnect (QString remote);
   void Activity (QWidget * activeWidget);
+  void ChangeProto (QWidget *, QString newproto);
 
 private:
 
   void EmbedDirectMessage (QByteArray & raw);
   void ExtractXmpp (QDomElement & msg, bool isLocal);
   void SendMessage (const QString & content, bool isControl=false);
+  void ModeUpdate ();
 
   Ui_ChatContent   ui;
 
@@ -104,6 +111,10 @@ private:
   Mode             chatMode;
   quint64          rcvCount;
   quint64          sendCount;
+  QString          protoVersion;
+  int              heartPeriod;
+  QTimer          *heartBeat;
+
   QString          dateMask;
   QString          chatLine;
   QString          localLine;

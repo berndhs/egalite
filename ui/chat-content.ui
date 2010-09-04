@@ -12,7 +12,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Chat</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../dchat.qrc">
+    <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -69,6 +73,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="0" margin="0"/>
- <resources/>
+ <resources>
+  <include location="../dchat.qrc"/>
+ </resources>
  <connections/>
 </ui>

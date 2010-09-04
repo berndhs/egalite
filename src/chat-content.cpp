@@ -8,6 +8,7 @@
 #include <QDomText>
 #include <QRegExp>
 #include <QDesktopServices>
+#include <QTimer>
 #include <QDebug>
 #include "link-mangle.h"
 
@@ -42,6 +43,9 @@ ChatContent::ChatContent (QWidget *parent)
    chatMode (ChatModeRaw),
    rcvCount (0),
    sendCount (0),
+   protoVersion (QString()),
+   heartPeriod (0),
+   heartBeat (0),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -117,6 +121,23 @@ ChatContent::Start (Mode mode,
   SetRemoteName (remoteName);
   SetLocalName (localName);
   Start ();
+  if (chatMode == ChatModeRaw) {
+    ModeUpdate ();
+  }
+}
+
+void
+ChatContent::SetHeartbeat (int secs)
+{
+  if (heartBeat == 0) {
+    heartBeat = new QTimer (this);
+    connect (heartBeat, SIGNAL (timeout()), this, SLOT (Heartbeat()));
+  }
+  if (secs <= 0) {
+    heartBeat->stop ();
+  } else {
+    heartBeat->start (secs * 1000);
+  }
 }
 
 
@@ -141,7 +162,7 @@ ChatContent::SaveContent ()
 }
 
 void
-ChatContent::Incoming (const QByteArray & data, bool isLocal)
+ChatContent::IncomingDirect (const QByteArray & data, bool isLocal)
 {
   QDomDocument doc;
   doc.setContent (data);
@@ -150,8 +171,10 @@ qDebug () << "Incoming Raw " << data;
   if (root.tagName() == "message") { 
     QXmppMessage msg;
     msg.parse (root);
-    Incoming (msg, isLocal);
+    SetProtoVersion ("0.1");
+    IncomingXmpp (msg, isLocal);
   } else if (root.tagName() == "Egalite") {
+    SetProtoVersion ("0.2");
     chatMode = ChatModeEmbed;
     ExtractXmpp (root, isLocal); 
   } else {
@@ -160,7 +183,16 @@ qDebug () << "Incoming Raw " << data;
 }
 
 void
-ChatContent::Incoming (const QXmppMessage & msg, bool isLocal)
+ChatContent::SetProtoVersion (QString newProto)
+{
+  if (protoVersion != newProto) {
+    protoVersion = newProto;
+    emit ChangeProto (this, newProto);
+  }
+}
+
+void
+ChatContent::IncomingXmpp (const QXmppMessage & msg, bool isLocal)
 {
   rcvCount ++;
 qDebug () << "Receive Count == " << rcvCount << " mode " << chatMode;
@@ -173,6 +205,7 @@ qDebug () << "Receive Count == " << rcvCount << " mode " << chatMode;
       SendMessage (QString (), true);
       chatMode = ChatModeEmbed;
       qDebug () << " Switch to Mode " << chatMode;
+      ChangeProto (this, "0.2");
     }
     return;
   }
@@ -201,12 +234,18 @@ ChatContent::Send ()
 }
 
 void
+ChatContent::ModeUpdate ()
+{
+  SendMessage (QString(),true);
+}
+
+void
 ChatContent::SendMessage (const QString & content, bool isControl)
 {
   if (chatMode == ChatModeRaw &&
       sendCount == 0 &&
       !isControl) { // try to go to Embed mode
-    SendMessage (QString(), true);
+    ModeUpdate ();
   }
   QXmppMessage msg (localName,remoteName,content);
   if (chatMode == ChatModeRaw || chatMode == ChatModeEmbed) {
@@ -215,6 +254,7 @@ ChatContent::SendMessage (const QString & content, bool isControl)
     msg.toXml (&out);
     if (chatMode == ChatModeEmbed) {
       EmbedDirectMessage (outbuf);
+      SetProtoVersion ("0.2");
     }
     sendCount++;
     emit Outgoing (outbuf);
@@ -224,7 +264,25 @@ ChatContent::SendMessage (const QString & content, bool isControl)
   }
   /// be optimistic and report what we just sent as being echoed back
   if (!isControl) {
-    Incoming (msg, true);
+    IncomingXmpp (msg, true);
+  }
+}
+
+void
+ChatContent::Heartbeat ()
+{
+  if (chatMode == ChatModeEmbed) {
+    QDomDocument heartDoc ("Egalite");
+    QDomElement root = heartDoc.createElement ("Egalite");
+    root.setAttribute ("version",protoVersion); 
+    heartDoc.appendChild (root);
+    QDomElement msg = heartDoc.createElement ("cmd");
+    msg.setAttribute ("op","ctl");
+    msg.setAttribute ("subop","heartbeat");
+    root.appendChild (msg);
+    QByteArray outbuf = heartDoc.toString().toUtf8();
+    emit Outgoing (outbuf);
+qDebug () << "SEND Heartbeat " << outbuf;
   }
 }
 
@@ -234,11 +292,11 @@ ChatContent::EmbedDirectMessage (QByteArray & raw)
   qDebug () << " sending " << raw;
   QDomDocument directDoc ("Egalite");
   QDomElement root = directDoc.createElement ("Egalite");
-  root.setAttribute ("version","0.2");
+  root.setAttribute ("version",protoVersion);
   directDoc.appendChild (root);
   QDomElement msg = directDoc.createElement ("cmd");
   msg.setAttribute ("op","xmpp");
-  msg.setAttribute ("type","message");
+  msg.setAttribute ("subop","msg");
   msg.setAttribute ("num",QString::number(sendCount));
   root.appendChild (msg);
   QDomText txt = directDoc.createTextNode (raw);
@@ -255,11 +313,16 @@ qDebug () << " incoming message op " << opcode;
   if (opcode == "xmpp") {
     QByteArray msgtext = body.text ().toUtf8();
 qDebug () << " encapsulated xmpp message is " << msgtext;
-    Incoming (msgtext, isLocal);
+    QDomDocument qxmppDoc;
+    qxmppDoc.setContent (msgtext);
+    QDomElement qxmppRoot = qxmppDoc.documentElement();
+    QXmppMessage msg;
+    msg.parse (qxmppRoot);
+    IncomingXmpp (msg, isLocal);
   } else if (opcode == "ctl") {
     qDebug () << "egalite ctl message received: " 
               << msg.attribute ("op") 
-              << msg.attribute("type");
+              << msg.attribute("subop");
   }
 }
 
