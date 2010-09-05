@@ -31,7 +31,9 @@
 
 class QXmppMessage;
 class QDomElement;
+class QDomDocument;
 class QTimer;
+class QLabel;
 
 namespace egalite
 {
@@ -106,6 +108,8 @@ private slots:
   void SaveContent ();
   void Heartbeat ();
   void StartFileSend ();
+  void UpdateXferDisplay ();
+  void StartXferDisplay ();
 
 signals:
 
@@ -140,6 +144,9 @@ private:
   void AbortTransfer (const QString & id);
   void AckChunk (const QString & id, quint64 num);
   void CloseTransfer (const QString & id, bool good=false);
+  void SendDomDoc (QDomDocument & doc);
+
+  void DumpAttributes (QDomElement & elt, QString msg = QString("debug:"));
 
   Ui_ChatContent   ui;
 
@@ -151,6 +158,13 @@ private:
   QString          protoVersion;
   int              heartPeriod;
   QTimer          *heartBeat;
+  QTimer          *stateUpdate;
+  QString          plainSendMessage;
+  QString          extraSendMessage;
+  bool             extraSendHighlight;
+  QString          extraSendStyle;
+  QString          normalStyle;
+  
 
   int              sendFileWindow;
   int              sendChunkSize;

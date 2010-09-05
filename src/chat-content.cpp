@@ -6,11 +6,13 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomText>
+#include <QDomAttr>
 #include <QRegExp>
 #include <QDesktopServices>
 #include <QTimer>
 #include <QMessageBox>
 #include <QUuid>
+#include <QLabel>
 #include <QDebug>
 #include "link-mangle.h"
 
@@ -48,6 +50,10 @@ ChatContent::ChatContent (QWidget *parent)
    protoVersion (QString()),
    heartPeriod (0),
    heartBeat (0),
+   stateUpdate (0),
+   extraSendMessage (tr("\n%1 active")),
+   extraSendHighlight (false),
+   extraSendStyle ("QPushButton { font-style:italic;}"),
    sendFileWindow (1),
    sendChunkSize (2048),
    dateMask ("yy-MM-dd hh:mm:ss"),
@@ -57,7 +63,8 @@ ChatContent::ChatContent (QWidget *parent)
    remoteHtmlColor ("red")
 {
   ui.setupUi (this);
-
+  
+  plainSendMessage = ui.sendFileButton->text ();
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
   connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (SaveContent()));
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
@@ -76,6 +83,12 @@ ChatContent::ChatContent (QWidget *parent)
   Qt::WindowFlags flags = windowFlags ();
   flags |= (Qt::WindowMinimizeButtonHint | Qt::WindowSystemMenuHint);
   setWindowFlags (flags);
+  heartBeat = new QTimer (this);
+  stateUpdate = new QTimer (this);
+  heartBeat->stop ();
+  stateUpdate->stop ();
+  connect (heartBeat, SIGNAL (timeout()), this, SLOT (Heartbeat ()));
+  connect (stateUpdate, SIGNAL (timeout()), this, SLOT (UpdateXferDisplay ()));
 }
 
 
@@ -144,8 +157,20 @@ ChatContent::Start ()
   localLine.replace (QString("@color@"),localHtmlColor);
   remoteLine = chatLine;
   remoteLine.replace (QString("@color@"),remoteHtmlColor);
+  extraSendMessage = deliberate::Settings().value("style/xfermessage",
+                                            extraSendMessage)
+                                            .toString();
+  deliberate::Settings().setValue ("style/xfermessage",extraSendMessage);
+  extraSendStyle = deliberate::Settings().value("style/xferstyle",
+                                            extraSendStyle)
+                                            .toString();
+  deliberate::Settings().setValue ("style/xferstyle",extraSendStyle);
+                          
   rcvCount = 0;
   sendCount = 0;
+  qDebug () << " style sheet for sendFile button "
+            << ui.sendFileButton->styleSheet();
+  normalStyle = ui.sendFileButton->styleSheet ();
 }
 
 void
@@ -315,9 +340,7 @@ ChatContent::Heartbeat ()
     msg.setAttribute ("op","ctl");
     msg.setAttribute ("subop","heartbeat");
     root.appendChild (msg);
-    QByteArray outbuf = heartDoc.toString().toUtf8();
-    emit Outgoing (outbuf);
-qDebug () << "SEND Heartbeat " << outbuf;
+    SendDomDoc (heartDoc);
   }
 }
 
@@ -355,23 +378,20 @@ qDebug () << " encapsulated xmpp message is " << msgtext;
     msg.parse (qxmppRoot);
     IncomingXmpp (msg, isLocal);
   } else if (opcode == "sendfile") {
-    qDebug () << " send file protocol message ";
     ReceiveSendfileProto (body);
   } else if (opcode == "ctl") {
-    qDebug () << "egalite ctl message received: " 
-              << msg.attribute ("op") 
-              << msg.attribute("subop");
+    DumpAttributes (msg, "egalite ctl message received: " );
   }
 }
 
 void
 ChatContent::ReceiveSendfileProto (QDomElement & msg)
 {
+  DumpAttributes (msg, " Incoming sendfile message ");
   QString subop;
   subop = msg.attribute ("subop");
   QString id;
   id = msg.attribute ("xferid");
-qDebug () << " ReceiveSendfileProto subop " << subop << "  xferid " << id;
   if (subop == "goahead") { 
     SendNextPart (id);
   } else if (subop == "deny") {
@@ -444,7 +464,7 @@ ChatContent::StartFileSend ()
 void
 ChatContent::SendFirstPart (const QString & id)
 {
-  qDebug () << " supposed to send next part for " << id;
+  qDebug () << " supposed to send first part for " << id;
   QFile * fp = xferFile[id];
   if (!fp) {
     return;
@@ -461,8 +481,8 @@ ChatContent::SendFirstPart (const QString & id)
   cmd.setAttribute ("name",fp->fileName());
   cmd.setAttribute ("size",info.fileSize);
   request.appendChild (cmd);
-  QByteArray msgbytes = requestDoc.toString().toUtf8 ();
-  emit Outgoing (msgbytes);
+  SendDomDoc (requestDoc);
+  StartXferDisplay ();
 }
   
 void
@@ -489,7 +509,6 @@ ChatContent::SendNextPart (const QString & id)
 void
 ChatContent::SendFinished (const QString & id)
 {
-  CloseTransfer (id, true);
   QDomDocument chunkDoc ("Egalite");
   QDomElement  chunkRoot = chunkDoc.createElement ("Egalite");
   chunkRoot.setAttribute ("version", protoVersion);
@@ -499,8 +518,8 @@ ChatContent::SendFinished (const QString & id)
   cmd.setAttribute ("subop","snd-done");
   cmd.setAttribute ("xferid",id);
   chunkRoot.appendChild (cmd);
-  QByteArray msgtext = chunkDoc.toString().toUtf8 ();
-  emit Outgoing (msgtext);
+  SendDomDoc (chunkDoc);
+  CloseTransfer (id, true);
 }
 
 void
@@ -520,8 +539,7 @@ ChatContent::SendChunk (XferInfo & info ,
   QDomText txt = chunkDoc.createTextNode (QString (data.toBase64()));
   chunk.appendChild (txt);
   chunkRoot.appendChild (chunk);
-  QByteArray msgbytes = chunkDoc.toString().toUtf8();
-  emit Outgoing (msgbytes);
+  SendDomDoc (chunkDoc);
 }
 
 void 
@@ -543,6 +561,7 @@ ChatContent::CloseTransfer (const QString & id, bool good)
     delete fp;
   }
   xferFile.erase (id);
+  UpdateXferDisplay ();
   QMessageBox finished (this);
   finished.setText (tr("Transfer of file \"%1\" ended %2")
                     .arg (filename)
@@ -573,7 +592,7 @@ ChatContent::SendfileChunkData (QDomElement & msg)
     QByteArray data = msg.text ().toUtf8();
     data = QByteArray::fromBase64 (data);
     fp->write (data);
-    int num = msg.attribute ("chunk").toULongLong ();
+    qulonglong num = msg.attribute ("chunk").toULongLong ();
     if (num > info.lastChunk) {
       info.lastChunk = num;
       AckChunk (id, num);
@@ -597,8 +616,7 @@ ChatContent::AckChunk (const QString & id, quint64 num)
   cmd.setAttribute ("xferid",id);
   cmd.setAttribute ("chunk",QString::number (num));
   ack.appendChild (cmd);
-  QByteArray msgtext = ackDoc.toString().toUtf8();
-  emit Outgoing (msgtext);
+  SendDomDoc (ackDoc);
 }
 
 void
@@ -614,8 +632,7 @@ ChatContent::AbortTransfer (const QString & id)
   cmd.setAttribute ("subop","abort");
   cmd.setAttribute ("xferid",id);
   nack.appendChild (cmd);
-  QByteArray msgtext = abortDoc.toString().toUtf8();
-  emit Outgoing (msgtext);
+  SendDomDoc (abortDoc);
 }
 
 void 
@@ -654,8 +671,17 @@ ChatContent::SendfileSendReq (QDomElement & msg)
   cmd.setAttribute ("subop",subop);
   cmd.setAttribute ("xferid",xferId);
   response.appendChild (cmd);
-  QByteArray msgbytes = responseDoc.toString().toUtf8();
+  SendDomDoc (responseDoc);
+}
+
+void
+ChatContent::SendDomDoc (QDomDocument & doc)
+{
+  QByteArray msgbytes = doc.toString().toUtf8();
   emit Outgoing (msgbytes);
+  QDomElement root = doc.documentElement ();
+  QDomElement msg = root.firstChildElement ();
+  DumpAttributes (msg, "outgoing message:");
 }
 
 void 
@@ -695,5 +721,54 @@ ChatContent::OpenSaveFile (const QString &id, const QString & filename)
   return false;
 }
 
+void
+ChatContent::StartXferDisplay ()
+{
+  if (stateUpdate == 0) {
+    stateUpdate = new QTimer (this);
+    connect (stateUpdate, SIGNAL (timeout ()),
+             this, SLOT (UpdateXferDisplay ()));
+  }
+  if (!stateUpdate->isActive() || (stateUpdate->interval() < 1)) {
+    stateUpdate->start (1000);
+  }
+  UpdateXferDisplay ();
+}
+
+void
+ChatContent::UpdateXferDisplay ()
+{
+  int howmany = xferState.size();
+  if (howmany == 0) {
+    ui.sendFileButton->setText (plainSendMessage);
+    ui.sendFileButton->setStyleSheet (normalStyle);
+    stateUpdate->stop ();
+  } else {
+    QString msgPat ("%1 %2");
+    QString extra;
+    extraSendHighlight = ! extraSendHighlight;  
+    extra = extraSendMessage.arg(howmany);
+    ui.sendFileButton->setText (msgPat.arg(plainSendMessage)
+                                      .arg (extra));
+    if (extraSendHighlight) {
+      ui.sendFileButton->setStyleSheet (extraSendStyle);
+    } else {
+      ui.sendFileButton->setStyleSheet (normalStyle);
+    }
+  }
+}
+
+void
+ChatContent::DumpAttributes (QDomElement & elt, QString msg)
+{
+  QDomNamedNodeMap atts = elt.attributes ();
+  qDebug () << msg;
+  qDebug () << " element with tag " << elt.tagName();
+  qDebug () << " has " << atts.size() << " attributes: ";
+  for (int i=0; i<atts.size(); i++) {
+    QDomAttr att = atts.item(i).toAttr();
+    qDebug () << att.name () << " = " << att.value ();
+  }
+}
 
 } // namespace
