@@ -139,7 +139,7 @@ private:
   bool OpenSaveFile (const QString & id, const QString & filename);
   void AbortTransfer (const QString & id);
   void AckChunk (const QString & id, quint64 num);
-  void CloseTransfer (const QString & id);
+  void CloseTransfer (const QString & id, bool good=false);
 
   Ui_ChatContent   ui;
 

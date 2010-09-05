@@ -489,7 +489,7 @@ ChatContent::SendNextPart (const QString & id)
 void
 ChatContent::SendFinished (const QString & id)
 {
-  CloseTransfer (id);
+  CloseTransfer (id, true);
   QDomDocument chunkDoc ("Egalite");
   QDomElement  chunkRoot = chunkDoc.createElement ("Egalite");
   chunkRoot.setAttribute ("version", protoVersion);
@@ -532,15 +532,24 @@ ChatContent::SendfileDeny (QDomElement & msg)
 }
 
 void
-ChatContent::CloseTransfer (const QString & id)
+ChatContent::CloseTransfer (const QString & id, bool good)
 {
   xferState.erase (id);
   QFile *fp = xferFile[id];
+  QString filename (tr("unknown file"));
   if (fp) {
+    filename = fp->fileName();
     fp->close();
     delete fp;
   }
   xferFile.erase (id);
+  QMessageBox finished (this);
+  finished.setText (tr("Transfer of file \"%1\" ended %2")
+                    .arg (filename)
+                    .arg (good ? QString ("with Success")
+                               : QString ("with Errors")));
+  QTimer::singleShot (30000, &finished, SLOT (accept()));
+  finished.exec ();
 }
 
 void 
@@ -653,7 +662,7 @@ void
 ChatContent::SendfileRcvDone (QDomElement & msg)
 {
   QString id = msg.attribute ("xferid");
-  CloseTransfer (id);
+  CloseTransfer (id, true);
 }
 
 void 
