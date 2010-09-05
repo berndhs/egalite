@@ -383,9 +383,9 @@ qDebug () << " ReceiveSendfileProto subop " << subop << "  xferid " << id;
   } else if (subop == "sendreq") {
     SendfileSendReq (msg);
   } else if (subop == "rcv-done") {
-    CloseTransfer (id);
+    CloseTransfer (id, true);
   } else if (subop == "snd-done") {
-    CloseTransfer (id);
+    CloseTransfer (id, true);
   } else if (subop == "abort") {
     SendfileAbort (msg);
   } else {
