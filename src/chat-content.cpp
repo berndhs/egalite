@@ -493,7 +493,7 @@ ChatContent::SendFirstPart (const QString & id)
   request.appendChild (cmd);
   SendDomDoc (requestDoc);
   StartXferDisplay ();
-  ListActiveTransfers (true);
+  ListActiveTransfers (false);
 }
   
 void
@@ -580,7 +580,7 @@ ChatContent::CloseTransfer (const QString & id, bool good)
                                : QString ("with Errors")));
   QTimer::singleShot (30000, &finished, SLOT (accept()));
   finished.exec ();
-  ListActiveTransfers (true);
+  ListActiveTransfers (false);
 }
 
 void 

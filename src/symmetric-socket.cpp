@@ -249,6 +249,7 @@ SymmetricSocket::SendData (const QByteArray &data)
 {
   if (sock) {
     qint64 bytesSent = sock->write (data);
+    sock->flush ();
     Q_UNUSED (bytesSent);
   }
 }
