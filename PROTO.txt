@@ -33,7 +33,7 @@ xmpp message escaped as text
 
 <Egalite version="0.2">
 <cmd op="sendfile" subop="chunk-data"
-   chunknum="47"
+   chunk="47"
    last="y"
    xferid="unique-id-A0F3B899">
 escaped chunk data
@@ -41,7 +41,7 @@ escaped chunk data
 
 <Egalite version="0.2">
 <cmd op="sendfile" subop="chunk-ack"
-   chunk="47"
+   chunknum="47"
    xferid="unique-id-A0F3B899" />
 </cmd>
 
@@ -52,9 +52,6 @@ escaped chunk data
 </cmd>
 <Egalite version="0.2">
 
-<cmd op="sendfile" subop="rcv-done"
-   xferid="unique-id-A0F3B899" />
-</cmd>
 
 <Egalite version="0.2">
 <cmd op="sendfile" subop="abort"

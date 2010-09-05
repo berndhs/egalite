@@ -247,7 +247,6 @@ SymmetricSocket::EncryptDone ()
 void
 SymmetricSocket::SendData (const QByteArray &data)
 {
-qDebug () << "SYMMETRIC Send Data " << data;
   if (sock) {
     qint64 bytesSent = sock->write (data);
     Q_UNUSED (bytesSent);

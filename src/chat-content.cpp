@@ -48,8 +48,8 @@ ChatContent::ChatContent (QWidget *parent)
    protoVersion (QString()),
    heartPeriod (0),
    heartBeat (0),
-   sendFileWindow (4),
-   sendChunkSize (64),
+   sendFileWindow (1),
+   sendChunkSize (2048),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -201,8 +201,8 @@ ChatContent::IncomingDirect (const QByteArray & data, bool isLocal)
 {
   QDomDocument doc;
   doc.setContent (data);
-qDebug () << "Incoming Raw " << data;
   QDomElement root = doc.documentElement();
+qDebug () << "INcoming Tag " << root.tagName();
   if (root.tagName() == "message") { 
     QXmppMessage msg;
     msg.parse (root);
@@ -369,8 +369,11 @@ ChatContent::ReceiveSendfileProto (QDomElement & msg)
 {
   QString subop;
   subop = msg.attribute ("subop");
+  QString id;
+  id = msg.attribute ("xferid");
+qDebug () << " ReceiveSendfileProto subop " << subop << "  xferid " << id;
   if (subop == "goahead") { 
-    SendfileGoahead (msg);
+    SendNextPart (id);
   } else if (subop == "deny") {
     SendfileDeny (msg);
   } else if (subop == "chunk-ack") {
@@ -380,7 +383,9 @@ ChatContent::ReceiveSendfileProto (QDomElement & msg)
   } else if (subop == "sendreq") {
     SendfileSendReq (msg);
   } else if (subop == "rcv-done") {
-    SendfileRcvDone (msg);
+    CloseTransfer (id);
+  } else if (subop == "snd-done") {
+    CloseTransfer (id);
   } else if (subop == "abort") {
     SendfileAbort (msg);
   } else {
@@ -417,7 +422,7 @@ ChatContent::StartFileSend ()
     XferInfo  info;
     info.id = QUuid::createUuid ().toString();
     info.fileSize = 0;
-    info.lastChunkSent = 0;
+    info.lastChunk = 0;
     info.lastChunkAck  = 0;
     QFile * fp =  new QFile (filename);
     bool isopen = fp ->open (QFile::ReadOnly);
@@ -463,16 +468,39 @@ ChatContent::SendFirstPart (const QString & id)
 void
 ChatContent::SendNextPart (const QString & id)
 {
-}
-
-void
-ChatContent::IncomingAck (QString xferId, quint64 chunkNum)
-{
+  XferStateMap::iterator  stateIt = xferState.find(id);
+  XferFileMap::iterator fileIt    = xferFile.find(id);
+  if (stateIt != xferState.end() && fileIt != xferFile.end()) {
+    QFile * fp =  fileIt->second;
+    XferInfo & info = stateIt->second;
+    if (fp) {
+      for (int ch=0; ch<sendFileWindow; ch++) {
+        QByteArray data = fp->read (sendChunkSize);
+        if (data.size() < 1) {
+          SendFinished (id);
+        } else {
+          SendChunk (info, data);
+        }
+      }
+    }
+  }
 }
 
 void
 ChatContent::SendFinished (const QString & id)
 {
+  CloseTransfer (id);
+  QDomDocument chunkDoc ("Egalite");
+  QDomElement  chunkRoot = chunkDoc.createElement ("Egalite");
+  chunkRoot.setAttribute ("version", protoVersion);
+  chunkDoc.appendChild (chunkRoot);
+  QDomElement cmd = chunkDoc.createElement ("cmd");
+  cmd.setAttribute ("op","sendfile");
+  cmd.setAttribute ("subop","snd-done");
+  cmd.setAttribute ("xferid",id);
+  chunkRoot.appendChild (cmd);
+  QByteArray msgtext = chunkDoc.toString().toUtf8 ();
+  emit Outgoing (msgtext);
 }
 
 void
@@ -486,9 +514,10 @@ ChatContent::SendChunk (XferInfo & info ,
   QDomElement chunk = chunkDoc.createElement ("cmd");
   chunk.setAttribute ("op","sendfile");
   chunk.setAttribute ("subop","chunk-data");
-  info.lastChunkSent += 1;
-  chunk.setAttribute ("chunk",QString::number(info.lastChunkSent));
-  QDomText txt = chunkDoc.createTextNode (QString (data));
+  chunk.setAttribute ("xferid",info.id);
+  info.lastChunk += 1;
+  chunk.setAttribute ("chunk",QString::number(info.lastChunk));
+  QDomText txt = chunkDoc.createTextNode (QString (data.toBase64()));
   chunk.appendChild (txt);
   chunkRoot.appendChild (chunk);
   QByteArray msgbytes = chunkDoc.toString().toUtf8();
@@ -498,36 +527,163 @@ ChatContent::SendChunk (XferInfo & info ,
 void 
 ChatContent::SendfileDeny (QDomElement & msg)
 {
+  QString id = msg.attribute ("xferid");
+  CloseTransfer (id);
 }
 
-void 
-ChatContent::SendfileGoahead (QDomElement & msg)
+void
+ChatContent::CloseTransfer (const QString & id)
 {
+  xferState.erase (id);
+  QFile *fp = xferFile[id];
+  if (fp) {
+    fp->close();
+    delete fp;
+  }
+  xferFile.erase (id);
 }
 
 void 
 ChatContent::SendfileChunkAck (QDomElement & msg)
 {
+  QString id = msg.attribute ("xferid");
+  SendNextPart (id);
 }
 
 void 
 ChatContent::SendfileChunkData (QDomElement & msg)
 {
+  QString id = msg.attribute ("xferid");
+  QFile * fp = xferFile[id];
+  if (fp) {
+    XferStateMap::iterator stateIt = xferState.find (id);
+    if (stateIt == xferState.end()) {
+      return;
+    }
+    XferInfo & info = stateIt->second;
+    QByteArray data = msg.text ().toUtf8();
+    data = QByteArray::fromBase64 (data);
+    fp->write (data);
+    int num = msg.attribute ("chunk").toULongLong ();
+    if (num > info.lastChunk) {
+      info.lastChunk = num;
+      AckChunk (id, num);
+    } else {
+      qDebug () << "WARNING: file transfer parts out of order";
+      AbortTransfer (id);
+    }
+  }
+}
+
+void
+ChatContent::AckChunk (const QString & id, quint64 num)
+{
+  QDomDocument  ackDoc ("Egalite");
+  QDomElement   ack = ackDoc.createElement ("Egalite");
+  ack.setAttribute ("version",protoVersion);
+  ackDoc.appendChild (ack);
+  QDomElement cmd = ackDoc.createElement ("cmd");
+  cmd.setAttribute ("op","sendfile");
+  cmd.setAttribute ("subop","chunk-ack");
+  cmd.setAttribute ("xferid",id);
+  cmd.setAttribute ("chunk",QString::number (num));
+  ack.appendChild (cmd);
+  QByteArray msgtext = ackDoc.toString().toUtf8();
+  emit Outgoing (msgtext);
+}
+
+void
+ChatContent::AbortTransfer (const QString & id)
+{
+  CloseTransfer (id);
+  QDomDocument  abortDoc ("Egalite");
+  QDomElement   nack = abortDoc.createElement ("Egalite");
+  nack.setAttribute ("version",protoVersion);
+  abortDoc.appendChild (nack);
+  QDomElement cmd = abortDoc.createElement ("cmd");
+  cmd.setAttribute ("op","sendfile");
+  cmd.setAttribute ("subop","abort");
+  cmd.setAttribute ("xferid",id);
+  nack.appendChild (cmd);
+  QByteArray msgtext = abortDoc.toString().toUtf8();
+  emit Outgoing (msgtext);
 }
 
 void 
 ChatContent::SendfileSendReq (QDomElement & msg)
 {
+  QString filename = msg.attribute ("name");
+  quint64 filesize = msg.attribute ("size").toULongLong();
+  QString xferId   = msg.attribute ("xferid");
+  QMessageBox askReceive (this);
+  askReceive.setText (tr("Accept file %1 size %2 Bytes?")
+                       .arg (filename)
+                        .arg(filesize));
+  askReceive.setStandardButtons (QMessageBox::Save 
+                               | QMessageBox::Discard);
+  askReceive.setDefaultButton (QMessageBox::Discard);
+  int ans = askReceive.exec ();
+  QString subop ("deny");
+  bool goahead (false);
+  switch (ans) {
+  case QMessageBox::Save:
+    goahead = OpenSaveFile (xferId,filename);
+    if (goahead) {
+      subop = "goahead";
+    }
+    break;
+  case QMessageBox::Discard:
+  default:
+    break;
+  }
+  QDomDocument  responseDoc ("Egalite");
+  QDomElement response = responseDoc.createElement ("Egalite");
+  response.setAttribute ("version",protoVersion);
+  responseDoc.appendChild (response);
+  QDomElement cmd = responseDoc.createElement ("cmd");
+  cmd.setAttribute ("op","sendfile");
+  cmd.setAttribute ("subop",subop);
+  cmd.setAttribute ("xferid",xferId);
+  response.appendChild (cmd);
+  QByteArray msgbytes = responseDoc.toString().toUtf8();
+  emit Outgoing (msgbytes);
 }
 
 void 
 ChatContent::SendfileRcvDone (QDomElement & msg)
 {
+  QString id = msg.attribute ("xferid");
+  CloseTransfer (id);
 }
 
 void 
 ChatContent::SendfileAbort (QDomElement & msg)
 {
+  QString id = msg.attribute ("xferid");
+  CloseTransfer (id);
+}
+
+bool
+ChatContent::OpenSaveFile (const QString &id, const QString & filename)
+{
+  QString savename = QFileDialog::getSaveFileName (this, 
+                      tr ("Store Received File"),
+                      filename);
+  if (savename.length () > 0) {
+    XferInfo info;
+    info.id = id;
+    info.fileSize = 0;
+    info.lastChunk = 0;
+    info.lastChunkAck = 0;
+    QFile * fp = new QFile (savename);
+    bool isopen = fp->open (QFile::WriteOnly);
+    if (isopen) {
+      xferFile [id] = fp;
+      xferState [id] = info;
+      return true;
+    }
+  }
+  return false;
 }
 
 

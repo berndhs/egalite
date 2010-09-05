@@ -50,7 +50,7 @@ public:
   
   QString      id;
   quint64      fileSize;
-  quint64      lastChunkSent;
+  quint64      lastChunk;
   quint64      lastChunkAck;
 };
 
@@ -106,7 +106,6 @@ private slots:
   void SaveContent ();
   void Heartbeat ();
   void StartFileSend ();
-  void IncomingAck (QString xferId, quint64 chunkNum);
 
 signals:
 
@@ -132,12 +131,15 @@ private:
   void SendChunk (XferInfo & info, const QByteArray & data);
   void ReceiveSendfileProto (QDomElement & msg);
   void SendfileDeny (QDomElement & msg);
-  void SendfileGoahead (QDomElement & msg);
   void SendfileChunkAck (QDomElement & msg);
   void SendfileChunkData (QDomElement & msg);
   void SendfileSendReq (QDomElement & msg);
   void SendfileRcvDone (QDomElement & msg);
   void SendfileAbort (QDomElement & msg);
+  bool OpenSaveFile (const QString & id, const QString & filename);
+  void AbortTransfer (const QString & id);
+  void AckChunk (const QString & id, quint64 num);
+  void CloseTransfer (const QString & id);
 
   Ui_ChatContent   ui;
 
