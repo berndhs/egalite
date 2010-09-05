@@ -329,6 +329,15 @@ ChatContent::SendMessage (const QString & content, bool isControl)
 }
 
 void
+ChatContent::SendDomDoc (QDomDocument & doc)
+{
+  QByteArray msgbytes = doc.toString().toUtf8();
+  emit Outgoing (msgbytes);
+  DumpAttributes (doc.documentElement().firstChildElement(),
+                    " <<---- Outgoing message:");
+}
+
+void
 ChatContent::Heartbeat ()
 {
   if (chatMode == ChatModeEmbed) {
@@ -387,7 +396,7 @@ qDebug () << " encapsulated xmpp message is " << msgtext;
 void
 ChatContent::ReceiveSendfileProto (QDomElement & msg)
 {
-  DumpAttributes (msg, " Incoming sendfile message ");
+  DumpAttributes (msg, " ---->> Incoming sendfile message ");
   QString subop;
   subop = msg.attribute ("subop");
   QString id;
@@ -470,6 +479,7 @@ ChatContent::SendFirstPart (const QString & id)
     return;
   }
   XferInfo & info = xferState[id];
+  QFileInfo finfo (fp->fileName());
   QDomDocument requestDoc ("Egalite");
   QDomElement  request = requestDoc.createElement ("Egalite");
   request.setAttribute ("version", protoVersion);
@@ -478,11 +488,12 @@ ChatContent::SendFirstPart (const QString & id)
   cmd.setAttribute ("op","sendfile");
   cmd.setAttribute ("subop","sendreq");
   cmd.setAttribute ("xferid",id);
-  cmd.setAttribute ("name",fp->fileName());
+  cmd.setAttribute ("name",finfo.fileName());
   cmd.setAttribute ("size",info.fileSize);
   request.appendChild (cmd);
   SendDomDoc (requestDoc);
   StartXferDisplay ();
+  ListActiveTransfers (true);
 }
   
 void
@@ -569,6 +580,7 @@ ChatContent::CloseTransfer (const QString & id, bool good)
                                : QString ("with Errors")));
   QTimer::singleShot (30000, &finished, SLOT (accept()));
   finished.exec ();
+  ListActiveTransfers (true);
 }
 
 void 
@@ -597,8 +609,7 @@ ChatContent::SendfileChunkData (QDomElement & msg)
       info.lastChunk = num;
       AckChunk (id, num);
     } else {
-      qDebug () << "WARNING: file transfer parts out of order";
-      AbortTransfer (id);
+      AbortTransfer (id, "File transfer: out of order chunks");
     }
   }
 }
@@ -620,8 +631,9 @@ ChatContent::AckChunk (const QString & id, quint64 num)
 }
 
 void
-ChatContent::AbortTransfer (const QString & id)
+ChatContent::AbortTransfer (const QString & id, QString msg)
 {
+  qDebug () << " Abort Transfer: " << msg;
   CloseTransfer (id);
   QDomDocument  abortDoc ("Egalite");
   QDomElement   nack = abortDoc.createElement ("Egalite");
@@ -633,6 +645,10 @@ ChatContent::AbortTransfer (const QString & id)
   cmd.setAttribute ("xferid",id);
   nack.appendChild (cmd);
   SendDomDoc (abortDoc);
+  QMessageBox box;
+  box.setText (tr("Failure: ") + msg);
+  QTimer::singleShot (15000, &box, SLOT (reject()));
+  box.exec ();
 }
 
 void 
@@ -656,6 +672,7 @@ ChatContent::SendfileSendReq (QDomElement & msg)
     goahead = OpenSaveFile (xferId,filename);
     if (goahead) {
       subop = "goahead";
+      StartXferDisplay ();
     }
     break;
   case QMessageBox::Discard:
@@ -672,16 +689,6 @@ ChatContent::SendfileSendReq (QDomElement & msg)
   cmd.setAttribute ("xferid",xferId);
   response.appendChild (cmd);
   SendDomDoc (responseDoc);
-}
-
-void
-ChatContent::SendDomDoc (QDomDocument & doc)
-{
-  QByteArray msgbytes = doc.toString().toUtf8();
-  emit Outgoing (msgbytes);
-  QDomElement root = doc.documentElement ();
-  QDomElement msg = root.firstChildElement ();
-  DumpAttributes (msg, "outgoing message:");
 }
 
 void 
@@ -759,7 +766,7 @@ ChatContent::UpdateXferDisplay ()
 }
 
 void
-ChatContent::DumpAttributes (QDomElement & elt, QString msg)
+ChatContent::DumpAttributes (const QDomElement & elt, QString msg)
 {
   QDomNamedNodeMap atts = elt.attributes ();
   qDebug () << msg;
@@ -768,6 +775,34 @@ ChatContent::DumpAttributes (QDomElement & elt, QString msg)
   for (int i=0; i<atts.size(); i++) {
     QDomAttr att = atts.item(i).toAttr();
     qDebug () << att.name () << " = " << att.value ();
+  }
+}
+
+void
+ChatContent::ListActiveTransfers (bool showBox)
+{
+  XferStateMap::iterator  stateIt;
+  QStringList report;
+  for (stateIt = xferState.begin (); stateIt != xferState.end(); stateIt++) {
+    QString line;
+    XferInfo  & info = stateIt->second;
+    line.append ("Id: ");
+    line.append (info.id);
+    line.append (" size ");
+    line.append (QString::number (info.fileSize));
+    line.append (" lastChunk ");
+    line.append (QString::number (info.lastChunk));
+    line.append (" lastAck ");
+    line.append (QString::number (info.lastChunkAck));
+    report << line;
+  }
+  qDebug () << " Active Transfers:";
+  qDebug () << report;
+  if (showBox) {
+    QMessageBox  box;
+    box.setWindowTitle ("Active File Transfers");
+    box.setText (report.join("\n"));
+    box.exec ();
   }
 }
 

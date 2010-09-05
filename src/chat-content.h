@@ -141,12 +141,13 @@ private:
   void SendfileRcvDone (QDomElement & msg);
   void SendfileAbort (QDomElement & msg);
   bool OpenSaveFile (const QString & id, const QString & filename);
-  void AbortTransfer (const QString & id);
+  void AbortTransfer (const QString & id, QString msg = QString());
   void AckChunk (const QString & id, quint64 num);
   void CloseTransfer (const QString & id, bool good=false);
   void SendDomDoc (QDomDocument & doc);
 
-  void DumpAttributes (QDomElement & elt, QString msg = QString("debug:"));
+  void DumpAttributes (const QDomElement & elt, QString msg = QString("debug:"));
+  void ListActiveTransfers (bool showBox = false);
 
   Ui_ChatContent   ui;
 
