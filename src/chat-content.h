@@ -165,6 +165,7 @@ private:
   quint64          rcvCount;
   quint64          sendCount;
   QString          protoVersion;
+  int              nProto;
   int              heartPeriod;
   QTimer          *heartBeat;
   QTimer          *stateUpdate;

@@ -51,6 +51,7 @@ ChatContent::ChatContent (QWidget *parent)
    rcvCount (0),
    sendCount (0),
    protoVersion (QString()),
+   nProto (0),
    heartPeriod (0),
    heartBeat (0),
    stateUpdate (0),
@@ -238,9 +239,6 @@ ChatContent::IncomingDirect (const QByteArray & data, bool isLocal)
 {
   QDomDocument doc;
   doc.setContent (data);
-QMessageBox box (this);
-box.setText (data);
-box.exec ();
   ReadDomDoc (doc, isLocal);
 }
 
@@ -248,10 +246,7 @@ void
 ChatContent::InputAvailable ()
 {
   if (ioDev && ioDev->isReadable()) {
-    if (chatMode == ChatModeEmbed && 0) {
-QByteArray bytes = ioDev->readAll ();
-qDebug() << " Incoming bytes " << bytes;
-IncomingDirect (bytes, false);
+    if (chatMode == ChatModeEmbed && nProto > 1) {
       QDomDocument doc;
       bool havedoc = doc.setContent (ioDev);
       if (havedoc) {
@@ -273,9 +268,11 @@ qDebug () << "INcoming Tag " << root.tagName();
     QXmppMessage msg;
     msg.parse (root);
     SetProtoVersion ("0.1");
+    nProto = 1;
     IncomingXmpp (msg, isLocal);
   } else if (root.tagName() == "Egalite") {
     SetProtoVersion ("0.2");
+    nProto = 2;
     SetMode (ChatModeEmbed);
     ExtractXmpp (root, isLocal); 
   } else {
@@ -286,11 +283,13 @@ qDebug () << "INcoming Tag " << root.tagName();
 void
 ChatContent::SendDomDoc (QDomDocument & doc)
 {
+  static QByteArray spaces (8,' ');
   DumpAttributes (doc.documentElement().firstChildElement(),
                     " <<---- Outgoing message:");
   QByteArray msgbytes = doc.toString().toUtf8();
   if (ioDev) {
     ioDev->write (msgbytes);
+    ioDev->write (spaces);
     ioDev->flush ();
   } else {
     emit Outgoing (msgbytes);
