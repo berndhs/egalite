@@ -1,6 +1,8 @@
 
 #include "deliberate.h"
 #include "chat-content.h"
+#include "direct-message.h"
+#include "direct-parser.h"
 #include <QXmppMessage.h>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
@@ -47,6 +49,7 @@ namespace egalite
 ChatContent::ChatContent (QWidget *parent)
   :QDialog (parent),
    ioDev (0),
+   directParser (this),
    chatMode (ChatModeRaw),
    rcvCount (0),
    sendCount (0),
@@ -234,14 +237,6 @@ ChatContent::SaveContent ()
 }
 
 void
-ChatContent::IncomingDirect (const QByteArray & data, bool isLocal)
-{
-  QDomDocument doc;
-  doc.setContent (data);
-  ReadDomDoc (doc, isLocal);
-}
-
-void
 ChatContent::InputAvailable ()
 {
   if (ioDev && ioDev->isReadable()) { 
@@ -249,9 +244,65 @@ ChatContent::InputAvailable ()
         directly from the socket
     */
     QByteArray bytes = ioDev->readAll ();
-    IncomingDirect (bytes, false);
+    directParser.AddData (bytes);
+    directParser.TryRead ();
   }
 }
+
+void
+ChatContent::IncomingDirect (DirectMessage msg)
+{
+  QString op = msg.Op();
+  if (op == "xmpp") {
+    QDomDocument xmppDoc;
+    QByteArray data = msg.Data();
+    xmppDoc.setContent (data);
+    ReadDomDoc (xmppDoc);
+  } else if (op == "ctl") {
+    ReadCtl (msg);
+  } else if (op == "sendfile") {
+    ReadSendfile (msg);
+  }
+}
+
+void
+ChatContent::ReadCtl (DirectMessage & msg)
+{
+  QString subop = msg.Subop ();
+  if (subop == "heartbeat") {
+    qDebug () << " heartbead received, thank you";
+  } else {
+    qDebug () << " Unknown Control Message subop " << subop;
+  }
+}
+
+void
+ChatContent::ReadSendfile (DirectMessage & msg)
+{
+  DumpAttributes (msg, " ---->> Incoming V 0.3 sendfile message ");
+  QString subop = msg.Subop();
+  QString id = msg.Attribute ("xferid");
+  if (subop == "goahead") { 
+    SendNextPart (id);
+  } else if (subop == "deny") {
+    SendfileDeny (msg);
+  } else if (subop == "chunk-ack") {
+    SendfileChunkAck (msg);
+  } else if (subop == "chunk-data") {
+    SendfileChunkData (msg);
+  } else if (subop == "sendreq") {
+    SendfileSendReq (msg);
+  } else if (subop == "rcv-done") {
+    CloseTransfer (id, true);
+  } else if (subop == "snd-done") {
+    CloseTransfer (id, true);
+  } else if (subop == "abort") {
+    SendfileAbort (msg);
+  } else {
+    qDebug () << " Unknown subop-code" << subop;
+  }
+}
+
 
 void
 ChatContent::ReadDomDoc (QDomDocument & doc, bool isLocal)
@@ -261,12 +312,7 @@ qDebug () << "INcoming Tag " << root.tagName();
   if (root.tagName() == "message") { 
     QXmppMessage msg;
     msg.parse (root);
-    SetProtoVersion ("0.1");
     IncomingXmpp (msg, isLocal);
-  } else if (root.tagName() == "Egalite") {
-    SetProtoVersion ("0.2");
-    SetMode (ChatModeEmbed);
-    ExtractXmpp (root, isLocal); 
   } else {
     qDebug () << " invalid tag " << root.tagName();
   }
@@ -276,8 +322,6 @@ void
 ChatContent::SendDomDoc (QDomDocument & doc)
 {
   static QByteArray spaces (8,' ');
-  DumpAttributes (doc.documentElement().firstChildElement(),
-                    " <<---- Outgoing message:");
   QByteArray msgbytes = doc.toString().toUtf8();
   if (ioDev) {
     ioDev->write (msgbytes);
@@ -359,7 +403,7 @@ ChatContent::SendMessage (const QString & content, bool isControl)
     QXmlStreamWriter out (&outbuf);
     msg.toXml (&out);
     if (chatMode == ChatModeEmbed) {
-      SetProtoVersion ("0.2");
+      SetProtoVersion ("0.3");
       EmbedDirectMessage (outbuf);
     } else {
       sendCount++;
@@ -379,8 +423,8 @@ void
 ChatContent::Heartbeat ()
 {
   if (chatMode == ChatModeEmbed) {
-    QDomDocument heartDoc ("Egalite");
-    QDomElement root = heartDoc.createElement ("Egalite");
+    QDomDocument heartDoc ("egalite");
+    QDomElement root = heartDoc.createElement ("egalite");
     root.setAttribute ("version",protoVersion); 
     heartDoc.appendChild (root);
     QDomElement msg = heartDoc.createElement ("cmd");
@@ -395,8 +439,8 @@ void
 ChatContent::EmbedDirectMessage (QByteArray & raw)
 {
   qDebug () << " sending " << raw;
-  QDomDocument directDoc ("Egalite");
-  QDomElement root = directDoc.createElement ("Egalite");
+  QDomDocument directDoc ("egalite");
+  QDomElement root = directDoc.createElement ("egalite");
   root.setAttribute ("version",protoVersion);
   QDomElement msg = directDoc.createElement ("cmd");
   msg.setAttribute ("op","xmpp");
@@ -408,57 +452,6 @@ ChatContent::EmbedDirectMessage (QByteArray & raw)
   directDoc.appendChild (root);
   sendCount++;
   SendDomDoc (directDoc);
-}
-
-void
-ChatContent::ExtractXmpp (QDomElement & msg, bool isLocal)
-{
-  QDomElement body = msg.firstChildElement ();
-  QString opcode = body.attribute ("op",QString("badop"));
-qDebug () << " incoming message op " << opcode;
-  if (opcode == "xmpp") {
-    QByteArray msgtext = body.text ().toUtf8();
-qDebug () << " encapsulated xmpp message is " << msgtext;
-    QDomDocument qxmppDoc;
-    qxmppDoc.setContent (msgtext);
-    QDomElement qxmppRoot = qxmppDoc.documentElement();
-    QXmppMessage msg;
-    msg.parse (qxmppRoot);
-    IncomingXmpp (msg, isLocal);
-  } else if (opcode == "sendfile") {
-    ReceiveSendfileProto (body);
-  } else if (opcode == "ctl") {
-    DumpAttributes (msg, "egalite ctl message received: " );
-  }
-}
-
-void
-ChatContent::ReceiveSendfileProto (QDomElement & msg)
-{
-  DumpAttributes (msg, " ---->> Incoming sendfile message ");
-  QString subop;
-  subop = msg.attribute ("subop");
-  QString id;
-  id = msg.attribute ("xferid");
-  if (subop == "goahead") { 
-    SendNextPart (id);
-  } else if (subop == "deny") {
-    SendfileDeny (msg);
-  } else if (subop == "chunk-ack") {
-    SendfileChunkAck (msg);
-  } else if (subop == "chunk-data") {
-    SendfileChunkData (msg);
-  } else if (subop == "sendreq") {
-    SendfileSendReq (msg);
-  } else if (subop == "rcv-done") {
-    CloseTransfer (id, true);
-  } else if (subop == "snd-done") {
-    CloseTransfer (id, true);
-  } else if (subop == "abort") {
-    SendfileAbort (msg);
-  } else {
-    qDebug () << " Unknown subop-code" << subop;
-  }
 }
 
 void
@@ -519,8 +512,8 @@ ChatContent::SendFirstPart (const QString & id)
   }
   XferInfo & info = xferState[id];
   QFileInfo finfo (fp->fileName());
-  QDomDocument requestDoc ("Egalite");
-  QDomElement  request = requestDoc.createElement ("Egalite");
+  QDomDocument requestDoc ("egalite");
+  QDomElement  request = requestDoc.createElement ("egalite");
   request.setAttribute ("version", protoVersion);
   requestDoc.appendChild (request);
   QDomElement cmd = requestDoc.createElement ("cmd");
@@ -559,8 +552,8 @@ ChatContent::SendNextPart (const QString & id)
 void
 ChatContent::SendFinished (const QString & id)
 {
-  QDomDocument chunkDoc ("Egalite");
-  QDomElement  chunkRoot = chunkDoc.createElement ("Egalite");
+  QDomDocument chunkDoc ("egalite");
+  QDomElement  chunkRoot = chunkDoc.createElement ("egalite");
   chunkRoot.setAttribute ("version", protoVersion);
   chunkDoc.appendChild (chunkRoot);
   QDomElement cmd = chunkDoc.createElement ("cmd");
@@ -576,8 +569,8 @@ void
 ChatContent::SendChunk (XferInfo & info ,
                         const QByteArray & data)
 {
-  QDomDocument chunkDoc ("Egalite");
-  QDomElement  chunkRoot = chunkDoc.createElement ("Egalite");
+  QDomDocument chunkDoc ("egalite");
+  QDomElement  chunkRoot = chunkDoc.createElement ("egalite");
   chunkRoot.setAttribute ("version", protoVersion);
   chunkDoc.appendChild (chunkRoot);
   QDomElement chunk = chunkDoc.createElement ("cmd");
@@ -593,9 +586,9 @@ ChatContent::SendChunk (XferInfo & info ,
 }
 
 void 
-ChatContent::SendfileDeny (QDomElement & msg)
+ChatContent::SendfileDeny (DirectMessage & msg)
 {
-  QString id = msg.attribute ("xferid");
+  QString id = msg.Attribute ("xferid");
   CloseTransfer (id);
 }
 
@@ -623,16 +616,16 @@ ChatContent::CloseTransfer (const QString & id, bool good)
 }
 
 void 
-ChatContent::SendfileChunkAck (QDomElement & msg)
+ChatContent::SendfileChunkAck (DirectMessage & msg)
 {
-  QString id = msg.attribute ("xferid");
+  QString id = msg.Attribute ("xferid");
   SendNextPart (id);
 }
 
 void 
-ChatContent::SendfileChunkData (QDomElement & msg)
+ChatContent::SendfileChunkData (DirectMessage & msg)
 {
-  QString id = msg.attribute ("xferid");
+  QString id = msg.Attribute ("xferid");
   QFile * fp = xferFile[id];
   if (fp) {
     XferStateMap::iterator stateIt = xferState.find (id);
@@ -640,10 +633,10 @@ ChatContent::SendfileChunkData (QDomElement & msg)
       return;
     }
     XferInfo & info = stateIt->second;
-    QByteArray data = msg.text ().toUtf8();
+    QByteArray data = msg.Data ();
     data = QByteArray::fromBase64 (data);
     fp->write (data);
-    qulonglong num = msg.attribute ("chunk").toULongLong ();
+    qulonglong num = msg.Attribute ("chunk").toULongLong ();
     if (num > info.lastChunk) {
       info.lastChunk = num;
       AckChunk (id, num);
@@ -656,8 +649,8 @@ ChatContent::SendfileChunkData (QDomElement & msg)
 void
 ChatContent::AckChunk (const QString & id, quint64 num)
 {
-  QDomDocument  ackDoc ("Egalite");
-  QDomElement   ack = ackDoc.createElement ("Egalite");
+  QDomDocument  ackDoc ("egalite");
+  QDomElement   ack = ackDoc.createElement ("egalite");
   ack.setAttribute ("version",protoVersion);
   ackDoc.appendChild (ack);
   QDomElement cmd = ackDoc.createElement ("cmd");
@@ -674,8 +667,8 @@ ChatContent::AbortTransfer (const QString & id, QString msg)
 {
   qDebug () << " Abort Transfer: " << msg;
   CloseTransfer (id);
-  QDomDocument  abortDoc ("Egalite");
-  QDomElement   nack = abortDoc.createElement ("Egalite");
+  QDomDocument  abortDoc ("egalite");
+  QDomElement   nack = abortDoc.createElement ("egalite");
   nack.setAttribute ("version",protoVersion);
   abortDoc.appendChild (nack);
   QDomElement cmd = abortDoc.createElement ("cmd");
@@ -691,11 +684,11 @@ ChatContent::AbortTransfer (const QString & id, QString msg)
 }
 
 void 
-ChatContent::SendfileSendReq (QDomElement & msg)
+ChatContent::SendfileSendReq (DirectMessage & msg)
 {
-  QString filename = msg.attribute ("name");
-  quint64 filesize = msg.attribute ("size").toULongLong();
-  QString xferId   = msg.attribute ("xferid");
+  QString filename = msg.Attribute ("name");
+  quint64 filesize = msg.Attribute ("size").toULongLong();
+  QString xferId   = msg.Attribute ("xferid");
   QMessageBox askReceive (this);
   askReceive.setText (tr("Accept file %1 size %2 Bytes?")
                        .arg (filename)
@@ -718,8 +711,8 @@ ChatContent::SendfileSendReq (QDomElement & msg)
   default:
     break;
   }
-  QDomDocument  responseDoc ("Egalite");
-  QDomElement response = responseDoc.createElement ("Egalite");
+  QDomDocument  responseDoc ("egalite");
+  QDomElement response = responseDoc.createElement ("egalite");
   response.setAttribute ("version",protoVersion);
   responseDoc.appendChild (response);
   QDomElement cmd = responseDoc.createElement ("cmd");
@@ -731,16 +724,16 @@ ChatContent::SendfileSendReq (QDomElement & msg)
 }
 
 void 
-ChatContent::SendfileRcvDone (QDomElement & msg)
+ChatContent::SendfileRcvDone (DirectMessage & msg)
 {
-  QString id = msg.attribute ("xferid");
+  QString id = msg.Attribute ("xferid");
   CloseTransfer (id, true);
 }
 
 void 
-ChatContent::SendfileAbort (QDomElement & msg)
+ChatContent::SendfileAbort (DirectMessage & msg)
 {
-  QString id = msg.attribute ("xferid");
+  QString id = msg.Attribute ("xferid");
   CloseTransfer (id);
 }
 
@@ -805,15 +798,14 @@ ChatContent::UpdateXferDisplay ()
 }
 
 void
-ChatContent::DumpAttributes (const QDomElement & elt, QString msg)
+ChatContent::DumpAttributes (DirectMessage & elt, QString msg)
 {
-  QDomNamedNodeMap atts = elt.attributes ();
+  DirectMessage::AttributeMap atts = elt.Attributes ();
   qDebug () << msg;
-  qDebug () << " element with tag " << elt.tagName();
-  qDebug () << " has " << atts.size() << " attributes: ";
-  for (int i=0; i<atts.size(); i++) {
-    QDomAttr att = atts.item(i).toAttr();
-    qDebug () << att.name () << " = " << att.value ();
+  qDebug () << " message " << atts.size() << " attributes: ";
+  DirectMessage::AttributeMap::iterator it;
+  for (it = atts.begin(); it != atts.end(); it++) {
+    qDebug () << it->first << " = " << it->second;
   }
 }
 

@@ -24,6 +24,7 @@
  ****************************************************************/
 
 #include "ui_chat-content.h"
+#include "direct-parser.h"
 #include <QDialog>
 #include <QByteArray>
 #include <QUrl>
@@ -97,11 +98,11 @@ public:
 
 public slots:
 
-  void IncomingDirect (const QByteArray &data, bool isLocal=false);
   void IncomingXmpp (const QXmppMessage &msg, bool isLocal=false);
   void HandleAnchor (const QUrl & url);
   void Stop ();
   void InputAvailable ();
+  void IncomingDirect (DirectMessage msg);
 
   bool close ();
 
@@ -130,20 +131,20 @@ private:
   typedef std::map <QString, QFile*>     XferFileMap;
 
   void EmbedDirectMessage (QByteArray & raw);
-  void ExtractXmpp (QDomElement & msg, bool isLocal);
+  void ReadCtl (DirectMessage & msg);
+  void ReadSendfile (DirectMessage & msg);
   void SendMessage (const QString & content, bool isControl=false);
   void ModeUpdate ();
   void SendFirstPart (const QString & id);
   void SendNextPart (const QString & id);
   void SendFinished (const QString & id);
   void SendChunk (XferInfo & info, const QByteArray & data);
-  void ReceiveSendfileProto (QDomElement & msg);
-  void SendfileDeny (QDomElement & msg);
-  void SendfileChunkAck (QDomElement & msg);
-  void SendfileChunkData (QDomElement & msg);
-  void SendfileSendReq (QDomElement & msg);
-  void SendfileRcvDone (QDomElement & msg);
-  void SendfileAbort (QDomElement & msg);
+  void SendfileDeny (DirectMessage & msg);
+  void SendfileChunkAck (DirectMessage & msg);
+  void SendfileChunkData (DirectMessage & msg);
+  void SendfileSendReq (DirectMessage & msg);
+  void SendfileRcvDone (DirectMessage & msg);
+  void SendfileAbort (DirectMessage & msg);
   bool OpenSaveFile (const QString & id, const QString & filename);
   void AbortTransfer (const QString & id, QString msg = QString());
   void AckChunk (const QString & id, quint64 num);
@@ -151,7 +152,7 @@ private:
   void SendDomDoc (QDomDocument & doc);
   void ReadDomDoc (QDomDocument & doc, bool isLocal = false);
 
-  void DumpAttributes (const QDomElement & elt, QString msg = QString("debug:"));
+  void DumpAttributes (DirectMessage & elt, QString msg = QString("debug:"));
   void ListActiveTransfers (bool showBox = false);
 
   void DebugCheck ();
@@ -159,6 +160,7 @@ private:
   Ui_ChatContent   ui;
 
   QSslSocket      *ioDev;
+  DirectParser     directParser;
   QString          remoteName;
   QString          localName;
   Mode             chatMode;
@@ -187,6 +189,7 @@ private:
   QString          remoteLine;
   QString          localHtmlColor;
   QString          remoteHtmlColor;
+
 };
 
 } // namespace

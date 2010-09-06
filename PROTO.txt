@@ -58,11 +58,6 @@ escaped chunk data
    xferid="unique-id-A0F3B899" />
 </cmd>
 
-<Egalite version="0.2">
-<cmd op="sendfile" subop="resend"
-  chunknum="47"
-  xferid="unique-id-A0F3B899" />
-</Egalite>
 
 
 

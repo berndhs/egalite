@@ -121,6 +121,8 @@ SOURCES = src/main.cpp \
         src/add-listener.cpp \
         src/cert-generate.cpp \
 	src/account-edit.cpp \
+	src/direct-message.cpp \
+	src/direct-parser.cpp \
 
 
 
@@ -150,6 +152,8 @@ HEADERS = \
         src/add-listener.h \
         src/cert-generate.h \
 	src/account-edit.h \
+	src/direct-message.h \
+	src/direct-parser.h \
 
 
 

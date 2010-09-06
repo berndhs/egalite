@@ -648,8 +648,6 @@ Q_UNUSED (localNick);
              newBox, SLOT (WidgetActivity (QWidget*)));
     connect (newCont, SIGNAL (Outgoing (const QByteArray&)),
              sock, SLOT (SendData (const QByteArray&)));
-    connect (sock, SIGNAL (ReceiveData (const QByteArray&)),
-             newCont, SLOT (IncomingDirect (const QByteArray&)));
     connect (newCont, SIGNAL (Disconnect (QString)),
              sock, SLOT (Close()));
     connect (newCont, SIGNAL (ChangeProto (QWidget*, QString)),
