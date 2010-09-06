@@ -42,7 +42,8 @@ SymmetricSocket::SymmetricSocket (int socketDescriptor,
    dialog (0),
    key (argKey),
    cert (argCert),
-   checkTimer (0)
+   checkTimer (0),
+   doOwnRead (true)
 {
   dialog = new QDialog;
   ui.setupUi (dialog);
@@ -267,11 +268,16 @@ SymmetricSocket::PeerName ()
 void
 SymmetricSocket::Receive ()
 {
-  QByteArray data;
-  if (sock) {
-    data = sock->readAll ();
+qDebug () << " SYMMETRIC has input ready " << sock->bytesAvailable() << " bytes";
+  if (doOwnRead) {
+    QByteArray data;
+    if (sock) {
+      data = sock->readAll ();
+    }
+    emit ReceiveData (data);
+  } else {
+    emit ReadyRead ();
   }
-  emit ReceiveData (data);
 }
 
 void

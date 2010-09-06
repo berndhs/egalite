@@ -13,8 +13,10 @@
 #include <QMessageBox>
 #include <QUuid>
 #include <QLabel>
+#include <QSslSocket>
 #include <QDebug>
 #include "link-mangle.h"
+#include <iostream>
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -44,6 +46,7 @@ namespace egalite
 
 ChatContent::ChatContent (QWidget *parent)
   :QDialog (parent),
+   ioDev (0),
    chatMode (ChatModeRaw),
    rcvCount (0),
    sendCount (0),
@@ -55,7 +58,7 @@ ChatContent::ChatContent (QWidget *parent)
    extraSendHighlight (false),
    extraSendStyle ("QPushButton { font-style:italic;}"),
    sendFileWindow (1),
-   sendChunkSize (2048),
+   sendChunkSize (4*1024),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -89,6 +92,9 @@ ChatContent::ChatContent (QWidget *parent)
   stateUpdate->stop ();
   connect (heartBeat, SIGNAL (timeout()), this, SLOT (Heartbeat ()));
   connect (stateUpdate, SIGNAL (timeout()), this, SLOT (UpdateXferDisplay ()));
+  QTimer * debugTimer = new QTimer (this);
+  connect (debugTimer, SIGNAL (timeout()), this, SLOT (DebugCheck()));
+  debugTimer->start (10*1000);
 }
 
 
@@ -188,6 +194,12 @@ ChatContent::Start (Mode mode,
 }
 
 void
+ChatContent::SetInput (QSslSocket * dev)
+{
+  ioDev = dev;
+}
+
+void
 ChatContent::SetHeartbeat (int secs)
 {
   if (heartBeat == 0) {
@@ -226,6 +238,36 @@ ChatContent::IncomingDirect (const QByteArray & data, bool isLocal)
 {
   QDomDocument doc;
   doc.setContent (data);
+QMessageBox box (this);
+box.setText (data);
+box.exec ();
+  ReadDomDoc (doc, isLocal);
+}
+
+void
+ChatContent::InputAvailable ()
+{
+  if (ioDev && ioDev->isReadable()) {
+    if (chatMode == ChatModeEmbed && 0) {
+QByteArray bytes = ioDev->readAll ();
+QMessageBox box (this);
+box.setText (bytes);
+box.exec ();
+      QDomDocument doc;
+      bool havedoc = doc.setContent (ioDev);
+      if (havedoc) {
+        ReadDomDoc (doc, false);
+      }
+    } else {
+      QByteArray bytes = ioDev->readAll ();
+      IncomingDirect (bytes, false);
+    }
+  }
+}
+
+void
+ChatContent::ReadDomDoc (QDomDocument & doc, bool isLocal)
+{
   QDomElement root = doc.documentElement();
 qDebug () << "INcoming Tag " << root.tagName();
   if (root.tagName() == "message") { 
@@ -239,6 +281,20 @@ qDebug () << "INcoming Tag " << root.tagName();
     ExtractXmpp (root, isLocal); 
   } else {
     qDebug () << " invalid tag " << root.tagName();
+  }
+}
+
+void
+ChatContent::SendDomDoc (QDomDocument & doc)
+{
+  DumpAttributes (doc.documentElement().firstChildElement(),
+                    " <<---- Outgoing message:");
+  QByteArray msgbytes = doc.toString().toUtf8();
+  if (ioDev) {
+    ioDev->write (msgbytes);
+    ioDev->flush ();
+  } else {
+    emit Outgoing (msgbytes);
   }
 }
 
@@ -313,11 +369,12 @@ ChatContent::SendMessage (const QString & content, bool isControl)
     QXmlStreamWriter out (&outbuf);
     msg.toXml (&out);
     if (chatMode == ChatModeEmbed) {
-      EmbedDirectMessage (outbuf);
       SetProtoVersion ("0.2");
+      EmbedDirectMessage (outbuf);
+    } else {
+      sendCount++;
+      emit Outgoing (outbuf);
     }
-    sendCount++;
-    emit Outgoing (outbuf);
   } else if (chatMode == ChatModeXmpp) {
     sendCount++;
     emit Outgoing (msg);
@@ -326,15 +383,6 @@ ChatContent::SendMessage (const QString & content, bool isControl)
   if (!isControl) {
     IncomingXmpp (msg, true);
   }
-}
-
-void
-ChatContent::SendDomDoc (QDomDocument & doc)
-{
-  QByteArray msgbytes = doc.toString().toUtf8();
-  emit Outgoing (msgbytes);
-  DumpAttributes (doc.documentElement().firstChildElement(),
-                    " <<---- Outgoing message:");
 }
 
 void
@@ -360,7 +408,6 @@ ChatContent::EmbedDirectMessage (QByteArray & raw)
   QDomDocument directDoc ("Egalite");
   QDomElement root = directDoc.createElement ("Egalite");
   root.setAttribute ("version",protoVersion);
-  directDoc.appendChild (root);
   QDomElement msg = directDoc.createElement ("cmd");
   msg.setAttribute ("op","xmpp");
   msg.setAttribute ("subop","msg");
@@ -368,7 +415,19 @@ ChatContent::EmbedDirectMessage (QByteArray & raw)
   root.appendChild (msg);
   QDomText txt = directDoc.createTextNode (raw);
   msg.appendChild (txt);
-  raw = directDoc.toString().toUtf8();
+  directDoc.appendChild (root);
+  QByteArray newraw = directDoc.toByteArray ();
+qDebug () << " raw bytes " << newraw;
+qDebug () << " direct bytes " << directDoc.toByteArray ();
+  sendCount++;
+  emit Outgoing (newraw);
+QMessageBox box1 (this);
+QString bigmsg;
+bigmsg.append (newraw);
+bigmsg.append ("/n");
+bigmsg.append (directDoc.toByteArray());
+box1.setText (bigmsg);
+box1.exec ();
 }
 
 void
@@ -804,6 +863,15 @@ ChatContent::ListActiveTransfers (bool showBox)
     box.setText (report.join("\n"));
     box.exec ();
   }
+}
+
+void
+ChatContent::DebugCheck ()
+{
+  std::cout << " Debug Check Chat COntent " << this;
+  std::cout << " socket " << ioDev << " ready " << ioDev->isReadable();
+  std::cout << " socket bytes avail " << ioDev->bytesAvailable();
+  std::cout << std::endl;
 }
 
 } // namespace

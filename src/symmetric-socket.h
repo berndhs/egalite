@@ -76,6 +76,9 @@ public:
     return dialog;
   }
 
+  void SetDoOwnRead (bool own) { doOwnRead = own; }
+  bool DoOwnRead ()            { return doOwnRead; }
+
 public slots:
 
   void Done ();
@@ -104,6 +107,7 @@ signals:
   void ReceiveData (const QByteArray &data);
   void Ready (SymmetricSocket * self);
   void SaveRemoteCert (const QString & name, const QByteArray & pem);
+  void ReadyRead ();
 
 private:
 
@@ -120,6 +124,7 @@ private:
   QTimer       *checkTimer;
   QString      remoteName;
   QString      localName;
+  bool         doOwnRead;
 
 
 } ;

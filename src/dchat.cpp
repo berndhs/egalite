@@ -658,7 +658,11 @@ Q_UNUSED (localNick);
              this, SLOT (ClearDirect (SymmetricSocket *)));
     connect (sock, SIGNAL (Exiting(SymmetricSocket *)),
               newCont, SLOT (Stop ()));
+    connect (sock, SIGNAL (ReadyRead ()), 
+              newCont, SLOT (InputAvailable ()));
     newBox->Run ();
+    newCont->SetInput (sock->Socket());
+    sock->SetDoOwnRead (false);
     newCont->SetProtoVersion ("0.1");
     newCont->SetHeartbeat (60);
     newCont->Start (ChatContent::ChatModeRaw,

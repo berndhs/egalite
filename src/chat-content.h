@@ -34,6 +34,7 @@ class QDomElement;
 class QDomDocument;
 class QTimer;
 class QLabel;
+class QSslSocket;
 
 namespace egalite
 {
@@ -92,12 +93,15 @@ public:
   void    SetProtoVersion (QString newProto);
   void    SetHeartbeat (int secs);
 
+  void    SetInput (QSslSocket * dev);
+
 public slots:
 
   void IncomingDirect (const QByteArray &data, bool isLocal=false);
   void IncomingXmpp (const QXmppMessage &msg, bool isLocal=false);
   void HandleAnchor (const QUrl & url);
   void Stop ();
+  void InputAvailable ();
 
   bool close ();
 
@@ -145,12 +149,16 @@ private:
   void AckChunk (const QString & id, quint64 num);
   void CloseTransfer (const QString & id, bool good=false);
   void SendDomDoc (QDomDocument & doc);
+  void ReadDomDoc (QDomDocument & doc, bool isLocal = false);
 
   void DumpAttributes (const QDomElement & elt, QString msg = QString("debug:"));
   void ListActiveTransfers (bool showBox = false);
 
+  void DebugCheck ();
+
   Ui_ChatContent   ui;
 
+  QSslSocket      *ioDev;
   QString          remoteName;
   QString          localName;
   Mode             chatMode;
