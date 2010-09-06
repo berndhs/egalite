@@ -51,7 +51,6 @@ ChatContent::ChatContent (QWidget *parent)
    rcvCount (0),
    sendCount (0),
    protoVersion (QString()),
-   nProto (0),
    heartPeriod (0),
    heartBeat (0),
    stateUpdate (0),
@@ -245,17 +244,12 @@ ChatContent::IncomingDirect (const QByteArray & data, bool isLocal)
 void
 ChatContent::InputAvailable ()
 {
-  if (ioDev && ioDev->isReadable()) {
-    if (chatMode == ChatModeEmbed && nProto > 1) {
-      QDomDocument doc;
-      bool havedoc = doc.setContent (ioDev);
-      if (havedoc) {
-        ReadDomDoc (doc, false);
-      }
-    } else {
-      QByteArray bytes = ioDev->readAll ();
-      IncomingDirect (bytes, false);
-    }
+  if (ioDev && ioDev->isReadable()) { 
+    /** QDomDocument.setContent is not reentrannt so we cannot read
+        directly from the socket
+    */
+    QByteArray bytes = ioDev->readAll ();
+    IncomingDirect (bytes, false);
   }
 }
 
@@ -268,11 +262,9 @@ qDebug () << "INcoming Tag " << root.tagName();
     QXmppMessage msg;
     msg.parse (root);
     SetProtoVersion ("0.1");
-    nProto = 1;
     IncomingXmpp (msg, isLocal);
   } else if (root.tagName() == "Egalite") {
     SetProtoVersion ("0.2");
-    nProto = 2;
     SetMode (ChatModeEmbed);
     ExtractXmpp (root, isLocal); 
   } else {
