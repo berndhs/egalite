@@ -286,7 +286,6 @@ ChatContent::SendDomDoc (QDomDocument & doc)
   } else {
     emit Outgoing (msgbytes);
   }
-qDebug () << " <<---- Outgoing bytes " << msgbytes;
 }
 
 void
