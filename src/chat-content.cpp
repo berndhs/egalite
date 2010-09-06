@@ -416,11 +416,11 @@ ChatContent::EmbedDirectMessage (QByteArray & raw)
   QDomText txt = directDoc.createTextNode (raw);
   msg.appendChild (txt);
   directDoc.appendChild (root);
+  sendCount++;
+  SendDomDoc (directDoc);
   QByteArray newraw = directDoc.toByteArray ();
 qDebug () << " raw bytes " << newraw;
 qDebug () << " direct bytes " << directDoc.toByteArray ();
-  sendCount++;
-  emit Outgoing (newraw);
 QMessageBox box1 (this);
 QString bigmsg;
 bigmsg.append (newraw);
