@@ -250,9 +250,8 @@ ChatContent::InputAvailable ()
   if (ioDev && ioDev->isReadable()) {
     if (chatMode == ChatModeEmbed && 0) {
 QByteArray bytes = ioDev->readAll ();
-QMessageBox box (this);
-box.setText (bytes);
-box.exec ();
+qDebug() << " Incoming bytes " << bytes;
+IncomingDirect (bytes, false);
       QDomDocument doc;
       bool havedoc = doc.setContent (ioDev);
       if (havedoc) {
@@ -296,6 +295,7 @@ ChatContent::SendDomDoc (QDomDocument & doc)
   } else {
     emit Outgoing (msgbytes);
   }
+qDebug () << " <<---- Outgoing bytes " << msgbytes;
 }
 
 void
@@ -418,16 +418,6 @@ ChatContent::EmbedDirectMessage (QByteArray & raw)
   directDoc.appendChild (root);
   sendCount++;
   SendDomDoc (directDoc);
-  QByteArray newraw = directDoc.toByteArray ();
-qDebug () << " raw bytes " << newraw;
-qDebug () << " direct bytes " << directDoc.toByteArray ();
-QMessageBox box1 (this);
-QString bigmsg;
-bigmsg.append (newraw);
-bigmsg.append ("/n");
-bigmsg.append (directDoc.toByteArray());
-box1.setText (bigmsg);
-box1.exec ();
 }
 
 void
