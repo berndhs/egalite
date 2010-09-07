@@ -26,10 +26,10 @@
 #include <QByteArray>
 #include <QBuffer>
 #include <QMutex>
+#include <QXmlStreamReader>
 
 #include "direct-message.h"
 
-class QXmlStreamReader;
 class QXmlStreamAttributes;
 
 namespace egalite
@@ -103,6 +103,8 @@ private:
                       bool             & complete,
                       bool             & good,
                       QXmlStreamAttributes & atts);
+
+  QXmlStreamReader::TokenType   ReadNext (QXmlStreamReader & xread);
 
   QBuffer     inbuf;
   QMutex      bufLock;

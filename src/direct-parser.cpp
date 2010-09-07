@@ -103,10 +103,11 @@ DirectParser::Read (DirectMessage & msg)
   bool complete (false);
   bool good (false);
   QString  topname;
+  QString  bottomtag;
   QString  version;
   qint64 offset (0);
   while (!finished) {
-    tokt = xread.readNext ();
+    tokt = ReadNext (xread);
     offset = xread.characterOffset ();
     qDebug () << " Direct token " << xread.tokenString();
     switch (tokt) {
@@ -130,22 +131,26 @@ DirectParser::Read (DirectMessage & msg)
         qDebug () << " After ParseOld good/complete " << good << "/" << complete;
         msg.SetAttribute ("version","0.1");
       } else if (topname == topTag) {
+qDebug () << " topname is egalite " << topTag;
         version = xread.documentVersion ().toString();
         msg.SetAttribute ("version",version);
         ParseMessage (xread, msg, offset, complete, good);
       } else {
+qDebug () << " topname unknown: " << topname;
         finished = true;  complete = false; good = false;
         lastErr = Proto_WrongProtocol;
+      }
+      break;
+    case QXmlStreamReader::EndElement:
+      bottomtag = xread.name().toString().toLower();
+      if (bottomtag == topname) {
+        finished = true;
       }
       break;
     case QXmlStreamReader::EndDocument :
       finished = true;
       break;
     case QXmlStreamReader::Characters:
-    case QXmlStreamReader::EndElement:
-      qDebug () << " character data";
-      lastErr = Proto_OutOfOrder;
-      finished = true; complete = false; good = false;
       break;
     case QXmlStreamReader::StartDocument:
     case QXmlStreamReader::Comment:
@@ -181,16 +186,23 @@ DirectParser::ParseMessage (QXmlStreamReader & xread,
                             bool             & complete,
                             bool             & good)
 {
-  QXmlStreamReader::TokenType tokt = xread.readNext ();
+qDebug () << " ParseMessage";
+  QXmlStreamReader::TokenType tokt = ReadNext (xread);
   offset = xread.characterOffset ();
   QXmlStreamAttributes atts;
   QString op;
   QString tag;
+  if (tokt == QXmlStreamReader::Characters) {
+    tokt = ReadNext (xread);
+    offset = xread.characterOffset();
+  }
+qDebug () << "    ParseMessage token " << xread.tokenString ();
   switch (tokt) {
   case QXmlStreamReader::StartElement:
     atts = xread.attributes();
     tag = xread.name().toString();
     op = atts.value ("op").toString().toLower();
+qDebug () << "       ParseMessage op " << op;
     msg.SetOp (op);
     if (tag == "cmd") {
       if (op == "xmpp") {
@@ -200,8 +212,10 @@ DirectParser::ParseMessage (QXmlStreamReader & xread,
       } else if (op == "sendfile") {
         ParseSendfile (xread, msg, offset, complete, good, atts);
       }
-      xread.readNext ();
       offset = xread.characterOffset ();
+qDebug () << "  ParseMessage tail check " << xread.tokenString() << " tag "
+               << xread.name () << " for " << tag;
+qDebug () << "       stats is " << good << "/" << complete;
       if (xread.tokenType() != QXmlStreamReader::EndElement
          || xread.name() != tag) {
         complete = false;
@@ -214,6 +228,7 @@ DirectParser::ParseMessage (QXmlStreamReader & xread,
     good = false;
     break;
   }
+qDebug () << " ParseMessage return " << good << "/" << complete << " at "<<  xread.tokenString();
 }
 
 void
@@ -224,20 +239,24 @@ DirectParser::ParseXmpp (QXmlStreamReader & xread,
                             bool             & good,
                             QXmlStreamAttributes & atts)
 {
+qDebug () << " ParseXmpp ";
   QString subop = atts.value("subop").toString().toLower();
   msg.SetSubop (subop);
-  if (subop == "xmpp") {
+qDebug () << " ParseXmpp subop " << subop;
+  if (subop == "msg") {
     complete = true; good = true;
   }
-  xread.readNext ();
+  ReadNext (xread);
   if (xread.isCharacters()) {
-    xread.readNext ();
     msg.SetData (xread.text().toString().toUtf8());
+qDebug () << " xmpp message has payload " << msg.Data();
+    ReadNext (xread);
   }
   offset = xread.characterOffset ();
   if (xread.tokenType() != QXmlStreamReader::EndElement) {
     complete = false; good = false;
   }
+qDebug () << " ParseXmpp return " << good << "/" << complete << " at "<<  xread.tokenString();
 }
 
 void
@@ -248,18 +267,24 @@ DirectParser::ParseCtl (QXmlStreamReader & xread,
                             bool             & good,
                             QXmlStreamAttributes & atts)
 {
+qDebug () << " ParseCtl " ;
   QString subop = atts.value("subop").toString().toLower();
   msg.SetSubop (subop);
+qDebug () <<  " ParseCtl subop " << subop;
   if (subop == "heartbeat") {
     complete = true;
     good = true;
   }
-  xread.readNext ();
+  ReadNext (xread);
+  if (ReadNext (xread) == QXmlStreamReader::Characters) {
+    ReadNext (xread);
+  }
   offset = xread.characterOffset ();
   if (xread.tokenType() != QXmlStreamReader::EndElement) {
     complete = false;
     good = false;
   }
+qDebug () << " ParseCtl return " << good << "/" << complete << " at " << xread.tokenString();
 }
 
 void
@@ -274,11 +299,11 @@ DirectParser::ParseSendfile (QXmlStreamReader & xread,
   msg.SetSubop (subop);
   bool valid (false);
   if (subop == "chunk-data") {
-    xread.readNext ();
+    ReadNext (xread);
     if (xread.isCharacters()) {
       msg.SetData (xread.text().toString().toUtf8());
       valid = true;
-      xread.readNext ();
+      ReadNext (xread);
     } 
     offset = xread.characterOffset ();
   } else {
@@ -299,6 +324,7 @@ DirectParser::ParseSendfile (QXmlStreamReader & xread,
     complete = true;
     offset = xread.characterOffset ();
   } 
+qDebug () << " ParseSendfile return " << good << "/" << complete << " at " <<  xread.tokenString();
 }
 
 void
@@ -308,12 +334,12 @@ DirectParser::ParseOld     (QXmlStreamReader & xread,
                             bool             & complete,
                             bool             & good)
 {
-  QXmlStreamReader::TokenType tokt = xread.readNext ();
+  QXmlStreamReader::TokenType tokt = ReadNext (xread);
   QXmlStreamAttributes atts;
   msg.SetOp ("xmpp");
   msg.SetSubop ("msg");
-  xread.readNext (); // eat the characters
-  xread.readNext (); // eat the end-element
+  ReadNext (xread); // eat the characters
+  ReadNext (xread); // eat the end-element
   offset = xread.characterOffset ();
   QByteArray data = inbuf.buffer().left (offset);
   msg.SetData (data);
@@ -321,6 +347,16 @@ DirectParser::ParseOld     (QXmlStreamReader & xread,
   good = true;
 qDebug () << " ParseOld has data " << msg.Data ();
 qDebug () << " ParseOld good/complete " << good << "/" << complete;
+}
+
+QXmlStreamReader::TokenType
+DirectParser::ReadNext (QXmlStreamReader & xread)
+{
+  QXmlStreamReader::TokenType  tokt;
+  tokt = xread.readNext ();
+  qDebug () << "next token " << xread.tokenString ();
+  qDebug () << "     name " << xread.name();
+  return tokt;
 }
 
 } // namespace
