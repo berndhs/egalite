@@ -72,8 +72,10 @@ DirectParser::TryRead (int howmany)
 {
   DirectMessage msg;
   bool haveOne (true);
+  bool atLeastOne (false);
   for (int i=0; i<howmany && haveOne; i++) {
     haveOne = Read (msg);
+    atLeastOne |= haveOne;
     if (haveOne) {
       emit Message (msg);
       qDebug () << " Good Direct Read, emit message with " 
@@ -85,6 +87,7 @@ DirectParser::TryRead (int howmany)
       }
     }
   }
+  return atLeastOne ;
 }
 
 void
