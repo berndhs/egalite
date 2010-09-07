@@ -55,14 +55,14 @@ ChatContent::ChatContent (QWidget *parent)
    sendCount (0),
    protoVersion (QString()),
    sendSinceBeat (0),
-   heartPeriod (0),
+   maxBurst (0),
    heartBeat (0),
    stateUpdate (0),
    extraSendMessage (tr("\n%1 active")),
    extraSendHighlight (false),
    extraSendStyle ("QPushButton { font-style:italic;}"),
    sendFileWindow (1),
-   sendChunkSize (128),
+   sendChunkSize (1*1024),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -98,7 +98,7 @@ ChatContent::ChatContent (QWidget *parent)
   connect (stateUpdate, SIGNAL (timeout()), this, SLOT (UpdateXferDisplay ()));
   QTimer * debugTimer = new QTimer (this);
   connect (debugTimer, SIGNAL (timeout()), this, SLOT (DebugCheck()));
-  debugTimer->start (10*1000);
+  debugTimer->start (60*1000);
 }
 
 
@@ -440,6 +440,7 @@ ChatContent::Heartbeat ()
       root.appendChild (msg);
       SendDomDoc (heartDoc);
     }
+    directParser.TryRead (maxBurst);
     sendSinceBeat = 0;
   }
 }
@@ -849,10 +850,9 @@ ChatContent::ListActiveTransfers (bool showBox)
 void
 ChatContent::DebugCheck ()
 {
-  std::cout << " Debug Check Chat COntent " << this;
-  std::cout << " socket " << ioDev << " ready " << ioDev->isReadable();
-  std::cout << " socket bytes avail " << ioDev->bytesAvailable();
-  std::cout << std::endl;
+  qDebug() << " Debug Check Chat COntent " << this;
+  qDebug() << " socket " << ioDev << " ready " << ioDev->isReadable();
+  qDebug() << " socket bytes avail " << ioDev->bytesAvailable();
 }
 
 } // namespace

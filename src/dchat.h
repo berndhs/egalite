@@ -155,6 +155,7 @@ private:
   QTimer       *debugTimer;
   QTimer       *xmppTimer;
   QTimer       *announceHeartbeat;
+  int           directHeartPeriod;
 
 
   std::map <QString, XEgalClient*>    xclientMap;

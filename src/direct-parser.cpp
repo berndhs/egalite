@@ -31,6 +31,9 @@ DirectParser::DirectParser (QObject *parent)
   :QObject(parent),
    bufLock (QMutex::NonRecursive),
    lastErr (-1),
+   lastComplete (false),
+   lastGood (false),
+   lastPos (0),
    topTag ("egalite"),
    oldTopTag ("message")
 {
@@ -64,16 +67,23 @@ DirectParser::AddData (const QByteArray & moreBytes)
   bufLock.unlock ();
 }
 
-void
-DirectParser::TryRead ()
+bool
+DirectParser::TryRead (int howmany)
 {
   DirectMessage msg;
-  if (Read (msg)) {
-    emit Message (msg);
-    qDebug () << " Good Direct Read, emit message with " 
-              << msg.Op() <<"/" << msg.Subop();
-  } else {
-    qDebug () << " Bad Direct Read, no emit";
+  bool haveOne (true);
+  for (int i=0; i<howmany && haveOne; i++) {
+    haveOne = Read (msg);
+    if (haveOne) {
+      emit Message (msg);
+      qDebug () << " Good Direct Read, emit message with " 
+                << msg.Op() <<"/" << msg.Subop();
+    } else {
+      qDebug () << " Bad Direct Read, no emit";
+      if (Good () && !Complete()) {
+        Reset ();
+      }
+    }
   }
 }
 
@@ -85,10 +95,17 @@ DirectParser::Flush ()
 }
 
 void
-DirectParser::Reset ()
+DirectParser::Reset (qint64 newPos)
 {
-  Flush ();
+  inbuf.seek (newPos);
   lastErr = 0;
+}
+
+void
+DirectParser::Shift (qint64 len)
+{
+  inbuf.buffer().remove (0,len);
+  inbuf.seek (0);
 }
 
 bool
@@ -178,6 +195,14 @@ qDebug () << " direct message top parse good/complete "
     msg.Clear ();
   }
 qDebug () << " after DirectParser::Read buffer has [[" << inbuf.buffer() << "]]";
+  if (!good) {
+    if (xread.error () == QXmlStreamReader::PrematureEndOfDocumentError) {
+      complete = false;
+      good = true;
+    }
+  }
+  lastComplete = complete;
+  lastGood = good;
   bufLock.unlock ();
   return good && complete;
 }

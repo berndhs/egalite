@@ -115,6 +115,7 @@ private slots:
   void StartFileSend ();
   void UpdateXferDisplay ();
   void StartXferDisplay ();
+  void DebugCheck ();
 
 signals:
 
@@ -155,7 +156,6 @@ private:
   void DumpAttributes (DirectMessage & elt, QString msg = QString("debug:"));
   void ListActiveTransfers (bool showBox = false);
 
-  void DebugCheck ();
 
   Ui_ChatContent   ui;
 
@@ -168,7 +168,7 @@ private:
   quint64          sendCount;
   QString          protoVersion;
   int              sendSinceBeat;
-  int              heartPeriod;
+  int              maxBurst;
   QTimer          *heartBeat;
   QTimer          *stateUpdate;
   QString          plainSendMessage;

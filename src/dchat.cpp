@@ -69,7 +69,8 @@ DChatMain::DChatMain (QWidget *parent)
    callnum (0),
    debugTimer (0),
    xmppTimer (0),
-   announceHeartbeat (0)
+   announceHeartbeat (0),
+   directHeartPeriod (60)
 {
   ui.setupUi (this);
   ui.contactView->setModel (&contactListModel);
@@ -114,6 +115,9 @@ DChatMain::Run ()
     QString stylePattern  ("QTreeView { background-image: url(%1) }");
     pApp->setStyleSheet (stylePattern.arg (backPic));
   }
+  directHeartPeriod = Settings().value ("direct/heartperiodsecs",
+                                      directHeartPeriod).toInt();
+  Settings().setValue ("direct/heartperiodsecs",directHeartPeriod);
   show ();
   SetupListener ();
   Settings().sync ();
@@ -662,7 +666,7 @@ Q_UNUSED (localNick);
     newCont->SetInput (sock->Socket());
     sock->SetDoOwnRead (false);
     newCont->SetProtoVersion ("0.1");
-    newCont->SetHeartbeat (15);
+    newCont->SetHeartbeat (directHeartPeriod);
     newCont->Start (ChatContent::ChatModeRaw,
                     sock->RemoteName(),
                     sock->LocalName());

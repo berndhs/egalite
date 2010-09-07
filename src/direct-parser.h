@@ -61,12 +61,15 @@ public:
   bool Read (DirectMessage & msg);
   void Flush ();
   int  Error ();
-  void Reset ();
+  bool Good () { return lastGood; }
+  bool Complete () { return lastComplete; }
+  void Reset (qint64 newPos=0);
+  void Shift (qint64 len=0);
 
 
 public slots:
 
-  void TryRead ();
+  bool TryRead (int howmany=1);
   void AddData  (const QByteArray & moreBytes);
 
 signals:
@@ -109,6 +112,9 @@ private:
   QBuffer     inbuf;
   QMutex      bufLock;
   int         lastErr;
+  bool        lastComplete;
+  bool        lastGood;
+  qint64      lastPos;
   QString     topTag;
   QString     oldTopTag;
 
