@@ -324,6 +324,7 @@ DirectParser::ParseSendfile (QXmlStreamReader & xread,
     complete = true;
     offset = xread.characterOffset ();
   } 
+  ReadNext (xread);
 qDebug () << " ParseSendfile return " << good << "/" << complete << " at " <<  xread.tokenString();
 }
 
