@@ -43,7 +43,10 @@ DirectParser::~DirectParser ()
 void
 DirectParser::Start ()
 {
-  inbuf.open (QBuffer::ReadOnly);
+  bool isopen = inbuf.open (QBuffer::ReadOnly);
+  if (!isopen) {
+    qDebug () << "Cannot open direct input buffer!";
+  }
   inbuf.seek (0);
 }
 
@@ -67,6 +70,9 @@ DirectParser::TryRead ()
   DirectMessage msg;
   if (Read (msg)) {
     emit Message (msg);
+    qDebug () << " Good Direct REad, emit message with op " << msg.Op();
+  } else {
+    qDebug () << " Bad Direct Read, no emit";
   }
 }
 
@@ -102,6 +108,7 @@ DirectParser::Read (DirectMessage & msg)
   while (!finished) {
     tokt = xread.readNext ();
     offset = xread.characterOffset ();
+    qDebug () << " Direct token " << xread.tokenString();
     switch (tokt) {
     case QXmlStreamReader::NoToken :
       qDebug () << " no token found";
@@ -110,6 +117,7 @@ DirectParser::Read (DirectMessage & msg)
       break;
     case QXmlStreamReader::Invalid :
       qDebug () << " bad token";
+      qDebug () << " text until here: " << inbuf.buffer().left(offset);
       finished = true; complete = false; good = false;
       lastErr = Proto_BadTag;
       break;
@@ -117,9 +125,9 @@ DirectParser::Read (DirectMessage & msg)
       topname = xread.name().toString().toLower();
       qDebug () << " TOP NAME " << topname;
       if (topname == oldTopTag) {
-        qDebug () << " not supporting old top tag";
         qDebug () << " text is " << inbuf.buffer();
         ParseOld (xread, msg, offset, complete, good);
+        qDebug () << " After ParseOld good/complete " << good << "/" << complete;
         msg.SetAttribute ("version","0.1");
       } else if (topname == topTag) {
         version = xread.documentVersion ().toString();
@@ -131,6 +139,8 @@ DirectParser::Read (DirectMessage & msg)
       }
       break;
     case QXmlStreamReader::EndDocument :
+      finished = true;
+      break;
     case QXmlStreamReader::Characters:
     case QXmlStreamReader::EndElement:
       qDebug () << " character data";
@@ -150,6 +160,8 @@ DirectParser::Read (DirectMessage & msg)
       break;
     }
   }
+qDebug () << " direct message top parse good/complete " 
+          << good << "/" << complete;
   if (good && complete) {
     /// we have consumed a message, so get rid of the raw data
     /// so we can read the next message next time
@@ -307,6 +319,8 @@ DirectParser::ParseOld     (QXmlStreamReader & xread,
   msg.SetData (data);
   complete = true;
   good = true;
+qDebug () << " ParseOld has data " << msg.Data ();
+qDebug () << " ParseOld good/complete " << good << "/" << complete;
 }
 
 } // namespace

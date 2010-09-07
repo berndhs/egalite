@@ -180,6 +180,9 @@ ChatContent::Start ()
   qDebug () << " style sheet for sendFile button "
             << ui.sendFileButton->styleSheet();
   normalStyle = ui.sendFileButton->styleSheet ();
+  connect (&directParser, SIGNAL (Message (DirectMessage)),
+           this, SLOT (IncomingDirect (DirectMessage)));
+  directParser.Start ();
 }
 
 void
@@ -191,9 +194,6 @@ ChatContent::Start (Mode mode,
   SetRemoteName (remoteName);
   SetLocalName (localName);
   Start ();
-  if (chatMode != ChatModeXmpp) {
-    directParser.Start ();
-  }
   if (chatMode == ChatModeRaw) {
     ModeUpdate ();
   }
@@ -255,6 +255,7 @@ ChatContent::InputAvailable ()
 void
 ChatContent::IncomingDirect (DirectMessage msg)
 {
+qDebug () << " Incoming Direct op " << msg.Op () << "/" << msg.Subop();
   QString op = msg.Op();
   if (op == "xmpp") {
     QDomDocument xmppDoc;
