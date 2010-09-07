@@ -297,6 +297,7 @@ DirectParser::ParseSendfile (QXmlStreamReader & xread,
 {
   QString subop = atts.value("subop").toString().toLower();
   msg.SetSubop (subop);
+qDebug () << " Parse Sendfile subop " << subop;
   bool valid (false);
   if (subop == "chunk-data") {
     ReadNext (xread);
@@ -314,6 +315,7 @@ DirectParser::ParseSendfile (QXmlStreamReader & xread,
           || subop == "send-done"
           || subop == "abort"
            );
+    ReadNext (xread);
   }
   if (valid) {
     for (int i=0; i< atts.size(); i++) {
@@ -324,7 +326,6 @@ DirectParser::ParseSendfile (QXmlStreamReader & xread,
     complete = true;
     offset = xread.characterOffset ();
   } 
-  ReadNext (xread);
 qDebug () << " ParseSendfile return " << good << "/" << complete << " at " <<  xread.tokenString();
 }
 

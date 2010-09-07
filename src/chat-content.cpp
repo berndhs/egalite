@@ -61,7 +61,7 @@ ChatContent::ChatContent (QWidget *parent)
    extraSendHighlight (false),
    extraSendStyle ("QPushButton { font-style:italic;}"),
    sendFileWindow (1),
-   sendChunkSize (4*1024),
+   sendChunkSize (128),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
