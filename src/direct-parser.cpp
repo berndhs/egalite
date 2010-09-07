@@ -34,11 +34,17 @@ DirectParser::DirectParser (QObject *parent)
    topTag ("egalite"),
    oldTopTag ("message")
 {
-  inbuf.seek (0);
 }
 
 DirectParser::~DirectParser ()
 {
+}
+
+void
+DirectParser::Start ()
+{
+  inbuf.open (QBuffer::ReadOnly);
+  inbuf.seek (0);
 }
 
 int

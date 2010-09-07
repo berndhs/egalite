@@ -57,6 +57,7 @@ public:
   DirectParser (QObject * parent=0);
   ~DirectParser (); 
 
+  void Start ();
   bool Read (DirectMessage & msg);
   void Flush ();
   int  Error ();

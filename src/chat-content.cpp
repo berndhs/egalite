@@ -191,6 +191,9 @@ ChatContent::Start (Mode mode,
   SetRemoteName (remoteName);
   SetLocalName (localName);
   Start ();
+  if (chatMode != ChatModeXmpp) {
+    directParser.Start ();
+  }
   if (chatMode == ChatModeRaw) {
     ModeUpdate ();
   }
