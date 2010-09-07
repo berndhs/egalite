@@ -312,7 +312,7 @@ qDebug () << " Parse Sendfile subop " << subop;
           || subop == "goahead"
           || subop == "deny"
           || subop == "chunk-ack"
-          || subop == "send-done"
+          || subop == "snd-done"
           || subop == "abort"
            );
     ReadNext (xread);
