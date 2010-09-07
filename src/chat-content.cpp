@@ -54,6 +54,7 @@ ChatContent::ChatContent (QWidget *parent)
    rcvCount (0),
    sendCount (0),
    protoVersion (QString()),
+   sendSinceBeat (0),
    heartPeriod (0),
    heartBeat (0),
    stateUpdate (0),
@@ -327,6 +328,7 @@ ChatContent::SendDomDoc (QDomDocument & doc)
 {
   static QByteArray spaces (8,' ');
   QByteArray msgbytes = doc.toString().toUtf8();
+  sendSinceBeat ++;
   if (ioDev) {
     ioDev->write (msgbytes);
     ioDev->write (spaces);
@@ -427,15 +429,18 @@ void
 ChatContent::Heartbeat ()
 {
   if (chatMode == ChatModeEmbed) {
-    QDomDocument heartDoc ("egalite");
-    QDomElement root = heartDoc.createElement ("egalite");
-    root.setAttribute ("version",protoVersion); 
-    heartDoc.appendChild (root);
-    QDomElement msg = heartDoc.createElement ("cmd");
-    msg.setAttribute ("op","ctl");
-    msg.setAttribute ("subop","heartbeat");
-    root.appendChild (msg);
-    SendDomDoc (heartDoc);
+    if (sendSinceBeat < 2) {
+      QDomDocument heartDoc ("egalite");
+      QDomElement root = heartDoc.createElement ("egalite");
+      root.setAttribute ("version",protoVersion); 
+      heartDoc.appendChild (root);
+      QDomElement msg = heartDoc.createElement ("cmd");
+      msg.setAttribute ("op","ctl");
+      msg.setAttribute ("subop","heartbeat");
+      root.appendChild (msg);
+      SendDomDoc (heartDoc);
+    }
+    sendSinceBeat = 0;
   }
 }
 

@@ -662,7 +662,7 @@ Q_UNUSED (localNick);
     newCont->SetInput (sock->Socket());
     sock->SetDoOwnRead (false);
     newCont->SetProtoVersion ("0.1");
-    newCont->SetHeartbeat (0);
+    newCont->SetHeartbeat (15);
     newCont->Start (ChatContent::ChatModeRaw,
                     sock->RemoteName(),
                     sock->LocalName());

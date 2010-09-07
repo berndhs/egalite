@@ -70,7 +70,8 @@ DirectParser::TryRead ()
   DirectMessage msg;
   if (Read (msg)) {
     emit Message (msg);
-    qDebug () << " Good Direct REad, emit message with op " << msg.Op();
+    qDebug () << " Good Direct Read, emit message with " 
+              << msg.Op() <<"/" << msg.Subop();
   } else {
     qDebug () << " Bad Direct Read, no emit";
   }
@@ -95,6 +96,7 @@ DirectParser::Read (DirectMessage & msg)
 {
   msg.Clear ();
   if (!bufLock.tryLock (5000)) {
+    qDebug () << "WARNING: Mutex locked 5 seconds, giving up";
     return false;
   }
   QXmlStreamReader              xread (&inbuf);
@@ -277,14 +279,6 @@ qDebug () <<  " ParseCtl subop " << subop;
     good = true;
   }
   ReadNext (xread);
-  if (ReadNext (xread) == QXmlStreamReader::Characters) {
-    ReadNext (xread);
-  }
-  offset = xread.characterOffset ();
-  if (xread.tokenType() != QXmlStreamReader::EndElement) {
-    complete = false;
-    good = false;
-  }
 qDebug () << " ParseCtl return " << good << "/" << complete << " at " << xread.tokenString();
 }
 
