@@ -175,6 +175,7 @@ qDebug () << " direct message top parse good/complete "
   } else {
     msg.Clear ();
   }
+qDebug () << " after DirectParser::Read buffer has [[" << inbuf.buffer() << "]]";
   bufLock.unlock ();
   return good && complete;
 }
