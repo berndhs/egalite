@@ -361,7 +361,7 @@ qDebug () << "Receive Count == " << rcvCount << " mode " << chatMode;
       SendMessage (QString (), true);
       SetMode (ChatModeEmbed);
       qDebug () << " Switch to Mode " << chatMode;
-      ChangeProto (this, "0.2");
+      ChangeProto (this, "0.3");
     }
     return;
   }
@@ -850,9 +850,11 @@ ChatContent::ListActiveTransfers (bool showBox)
 void
 ChatContent::DebugCheck ()
 {
-  qDebug() << " Debug Check Chat COntent " << this;
-  qDebug() << " socket " << ioDev << " ready " << ioDev->isReadable();
-  qDebug() << " socket bytes avail " << ioDev->bytesAvailable();
+  if (ioDev) {
+    qDebug() << " Debug Check Chat COntent " << this;
+    qDebug() << " socket " << ioDev << " ready " << ioDev->isReadable();
+    qDebug() << " socket bytes avail " << ioDev->bytesAvailable();
+  }
 }
 
 } // namespace
