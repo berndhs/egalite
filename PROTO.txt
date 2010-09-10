@@ -13,6 +13,17 @@ xmpp message escaped as text
 </Egalite>
 
 <Egalite version="0.2">
+<cmd op="sendfile" subop="samreq"
+    xferid="unique-id-5678"
+    encoding="audio/pcm"
+    rate="8000"
+    bits="16"
+    channels="1"
+    byteorder="0"
+    signed="signed" /> 
+</Egalite>
+
+<Egalite version="0.2">
 <cmd op="sendfile" subop="sendreq" 
      xferid="unique-id-A0F3B99" 
      name="file-name with spaces.jpg" 
