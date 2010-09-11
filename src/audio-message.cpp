@@ -39,10 +39,12 @@ AudioMessage::AudioMessage (QWidget *parent)
    recTime (10.0),
    tick (0.0),
    secsLeft (0.0),
-   limitTimer (0)
+   recLimitTimer (0),
+   playLimitTimer (0)
 {
   ui.setupUi (this);
-  limitTimer = new QTimer (this);
+  recLimitTimer = new QTimer (this);
+  playLimitTimer = new QTimer (this);
   ui.countDown->setDigitCount (4);
   ui.countDown->setMode (QLCDNumber::Dec);
   hide ();
@@ -77,7 +79,7 @@ AudioMessage::Record (const QPoint & where, const QSize & size)
   outFile.setFileName(filename);
   outFile.open( QIODevice::WriteOnly | QIODevice::Truncate );
   
-  outFormat.setFrequency(8000);
+  outFormat.setFrequency(22050);
   outFormat.setChannels(1);
   outFormat.setSampleSize(16);
   outFormat.setCodec("audio/pcm");
@@ -97,7 +99,7 @@ AudioMessage::Record (const QPoint & where, const QSize & size)
   qDebug () << " rate " << record->format().frequency();
   record->reset ();
   record->start(&outFile);
-  connect (limitTimer, SIGNAL (timeout()), this, SLOT (CountDown()));
+  connect (recLimitTimer, SIGNAL (timeout()), this, SLOT (CountDown()));
   move (parentWidget->mapToGlobal (where));
   resize (size);
   show ();
@@ -126,8 +128,8 @@ AudioMessage::StopRecording ()
 void
 AudioMessage::StartCount (double maxtime)
 {
-  tick = 0.1;
-  limitTimer->start (100);
+  tick = 1.0;
+  recLimitTimer->start (1000);
   secsLeft = maxtime;
   show ();
   CountDown ();
@@ -138,12 +140,9 @@ AudioMessage::CountDown ()
 {
   ui.countDown->display (secsLeft);
   secsLeft -= tick;
-  qDebug () << " time left " << secsLeft;
-qDebug () << " countDonw pos " << pos() << " shown " << ui.countDown->isVisible();
   if (secsLeft <= 0.0) {
-qDebug () << " callign stop with " << secsLeft << " left ";
     StopRecording();
-    limitTimer->stop ();
+    recLimitTimer->stop ();
     ui.countDown->display (0);
     hide ();
     accept ();
@@ -154,20 +153,49 @@ void
 AudioMessage::StartPlay ()
 {
   qDebug () << "Play audio message";
+  QAudioDeviceInfo info = QAudioDeviceInfo::defaultOutputDevice();
+  if (!info.isFormatSupported(inFormat)) {
+    qWarning()<<"default inFormat not supported try to use nearest";
+    inFormat = info.nearestFormat(inFormat);
+  }
   inFile.open (QFile::ReadOnly);
   if (player == 0) {
     player = new QAudioOutput (inFormat, this);
     connect (player, SIGNAL (stateChanged (QAudio::State)),
              this, SLOT (PlayChanged (QAudio::State)));
+    connect (playLimitTimer, SIGNAL (timeout()),
+             this, SLOT (CheckPlayState ()));
   }
   emit PlayStarting ();
   player->start (&inFile);
+  playLimitTimer->start (2000);
+}
+
+void
+AudioMessage::CheckPlayState ()
+{
+  static qint64  oldWork (0);
+  if (player) {
+    QAudio::State  state = player->state ();
+    if (state == QAudio::IdleState) {
+      StopPlay ();
+    } else {
+      qint64 workdone = player->processedUSecs ();
+      if (workdone <= oldWork) {  // nothing done in 2 secs, shut it down
+        StopPlay ();
+        qDebug () << " forcing audio player stop";
+      } else {
+        oldWork = workdone;
+      }
+    }
+  }
 }
 
 void
 AudioMessage::PlayChanged (QAudio::State state)
 {
-  if (state == QAudio::IdleState) {
+  qDebug () << " Audio Play state " << state;
+  if (state == QAudio::IdleState || state == QAudio::StoppedState) {
     StopPlay ();
   }
 }
@@ -181,6 +209,7 @@ AudioMessage::StopPlay ()
   }
   busyReceive = false;
   emit PlayFinished ();
+  playLimitTimer->stop ();
   qDebug () << " done playing audio message";
 }
 

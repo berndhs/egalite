@@ -74,6 +74,7 @@ private slots:
 
   void CountDown ();
   void PlayChanged (QAudio::State state);
+  void CheckPlayState ();
 
 signals:
 
@@ -96,7 +97,8 @@ private:
   double         recTime;
   double         tick;
   double         secsLeft;
-  QTimer        *limitTimer;
+  QTimer        *recLimitTimer;
+  QTimer        *playLimitTimer;
   bool           busyReceive;
 
   Ui_CountDownDisplay ui;
