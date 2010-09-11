@@ -95,6 +95,7 @@ FORMS = \
         ui/cert-edit.ui \
         ui/cert-input.ui \
 	ui/server-account.ui \
+	ui/count-down.ui \
 
 
 SOURCES = src/main.cpp \

@@ -486,10 +486,7 @@ ChatContent::HandleAnchor (const QUrl & url)
 void
 ChatContent::StartAudioSend ()
 {
-  QMessageBox box;
-  box.setText ("Send Audio goes here");
-  box.exec ();
-  audio.Record ();
+  audio.Record (ui.textHistory->pos(), ui.chatInput->size());
 }
 
 void

@@ -26,6 +26,11 @@
 #include <QAudioFormat>
 #include <QFile>
 #include <QString>
+#include <QPoint>
+#include <QLCDNumber>
+#include <QWidget>
+#include <QDialog>
+#include "ui_count-down.h"
 
 class QAudioInput;
 class QTimer;
@@ -33,12 +38,12 @@ class QTimer;
 namespace egalite
 {
 
-class AudioMessage : public QObject
+class AudioMessage : public QDialog
 {
 Q_OBJECT
 public:
 
-  AudioMessage (QObject * parent=0);
+  AudioMessage (QWidget * parent=0);
 
   QAudioFormat & Format () { return format; }
 
@@ -46,7 +51,7 @@ public:
 
   void  SetFilename (QString fn) { filename = fn; }
 
-  void  Record ();
+  void  Record (const QPoint & where, const QSize & size);
   int   Size ();
 
 public slots:
@@ -65,6 +70,7 @@ private:
 
   void   StartCount (double maxtime);
 
+  QWidget       *parentWidget;
   QString        filename;
   QAudioFormat   format;
   QFile          file;
@@ -73,6 +79,8 @@ private:
   double         tick;
   double         secsLeft;
   QTimer        *limitTimer;
+
+  Ui_CountDownDisplay ui;
 } ;
 
 } // namespace

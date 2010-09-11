@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CountDownDisplay</class>
+ <widget class="QWidget" name="CountDownDisplay">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>297</width>
+    <height>79</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Time for Message</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../dchat.qrc">
+    <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
+  </property>
+  <property name="windowOpacity">
+   <double>0.100000000000000</double>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLCDNumber" name="countDown"/>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../dchat.qrc"/>
+ </resources>
+ <connections/>
+</ui>

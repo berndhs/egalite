@@ -30,19 +30,24 @@
 namespace egalite
 {
 
-AudioMessage::AudioMessage (QObject *parent)
-  :QObject (parent),
+AudioMessage::AudioMessage (QWidget *parent)
+  :QDialog (parent),
+   parentWidget (parent),
    record (0),
    recTime (10.0),
    tick (0.0),
    secsLeft (0.0),
    limitTimer (0)
 {
+  ui.setupUi (this);
   limitTimer = new QTimer (this);
+  ui.countDown->setDigitCount (4);
+  ui.countDown->setMode (QLCDNumber::Dec);
+  hide ();
 }
 
 void
-AudioMessage::Record ()
+AudioMessage::Record (const QPoint & where, const QSize & size)
 {
   QString tmpdir = QDesktopServices::storageLocation 
                     (QDesktopServices::CacheLocation);
@@ -52,7 +57,7 @@ AudioMessage::Record ()
   file.setFileName(filename);
   file.open( QIODevice::WriteOnly | QIODevice::Truncate );
   
-  format.setFrequency(44100);
+  format.setFrequency(8000);
   format.setChannels(1);
   format.setSampleSize(16);
   format.setCodec("audio/pcm");
@@ -69,8 +74,13 @@ AudioMessage::Record ()
     record = new QAudioInput(format, this);
   }
   qDebug () << " record ";
+  qDebug () << " rate " << record->format().frequency();
+  record->reset ();
   record->start(&file);
   connect (limitTimer, SIGNAL (timeout()), this, SLOT (CountDown()));
+  move (parentWidget->mapToGlobal (where));
+  resize (size);
+  show ();
   StartCount (10.0);
 }
 
@@ -99,20 +109,24 @@ AudioMessage::StartCount (double maxtime)
   tick = 0.1;
   limitTimer->start (100);
   secsLeft = maxtime;
+  show ();
   CountDown ();
 }
 
 void
 AudioMessage::CountDown ()
 {
-  //ui.secsLeft->display (secsLeft);
+  ui.countDown->display (secsLeft);
   secsLeft -= tick;
   qDebug () << " time left " << secsLeft;
+qDebug () << " countDonw pos " << pos() << " shown " << ui.countDown->isVisible();
   if (secsLeft <= 0.0) {
 qDebug () << " callign stop with " << secsLeft << " left ";
     StopRecording();
     limitTimer->stop ();
-    //ui.secsLeft->display (0);
+    ui.countDown->display (0);
+    hide ();
+    accept ();
   }
 }
 
