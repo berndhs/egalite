@@ -20,7 +20,7 @@ xmpp message escaped as text
     bits="16"
     channels="1"
     byteorder="0"
-    signed="signed" /> 
+    signed="1" /> 
 </Egalite>
 
 <Egalite version="0.2">

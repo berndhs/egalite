@@ -3,6 +3,7 @@
 #include "chat-content.h"
 #include "direct-message.h"
 #include "direct-parser.h"
+#include "audio-message.h"
 #include <QXmppMessage.h>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
@@ -63,6 +64,7 @@ ChatContent::ChatContent (QWidget *parent)
    extraSendStyle ("QPushButton { font-style:italic;}"),
    sendFileWindow (1),
    sendChunkSize (1*1024),
+   audio (this),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -77,8 +79,11 @@ ChatContent::ChatContent (QWidget *parent)
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
   connect (ui.sendFileButton, SIGNAL (clicked()), 
           this, SLOT (StartFileSend ()));
+  connect (ui.samButton, SIGNAL (clicked()),
+          this, SLOT (StartAudioSend ()));
   connect (ui.textHistory, SIGNAL (anchorClicked (const QUrl&)),
           this, SLOT (HandleAnchor (const QUrl&)));
+  connect (&audio, SIGNAL (HaveAudio()), this, SLOT (SendAudioRequest()));
   ui.quitButton->setDefault (false);
   ui.saveButton->setDefault (false);
   ui.sendFileButton->setDefault (false);
@@ -476,6 +481,51 @@ void
 ChatContent::HandleAnchor (const QUrl & url)
 {
   QDesktopServices::openUrl (url);
+}
+
+void
+ChatContent::StartAudioSend ()
+{
+  QMessageBox box;
+  box.setText ("Send Audio goes here");
+  box.exec ();
+  audio.Record ();
+}
+
+void
+ChatContent::SendAudioRequest ()
+{
+qDebug () << " have audio " << audio.Filename();
+  XferInfo  info;
+  info.id = QUuid::createUuid ().toString();
+  info.lastChunk = 0;
+  QFile * fp =  new QFile (audio.Filename());
+  bool isopen = fp ->open (QFile::ReadOnly);
+  info.fileSize = fp->size ();
+qDebug () << " file open " << isopen << " size " << fp->size();
+  if (isopen) {
+    xferFile [info.id] = fp;
+    xferState [info.id] = info;  
+    QDomDocument requestDoc ("egalite");
+    QDomElement  request = requestDoc.createElement ("egalite");
+    request.setAttribute ("version", protoVersion);
+    requestDoc.appendChild (request);
+    QDomElement cmd = requestDoc.createElement ("cmd");
+    cmd.setAttribute ("op","sendfile");
+    cmd.setAttribute ("subop","samreq");
+    cmd.setAttribute ("xferid",info.id);
+    cmd.setAttribute ("size",info.fileSize);
+    cmd.setAttribute ("rate",audio.Format().frequency());
+    cmd.setAttribute ("channels",audio.Format().channels ());
+    cmd.setAttribute ("samplesize",audio.Format().sampleSize());
+    cmd.setAttribute ("codec",audio.Format().codec ());
+    cmd.setAttribute ("byteorder",audio.Format().byteOrder());
+    cmd.setAttribute ("sampletype",audio.Format().sampleType());
+    request.appendChild (cmd);
+    SendDomDoc (requestDoc);
+    StartXferDisplay ();
+    qDebug () << "  ]]]]] Audio request sent: " << requestDoc.toString();
+  }
 }
 
 void

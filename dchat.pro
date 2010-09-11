@@ -25,7 +25,7 @@ message ("translations in $$TRANS_DIR/")
 CODEFORTR = UTF-8
 
 message ("generating MAKEFILE as $$MAKEFILE")
-QT += core gui network xml xmlpatterns sql webkit
+QT += core gui network xml xmlpatterns sql webkit multimedia
 
 unix {
   message ("Applying Unix settings")
@@ -123,6 +123,7 @@ SOURCES = src/main.cpp \
 	src/account-edit.cpp \
 	src/direct-message.cpp \
 	src/direct-parser.cpp \
+	src/audio-message.cpp \
 
 
 
@@ -154,6 +155,7 @@ HEADERS = \
 	src/account-edit.h \
 	src/direct-message.h \
 	src/direct-parser.h \
+	src/audio-message.h \
 
 
 

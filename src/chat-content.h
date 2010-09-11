@@ -25,6 +25,7 @@
 
 #include "ui_chat-content.h"
 #include "direct-parser.h"
+#include "audio-message.h"
 #include <QDialog>
 #include <QByteArray>
 #include <QUrl>
@@ -53,6 +54,7 @@ public:
   ~XferInfo() {}
   
   QString      id;
+  QString      kind;
   quint64      fileSize;
   quint64      lastChunk;
   quint64      lastChunkAck;
@@ -67,6 +69,7 @@ public:
   /** \brief ChatContent::Mode - None: don't send anything
                                   Raw: send bytes
                                   Xmpp: send xmpp
+                                  Embed: send Egalite protocol
    */
 
   enum Mode { ChatModeNone = 0, 
@@ -112,7 +115,9 @@ private slots:
   void EndChat ();
   void SaveContent ();
   void Heartbeat ();
+  void SendAudioRequest ();
   void StartFileSend ();
+  void StartAudioSend ();
   void UpdateXferDisplay ();
   void StartXferDisplay ();
   void DebugCheck ();
@@ -182,6 +187,7 @@ private:
   int              sendChunkSize;
   XferStateMap     xferState;
   XferFileMap      xferFile;
+  AudioMessage     audio;
 
   QString          dateMask;
   QString          chatLine;
