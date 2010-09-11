@@ -23,9 +23,9 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include "audio-message.h"
 #include "ui_chat-content.h"
 #include "direct-parser.h"
-#include "audio-message.h"
 #include <QDialog>
 #include <QByteArray>
 #include <QUrl>
@@ -49,15 +49,27 @@ namespace egalite
 
 class XferInfo {
 public:
+
+  enum XferKind {
+    Xfer_None = 0,
+    Xfer_File = 1,
+    Xfer_Audio = 2
+  };
+
+  enum XferDirection {
+    Xfer_In = 0,
+    Xfer_Out = 1
+  };
   
   XferInfo () {}
   ~XferInfo() {}
   
-  QString      id;
-  QString      kind;
-  quint64      fileSize;
-  quint64      lastChunk;
-  quint64      lastChunkAck;
+  QString         id;
+  XferKind        kind;
+  XferDirection   inout;
+  quint64         fileSize;
+  quint64         lastChunk;
+  quint64         lastChunkAck;
 };
 
 class ChatContent : public QDialog 
@@ -106,6 +118,8 @@ public slots:
   void Stop ();
   void InputAvailable ();
   void IncomingDirect (DirectMessage msg);
+  void AudioStarted ();
+  void AudioStopped ();
 
   bool close ();
 
@@ -148,6 +162,7 @@ private:
   void SendfileDeny (DirectMessage & msg);
   void SendfileChunkAck (DirectMessage & msg);
   void SendfileChunkData (DirectMessage & msg);
+  void SendfileSamReq (DirectMessage & msg);
   void SendfileSendReq (DirectMessage & msg);
   void SendfileRcvDone (DirectMessage & msg);
   void SendfileAbort (DirectMessage & msg);
@@ -181,6 +196,8 @@ private:
   bool             extraSendHighlight;
   QString          extraSendStyle;
   QString          normalStyle;
+  QString          plainAudioMessage;
+  QString          activeAudioMessage;
   
 
   int              sendFileWindow;

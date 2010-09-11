@@ -332,6 +332,7 @@ qDebug () << " Parse Sendfile subop " << subop;
     offset = xread.characterOffset ();
   } else {
     valid= ( subop == "sendreq"
+          || subop == "samreq"
           || subop == "goahead"
           || subop == "deny"
           || subop == "chunk-ack"

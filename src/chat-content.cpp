@@ -62,6 +62,7 @@ ChatContent::ChatContent (QWidget *parent)
    extraSendMessage (tr("\n%1 active")),
    extraSendHighlight (false),
    extraSendStyle ("QPushButton { font-style:italic;}"),
+   activeAudioMessage (tr("\n playing")),
    sendFileWindow (1),
    sendChunkSize (1*1024),
    audio (this),
@@ -74,6 +75,7 @@ ChatContent::ChatContent (QWidget *parent)
   ui.setupUi (this);
   
   plainSendMessage = ui.sendFileButton->text ();
+  plainAudioMessage = ui.samButton->text ();
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
   connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (SaveContent()));
   connect (ui.sendButton, SIGNAL (clicked()), this, SLOT (Send()));
@@ -84,6 +86,8 @@ ChatContent::ChatContent (QWidget *parent)
   connect (ui.textHistory, SIGNAL (anchorClicked (const QUrl&)),
           this, SLOT (HandleAnchor (const QUrl&)));
   connect (&audio, SIGNAL (HaveAudio()), this, SLOT (SendAudioRequest()));
+  connect (&audio, SIGNAL (PlayStarting()), this, SLOT (AudioStarted()));
+  connect (&audio, SIGNAL (PlayFinished()), this, SLOT (AudioStopped()));
   ui.quitButton->setDefault (false);
   ui.saveButton->setDefault (false);
   ui.sendFileButton->setDefault (false);
@@ -300,6 +304,8 @@ ChatContent::ReadSendfile (DirectMessage & msg)
     SendfileChunkAck (msg);
   } else if (subop == "chunk-data") {
     SendfileChunkData (msg);
+  } else if (subop == "samreq") {
+    SendfileSamReq (msg);
   } else if (subop == "sendreq") {
     SendfileSendReq (msg);
   } else if (subop == "rcv-done") {
@@ -334,6 +340,7 @@ ChatContent::SendDomDoc (QDomDocument & doc)
   static QByteArray spaces (8,' ');
   QByteArray msgbytes = doc.toString().toUtf8();
   sendSinceBeat ++;
+qDebug () << " sending Dom Doc op " << doc.toByteArray().left(256);
   if (ioDev) {
     ioDev->write (msgbytes);
     ioDev->write (spaces);
@@ -486,6 +493,7 @@ ChatContent::HandleAnchor (const QUrl & url)
 void
 ChatContent::StartAudioSend ()
 {
+  ui.samButton->setEnabled  (false);
   audio.Record (ui.textHistory->pos(), ui.chatInput->size());
 }
 
@@ -496,6 +504,8 @@ qDebug () << " have audio " << audio.Filename();
   XferInfo  info;
   info.id = QUuid::createUuid ().toString();
   info.lastChunk = 0;
+  info.kind = XferInfo::Xfer_Audio;
+  info.inout = XferInfo::Xfer_Out;
   QFile * fp =  new QFile (audio.Filename());
   bool isopen = fp ->open (QFile::ReadOnly);
   info.fileSize = fp->size ();
@@ -512,12 +522,13 @@ qDebug () << " file open " << isopen << " size " << fp->size();
     cmd.setAttribute ("subop","samreq");
     cmd.setAttribute ("xferid",info.id);
     cmd.setAttribute ("size",info.fileSize);
-    cmd.setAttribute ("rate",audio.Format().frequency());
-    cmd.setAttribute ("channels",audio.Format().channels ());
-    cmd.setAttribute ("samplesize",audio.Format().sampleSize());
-    cmd.setAttribute ("codec",audio.Format().codec ());
-    cmd.setAttribute ("byteorder",audio.Format().byteOrder());
-    cmd.setAttribute ("sampletype",audio.Format().sampleType());
+    cmd.setAttribute ("name",audio.OutFormat().codec());
+    cmd.setAttribute ("rate",audio.OutFormat().frequency());
+    cmd.setAttribute ("channels",audio.OutFormat().channels ());
+    cmd.setAttribute ("samplesize",audio.OutFormat().sampleSize());
+    cmd.setAttribute ("codec",audio.OutFormat().codec ());
+    cmd.setAttribute ("byteorder",audio.OutFormat().byteOrder());
+    cmd.setAttribute ("sampletype",audio.OutFormat().sampleType());
     request.appendChild (cmd);
     SendDomDoc (requestDoc);
     StartXferDisplay ();
@@ -542,6 +553,8 @@ ChatContent::StartFileSend ()
     info.fileSize = 0;
     info.lastChunk = 0;
     info.lastChunkAck  = 0;
+    info.kind = XferInfo::Xfer_File;
+    info.inout = XferInfo::Xfer_Out;
     QFile * fp =  new QFile (filename);
     bool isopen = fp ->open (QFile::ReadOnly);
     info.fileSize = fp->size ();
@@ -652,23 +665,46 @@ ChatContent::SendfileDeny (DirectMessage & msg)
 void
 ChatContent::CloseTransfer (const QString & id, bool good)
 {
+  XferInfo::XferKind kind (XferInfo::Xfer_None);
+  XferInfo::XferDirection inout (XferInfo::Xfer_Out);
+  XferStateMap::iterator  stateIt = xferState.find(id);
+  if (stateIt != xferState.end()) {
+    kind = stateIt->second.kind;
+    inout = stateIt->second.inout;
+  }
   xferState.erase (id);
   QFile *fp = xferFile[id];
   QString filename (tr("unknown file"));
   if (fp) {
     filename = fp->fileName();
     fp->close();
-    delete fp;
+    if (kind == XferInfo::Xfer_File) {
+      delete fp;
+    }
   }
   xferFile.erase (id);
   UpdateXferDisplay ();
   QMessageBox finished (this);
-  finished.setText (tr("Transfer of file \"%1\" ended %2")
+  switch (kind) {
+  case XferInfo::Xfer_File:
+    finished.setText (tr("Transfer of file \"%1\" ended %2")
                     .arg (filename)
                     .arg (good ? QString ("with Success")
                                : QString ("with Errors")));
-  QTimer::singleShot (30000, &finished, SLOT (accept()));
-  finished.exec ();
+    QTimer::singleShot (30000, &finished, SLOT (accept()));
+    finished.exec ();
+    break;
+  case XferInfo::Xfer_Audio:
+    if (inout == XferInfo::Xfer_In) {
+      audio.FinishReceive ();
+    } else if (inout == XferInfo::Xfer_Out) {
+      ui.samButton->setEnabled (true);
+    }
+    break;
+  default:
+    qDebug () << " invalid transfer type " << kind << " finished"; 
+    break;
+  }
   ListActiveTransfers (false);
 }
 
@@ -740,6 +776,50 @@ ChatContent::AbortTransfer (const QString & id, QString msg)
   box.exec ();
 }
 
+void
+ChatContent::SendfileSamReq (DirectMessage & msg)
+{
+  qDebug () << " received SAM request";
+  QString subop ("deny");
+  QString xferId = msg.Attribute ("xferid");
+  if (!audio.BusyReceive()) {   
+    XferInfo info;
+    info.id = xferId;
+    info.fileSize = 0;
+    info.lastChunk = 0;
+    info.lastChunkAck = 0;
+    info.kind = XferInfo::Xfer_Audio;
+    info.inout = XferInfo::Xfer_In;
+    audio.StartReceive ();
+    QFile * fp = audio.InFile ();
+    bool isopen = fp->open (QFile::WriteOnly);
+    if (isopen) {
+      xferFile [xferId] = fp;
+      xferState [xferId] = info;
+      subop = "goahead";
+      QAudioFormat & fmt (audio.InFormat());
+      fmt.setFrequency (msg.Attribute("rate").toInt());
+      fmt.setChannels (msg.Attribute("channels").toInt());
+      fmt.setSampleSize (msg.Attribute("samplesize").toInt());
+      fmt.setByteOrder (QAudioFormat::Endian 
+                          (msg.Attribute("byteorder").toInt()));
+      fmt.setSampleType (QAudioFormat::SampleType 
+                          (msg.Attribute("sampletype").toInt()));
+      StartXferDisplay ();
+    }
+  }
+  QDomDocument  responseDoc ("egalite");
+  QDomElement response = responseDoc.createElement ("egalite");
+  response.setAttribute ("version",protoVersion);
+  responseDoc.appendChild (response);
+  QDomElement cmd = responseDoc.createElement ("cmd");
+  cmd.setAttribute ("op","sendfile");
+  cmd.setAttribute ("subop",subop);
+  cmd.setAttribute ("xferid",xferId);
+  response.appendChild (cmd);
+  SendDomDoc (responseDoc);
+}
+
 void 
 ChatContent::SendfileSendReq (DirectMessage & msg)
 {
@@ -806,6 +886,8 @@ ChatContent::OpenSaveFile (const QString &id, const QString & filename)
     info.fileSize = 0;
     info.lastChunk = 0;
     info.lastChunkAck = 0;
+    info.kind = XferInfo::Xfer_File;
+    info.inout =XferInfo::Xfer_In;
     QFile * fp = new QFile (savename);
     bool isopen = fp->open (QFile::WriteOnly);
     if (isopen) {
@@ -852,6 +934,20 @@ ChatContent::UpdateXferDisplay ()
       ui.sendFileButton->setStyleSheet (normalStyle);
     }
   }
+}
+
+void
+ChatContent::AudioStarted ()
+{
+  QString msgPat ("%1 %2");
+  ui.samButton->setText (msgPat.arg(plainAudioMessage)
+                               .arg(activeAudioMessage));
+}
+
+void
+ChatContent::AudioStopped ()
+{
+  ui.samButton->setText (plainAudioMessage);
 }
 
 void

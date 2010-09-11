@@ -23,6 +23,7 @@
  ****************************************************************/
 
 #include <QObject>
+#include <QAudio>
 #include <QAudioFormat>
 #include <QFile>
 #include <QString>
@@ -33,6 +34,7 @@
 #include "ui_count-down.h"
 
 class QAudioInput;
+class QAudioOutput;
 class QTimer;
 
 namespace egalite
@@ -44,27 +46,40 @@ Q_OBJECT
 public:
 
   AudioMessage (QWidget * parent=0);
-
-  QAudioFormat & Format () { return format; }
+  ~AudioMessage ();
 
   QString        Filename () { return filename; }
+  QAudioFormat & OutFormat () { return outFormat; }
+  QAudioFormat & InFormat () { return inFormat; }
+
 
   void  SetFilename (QString fn) { filename = fn; }
 
+  QFile * InFile () { return  &inFile; }
+  void  StartReceive ();
+
+  bool  BusyReceive () { return busyReceive; }
+
   void  Record (const QPoint & where, const QSize & size);
+  void  StartPlay ();
   int   Size ();
 
 public slots:
 
   void StopRecording ();
+  void FinishReceive ();
+  void StopPlay ();
 
 private slots:
 
   void CountDown ();
+  void PlayChanged (QAudio::State state);
 
 signals:
 
   void HaveAudio ();
+  void PlayStarting ();
+  void PlayFinished ();
 
 private:
 
@@ -72,13 +87,17 @@ private:
 
   QWidget       *parentWidget;
   QString        filename;
-  QAudioFormat   format;
-  QFile          file;
+  QAudioFormat   outFormat;
+  QAudioFormat   inFormat;
+  QFile          outFile;
+  QFile          inFile;
   QAudioInput   *record;
+  QAudioOutput  *player;
   double         recTime;
   double         tick;
   double         secsLeft;
   QTimer        *limitTimer;
+  bool           busyReceive;
 
   Ui_CountDownDisplay ui;
 } ;

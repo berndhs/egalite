@@ -1,6 +1,6 @@
 
 /****************************************************************
- * This file is distributed under the following license:
+ * This outFile is distributed under the following license:
  *
  * Copyright (C) 2010, Bernd Stramm
  *
@@ -24,6 +24,7 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QAudioInput>
+#include <QAudioOutput>
 #include <QTimer>
 #include <QDebug>
 
@@ -34,6 +35,7 @@ AudioMessage::AudioMessage (QWidget *parent)
   :QDialog (parent),
    parentWidget (parent),
    record (0),
+   player (0),
    recTime (10.0),
    tick (0.0),
    secsLeft (0.0),
@@ -46,6 +48,24 @@ AudioMessage::AudioMessage (QWidget *parent)
   hide ();
 }
 
+AudioMessage::~AudioMessage ()
+{
+  outFile.close ();
+  inFile.close ();
+  if (record) {
+    disconnect (record, 0,0,0);
+    record->stop ();
+    delete record;
+    record = 0;
+  }
+  if (player) {
+    disconnect (player, 0,0,0);
+    player->stop ();
+    delete player;
+    player = 0;
+  }
+}
+
 void
 AudioMessage::Record (const QPoint & where, const QSize & size)
 {
@@ -53,30 +73,30 @@ AudioMessage::Record (const QPoint & where, const QSize & size)
                     (QDesktopServices::CacheLocation);
   tmpdir = ".";
   filename = tmpdir + QDir::separator() 
-                    + QString ("audio-egalite.raw");
-  file.setFileName(filename);
-  file.open( QIODevice::WriteOnly | QIODevice::Truncate );
+                    + QString ("audio-egalite-out.raw");
+  outFile.setFileName(filename);
+  outFile.open( QIODevice::WriteOnly | QIODevice::Truncate );
   
-  format.setFrequency(8000);
-  format.setChannels(1);
-  format.setSampleSize(16);
-  format.setCodec("audio/pcm");
-  format.setByteOrder(QAudioFormat::LittleEndian);
-  format.setSampleType(QAudioFormat::SignedInt);
+  outFormat.setFrequency(8000);
+  outFormat.setChannels(1);
+  outFormat.setSampleSize(16);
+  outFormat.setCodec("audio/pcm");
+  outFormat.setByteOrder(QAudioFormat::LittleEndian);
+  outFormat.setSampleType(QAudioFormat::SignedInt);
 
   QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
-  qDebug () << " try to set format";
-  if (!info.isFormatSupported(format)) {
-    qWarning()<<"default format not supported try to use nearest";
-    format = info.nearestFormat(format);
+  qDebug () << " try to set outFormat";
+  if (!info.isFormatSupported(outFormat)) {
+    qWarning()<<"default outFormat not supported try to use nearest";
+    outFormat = info.nearestFormat(outFormat);
   }
   if (record == 0) {
-    record = new QAudioInput(format, this);
+    record = new QAudioInput(outFormat, this);
   }
   qDebug () << " record ";
   qDebug () << " rate " << record->format().frequency();
   record->reset ();
-  record->start(&file);
+  record->start(&outFile);
   connect (limitTimer, SIGNAL (timeout()), this, SLOT (CountDown()));
   move (parentWidget->mapToGlobal (where));
   resize (size);
@@ -90,14 +110,14 @@ AudioMessage::StopRecording ()
   qDebug () << " done recording";
   if (record) {
     record->stop ();
-    qDebug () << " closing file " << file.fileName();
-    qDebug () << "         size " << file.size ();
-    file.close ();
+    qDebug () << " closing outFile " << outFile.fileName();
+    qDebug () << "         size " << outFile.size ();
+    outFile.close ();
     qDebug () << " recording stopped ";
     
     emit HaveAudio ();
     #if 0
-    encoder.SetParams (format);
+    encoder.SetParams (outFormat);
     encoder.Encode (outputFile.fileName(), QString ("./testdata.ogg"));
     #endif
   }
@@ -130,10 +150,62 @@ qDebug () << " callign stop with " << secsLeft << " left ";
   }
 }
 
+void
+AudioMessage::StartPlay ()
+{
+  qDebug () << "Play audio message";
+  inFile.open (QFile::ReadOnly);
+  if (player == 0) {
+    player = new QAudioOutput (inFormat, this);
+    connect (player, SIGNAL (stateChanged (QAudio::State)),
+             this, SLOT (PlayChanged (QAudio::State)));
+  }
+  emit PlayStarting ();
+  player->start (&inFile);
+}
+
+void
+AudioMessage::PlayChanged (QAudio::State state)
+{
+  if (state == QAudio::IdleState) {
+    StopPlay ();
+  }
+}
+
+void
+AudioMessage::StopPlay ()
+{
+  inFile.close ();
+  if (player) {
+    player->stop();
+  }
+  busyReceive = false;
+  emit PlayFinished ();
+  qDebug () << " done playing audio message";
+}
+
 int
 AudioMessage::Size ()
 {
-  return file.size ();
+  return outFile.size ();
+}
+
+void
+AudioMessage::StartReceive ()
+{
+  QString tmpdir = QDesktopServices::storageLocation 
+                    (QDesktopServices::CacheLocation);
+  tmpdir = ".";
+  QString filename = tmpdir + QDir::separator() 
+                    + QString ("audio-egalite-in.raw");
+  inFile.setFileName(filename);
+  busyReceive = true;
+}
+
+void
+AudioMessage::FinishReceive ()
+{
+  StartPlay ();
 }
 
 } // namespace
