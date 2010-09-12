@@ -31,6 +31,7 @@
 #include <QLocale>
 #include <QTextCodec>
 #include <QtCrypto>
+#include <QStringList>
 #include <QXmppLogger.h>
 #include <QDebug>
 #include "delib-debug.h"
@@ -80,14 +81,23 @@ main (int argc, char* argv[])
 
   QCA::Initializer  qcaInit;
   QApplication  app (argc,argv);
+
+  QStringList  configMessages;
+
   QCA::scanForPlugins ();
   // We need to ensure that we have certificate handling support
   if ( !QCA::isSupported( "cert" ) ) {
-    qDebug() << "Sorry, no PKI certificate support" ;
+    configMessages << "No PKI certificate support on this system" ;
   } else {
-    qDebug () << " cert support available ";
+    configMessages << " Certificate support available ";
   }
-
+  #if DELIBERATE_QT_AUDIO_OK
+  configMessages << QString(" Audio enabled with Qt %1") 
+                    .arg (DELIBERATE_QT_NUM) ;
+  #else
+  configMessages << QString(" No Audio Input with Qt %1") 
+                     .arg (DELIBERATE_QT_NUM) ;
+  #endif
   QString locale = QLocale::system().name();
   QTranslator  translate;
   QString xlateFile (QString ("egalite_") + locale);
@@ -114,6 +124,9 @@ main (int argc, char* argv[])
     exit (0);
   }
   pv.CLIVersion ();
+  for (int cm=0; cm<configMessages.size(); cm++) {
+    deliberate::StdOut () << configMessages[cm] << endl;
+  }
   if (opts.WantVersion ()) {
     exit (0);
   }
@@ -150,6 +163,8 @@ main (int argc, char* argv[])
 
   chatmain.Init (&app);
   app.setWindowIcon (chatmain.windowIcon());
+
+  chatmain.AddConfigMessages (configMessages);
 
   chatmain.Run ();
   return app.exec ();

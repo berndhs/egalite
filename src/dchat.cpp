@@ -354,7 +354,16 @@ DChatMain::Manual ()
 void
 DChatMain::About ()
 {
-  deliberate::ProgramVersion::ShowVersionWindow ();
+  QString version (deliberate::ProgramVersion::Version());
+  QStringList messages;
+  messages.append (version);
+  messages.append (configMessages);
+
+  QMessageBox  box;
+  box.setText (version);
+  box.setDetailedText (messages.join ("\n"));
+  QTimer::singleShot (30000, &box, SLOT (accept()));
+  box.exec ();
 }
 
 

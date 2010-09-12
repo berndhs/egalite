@@ -71,6 +71,9 @@ public:
 
   void Run ();
 
+  void AddConfigMessage (QString msg) { configMessages.append (msg); }
+  void AddConfigMessages (QStringList ml) { configMessages.append (ml); }
+
 public slots:
 
   void Quit ();
@@ -133,6 +136,8 @@ private:
   Ui_GetString          passui;
   Ui_RequestSubscribe   reqSubUi;
   QApplication         *pApp;
+
+  QStringList           configMessages;
 
   ContactListModel  contactListModel;
 

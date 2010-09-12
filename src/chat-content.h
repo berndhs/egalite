@@ -198,6 +198,7 @@ private:
   QString          normalStyle;
   QString          plainAudioMessage;
   QString          activeAudioMessage;
+  bool             qtAudioOk;
   
 
   int              sendFileWindow;

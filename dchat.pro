@@ -27,6 +27,11 @@ CODEFORTR = UTF-8
 message ("generating MAKEFILE as $$MAKEFILE")
 QT += core gui network xml xmlpatterns sql webkit multimedia
 
+DEFINES += DELIBERATE_QTM1=$$QT_MAJOR_VERSION
+DEFINES += DELIBERATE_QTM2=$$QT_MINOR_VERSION
+DEFINES += DELIBERATE_QTP=$$QT_PATCH_VERSION
+
+
 unix {
   message ("Applying Unix settings")
   !include ( options.pri ) {

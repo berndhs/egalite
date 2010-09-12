@@ -63,6 +63,7 @@ ChatContent::ChatContent (QWidget *parent)
    extraSendHighlight (false),
    extraSendStyle ("QPushButton { font-style:italic;}"),
    activeAudioMessage (tr("\n playing")),
+   qtAudioOk (false),
    sendFileWindow (1),
    sendChunkSize (1*1024),
    audio (this),
@@ -73,6 +74,11 @@ ChatContent::ChatContent (QWidget *parent)
    remoteHtmlColor ("red")
 {
   ui.setupUi (this);
+  #if DELIBERATE_QT_AUDIO_OK
+  qtAudioOk = true;
+  #else
+  qtAudioOk = false;
+  #endif
   
   plainSendMessage = ui.sendFileButton->text ();
   plainAudioMessage = ui.samButton->text ();
@@ -92,10 +98,13 @@ ChatContent::ChatContent (QWidget *parent)
   ui.quitButton->setDefault (false);
   ui.saveButton->setDefault (false);
   ui.sendFileButton->setDefault (false);
+  ui.samButton->setDefault (false);
   ui.quitButton->setAutoDefault (false);
   ui.saveButton->setAutoDefault (false);
+  ui.samButton->setAutoDefault (false);
   ui.sendFileButton->setAutoDefault (false);
-  ui.sendFileButton->hide();
+  ui.sendFileButton->hide ();
+  ui.samButton->hide ();
   ui.sendButton->setDefault (true);  /// send when Return pressed
   Qt::WindowFlags flags = windowFlags ();
   flags |= (Qt::WindowMinimizeButtonHint | Qt::WindowSystemMenuHint);
@@ -139,8 +148,11 @@ ChatContent::SetMode (Mode mode)
   chatMode = mode;
   if (chatMode == ChatModeEmbed) {
     ui.sendFileButton->show ();
+    ui.samButton->show ();
+    ui.samButton->setEnabled (qtAudioOk);
   } else {
     ui.sendFileButton->hide ();
+    ui.samButton->hide ();
   }
 }
 
@@ -700,7 +712,7 @@ ChatContent::CloseTransfer (const QString & id, bool good)
     if (inout == XferInfo::Xfer_In) {
       audio.FinishReceive ();
     } else if (inout == XferInfo::Xfer_Out) {
-      ui.samButton->setEnabled (true);
+      ui.samButton->setEnabled (qtAudioOk);
     }
     break;
   default:

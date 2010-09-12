@@ -28,10 +28,17 @@
 #include <QSettings>
 
 #define DELIBERATE_QT_NUM (((DELIBERATE_QTM1)*10000)+((DELIBERATE_QTM2)*100)+(DELIBERATE_QTP))
+
 #if DELIBERATE_QT_NUM > 40600
 #define DELIBERATE_HAVE_WEBELT 1
 #else
 #define DELIBERATE_HAVE_WEBELT 0
+#endif
+
+#if DELIBERATE_QT_NUM > 40603
+#define DELIBERATE_QT_AUDIO_OK 1
+#else
+#define DELIBERATE_QT_AUDIO_OK 0
 #endif
 
 namespace deliberate {
