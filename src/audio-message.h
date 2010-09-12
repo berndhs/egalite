@@ -31,6 +31,7 @@
 #include <QLCDNumber>
 #include <QWidget>
 #include <QDialog>
+#include <QTime>
 #include "ui_count-down.h"
 
 class QAudioInput;
@@ -100,6 +101,7 @@ private:
   QTimer        *recLimitTimer;
   QTimer        *playLimitTimer;
   bool           busyReceive;
+  QTime          clock;
 
   Ui_CountDownDisplay ui;
 } ;

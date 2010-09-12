@@ -146,6 +146,7 @@ DebugLog::DebugLog ()
   setupUi (this);
   Connect ();
   hide ();
+  clock.start ();
 }
 
 DebugLog::DebugLog (QWidget * parent)
@@ -156,6 +157,7 @@ DebugLog::DebugLog (QWidget * parent)
   setupUi (this);
   Connect ();
   hide ();
+  clock.start ();
 }
 
 DebugLog::~DebugLog ()
@@ -210,9 +212,11 @@ DebugLog::Log (const char* msg)
 bool
 DebugLog::Log (const char* kind, const char* msg)
 {
-  QString realMessage (QString(kind) + " - " + QString(msg));
+  QString realMessage (QString(kind) + " " + 
+                       QString::number (clock.elapsed()) + " - " + QString(msg));
   if (isLogging && useGui) {
-    logBox->append (QString(kind) + " - " + QString(msg));
+    logBox->append (QString(kind) + " " +
+                       QString::number (clock.elapsed()) + " - " + QString(msg));
     update ();
   }
   if (logToFile) {

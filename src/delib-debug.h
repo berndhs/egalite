@@ -56,6 +56,7 @@
 
 #include <QDebug>
 #include <QCloseEvent>
+#include <QTime>
 #include <QFile>
 
 namespace deliberate
@@ -123,6 +124,7 @@ private:
   bool  useGui;
   bool  logToFile;
   QFile logFile;
+  QTime clock;
 
 };
 

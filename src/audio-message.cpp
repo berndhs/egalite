@@ -43,11 +43,10 @@ AudioMessage::AudioMessage (QWidget *parent)
    playLimitTimer (0)
 {
   ui.setupUi (this);
-  recLimitTimer = new QTimer (this);
+  //recLimitTimer = new QTimer (this);
   playLimitTimer = new QTimer (this);
-  ui.countDown->setDigitCount (4);
-  ui.countDown->setMode (QLCDNumber::Dec);
   hide ();
+  clock.start ();
 }
 
 AudioMessage::~AudioMessage ()
@@ -94,28 +93,32 @@ AudioMessage::Record (const QPoint & where, const QSize & size)
   }
   if (record == 0) {
     record = new QAudioInput(outFormat, this);
-  }
-  qDebug () << " record ";
+  } 
+  qDebug () << " record at " << clock.elapsed ();
   qDebug () << " rate " << record->format().frequency();
   record->reset ();
   record->start(&outFile);
-  connect (recLimitTimer, SIGNAL (timeout()), this, SLOT (CountDown()));
-  move (parentWidget->mapToGlobal (where));
-  resize (size);
+  //connect (recLimitTimer, SIGNAL (timeout()), this, SLOT (CountDown()));
+  //move (parentWidget->mapToGlobal (where));
+  //resize (size);
   show ();
   StartCount (10.0);
+  QTimer::singleShot (10000,this, SLOT (StopRecording()));
 }
 
 void
 AudioMessage::StopRecording ()
 {
-  qDebug () << " done recording";
+  qDebug () << " done recording at " << clock.elapsed ();
   if (record) {
     record->stop ();
     qDebug () << " closing outFile " << outFile.fileName();
     qDebug () << "         size " << outFile.size ();
+    qDebug () << "     buf size " << record->bufferSize();
     outFile.close ();
     qDebug () << " recording stopped ";
+    record->deleteLater();
+    record = 0;
     
     emit HaveAudio ();
     #if 0
@@ -129,23 +132,26 @@ void
 AudioMessage::StartCount (double maxtime)
 {
   tick = 1.0;
-  recLimitTimer->start (1000);
+  QTimer::singleShot (1000, this, SLOT (CountDown()));
+  //recLimitTimer->start (1000);
   secsLeft = maxtime;
   show ();
-  CountDown ();
 }
 
 void
 AudioMessage::CountDown ()
 {
-  ui.countDown->display (secsLeft);
   secsLeft -= tick;
+  ui.countDown->display (secsLeft);
+qDebug () << " countdown at " << secsLeft << " elapsed " << clock.elapsed();
   if (secsLeft <= 0.0) {
     StopRecording();
-    recLimitTimer->stop ();
+    //recLimitTimer->stop ();
     ui.countDown->display (0);
     hide ();
     accept ();
+  } else {
+    QTimer::singleShot (1000, this, SLOT (CountDown()));
   }
 }
 
@@ -206,6 +212,8 @@ AudioMessage::StopPlay ()
   inFile.close ();
   if (player) {
     player->stop();
+    player->deleteLater ();
+    player = 0;
   }
   busyReceive = false;
   emit PlayFinished ();
