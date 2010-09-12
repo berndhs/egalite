@@ -45,6 +45,10 @@ AudioMessage::AudioMessage (QWidget *parent)
   playLimitTimer = new QTimer (this);
   hide ();
   clock.start ();
+  inStateText[0] = QString("active");
+  inStateText[1] = QString("suspend");
+  inStateText[2] = QString("stopped");
+  inStateText[3] = QString("idle");
 }
 
 AudioMessage::~AudioMessage ()
@@ -95,6 +99,7 @@ AudioMessage::Record (const QPoint & where, const QSize & size)
   qDebug () << " record at " << clock.elapsed ();
   qDebug () << " rate " << record->format().frequency();
   record->reset ();
+  record->setBufferSize (11000);
   record->start(&outFile);
   move (parentWidget->mapToGlobal (where));
   show ();
@@ -138,6 +143,11 @@ AudioMessage::CountDown ()
 {
   secsLeft -= tick;
   ui.countDown->display (secsLeft);
+  if (record) {
+    ui.stateLabel->setText (inStateText [record->state()]);
+  } else {
+    ui.stateLabel->setText (tr("gone"));
+  }
 qDebug () << " countdown at " << secsLeft << " elapsed " << clock.elapsed();
   if (secsLeft <= 0.0) {
     StopRecording();

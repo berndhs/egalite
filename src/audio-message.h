@@ -101,6 +101,7 @@ private:
   QTimer        *playLimitTimer;
   bool           busyReceive;
   QTime          clock;
+  QString        inStateText[4];
 
   Ui_CountDownDisplay ui;
 } ;
