@@ -74,7 +74,10 @@ AudioMessage::Record (const QPoint & where, const QSize & size)
 {
   QString tmpdir = QDesktopServices::storageLocation 
                     (QDesktopServices::CacheLocation);
-  tmpdir = ".";
+  QDir tmppath (tmpdir);
+  if (!tmppath.exists()) {
+    tmppath.mkpath (tmpdir);
+  } 
   filename = tmpdir + QDir::separator() 
                     + QString ("audio-egalite-out.raw");
   outFile.setFileName(filename);
@@ -239,7 +242,10 @@ AudioMessage::StartReceive ()
 {
   QString tmpdir = QDesktopServices::storageLocation 
                     (QDesktopServices::CacheLocation);
-  tmpdir = ".";
+  QDir tmppath (tmpdir);
+  if (!tmppath.exists()) {
+    tmppath.mkpath (tmpdir);
+  } 
   QString filename = tmpdir + QDir::separator() 
                     + QString ("audio-egalite-in.raw");
   inFile.setFileName(filename);
