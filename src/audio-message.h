@@ -98,7 +98,6 @@ private:
   double         recTime;
   double         tick;
   double         secsLeft;
-  QTimer        *recLimitTimer;
   QTimer        *playLimitTimer;
   bool           busyReceive;
   QTime          clock;

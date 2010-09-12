@@ -39,11 +39,9 @@ AudioMessage::AudioMessage (QWidget *parent)
    recTime (10.0),
    tick (0.0),
    secsLeft (0.0),
-   recLimitTimer (0),
    playLimitTimer (0)
 {
   ui.setupUi (this);
-  //recLimitTimer = new QTimer (this);
   playLimitTimer = new QTimer (this);
   hide ();
   clock.start ();
@@ -98,9 +96,7 @@ AudioMessage::Record (const QPoint & where, const QSize & size)
   qDebug () << " rate " << record->format().frequency();
   record->reset ();
   record->start(&outFile);
-  //connect (recLimitTimer, SIGNAL (timeout()), this, SLOT (CountDown()));
-  //move (parentWidget->mapToGlobal (where));
-  //resize (size);
+  move (parentWidget->mapToGlobal (where));
   show ();
   StartCount (10.0);
   QTimer::singleShot (10000,this, SLOT (StopRecording()));
@@ -133,7 +129,6 @@ AudioMessage::StartCount (double maxtime)
 {
   tick = 1.0;
   QTimer::singleShot (1000, this, SLOT (CountDown()));
-  //recLimitTimer->start (1000);
   secsLeft = maxtime;
   show ();
 }
@@ -146,7 +141,6 @@ AudioMessage::CountDown ()
 qDebug () << " countdown at " << secsLeft << " elapsed " << clock.elapsed();
   if (secsLeft <= 0.0) {
     StopRecording();
-    //recLimitTimer->stop ();
     ui.countDown->display (0);
     hide ();
     accept ();
