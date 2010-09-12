@@ -26,6 +26,7 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QTimer>
+#include <QUuid>
 #include <QDebug>
 
 namespace egalite
@@ -79,7 +80,8 @@ AudioMessage::Record (const QPoint & where, const QSize & size)
     tmppath.mkpath (tmpdir);
   } 
   filename = tmpdir + QDir::separator() 
-                    + QString ("audio-egalite-out.raw");
+                    + QString ("egalite-%1.raw")
+                      .arg(Tempname());
   outFile.setFileName(filename);
   outFile.open( QIODevice::WriteOnly | QIODevice::Truncate );
   
@@ -220,6 +222,7 @@ void
 AudioMessage::StopPlay ()
 {
   inFile.close ();
+  inFile.remove ();
   if (player) {
     player->stop();
     player->deleteLater ();
@@ -247,7 +250,8 @@ AudioMessage::StartReceive ()
     tmppath.mkpath (tmpdir);
   } 
   QString filename = tmpdir + QDir::separator() 
-                    + QString ("audio-egalite-in.raw");
+                    + QString ("egalite-%1.raw")
+                      .arg(Tempname ());
   inFile.setFileName(filename);
   busyReceive = true;
 }
@@ -256,6 +260,15 @@ void
 AudioMessage::FinishReceive ()
 {
   StartPlay ();
+}
+
+QString
+AudioMessage::Tempname ()
+{
+  QString tmp = QUuid::createUuid().toString();
+  tmp.remove (0,1);
+  tmp.chop (1);
+  return tmp;
 }
 
 } // namespace

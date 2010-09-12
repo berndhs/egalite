@@ -519,6 +519,7 @@ qDebug () << " have audio " << audio.Filename();
   info.lastChunk = 0;
   info.kind = XferInfo::Xfer_Audio;
   info.inout = XferInfo::Xfer_Out;
+  info.removeOnComplete = true;
   QFile * fp =  new QFile (audio.Filename());
   bool isopen = fp ->open (QFile::ReadOnly);
   info.fileSize = fp->size ();
@@ -679,12 +680,14 @@ ChatContent::SendfileDeny (DirectMessage & msg)
 void
 ChatContent::CloseTransfer (const QString & id, bool good)
 {
+  bool removeFile (false);
   XferInfo::XferKind kind (XferInfo::Xfer_None);
   XferInfo::XferDirection inout (XferInfo::Xfer_Out);
   XferStateMap::iterator  stateIt = xferState.find(id);
   if (stateIt != xferState.end()) {
     kind = stateIt->second.kind;
     inout = stateIt->second.inout;
+    removeFile = stateIt->second.removeOnComplete;
   }
   xferState.erase (id);
   QFile *fp = xferFile[id];
@@ -692,6 +695,9 @@ ChatContent::CloseTransfer (const QString & id, bool good)
   if (fp) {
     filename = fp->fileName();
     fp->close();
+    if (removeFile) {
+      fp->remove ();
+    }
     if (kind == XferInfo::Xfer_File) {
       delete fp;
     }

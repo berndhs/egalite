@@ -61,7 +61,9 @@ public:
     Xfer_Out = 1
   };
   
-  XferInfo () {}
+  XferInfo ()
+    :removeOnComplete (false)
+    {}
   ~XferInfo() {}
   
   QString         id;
@@ -70,6 +72,7 @@ public:
   quint64         fileSize;
   quint64         lastChunk;
   quint64         lastChunkAck;
+  bool            removeOnComplete;
 };
 
 class ChatContent : public QDialog 

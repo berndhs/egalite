@@ -86,7 +86,8 @@ signals:
 
 private:
 
-  void   StartCount (double maxtime);
+  void       StartCount (double maxtime);
+  QString    Tempname ();
 
   QWidget       *parentWidget;
   QString        filename;
