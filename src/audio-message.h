@@ -23,7 +23,8 @@
  ****************************************************************/
 
 #include <QObject>
-#include <QAudio>
+#include <QAudioInput>
+#include <QAudioOutput>
 #include <QAudioFormat>
 #include <QFile>
 #include <QString>
@@ -34,8 +35,6 @@
 #include <QTime>
 #include "ui_count-down.h"
 
-class QAudioInput;
-class QAudioOutput;
 class QTimer;
 
 namespace egalite
