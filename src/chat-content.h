@@ -129,7 +129,7 @@ private slots:
   void EndChat ();
   void SaveContent ();
   void Heartbeat ();
-  void SendAudioRequest ();
+  void SendAudioRequest (qint64 usecs);
   void StartFileSend ();
   void StartAudioSend ();
   void UpdateXferDisplay ();

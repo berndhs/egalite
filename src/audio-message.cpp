@@ -112,6 +112,7 @@ AudioMessage::StopRecording ()
 {
   qDebug () << " done recording at " << clock.elapsed ();
   if (record) {
+    qint64 usecs = record->processedUSecs ();
     record->stop ();
     qDebug () << " closing outFile " << outFile.fileName();
     qDebug () << "         size " << outFile.size ();
@@ -121,7 +122,7 @@ AudioMessage::StopRecording ()
     record->deleteLater();
     record = 0;
     
-    emit HaveAudio ();
+    emit HaveAudio (usecs);
     #if 0
     encoder.SetParams (outFormat);
     encoder.Encode (outputFile.fileName(), QString ("./testdata.ogg"));
@@ -178,7 +179,9 @@ AudioMessage::StartPlay ()
   }
   emit PlayStarting ();
   player->start (&inFile);
-  playLimitTimer->start (2000);
+  int playtime = (playUSecs / 1000) + 1000;
+ // playLimitTimer->start (playtime);
+  QTimer::singleShot (playtime, this, SLOT (StopPlay()));
 }
 
 void

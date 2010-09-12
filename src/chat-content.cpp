@@ -85,7 +85,8 @@ ChatContent::ChatContent (QWidget *parent)
           this, SLOT (StartAudioSend ()));
   connect (ui.textHistory, SIGNAL (anchorClicked (const QUrl&)),
           this, SLOT (HandleAnchor (const QUrl&)));
-  connect (&audio, SIGNAL (HaveAudio()), this, SLOT (SendAudioRequest()));
+  connect (&audio, SIGNAL (HaveAudio(qint64)), 
+          this, SLOT (SendAudioRequest(qint64)));
   connect (&audio, SIGNAL (PlayStarting()), this, SLOT (AudioStarted()));
   connect (&audio, SIGNAL (PlayFinished()), this, SLOT (AudioStopped()));
   ui.quitButton->setDefault (false);
@@ -498,7 +499,7 @@ ChatContent::StartAudioSend ()
 }
 
 void
-ChatContent::SendAudioRequest ()
+ChatContent::SendAudioRequest (qint64 usecs)
 {
 qDebug () << " have audio " << audio.Filename();
   XferInfo  info;
@@ -522,6 +523,7 @@ qDebug () << " file open " << isopen << " size " << fp->size();
     cmd.setAttribute ("subop","samreq");
     cmd.setAttribute ("xferid",info.id);
     cmd.setAttribute ("size",info.fileSize);
+    cmd.setAttribute ("usecs",usecs);
     cmd.setAttribute ("name",audio.OutFormat().codec());
     cmd.setAttribute ("rate",audio.OutFormat().frequency());
     cmd.setAttribute ("channels",audio.OutFormat().channels ());
@@ -805,6 +807,7 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
                           (msg.Attribute("byteorder").toInt()));
       fmt.setSampleType (QAudioFormat::SampleType 
                           (msg.Attribute("sampletype").toInt()));
+      audio.SetInLength (msg.Attribute("usecs").toLongLong());
       StartXferDisplay ();
     }
   }

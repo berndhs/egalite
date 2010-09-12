@@ -65,6 +65,8 @@ public:
   void  StartPlay ();
   int   Size ();
 
+  void  SetInLength (qint64 usecs) { playUSecs = usecs; }
+
 public slots:
 
   void StopRecording ();
@@ -79,7 +81,7 @@ private slots:
 
 signals:
 
-  void HaveAudio ();
+  void HaveAudio (qint64 usecs);
   void PlayStarting ();
   void PlayFinished ();
 
@@ -99,6 +101,7 @@ private:
   double         tick;
   double         secsLeft;
   QTimer        *playLimitTimer;
+  qint64         playUSecs;
   bool           busyReceive;
   QTime          clock;
   QString        inStateText[4];
