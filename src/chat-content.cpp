@@ -796,7 +796,7 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
   qDebug () << " received SAM request";
   QString subop ("deny");
   QString xferId = msg.Attribute ("xferid");
-  if (!audio.BusyReceive()) {   
+  if (qtAudioOk && (!audio.BusyReceive())) {   
     XferInfo info;
     info.id = xferId;
     info.fileSize = 0;
