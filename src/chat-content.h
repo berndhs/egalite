@@ -62,7 +62,8 @@ public:
   };
   
   XferInfo ()
-    :removeOnComplete (false)
+    :removeOnComplete (false),
+     pipeline (1)
     {}
   ~XferInfo() {}
   
@@ -73,6 +74,7 @@ public:
   quint64         lastChunk;
   quint64         lastChunkAck;
   bool            removeOnComplete;
+  int             pipeline;
 };
 
 class ChatContent : public QDialog 

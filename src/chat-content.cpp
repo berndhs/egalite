@@ -65,7 +65,7 @@ ChatContent::ChatContent (QWidget *parent)
    activeAudioMessage (tr("\n playing")),
    qtAudioOk (false),
    sendFileWindow (1),
-   sendChunkSize (1*1024),
+   sendChunkSize (4*1024),
    audio (this),
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
@@ -570,6 +570,7 @@ ChatContent::StartFileSend ()
     info.lastChunkAck  = 0;
     info.kind = XferInfo::Xfer_File;
     info.inout = XferInfo::Xfer_Out;
+    info.pipeline = 5;
     QFile * fp =  new QFile (filename);
     bool isopen = fp ->open (QFile::ReadOnly);
     info.fileSize = fp->size ();
@@ -622,14 +623,17 @@ ChatContent::SendNextPart (const QString & id)
     QFile * fp =  fileIt->second;
     XferInfo & info = stateIt->second;
     if (fp) {
-      for (int ch=0; ch<sendFileWindow; ch++) {
+      for (int ch=0; ch< info.pipeline; ch++) {
         QByteArray data = fp->read (sendChunkSize);
         if (data.size() < 1) {
           SendFinished (id);
+          break;
         } else {
           SendChunk (info, data);
         }
+        qDebug () << " send chunk " << ch << " size " << sendChunkSize;
       }
+      info.pipeline = 1;
     }
   }
 }
