@@ -36,14 +36,14 @@ unix {
   message ("Applying Unix settings")
   !include ( options.pri ) {
     INCLUDEPATH += /usr/include/qxmpp
-    LIBS += -lqxmppclient
+    LIBS += -l$$QXMPP_NAME
     message ("Now options.pri, using default $$INCLUDEPATH")
   } else {
     INCLUDEPATH += $$QXMPP_BASE/include/qxmpp
     exists ("$$QXMPP_BASE/lib64") {
-      LIBS += -L$$QXMPP_BASE/lib64 -lqxmppclient
+      LIBS += -L$$QXMPP_BASE/lib64 -l$$QXMPP_NAME
     } else { 
-      LIBS += -L$$QXMPP_BASE/lib -lqxmppclient
+      LIBS += -L$$QXMPP_BASE/lib -l$$QXMPP_NAME
     }
   }
   message ("include path: $$INCLUDEPATH")
@@ -54,9 +54,9 @@ unix {
 # use the code below if QXmpp is installed in /usr/local
 #  INCLUDEPATH += /usr/local/include/qxmpp
 #  exists ("/usr/local/lib64") {
-#    LIBS += -L/usr/local/lib64 -lqxmppclient
+#    LIBS += -L/usr/local/lib64 -l$$QXMPP_NAME
 #  } else { 
-#    LIBS += -L/usr/local/lib -lQqxmppclient
+#    LIBS += -L/usr/local/lib -lQ$$QXMPP_NAME
 #  }
 #
 }
