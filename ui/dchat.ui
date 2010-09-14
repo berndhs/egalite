@@ -65,7 +65,7 @@
      <x>0</x>
      <y>0</y>
      <width>307</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -94,6 +94,9 @@
     </property>
     <addaction name="contactDirectAction"/>
     <addaction name="actionRequest"/>
+    <addaction name="separator"/>
+    <addaction name="actionBlacklisted"/>
+    <addaction name="actionWhitelisted"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -186,6 +189,16 @@
   <action name="actionServer">
    <property name="text">
     <string>Server Accounts</string>
+   </property>
+  </action>
+  <action name="actionBlacklisted">
+   <property name="text">
+    <string>Blacklisted</string>
+   </property>
+  </action>
+  <action name="actionWhitelisted">
+   <property name="text">
+    <string>Whitelisted</string>
    </property>
   </action>
  </widget>

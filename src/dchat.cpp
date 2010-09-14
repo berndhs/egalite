@@ -62,6 +62,7 @@ DChatMain::DChatMain (QWidget *parent)
    helpView (this),
    subscriptionDialog (this),
    serverAccountEdit (this),
+   certListEdit (this),
    publicPort (29999),
    defaultPort (29999),
    passdial (0),
@@ -277,6 +278,10 @@ DChatMain::Connect ()
            CertStore::Object(), SLOT (CreateCertificate()));
   connect (ui.actionServer, SIGNAL (triggered()),
            this, SLOT (EditServerLogin ()));
+  connect (ui.actionBlacklisted, SIGNAL (triggered()),
+           this, SLOT (EditBlacklist()));
+  connect (ui.actionWhitelisted, SIGNAL (triggered()),
+           this, SLOT (EditWhitelist ()));
   connect (ui.contactView, SIGNAL (activated (const QModelIndex &)),
            &contactListModel, SLOT (PickedItem (const QModelIndex &)));
   connect (ui.actionLicense, SIGNAL (triggered()),
@@ -926,6 +931,18 @@ void
 DChatMain::EditServerLogin ()
 {
   serverAccountEdit.Exec ();
+}
+
+void
+DChatMain::EditBlacklist ()
+{
+  certListEdit.Run ("blackcerts");
+}
+
+void
+DChatMain::EditWhitelist ()
+{
+  certListEdit.Run ("remotecerts");
 }
 
 } // namespace

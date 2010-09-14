@@ -101,6 +101,7 @@ FORMS = \
         ui/cert-input.ui \
 	ui/server-account.ui \
 	ui/count-down.ui \
+	ui/cert-list.ui \
 
 
 SOURCES = src/main.cpp \
@@ -130,6 +131,7 @@ SOURCES = src/main.cpp \
 	src/direct-message.cpp \
 	src/direct-parser.cpp \
 	src/audio-message.cpp \
+	src/cert-list-edit.cpp \
 
 
 
@@ -162,6 +164,7 @@ HEADERS = \
 	src/direct-message.h \
 	src/direct-parser.h \
 	src/audio-message.h \
+	src/cert-list-edit.h \
 
 
 

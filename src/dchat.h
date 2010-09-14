@@ -39,6 +39,7 @@
 #include "ui_getpassword.h"
 #include "ui_request-subscribe.h"
 #include "account-edit.h"
+#include "cert-list-edit.h"
 
 #include <map>
 
@@ -93,6 +94,8 @@ private slots:
   void ListenerDrop ();
   void EditSettings ();
   void EditServerLogin ();
+  void EditBlacklist ();
+  void EditWhitelist ();
   void RequestSubscribe ();
   void DoRequestSubscribe ();
   void CallDirect ();
@@ -145,6 +148,7 @@ private:
   deliberate::HelpView  helpView;
   SubscriptionChange    subscriptionDialog;
   AccountEdit           serverAccountEdit;
+  CertListEdit          certListEdit;
 
   QXmppConfiguration  xmppConfig;
   int           publicPort;
