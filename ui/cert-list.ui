@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>368</width>
-    <height>341</height>
+    <width>601</width>
+    <height>321</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,15 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="2">
     <widget class="QTableView" name="certListView">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
      </attribute>
@@ -29,9 +38,9 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QPushButton" name="editButton">
+    <widget class="QPushButton" name="applyButton">
      <property name="text">
-      <string>Edit Selected</string>
+      <string>Apply</string>
      </property>
     </widget>
    </item>

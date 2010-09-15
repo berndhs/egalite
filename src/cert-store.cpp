@@ -664,7 +664,7 @@ CertStore::RemoveCert (const QString & table,
 
 
 bool
-CertStore::RemoteNick (QByteArray  pem, QString & nick)
+CertStore::GetWhite (QByteArray  pem, QString & nick)
 {
   QString qryString = QString ("select ident from remotecerts "
                       "where pemcert = \"%1\"").arg (QString(pem));
@@ -869,6 +869,69 @@ CertStore::DeleteAccount (QString jid)
                         .arg (jid));
   bool del = delQuery.exec (delString);
   return del;
+}
+
+QStringList
+CertStore::CertList (const QString & table)
+{
+  QStringList results;
+  QString qryString = QString ("select ident from %1 where 1").arg (table);
+  QSqlQuery query (certDB);
+  bool ok = query.exec (qryString);
+qDebug () << " query " << qryString << " result " << ok;
+  while (ok && query.next()) {
+    results.append (query.value (0).toString());
+  }
+qDebug () << " results list " << results;
+  return results;
+}
+
+QStringList
+CertStore::CertList (RemoteType rt)
+{
+  if (rt == Remote_White) {
+    return CertList (QString("remotecerts"));
+  } else if (rt == Remote_Black) {
+    return CertList (QString("blackcerts"));
+  } else {
+    return QStringList();
+  }
+}
+
+bool
+CertStore::GetRemotePem (RemoteType rt, const QString & nick,
+                          QByteArray & pem)
+{
+  QString table; 
+  pem.clear ();
+  if (rt == Remote_White) {
+    table = QString ("remotecerts");
+  } else if (rt == Remote_Black) {
+    table = QString ("blackcerts");
+  } else {
+    return false;
+  }
+  QString qryString = QString ("select pemcert from %1 where ident = \"%2\"")
+                      .arg (table)
+                      .arg (nick);
+  QSqlQuery  query (certDB);
+  bool ok = query.exec (qryString);
+  if (ok && query.next ()) {
+    pem = query.value(0).toByteArray ();
+  }
+  return ok && (pem.size() > 0);
+}
+
+void
+CertStore::RemoveCert ( RemoteType rt,
+                       const QString & nick,
+                       const QByteArray & pem)
+{
+  if (rt == Remote_White) {
+    RemoveCert ("remotecerts",nick, pem);
+  } else if (rt == Remote_Black) {
+    RemoveCert ("blackcerts", nick, pem);
+  }
 }
 
 } // namespace

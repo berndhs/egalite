@@ -279,9 +279,9 @@ DChatMain::Connect ()
   connect (ui.actionServer, SIGNAL (triggered()),
            this, SLOT (EditServerLogin ()));
   connect (ui.actionBlacklisted, SIGNAL (triggered()),
-           this, SLOT (EditBlacklist()));
+           &certListEdit, SLOT (EditBlacklist()));
   connect (ui.actionWhitelisted, SIGNAL (triggered()),
-           this, SLOT (EditWhitelist ()));
+           &certListEdit, SLOT (EditWhitelist ()));
   connect (ui.contactView, SIGNAL (activated (const QModelIndex &)),
            &contactListModel, SLOT (PickedItem (const QModelIndex &)));
   connect (ui.actionLicense, SIGNAL (triggered()),
@@ -933,17 +933,6 @@ DChatMain::EditServerLogin ()
   serverAccountEdit.Exec ();
 }
 
-void
-DChatMain::EditBlacklist ()
-{
-  certListEdit.Run ("blackcerts");
-}
-
-void
-DChatMain::EditWhitelist ()
-{
-  certListEdit.Run ("remotecerts");
-}
 
 } // namespace
 

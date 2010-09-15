@@ -21,8 +21,14 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
+
 #include <QDialog>
+#include <QStandardItemModel>
 #include "ui_cert-list.h"
+#include "cert-store.h"
+
+class QModelIndex;
+
 namespace egalite
 {
 
@@ -33,11 +39,45 @@ public:
 
   CertListEdit (QWidget * parent=0);
 
-  void Run (QString listname);
+public slots:
+
+  void EditWhitelist ();
+  void EditBlacklist ();
+
+private slots:
+
+  void Done ();
+  void Picked (const QModelIndex & index);
+  void Apply ();
 
 private:
 
+  enum CertState  {  Cert_BadState = 0,
+                     Cert_Keep = 1,
+                     Cert_Delete = 2
+                  };
+  enum DataTag    {  Tag_None = 0,
+                     Tag_State = 1,
+                     Tag_Id = 2,
+                     Tag_Expire = 3,
+                     Tag_Pem = 4
+                   };
+
+  void       SetModelData (const QStringList & idlist);
+  void       SetHeaders ();
+  QString    StateString (CertState st);
+  void       UpdateList ();
+
   Ui_CertList   ui;
+
+  QStandardItemModel       certModel;
+  CertStore::RemoteType    tableType;
+  int                      keepStateRole;
+  int                      tagType;
+  int                      pemData;
+  int                      nickIndex;
+  int                      pemIndex;
+ 
 } ;
 
 } // namespace

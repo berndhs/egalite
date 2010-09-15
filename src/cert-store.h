@@ -57,6 +57,10 @@ Q_OBJECT
 
 public:
 
+  enum  RemoteType { Remote_White = 0,
+                     Remote_Black = 1
+                   };
+
 
   static CertStore & IF();
   static CertStore * Object();
@@ -73,8 +77,14 @@ public:
   QString     ContactAddress (QString id);
   int         ContactPort    (QString id);
   QStringList ContactList ();
-  bool        RemoteNick (QByteArray pem, QString & nick);
+  QStringList CertList (RemoteType rt);
+  bool        GetWhite (QByteArray pem, QString & nick);
   bool        IsBlocked (QByteArray pem);
+  bool        GetRemotePem (RemoteType rt, const QString & nick,
+                            QByteArray & pem);
+  void RemoveCert ( RemoteType   rt,
+                   const QString & nick,
+                   const QByteArray & pem);
 
   bool        SaveAccount (QString jid, QString server, QString pass);
   bool        RecallAccount (QString jid, QString & server, QString &pass);
@@ -135,6 +145,7 @@ private:
   void RemoveCert (const QString & table,
                    const QString & nick,
                    const QByteArray & pem);
+  QStringList  CertList (const QString &table);
 
   QString ElementType (QString name);
 

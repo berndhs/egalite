@@ -94,8 +94,6 @@ private slots:
   void ListenerDrop ();
   void EditSettings ();
   void EditServerLogin ();
-  void EditBlacklist ();
-  void EditWhitelist ();
   void RequestSubscribe ();
   void DoRequestSubscribe ();
   void CallDirect ();

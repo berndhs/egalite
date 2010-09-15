@@ -159,7 +159,7 @@ PickCert::HaveGoodSavedCert (const QList <QSslCertificate> & clist,
     if (cit->effectiveDate() <= now
         && now <= cit->expiryDate()) {
       QString nick;
-      if (CertStore::IF().RemoteNick (cit->toPem(), nick)) {
+      if (CertStore::IF().GetWhite (cit->toPem(), nick)) {
         pickedCert = *cit;
         return true;
       }
