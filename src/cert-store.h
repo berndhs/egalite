@@ -85,6 +85,9 @@ public:
   void RemoveCert ( RemoteType   rt,
                    const QString & nick,
                    const QByteArray & pem);
+  void StoreCert ( RemoteType   rt,
+                   const QString & nick,
+                   const QByteArray & pem);
 
   bool        SaveAccount (QString jid, QString server, QString pass);
   bool        RecallAccount (QString jid, QString & server, QString &pass);

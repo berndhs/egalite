@@ -934,5 +934,17 @@ CertStore::RemoveCert ( RemoteType rt,
   }
 }
 
+void
+CertStore::StoreCert ( RemoteType rt,
+                       const QString & nick,
+                       const QByteArray & pem)
+{
+  if (rt == Remote_White) {
+    StoreCert ("remotecerts",nick, pem);
+  } else if (rt == Remote_Black) {
+    StoreCert ("blackcerts", nick, pem);
+  }
+}
+
 } // namespace
 

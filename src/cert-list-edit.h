@@ -54,7 +54,8 @@ private:
 
   enum CertState  {  Cert_BadState = 0,
                      Cert_Keep = 1,
-                     Cert_Delete = 2
+                     Cert_Delete = 2,
+                     Cert_Change = 3
                   };
   enum DataTag    {  Tag_None = 0,
                      Tag_State = 1,
@@ -72,6 +73,7 @@ private:
 
   QStandardItemModel       certModel;
   CertStore::RemoteType    tableType;
+  CertStore::RemoteType    otherTableType;
   int                      keepStateRole;
   int                      tagType;
   int                      pemData;

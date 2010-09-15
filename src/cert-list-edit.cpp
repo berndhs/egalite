@@ -50,6 +50,7 @@ CertListEdit::EditWhitelist ()
 {
   setWindowTitle (tr("White Listed Certificates"));
   tableType = CertStore::Remote_White;
+  otherTableType = CertStore::Remote_Black;
   UpdateList ();
   show ();
 }
@@ -59,6 +60,7 @@ CertListEdit::EditBlacklist ()
 {
   setWindowTitle (tr("Black Listed Certificates"));
   tableType = CertStore::Remote_Black;
+  otherTableType = CertStore::Remote_White;
   UpdateList ();
   show ();
 }
@@ -128,6 +130,8 @@ CertListEdit::Picked (const QModelIndex &index)
       if (oldState == Cert_Keep) {
         newState = Cert_Delete;
       } else if (oldState == Cert_Delete) {
+        newState = Cert_Change;
+      } else if (oldState == Cert_Change) {
         newState = Cert_Keep;
       }
       item->setData (QVariant (newState), keepStateRole);
@@ -146,6 +150,13 @@ CertListEdit::StateString ( CertState st)
   case Cert_Delete:
     return tr ("erase");
     break;
+  case Cert_Change:
+    if (otherTableType == CertStore::Remote_White) {
+       return tr ("-> white");
+    } else {
+       return tr ("-> black");
+    }
+    break;
   default:
     break;
   }
@@ -159,8 +170,9 @@ CertListEdit::Apply ()
   for (int r=0; r<nrows; r++) {
     QStandardItem * headItem = certModel.item (r,0);
     if (headItem) {
+      CertState state = CertState (headItem->data (keepStateRole).toInt());
       if (headItem->data (tagType).toInt() == Tag_State
-          && headItem->data (keepStateRole).toInt() == Cert_Delete) {
+          && state != Cert_Keep) {
         QStandardItem * identItem = certModel.item (r,nickIndex);
         QStandardItem * pemItem = certModel.item (r,pemIndex);
         if (identItem && pemItem
@@ -168,7 +180,12 @@ CertListEdit::Apply ()
           && pemItem->data (tagType).toInt () == Tag_Pem) {
           QString nick = identItem->text ();
           QByteArray pem = pemItem->data (pemData).toByteArray ();
-          CertStore::IF().RemoveCert (tableType, nick, pem);
+          if (state == Cert_Delete || state == Cert_Change) {
+            CertStore::IF().RemoveCert (tableType, nick, pem);
+          }
+          if (state == Cert_Change) {
+            CertStore::IF().StoreCert (otherTableType, nick, pem);
+          }
         }
       }
     }
