@@ -193,22 +193,23 @@ qDebug () << " topname unknown: " << topname;
   }
 qDebug () << " direct message top parse good/complete " 
           << good << "/" << complete;
-  if (badData) {
-    /// Something is badly wrong, try to recover one character at a time
-    qDebug () << " removing bad character" << inbuf.buffer().left(1);
-    inbuf.buffer().remove (0,1);
-    inbuf.seek (0);
-  } else if (good && complete) {
+    if (good && complete) {
     /// we have consumed a message, so get rid of the raw data
     /// so we can read the next message next time   
+    qDebug () << " trailing token " << xread.tokenString ();
+    while (!xread.atEnd() && xread.tokenType() != QXmlStreamReader::EndDocument) {
+      xread.readNext();
+      qDebug () << " consumed " << xread.tokenString ();
+    }
     qDebug () << " remove " << offset << " bytes from buffer: ";
     qDebug () << inbuf.buffer().left(offset);
-    inbuf.buffer().remove (0,offset);
+    inbuf.buffer().remove (0,offset+1);
     inbuf.seek (0);
   } else {
     msg.Clear ();
   }
 qDebug () << " after DirectParser::Read buffer has [[" << inbuf.buffer() << "]]";
+qDebug () << " token " << xread.tokenString() << " error " << xread.error();
   if (!good) {
     if (xread.error () == QXmlStreamReader::PrematureEndOfDocumentError) {
       complete = false;
