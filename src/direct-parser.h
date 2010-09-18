@@ -108,6 +108,8 @@ private:
                       QXmlStreamAttributes & atts);
 
   QXmlStreamReader::TokenType   ReadNext (QXmlStreamReader & xread);
+  QXmlStreamReader::TokenType   NoWhite (QXmlStreamReader & xread);
+  QXmlStreamReader::TokenType   NoEnd (QXmlStreamReader & xread);
 
   QBuffer     inbuf;
   QMutex      bufLock;

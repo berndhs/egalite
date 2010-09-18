@@ -175,6 +175,7 @@ private:
   void AbortTransfer (const QString & id, QString msg = QString());
   void AckChunk (const QString & id, quint64 num);
   void CloseTransfer (const QString & id, bool good=false);
+  void SendDirectMessage (DirectMessage & msg);
   void SendDomDoc (QDomDocument & doc);
   void ReadDomDoc (QDomDocument & doc, bool isLocal = false);
 

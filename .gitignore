@@ -1,3 +1,10 @@
 tmp/
 bin/
 doxy/
+*.gz
+*.log
+MakeDChat
+Makefile
+options.pri
+translate/*.qm
+*.raw

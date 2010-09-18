@@ -364,6 +364,46 @@ qDebug () << " sending Dom Doc op " << doc.toByteArray().left(256);
 }
 
 void
+ChatContent::SendDirectMessage (DirectMessage & msg)
+{
+  DumpAttributes (msg, " <------- Outgoing Direct");
+  // prepare message in XML format
+  QBuffer outbuf;
+  outbuf.open (QBuffer::WriteOnly);
+  QXmlStreamWriter xmlout;
+  xmlout.setDevice (&outbuf);
+  xmlout.setAutoFormatting (true);
+  xmlout.setAutoFormattingIndent (1);
+  xmlout.writeStartDocument ();
+  xmlout.writeStartElement ("egalite");
+  xmlout.writeAttribute ("version",protoVersion);
+  xmlout.writeStartElement ("cmd");
+  DirectMessage::AttributeMap atts = msg.Attributes();
+  DirectMessage::AttributeMap::iterator ait;
+  for (ait=atts.begin(); ait != atts.end(); ait++) {
+    xmlout.writeAttribute (ait->first, ait->second);
+  }
+  QByteArray & data = msg.Data();
+  if (data.size() > 0) {
+    xmlout.writeCharacters (data);
+  }
+  xmlout.writeEndElement (); // cmd
+  xmlout.writeEndElement (); // egalite
+  xmlout.writeEndDocument ();
+  // send bytes
+  if (ioDev) {
+    ioDev->write (outbuf.buffer());
+    ioDev->flush ();
+qDebug () << " op " << msg.Op ();
+qDebug () << " message sent: " << outbuf.buffer().left (512);
+  } else {
+    emit Outgoing (outbuf.buffer());
+  }
+  sendSinceBeat ++;
+}
+
+
+void
 ChatContent::SetProtoVersion (QString newProto)
 {
   if (protoVersion != newProto) {
@@ -455,6 +495,7 @@ ChatContent::Heartbeat ()
 {
   if (chatMode == ChatModeEmbed) {
     if (sendSinceBeat < 2) {
+#if 0
       QDomDocument heartDoc ("egalite");
       QDomElement root = heartDoc.createElement ("egalite");
       root.setAttribute ("version",protoVersion); 
@@ -464,6 +505,11 @@ ChatContent::Heartbeat ()
       msg.setAttribute ("subop","heartbeat");
       root.appendChild (msg);
       SendDomDoc (heartDoc);
+#endif
+      DirectMessage dmsg;
+      dmsg.SetOp ("ctl");
+      dmsg.SetSubop ("heartbeat");
+      SendDirectMessage (dmsg);
     }
     directParser.TryRead (maxBurst);
     sendSinceBeat = 0;
@@ -474,6 +520,7 @@ void
 ChatContent::EmbedDirectMessage (QByteArray & raw)
 {
   qDebug () << " sending " << raw;
+#if 0
   QDomDocument directDoc ("egalite");
   QDomElement root = directDoc.createElement ("egalite");
   root.setAttribute ("version",protoVersion);
@@ -487,6 +534,15 @@ ChatContent::EmbedDirectMessage (QByteArray & raw)
   directDoc.appendChild (root);
   sendCount++;
   SendDomDoc (directDoc);
+#endif
+  DirectMessage dmsg;
+  dmsg.SetOp ("xmpp");
+  dmsg.SetSubop ("msg");
+  dmsg.SetAttribute ("num",QString::number (sendCount));
+  dmsg.SetData (raw);
+qDebug () << " embed op " << dmsg.Op () << " raw " << dmsg.Data();
+  SendDirectMessage (dmsg);
+  sendCount++;
 }
 
 void
@@ -527,6 +583,7 @@ qDebug () << " file open " << isopen << " size " << fp->size();
   if (isopen) {
     xferFile [info.id] = fp;
     xferState [info.id] = info;  
+#if 0
     QDomDocument requestDoc ("egalite");
     QDomElement  request = requestDoc.createElement ("egalite");
     request.setAttribute ("version", protoVersion);
@@ -546,8 +603,28 @@ qDebug () << " file open " << isopen << " size " << fp->size();
     cmd.setAttribute ("sampletype",audio.OutFormat().sampleType());
     request.appendChild (cmd);
     SendDomDoc (requestDoc);
+#endif
+
+    DirectMessage req;
+    req.SetOp ("sendfile");
+    req.SetSubop ("samreq");
+    req.SetAttribute ("xferid",info.id);
+    req.SetAttribute ("size",QString::number (info.fileSize));
+    req.SetAttribute ("usecs",QString::number (usecs));
+    req.SetAttribute ("name",audio.OutFormat().codec());
+    req.SetAttribute ("rate",
+                       QString::number (audio.OutFormat().frequency()));
+    req.SetAttribute ("channels",
+                       QString::number (audio.OutFormat().channels()));
+    req.SetAttribute ("samplesize",
+                       QString::number (audio.OutFormat().sampleSize()));
+    req.SetAttribute ("codec",audio.OutFormat().codec());
+    req.SetAttribute ("byteorder",
+                       QString::number (audio.OutFormat().byteOrder()));
+    req.SetAttribute ("sampletype",
+                       QString::number (audio.OutFormat().sampleType()));
+    SendDirectMessage (req);
     StartXferDisplay ();
-    qDebug () << "  ]]]]] Audio request sent: " << requestDoc.toString();
   }
 }
 
@@ -598,6 +675,7 @@ ChatContent::SendFirstPart (const QString & id)
   }
   XferInfo & info = xferState[id];
   QFileInfo finfo (fp->fileName());
+#if 0
   QDomDocument requestDoc ("egalite");
   QDomElement  request = requestDoc.createElement ("egalite");
   request.setAttribute ("version", protoVersion);
@@ -610,6 +688,14 @@ ChatContent::SendFirstPart (const QString & id)
   cmd.setAttribute ("size",info.fileSize);
   request.appendChild (cmd);
   SendDomDoc (requestDoc);
+#endif
+  DirectMessage req;
+  req.SetOp ("sendfile");
+  req.SetSubop ("sendreq");
+  req.SetAttribute ("xferid",id);
+  req.SetAttribute ("name",finfo.fileName());
+  req.SetAttribute ("size",QString::number (info.fileSize));
+  SendDirectMessage (req);
   StartXferDisplay ();
   ListActiveTransfers (false);
 }
@@ -641,6 +727,7 @@ ChatContent::SendNextPart (const QString & id)
 void
 ChatContent::SendFinished (const QString & id)
 {
+#if 0
   QDomDocument chunkDoc ("egalite");
   QDomElement  chunkRoot = chunkDoc.createElement ("egalite");
   chunkRoot.setAttribute ("version", protoVersion);
@@ -651,6 +738,13 @@ ChatContent::SendFinished (const QString & id)
   cmd.setAttribute ("xferid",id);
   chunkRoot.appendChild (cmd);
   SendDomDoc (chunkDoc);
+#endif
+
+  DirectMessage msg;
+  msg.SetOp ("sendfile");
+  msg.SetSubop ("snd-done");
+  msg.SetAttribute ("xferid",id);
+  SendDirectMessage (msg);
   CloseTransfer (id, true);
 }
 
@@ -658,20 +752,14 @@ void
 ChatContent::SendChunk (XferInfo & info ,
                         const QByteArray & data)
 {
-  QDomDocument chunkDoc ("egalite");
-  QDomElement  chunkRoot = chunkDoc.createElement ("egalite");
-  chunkRoot.setAttribute ("version", protoVersion);
-  chunkDoc.appendChild (chunkRoot);
-  QDomElement chunk = chunkDoc.createElement ("cmd");
-  chunk.setAttribute ("op","sendfile");
-  chunk.setAttribute ("subop","chunk-data");
-  chunk.setAttribute ("xferid",info.id);
+  DirectMessage msg;
+  msg.SetOp ("sendfile");
+  msg.SetSubop ("chunk-data");
+  msg.SetAttribute ("xferid",info.id);
   info.lastChunk += 1;
-  chunk.setAttribute ("chunk",QString::number(info.lastChunk));
-  QDomText txt = chunkDoc.createTextNode (QString (data.toBase64()));
-  chunk.appendChild (txt);
-  chunkRoot.appendChild (chunk);
-  SendDomDoc (chunkDoc);
+  msg.SetAttribute ("chunk",QString::number (info.lastChunk));
+  msg.SetData (data.toBase64());
+  SendDirectMessage (msg);
 }
 
 void 
@@ -766,6 +854,7 @@ ChatContent::SendfileChunkData (DirectMessage & msg)
 void
 ChatContent::AckChunk (const QString & id, quint64 num)
 {
+#if 0
   QDomDocument  ackDoc ("egalite");
   QDomElement   ack = ackDoc.createElement ("egalite");
   ack.setAttribute ("version",protoVersion);
@@ -777,6 +866,13 @@ ChatContent::AckChunk (const QString & id, quint64 num)
   cmd.setAttribute ("chunk",QString::number (num));
   ack.appendChild (cmd);
   SendDomDoc (ackDoc);
+#endif
+  DirectMessage msg;
+  msg.SetOp ("sendfile");
+  msg.SetSubop ("chunk-ack");
+  msg.SetAttribute ("xferid",id);
+  msg.SetAttribute ("chunk", QString::number (num));
+  SendDirectMessage (msg);
 }
 
 void
@@ -784,6 +880,7 @@ ChatContent::AbortTransfer (const QString & id, QString msg)
 {
   qDebug () << " Abort Transfer: " << msg;
   CloseTransfer (id);
+#if 0
   QDomDocument  abortDoc ("egalite");
   QDomElement   nack = abortDoc.createElement ("egalite");
   nack.setAttribute ("version",protoVersion);
@@ -794,6 +891,12 @@ ChatContent::AbortTransfer (const QString & id, QString msg)
   cmd.setAttribute ("xferid",id);
   nack.appendChild (cmd);
   SendDomDoc (abortDoc);
+#endif
+  DirectMessage nack;
+  nack.SetOp ("sendfile");
+  nack.SetSubop ("abort");
+  nack.SetAttribute ("xferid",id);
+  SendDirectMessage (nack);
   QMessageBox box;
   box.setText (tr("Failure: ") + msg);
   QTimer::singleShot (15000, &box, SLOT (reject()));
@@ -833,6 +936,7 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
       StartXferDisplay ();
     }
   }
+#if 0
   QDomDocument  responseDoc ("egalite");
   QDomElement response = responseDoc.createElement ("egalite");
   response.setAttribute ("version",protoVersion);
@@ -843,6 +947,12 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
   cmd.setAttribute ("xferid",xferId);
   response.appendChild (cmd);
   SendDomDoc (responseDoc);
+#endif
+  DirectMessage resp;
+  resp.SetOp ("sendfile");
+  resp.SetSubop (subop);
+  resp.SetAttribute ("xferid",xferId);
+  SendDirectMessage (resp);
 }
 
 void 
@@ -873,6 +983,7 @@ ChatContent::SendfileSendReq (DirectMessage & msg)
   default:
     break;
   }
+#if 0
   QDomDocument  responseDoc ("egalite");
   QDomElement response = responseDoc.createElement ("egalite");
   response.setAttribute ("version",protoVersion);
@@ -883,6 +994,12 @@ ChatContent::SendfileSendReq (DirectMessage & msg)
   cmd.setAttribute ("xferid",xferId);
   response.appendChild (cmd);
   SendDomDoc (responseDoc);
+#endif
+  DirectMessage resp;
+  resp.SetOp ("sendfile");
+  resp.SetSubop (subop);
+  resp.SetAttribute ("xferid",xferId);
+  SendDirectMessage (resp);
 }
 
 void 
