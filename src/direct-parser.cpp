@@ -124,6 +124,7 @@ DirectParser::Read (DirectMessage & msg)
   bool finished (false);
   bool complete (false);
   bool good (false);
+  bool badData (false);
   QString  topname;
   QString  bottomtag;
   QString  version;
@@ -142,10 +143,10 @@ qDebug () << " INCOMING direct " << inbuf.buffer().left(512);
     case QXmlStreamReader::Invalid :
       qDebug () << " bad token";
       qDebug () << " text until here: " << inbuf.buffer().left(offset);
-      #if 0
+    
       finished = true; complete = false; good = false;
       lastErr = Proto_BadTag;
-      #endif
+      badData = true;
       break;
     case QXmlStreamReader::StartElement:
       topname = xread.name().toString().toLower();
@@ -192,7 +193,12 @@ qDebug () << " topname unknown: " << topname;
   }
 qDebug () << " direct message top parse good/complete " 
           << good << "/" << complete;
-  if (good && complete) {
+  if (badData) {
+    /// Something is badly wrong, try to recover one character at a time
+    qDebug () << " removing bad character" << inbuf.buffer().left(1);
+    inbuf.buffer().remove (0,1);
+    inbuf.seek (0);
+  } else if (good && complete) {
     /// we have consumed a message, so get rid of the raw data
     /// so we can read the next message next time   
     qDebug () << " remove " << offset << " bytes from buffer: ";
