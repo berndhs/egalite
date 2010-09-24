@@ -186,6 +186,7 @@ OSLEN=`expr match "Z$OS" "ZWindow"`
 if [ $OSLEN -gt 5 ] ; then
   MAKE_PROGRAM="mingw32-make.exe"
   QMAKE="qmake.exe"
+  LRELEASE="lrelease.exe"
 else
   MAKE_PROGRAM="make"
   # 
