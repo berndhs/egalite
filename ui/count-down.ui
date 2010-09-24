@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Time for Message</string>
+   <string>Recording...</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../dchat.qrc">

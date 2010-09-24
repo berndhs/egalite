@@ -16,8 +16,14 @@
 TEMPLATE = app
 MAKEFILE = MakeDChat
 TARGET = bin/egalite
-CONFIG += debug
-CONFIG += crypto
+unix {
+  CONFIG += debug
+  CONFIG += crypto
+}
+win32 {
+  CONFIG += debug_and_release
+  CONFIG += link_prl
+}
 TRANS_DIR = translate
 TRANSLATIONS += $$TRANS_DIR/egalite_fr.ts $$TRANS_DIR/egalite_de.ts
 message ("translations in $$TRANS_DIR/")
@@ -63,13 +69,24 @@ unix {
 
 win32 {
   message ("Applying Windows 32 bit settings")
-  INCLUDEPATH += ../qxmpp/source
-  DEFINES += DELIBERATE_DEBUG=1
-debug {
-  LIBS += ../qxmpp/source/debug/libQXmppClient_d.a
-} else {
-  LIBS += ../qxmpp/source/debug/libQXmppClient.a
-}
+  INCLUDEPATH += ../../software/qca/qca-2.0.2/include/QtCrypto
+  INCLUDEPATH += ../qxmpp-0.2.0/src
+  QTDIR = C:/Qt/2010.05/qt
+  LIBS += -L'd:/bernd/local/OpenSSL-Win32'
+  LIBS += -L'd:/bernd/local/OpenSSL-Win32/lib'
+  CONFIG(debug, debug|release) {
+    LIBS += ../qxmpp-0.2.0/lib/libqxmpp_d.a
+    LIBS += $$QTDIR/lib/libqcad2.a
+    LIBS += $$QTDIR/lib/libqca-ossld2.a
+    LIBS += -ldnsapi -lssl32 -leay32
+    DEFINES += DELIBERATE_DEBUG=1
+  } 
+  CONFIG(release, debug|release) {
+    LIBS += ../qxmpp-0.2.0/lib/libqxmpp.a
+    LIBS += $$QTDIR/lib/libqca2.a
+    LIBS += $$QTDIR/lib/libqca-ossl2.a
+    LIBS += -ldnsapi -lssl32 -leay32
+  }
 }
 message ("using extra libs $$LIBS")
 

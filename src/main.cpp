@@ -20,7 +20,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-
+#include <iostream>
 #include "dchat.h"
 
 #include <QApplication>
@@ -68,6 +68,7 @@ SetStyle (QSettings &zett)
 int
 main (int argc, char* argv[])
 {
+    std::cout << "hello" << std::endl;
   QCoreApplication::setApplicationName ("egalite");
   QCoreApplication::setOrganizationName ("BerndStramm");
   QCoreApplication::setOrganizationDomain ("bernd-stramm.com");
@@ -77,13 +78,12 @@ main (int argc, char* argv[])
   deliberate::SetSettings (settings);
   settings.setValue ("program",pv.MyName());
 
-  deliberate::SetStyle (settings);
+ // deliberate::SetStyle (settings);
 
   QCA::Initializer  qcaInit;
   QApplication  app (argc,argv);
 
   QStringList  configMessages;
-
   QCA::scanForPlugins ();
   // We need to ensure that we have certificate handling support
   if ( !QCA::isSupported( "cert" ) ) {
@@ -158,6 +158,7 @@ main (int argc, char* argv[])
     }
   }
   /** the real main program starts here */
+  qDebug () << " plugin library paths " <<  QCoreApplication::libraryPaths();
 
   egalite::DChatMain  chatmain;
 
