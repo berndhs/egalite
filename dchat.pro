@@ -64,6 +64,7 @@ unix {
 win32 {
   message ("Applying Windows 32 bit settings")
   INCLUDEPATH += ../qxmpp/source
+  DEFINES += DELIBERATE_DEBUG=1
 debug {
   LIBS += ../qxmpp/source/debug/libQXmppClient_d.a
 } else {
