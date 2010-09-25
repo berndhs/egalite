@@ -26,6 +26,7 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
  
+
 namespace deliberate {
 
   QString ProgramVersion::VersionNumber ("0.3.3");
