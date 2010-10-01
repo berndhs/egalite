@@ -40,7 +40,8 @@ signals:
   void NewCertificate (QString name,
                        QString password,
                        QString keyPEM,
-                       QString certPEM);
+                       QString certPEM,
+                       bool    saveDirectly);
 
 private:
 

@@ -300,7 +300,8 @@ qDebug () << " new cert PEM " << newcertPEM.left(100);
   emit NewCertificate (stringDataMap[tagCN],
                        password,
                        newkeyPEM,
-                       newcertPEM);
+                       newcertPEM,
+                       true);
 }
 
 } // namespace

@@ -125,7 +125,8 @@ private slots:
   void ToggleView ();
 
   void StartNewCert (QString name, QString pass, 
-                     QString keyPEM, QString certPEM);
+                     QString keyPEM, QString certPEM,
+                     bool saveDirectly=true);
 
 private:
 

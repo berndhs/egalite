@@ -122,9 +122,9 @@ CertStore::Connect ()
   connect (uiContact.deleteButton, SIGNAL (clicked()),
            this, SLOT (DeleteContact ()));  
   connect (certGenerate, SIGNAL (NewCertificate(QString,QString,
-                                                QString,QString)),
+                                                QString,QString, bool)),
            this, SLOT (StartNewCert (QString,QString, 
-                                     QString, QString)));
+                                     QString, QString, bool)));
 
 }
 
@@ -284,12 +284,17 @@ void
 CertStore::StartNewCert (QString name, 
                          QString pass, 
                          QString keyPEM, 
-                         QString certPEM)
+                         QString certPEM,
+                         bool    saveDirectly)
 {
   CertRecord newCR (name, pass, keyPEM, certPEM);
   currentRec = newCR;
 qDebug () << " incoming new Cert Rec cert " << currentRec.Cert().left(120);
   WriteCert (newCR);
+  if (saveDirectly) {
+    ReadDB ();
+    return;
+  }
   uiEditCert.nameEdit->setText (name);
   uiEditCert.keyEdit->setPlainText (keyPEM);
   uiEditCert.certEdit->setPlainText (certPEM);
