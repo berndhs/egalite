@@ -23,7 +23,8 @@ public:
 
 public slots:
 
-  void Dialog ();
+  void Dialog (bool reset = true);
+  void ReDialog ();
   void Generate ();
   void FinishGenerate ();
   void Cancel ();
@@ -46,9 +47,12 @@ signals:
 private:
 
   void FillModel (QStandardItemModel * model, 
-                  std::map <QString, QString> & data);
+                  const QStringList & headers,
+                  const std::map <QString, QString> & data);
   void FillMap  (std::map <QString, QString> & data,
                  QStandardItemModel * model);
+  void ResetMap (std::map <QString, QString> & data);
+
   Ui_CertificateInput    ui;
   QSslCertificate       storedCert;
   QString               newcertPEM;
@@ -60,6 +64,7 @@ private:
   int        timeCount;
 
   QStandardItemModel          * stringDataModel;
+  QStringList                   modelHeaders;
   std::map <QString, QString>   stringDataMap;
 
   QString  tagCN;

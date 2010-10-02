@@ -17,8 +17,7 @@ CertGenerate::CertGenerate (QWidget *parent)
    showCooked (false)  
 {
   ui.setupUi (this);
-  QStringList headers;
-  headers << tr("Data Field") << tr ("Content");
+  modelHeaders << tr("Data Field") << tr ("Content");
   tagCN = tr("1.Common Name");
   tagEmail = tr("2.e-mail");
   tagCountry = tr("3.Country");
@@ -27,17 +26,9 @@ CertGenerate::CertGenerate (QWidget *parent)
   tagCompany = tr("6.Organization");
   tagUnit = tr ("7.Oranization Unit");
   tagDays = tr ("8.Valid for Days");
-  stringDataMap[tagCN] = tr ("Your Name");
-  stringDataMap[tagEmail]      = QString ("");
-  stringDataMap[tagCountry]    = QString ("");
-  stringDataMap[tagState]      = QString ("");
-  stringDataMap[tagLocality]   = QString ("");
-  stringDataMap[tagCompany]    = QString ("");
-  stringDataMap[tagUnit]       = QString ("");
-  stringDataMap[tagDays]       = QString ("365");
+  ResetMap (stringDataMap);
   stringDataModel = new QStandardItemModel (this);
-  stringDataModel->setHorizontalHeaderLabels (headers);
-  FillModel (stringDataModel, stringDataMap);
+  FillModel (stringDataModel, modelHeaders, stringDataMap);
   ui.dataTable->setModel (stringDataModel);
   connect (ui.generateButton, SIGNAL (clicked()), this, SLOT (Generate ()));
   connect (ui.cancelButton, SIGNAL (clicked()), this, SLOT (Cancel ()));
@@ -48,12 +39,29 @@ CertGenerate::CertGenerate (QWidget *parent)
 }
 
 void
+CertGenerate::ResetMap (std::map <QString, QString> & data)
+{
+  data.clear ();
+  data[tagCN] = tr ("Your Name");
+  data[tagEmail]      = QString ("");
+  data[tagCountry]    = QString ("");
+  data[tagState]      = QString ("");
+  data[tagLocality]   = QString ("");
+  data[tagCompany]    = QString ("");
+  data[tagUnit]       = QString ("");
+  data[tagDays]       = QString ("365");
+}
+
+void
 CertGenerate::FillModel (QStandardItemModel *model,
-                     std::map < QString, QString > & data)
+                  const QStringList & headers,
+                  const std::map <QString, QString> & data)
 {
   QStandardItem *keyItem, *valItem;
   QString        key,      val;
-  std::map <QString, QString> :: iterator mit;
+  model->clear ();
+  model->setHorizontalHeaderLabels (headers);
+  std::map <QString, QString> :: const_iterator mit;
   for (mit = data.begin(); mit != data.end(); mit++) {
     key = mit->first;
     val = mit->second;
@@ -84,14 +92,21 @@ CertGenerate::FillMap (std::map <QString, QString> & data,
 }
 
 void
-CertGenerate::Dialog ()
+CertGenerate::Dialog (bool reset)
 {
   if ( ! QCA::isSupported ("cert")) {
     QMessageBox nosupport;
-    nosupport.setText (tr("Your System does not support generating certificates"));
+    nosupport.setText (
+         tr("Your System does not support generating certificates"));
     nosupport.exec ();
     return;
   }
+  if (reset) {
+    ResetMap (stringDataMap);
+    FillModel (stringDataModel, modelHeaders, stringDataMap);
+  }
+  ui.passwordEdit->clear ();
+  ui.certEdit->clear();
   ui.certEdit->hide();
   ui.exportButton->hide();
   ui.usenowButton->hide();
@@ -105,7 +120,13 @@ CertGenerate::Dialog ()
 void
 CertGenerate::Restart ()
 {
-  QTimer::singleShot (250,this, SLOT (Dialog()));
+  QTimer::singleShot (250,this, SLOT (ReDialog()));
+}
+
+void
+CertGenerate::ReDialog ()
+{
+  Dialog (false);
 }
 
 void
