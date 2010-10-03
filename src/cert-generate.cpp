@@ -214,7 +214,7 @@ CertGenerate::FinishGenerate ()
   ui.certEdit->show();
   ui.exportButton->show();
   showCooked = true;
-  storedCert = QSslCertificate (newcertPEM.toAscii());
+  storedCert = QSslCertificate (newcert.toDER(), QSsl::Der);
   if (storedCert.isValid ()) {
     ui.usenowButton->show();
   }
@@ -293,7 +293,7 @@ CertGenerate::Export ()
   storedCert = cert;
 
   QString keyDefault = stringDataMap[tagCN]
-                        + QString ("-cert.pem");
+                        + QString ("-key.pem");
 qDebug () << " default key file name " << pathDefault + keyDefault;
   QString keyfileName = QFileDialog::getSaveFileName (this,
                            tr("Save Key in File"),

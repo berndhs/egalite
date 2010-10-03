@@ -17,6 +17,10 @@
   <file alias="serveraccounts.sql">schemafiles/serveraccounts.sql</file>
   <file alias="uniquejid.sql">schemafiles/uniquejid.sql</file>
 </qresource>
+<qresource prefix="/data">
+  <file alias="nobody-key.pem">data/nobody-key.pem</file>
+  <file alias="nobody-cert.pem">data/nobody-cert.pem</file>
+</qresource>
 <qresource prefix="/help">
   <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
   <file alias="helpman.html">helpfiles/helpman.html</file>

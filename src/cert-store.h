@@ -94,6 +94,8 @@ public:
   bool        DeleteAccount (QString jid);
   QStringList AccountList ();
 
+  void        EnsureNobody ();
+
 public slots:
 
   /** \brief CertDialog - gui to add/remove/edit identities. */

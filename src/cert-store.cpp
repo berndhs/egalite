@@ -162,6 +162,32 @@ CertStore::Init (QWidget *parent)
   certDB.setDatabaseName (dbFileName);
   certDB.open ();
   ReadDB ();
+  EnsureNobody ();
+}
+
+void
+CertStore::EnsureNobody ()
+{
+  if (HaveCert (QString("nobody"))) {
+    return;
+  }
+  QString  id ("nobody");
+  QString  pass ("none");
+  QFile  file (":/data/nobody-key.pem");
+  file.open (QFile::ReadOnly);
+  QByteArray data = file.readAll ();
+  file.close ();
+  QString  pemkey (data);
+  file.setFileName  (":/data/nobody-cert.pem");
+  file.open (QFile::ReadOnly);
+  data.clear ();
+  data = file.readAll ();
+  file.close ();
+  QString pemcert (data);
+  
+  CertRecord nobodyCert (id, pass, pemkey, pemcert);
+  WriteCert (nobodyCert);
+  ReadDB ();
 }
 
 void
@@ -473,6 +499,9 @@ void
 CertStore::DeleteIdent ()
 {
   QString name = uiEditCert.nameEdit->text ();
+  if (name == QString ("nobody")) {  
+    return;   /// cannot delete nobody
+  }
   CertMap::iterator certit = homeCertMap.find (name);
   bool isnew = (certit == homeCertMap.end ());
   if (!isnew) {
@@ -508,6 +537,9 @@ CertStore::PasteCert ()
 void
 CertStore::DeleteCert (QString id)
 {
+  if (id == QString ("nobody")) {
+    return;
+  }
   QSqlQuery  delQuery (certDB);
   QString    delString (QString
                         ("delete from identities where ident = \"%1\"")

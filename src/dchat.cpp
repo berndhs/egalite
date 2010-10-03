@@ -657,7 +657,7 @@ Q_UNUSED (localNick);
   if (sock) {
     QString other = sock->PeerName();
     ChatBox * newBox = new ChatBox (this);
-    newBox->SetTitle (tr("direct ") + localNick);
+    newBox->SetTitle (tr("direct ") + sock->RemoteName());
     newBox->Add (sock->Dialog(),tr("Status")); 
     ChatContent * newCont = new ChatContent (this);
     newBox->Add (newCont,tr("Direct"));
