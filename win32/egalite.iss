@@ -71,6 +71,8 @@ Source: C:\Qt\2010.05\bin\QtXmlPatterns4.dll; DestDir: {app}
 Source: C:\Qt\2010.05\mingw\bin\mingwm10.dll; DestDir: {app}
 Source: C:\Qt\2010.05\mingw\bin\libgcc_s_dw2-1.dll; DestDir: {app}
 Source: C:\Qt\2010.05\bin\QtMultimedia4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\mingw\bin\libstdc++-6.dll; DestDir: {app}
+Source: C:\Qt\2010.05\mingw\bin\libssp-0.dll; DestDir: {app}
 
 [Icons]
 Name: {group}\{#MyAppName}; Filename: {app}\{#MyAppExeName}
