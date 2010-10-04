@@ -60,14 +60,17 @@ Source: D:\bernd\sample_codes\dchat\release\bin\ssleay32.dll; DestDir: {app}; Fl
 Source: D:\bernd\sample_codes\dchat\release\bin\sureware.dll; DestDir: {app}; Flags: ignoreversion
 Source: D:\bernd\sample_codes\dchat\release\bin\ubsec.dll; DestDir: {app}; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: C:\Qt\2010.05\qt\bin\QtCore4.dll; DestDir: {app}
-Source: C:\Qt\2010.05\qt\bin\phonon4.dll; DestDir: {app}
-Source: C:\Qt\2010.05\qt\bin\QtGui4.dll; DestDir: {app}
-Source: C:\Qt\2010.05\qt\bin\QtNetwork4.dll; DestDir: {app}
-Source: C:\Qt\2010.05\qt\bin\QtSql4.dll; DestDir: {app}
-Source: C:\Qt\2010.05\qt\bin\QtWebKit4.dll; DestDir: {app}
-Source: C:\Qt\2010.05\qt\bin\QtXml4.dll; DestDir: {app}
-Source: C:\Qt\2010.05\qt\bin\QtXmlPatterns4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\QtCore4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\phonon4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\QtGui4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\QtNetwork4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\QtSql4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\QtWebKit4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\QtXml4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\QtXmlPatterns4.dll; DestDir: {app}
+Source: C:\Qt\2010.05\mingw\bin\mingwm10.dll; DestDir: {app}
+Source: C:\Qt\2010.05\mingw\bin\libgcc_s_dw2-1.dll; DestDir: {app}
+Source: C:\Qt\2010.05\bin\QtMultimedia4.dll; DestDir: {app}
 
 [Icons]
 Name: {group}\{#MyAppName}; Filename: {app}\{#MyAppExeName}
