@@ -161,6 +161,7 @@ CertStore::Init (QWidget *parent)
   CheckExists (dbFileName);
   certDB.setDatabaseName (dbFileName);
   certDB.open ();
+  CheckDBComplete (dbFileName);
   ReadDB ();
   EnsureNobody ();
 }
