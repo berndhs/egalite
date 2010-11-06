@@ -82,7 +82,13 @@ CertStore::CertStore ()
                 << "uniqueblack"
                 << "uniqueblackcert"
                 << "serveraccounts"
-                << "uniquejid";
+                << "uniquejid"
+                << "ircservers"
+                << "uniqueircserver"
+                << "ircchannels"
+                << "uniquechannel"
+                << "ircnicks"
+                << "uniqueircnick";
 }
 
 void

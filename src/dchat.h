@@ -40,6 +40,7 @@
 #include "ui_request-subscribe.h"
 #include "account-edit.h"
 #include "cert-list-edit.h"
+#include "ircsock.h"
 
 #include <map>
 
@@ -92,6 +93,7 @@ private slots:
   void Logout ();
   void ListenerAdd ();
   void ListenerDrop ();
+  void RunIrc ();
   void EditSettings ();
   void EditServerLogin ();
   void RequestSubscribe ();
@@ -147,6 +149,7 @@ private:
   SubscriptionChange    subscriptionDialog;
   AccountEdit           serverAccountEdit;
   CertListEdit          certListEdit;
+  IrcSock              *ircSock;
 
   QXmppConfiguration  xmppConfig;
   int           publicPort;

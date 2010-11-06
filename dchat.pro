@@ -120,6 +120,10 @@ FORMS = \
 	ui/server-account.ui \
 	ui/count-down.ui \
 	ui/cert-list.ui \
+        ui/irc-channel-group.ui \
+        ui/irc-channel-box.ui \
+        ui/irc-sock.ui \
+
 
 
 SOURCES = src/main.cpp \
@@ -150,6 +154,9 @@ SOURCES = src/main.cpp \
 	src/direct-parser.cpp \
 	src/audio-message.cpp \
 	src/cert-list-edit.cpp \
+        src/irc-channel-group.cpp \
+        src/irc-channel-box.cpp \
+        src/ircsock.cpp \
 
 
 
@@ -183,6 +190,10 @@ HEADERS = \
 	src/direct-parser.h \
 	src/audio-message.h \
 	src/cert-list-edit.h \
+        src/irc-channel-box.h \
+        src/ircsock.h \
+        src/irc-channel-group.h \
+
 
 
 

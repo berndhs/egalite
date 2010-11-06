@@ -63,6 +63,7 @@ DChatMain::DChatMain (QWidget *parent)
    subscriptionDialog (this),
    serverAccountEdit (this),
    certListEdit (this),
+   ircSock (0),
    publicPort (29999),
    defaultPort (29999),
    passdial (0),
@@ -86,6 +87,7 @@ DChatMain::DChatMain (QWidget *parent)
   connect (announceHeartbeat, SIGNAL (timeout()), this, SLOT (AnnounceMe()));
   announceHeartbeat->start (1000*60*2); // 2 minutes
   xclientMap.clear ();
+  ircSock = new IrcSock (this);
 }
 
 void
@@ -292,6 +294,8 @@ DChatMain::Connect ()
            this, SLOT (About ()));
   connect (ui.actionRequest, SIGNAL (triggered ()),
            this, SLOT (RequestSubscribe ()));
+  connect (ui.actionConnectIRC, SIGNAL (triggered ()),
+           this, SLOT (RunIrc ()));
   connect (&contactListModel, SIGNAL (StartServerChat (QString, QString)),
            this, SLOT (StartServerChat (QString, QString)));
   connect (&contactListModel, SIGNAL (NewAccountIndex (QModelIndex)),
@@ -342,6 +346,13 @@ DChatMain::Login ()
              this, SLOT (XmppDiscoveryIqReceived (const QXmppDiscoveryIq &)));
     QTimer::singleShot (2500, this, SLOT (XmppPoll ()));
   }
+}
+
+void
+DChatMain::RunIrc ()
+{
+  qDebug () << " start Egalite IRC ";
+  ircSock->Run ();
 }
 
 void

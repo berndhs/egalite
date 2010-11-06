@@ -74,8 +74,12 @@
     </property>
     <addaction name="actionLog_In"/>
     <addaction name="actionLog_Out"/>
+    <addaction name="separator"/>
     <addaction name="actionAdd_Listener"/>
     <addaction name="actionDrop_Listener"/>
+    <addaction name="separator"/>
+    <addaction name="actionConnectIRC"/>
+    <addaction name="separator"/>
     <addaction name="actionSettings"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -87,6 +91,8 @@
     <addaction name="actionCreate"/>
     <addaction name="separator"/>
     <addaction name="actionServer"/>
+    <addaction name="separator"/>
+    <addaction name="actionIRCNicks"/>
    </widget>
    <widget class="QMenu" name="menuContacts">
     <property name="title">
@@ -113,7 +119,7 @@
   </widget>
   <action name="actionLog_In">
    <property name="text">
-    <string>Log In</string>
+    <string>Log In Xmpp</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -163,22 +169,22 @@
   </action>
   <action name="actionLog_Out">
    <property name="text">
-    <string>Log Out</string>
+    <string>Log Out Xmpp</string>
    </property>
   </action>
   <action name="actionRequest">
    <property name="text">
-    <string>Request</string>
+    <string>Xmpp Request</string>
    </property>
   </action>
   <action name="actionAdd_Listener">
    <property name="text">
-    <string>Add Listener</string>
+    <string>Add Direct Listener</string>
    </property>
   </action>
   <action name="actionDrop_Listener">
    <property name="text">
-    <string>Drop Listener</string>
+    <string>Drop Direct Listener</string>
    </property>
   </action>
   <action name="actionCreate">
@@ -199,6 +205,16 @@
   <action name="actionWhitelisted">
    <property name="text">
     <string>Whitelisted</string>
+   </property>
+  </action>
+  <action name="actionIRCNicks">
+   <property name="text">
+    <string>IRC Nicks</string>
+   </property>
+  </action>
+  <action name="actionConnectIRC">
+   <property name="text">
+    <string>Connect IRC</string>
    </property>
   </action>
  </widget>
