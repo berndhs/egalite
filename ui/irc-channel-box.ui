@@ -41,7 +41,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Cannel Topic</string>
+        <string>Channel Topic</string>
        </property>
       </widget>
      </item>

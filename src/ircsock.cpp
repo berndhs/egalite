@@ -55,8 +55,8 @@ IrcSock::IrcSock (QWidget *parent)
    waitFirstReceive (false)
 {
   mainUi.setupUi (this);
-  channelGroup = new IrcChannelGroup (this);
-  channelGroup->hide ();
+  dockedChannels = new IrcChannelGroup (this);
+  dockedChannels->hide ();
   socket = new QTcpSocket (this);
   pingTimer = new QTimer (this);
   scriptTimer = new QTimer (this);
@@ -71,6 +71,7 @@ IrcSock::IrcSock (QWidget *parent)
   receiveHandler ["PONG"] = IrcSock::ReceiveIgnore;
   receiveHandler ["PRIVMSG"] = IrcSock::ReceivePRIVMSG;
   receiveHandler ["JOIN"] = IrcSock::ReceiveJOIN;
+  receiveHandler ["PART"] = IrcSock::ReceivePART;
   receiveHandler ["VERSION"] = IrcSock::ReceiveIgnore;
 qDebug () << " IrcSock allocated and initialized";
 }
@@ -82,10 +83,10 @@ IrcSock::Run ()
   QSize defaultSize = size();
   QSize newsize = Settings().value ("sizes/ircsock", defaultSize).toSize();
   resize (newsize);
-  QSize  groupBoxSize = channelGroup->size();
+  QSize  groupBoxSize = dockedChannels->size();
   groupBoxSize = Settings().value ("sizes/channelgroup", groupBoxSize)
                            .toSize();
-  channelGroup->resize (groupBoxSize);
+  dockedChannels->resize (groupBoxSize);
   QStringList  servers = CertStore::IF().IrcServers ();
   noNameServer = tr("--- New Server ---");
   servers.append (noNameServer);
@@ -129,7 +130,7 @@ IrcSock::Exit ()
 {
   TryDisconnect ();
   CloseCleanup ();
-  channelGroup->Close ();
+  dockedChannels->Close ();
   hide ();
 }
 
@@ -149,7 +150,7 @@ IrcSock::CloseCleanup ()
   }
   QSize currentSize = size();
   Settings().setValue ("sizes/ircsock",currentSize);
-  QSize  groupBoxSize = channelGroup->size();
+  QSize  groupBoxSize = dockedChannels->size();
   Settings().setValue ("sizes/channelgroup", groupBoxSize);
   Settings().sync();
 }
@@ -316,7 +317,8 @@ IrcSock::Send (QString data)
 qDebug () << " prefix " << prefix << " room " << currentChan << " data " << data;
     data.prepend (prefix.arg (currentChan));
   }
-  SendData (data);
+  scriptLines += data;
+  RollScript ();
 }
 
 void
@@ -331,7 +333,7 @@ void
 IrcSock::RollScript ()
 {
   SendScriptHead ();
-  scriptTimer->start (2000);
+  scriptTimer->start (1000);
 }
 
 void
@@ -363,11 +365,14 @@ IrcSock::ConnectionReady ()
   QFont font = mainUi.peerAddressLabel->font ();
   font.setStrikeOut (false);
   mainUi.peerAddressLabel->setFont (font);
+  ignoreSources = CertStore::IF().IrcIgnores ();
 }
 
 void
 IrcSock::ConnectionGone ()
 {
+  pingTimer->stop ();
+  qDebug () << " disconnect seen for " << socket;
   mainUi.outLog->append (QString ("!!! disconnected from %1")
                  .arg (socket->peerAddress().toString()));
   QFont font = mainUi.peerAddressLabel->font ();
@@ -396,11 +401,15 @@ IrcSock::FakeLogin ()
     }
   }
   QString pass;
-  bool  havePass = CertStore::IF().GetIrcPass (nick, pass);
+  QString real;
+  bool  havePass = CertStore::IF().GetIrcIdent (nick, pass, real);
+  if (real.length() == 0) {
+    real = nick;
+  }
   if (havePass) {
     scriptLines.append (QString ("PASS :%1").arg(pass));
   }
-  scriptLines.append (QString ("USER %1 0 * :%1").arg (nick));
+  scriptLines.append (QString ("USER %1 0 * :%2").arg (nick).arg(real));
   scriptLines.append (QString ("NICK %1").arg (nick));
   QTimer::singleShot (100, this, SLOT (RollScript ()));
 }
@@ -408,28 +417,85 @@ IrcSock::FakeLogin ()
 void
 IrcSock::AddChannel (const QString & chanName)
 {
+  if (channels.contains (chanName)) {
+    return;
+  }
   IrcChannelBox * newchan  = new IrcChannelBox (chanName, this);
   channels [chanName] = newchan;
-  channelGroup->AddChannel (newchan);
-  channelGroup->show ();
+  dockedChannels->AddChannel (newchan);
+  dockedChannels->show ();
   connect (newchan, SIGNAL (Outgoing (QString, QString)),
            this, SLOT (Outgoing (QString, QString)));
   connect (newchan, SIGNAL (Active (IrcChannelBox *)),
            this, SLOT (ChanActive (IrcChannelBox *)));
   connect (newchan, SIGNAL (InUse (IrcChannelBox *)),
            this, SLOT (ChanInUse (IrcChannelBox *)));
+  connect (newchan, SIGNAL (WantFloat (IrcChannelBox *)),
+           this, SLOT (ChanWantsFloat (IrcChannelBox *)));
+  connect (newchan, SIGNAL (WantDock (IrcChannelBox *)),
+           this, SLOT (ChanWantsDock (IrcChannelBox *)));
+}
+
+void
+IrcSock::DropChannel (const QString & chanName)
+{
+  if (!channels.contains (chanName)) {
+    return;
+  }
+  IrcChannelBox * chanBox = channels [chanName];
+  disconnect (chanBox, 0,0,0);
+  if (dockedChannels->HaveChannel (chanBox)) {
+    dockedChannels->RemoveChannel (chanBox);
+  }
+  if (floatingChannels.contains (chanBox)) {
+    IrcFloat * oldFloat = floatingChannels [chanBox];
+    oldFloat->RemoveChannel (chanBox);
+    floatingChannels.remove (chanBox);
+    oldFloat->deleteLater ();
+  }
+  channels.remove (chanName);
+  chanBox->deleteLater ();
 }
 
 void
 IrcSock::ChanActive (IrcChannelBox *chan)
 {
-  channelGroup->MarkActive (chan, true);
+  dockedChannels->MarkActive (chan, true);
 }
 
 void
 IrcSock::ChanInUse (IrcChannelBox *chan)
 {
-  channelGroup->MarkActive (chan, false);
+  dockedChannels->MarkActive (chan, false);
+}
+
+void
+IrcSock::ChanWantsFloat (IrcChannelBox *chan)
+{
+  if (dockedChannels->HaveChannel (chan)) {
+    dockedChannels->RemoveChannel (chan);
+  }
+  if (!floatingChannels.contains (chan)) {
+    IrcFloat * newFloat = new IrcFloat (this);
+    floatingChannels [chan] = newFloat;
+    newFloat->AddChannel (chan);
+    newFloat->show ();
+  }
+}
+
+void
+IrcSock::ChanWantsDock (IrcChannelBox *chan)
+{
+  if (floatingChannels.contains (chan)) {
+    IrcFloat * oldFloat = floatingChannels [chan];
+    oldFloat->RemoveChannel (chan);
+    floatingChannels.remove (chan);
+    oldFloat->deleteLater ();
+  }
+  if (!dockedChannels->HaveChannel (chan)) {
+    dockedChannels->AddChannel (chan);
+    dockedChannels->show ();
+  }
 }
 
 void
@@ -453,6 +519,9 @@ IrcSock::InChanMsg (const QString & chan,
                     const QString & from, 
                     const QString & msg)
 {
+  if (ignoreSources.contains (from)) {
+    return;
+  }
   if (channels.contains (chan)) {
     QString themsg = msg.trimmed();
     if (themsg.startsWith (QChar (':'))) {
@@ -468,6 +537,9 @@ IrcSock::InUserMsg (const QString & from,
                     const QString & to, 
                     const QString & msg)
 {
+  if (ignoreSources.contains (from)) {
+    return;
+  }
   if (!channels.contains (from)) {
     AddChannel (from);
   }
@@ -554,11 +626,33 @@ IrcSock::ReceiveJOIN (IrcSock * context,
     QString chan = rest.mid (pos,len);
 qDebug () << " JOIN received, rest is " << rest;
 qDebug () << " chan " << chan;
-    chan.remove (0,1);
+    if (chan.startsWith (QChar(':'))) {
+      chan.remove (0,1);
+    }
     if (!context->channels.contains (chan)) {
       context->AddChannel (chan);
     }
     context->currentChan = chan;
+  }
+}
+
+void
+IrcSock::ReceivePART (IrcSock * context,
+                     const QString & first,
+                     const QString & cmd,
+                     const QString & rest)
+{
+  qDebug () << "receive PART " << first << cmd << rest;
+  QRegExp wordRx ("(\\S+)");
+  int pos = wordRx.indexIn (rest,0);
+  if (pos >= 0) {
+    int len = wordRx.matchedLength ();
+    QString chan = rest.mid (pos,len);
+    if (chan.startsWith (QChar (':'))) {
+      chan.remove (0,1);
+    }
+qDebug () << " PART received for channel " << chan;
+    context->DropChannel (chan);
   }
 }
 
@@ -603,7 +697,7 @@ IrcSock::ReceiveNumeric (IrcSock * context,
                         const QString & num,
                         const QString & rest)
 {
-  context->LogRaw (QString ("numeric %1  %2 %2").arg(first).arg(num).arg(rest));
+  context->LogRaw (QString ("numeric %1  %2 %3").arg(first).arg(num).arg(rest));
 }
 
 void

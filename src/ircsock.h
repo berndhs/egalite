@@ -25,9 +25,12 @@
 #include "ui_irc-sock.h"
 #include "config-edit.h"
 #include "helpview.h"
+#include "irc-float.h"
 #include <QTcpSocket>
 #include <QFile>
 #include <QStringList>
+#include <QMap>
+#include <QList>
 
 using namespace deliberate;
 
@@ -74,6 +77,8 @@ private slots:
   void FakeLogin ();
   void ChanActive (IrcChannelBox * chan);
   void ChanInUse (IrcChannelBox * chan);
+  void ChanWantsDock (IrcChannelBox * chan);
+  void ChanWantsFloat (IrcChannelBox * chan);
 
   void Outgoing (QString chan, QString msg);
   
@@ -90,6 +95,7 @@ private:
 
   void Connect ();
   void AddChannel (const QString & chanName);
+  void DropChannel (const QString & chanName);
   void SendData (const QString & data);
   void LogRaw (const QString & raw);
 
@@ -122,6 +128,10 @@ private:
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
+  static void ReceivePART (IrcSock * context,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest);
   static void ReceiveIgnore (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
@@ -134,7 +144,7 @@ private:
   bool             initDone;
   Ui_IrcSockMain   mainUi;
 
-  IrcChannelGroup  *channelGroup;
+  IrcChannelGroup  *dockedChannels;
 
   QTcpSocket     *socket;
 
@@ -155,8 +165,10 @@ private:
   QMap <QString, void (*) (IrcSock*, const QString &,
                            const QString &, const QString &)>
                receiveHandler;
-  QMap <QString, IrcChannelBox *> 
-               channels;
+  QMap <QString, IrcChannelBox *>     channels;
+  QMap <IrcChannelBox*, IrcFloat*>    floatingChannels;
+
+  QList <QString>  ignoreSources;
 
 };
 

@@ -53,6 +53,8 @@ public slots:
 
   void Incoming (const QString & message);
   void Part ();
+  void Float ();
+  void Dock ();
 
 private slots:
 
@@ -68,6 +70,8 @@ signals:
   void Outgoing (QString channel, QString message);
   void Active (IrcChannelBox * box);
   void InUse (IrcChannelBox * box);
+  void WantFloat (IrcChannelBox * box);
+  void WantDock (IrcChannelBox * box);
 
 private:
 
@@ -76,8 +80,11 @@ private:
 
    Ui_IrcChannelBox    ui;
    QMenuBar           *menuBar;
-   QMenu              *boxMenu;
+   QMenu              *chanMenu;
+   QMenu              *viewMenu;
    QAction            *actionPart;
+   QAction            *actionDock;
+   QAction            *actionFloat;
    QString             name;
    QString             topic;
 

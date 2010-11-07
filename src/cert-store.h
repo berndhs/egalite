@@ -99,14 +99,19 @@ public:
   QStringList IrcServers ();
   QStringList IrcNicks ();
   QStringList IrcChannels ();
-  bool        GetIrcPass (const QString & nick, QString & pass);
+  QStringList IrcIgnores ();
+  bool        GetIrcIdent (const QString & nick, 
+                                 QString & pass, 
+                                 QString & realname);
   void        SaveIrcServer (const QString & server);
   void        SaveIrcChannel (const QString & chan);
   void        SaveIrcNick (const QString & nick, 
                            const QString & pass = QString());
+  void        SaveIrcIgnore (const QString & name);
   bool        RemoveIrcServer (const QString & server);
   bool        RemoveIrcNick (const QString & nick);
   bool        RemoveIrcChannel (const QString & chan);
+  bool        RemoveIrcIgnore (const QString & name);
 
 public slots:
 
@@ -170,6 +175,7 @@ private:
   bool RemoveIrc (const QString & keytype,
                   const QString & keyval,
                   const QString & table);
+  void IrcGetList (const QString & qryCmd, QStringList & result);
 
   QWidget         *parentWidget;
   Ui_ListIdentity  uiListCert;

@@ -88,7 +88,9 @@ CertStore::CertStore ()
                 << "ircchannels"
                 << "uniquechannel"
                 << "ircnicks"
-                << "uniqueircnick";
+                << "uniqueircnick"
+                << "ircignore"
+                << "uniqueircignore";
 }
 
 void
@@ -993,39 +995,43 @@ CertStore::StoreCert ( RemoteType rt,
 QStringList
 CertStore::IrcServers ()
 {
-  QString selectStr ("select name from ircservers");
-  QSqlQuery query (certDB);
-  bool ok = query.exec (selectStr);
   QStringList list;
-  while (ok && query.next ()) {
-    list << query.value (0).toString();
-  }
+  IrcGetList ("select name from ircservers", list);
   return list;
 }
 
 QStringList
 CertStore::IrcNicks ()
 {
-  QString selectStr ("select inick from ircnicks");
-  QSqlQuery query (certDB);
-  bool ok = query.exec (selectStr);
   QStringList list;
-  while (ok && query.next ()) {
-    list << query.value (0).toString();
-  }
+  IrcGetList ("select inick from ircnicks", list);
   return list;
+}
+
+QStringList
+CertStore::IrcIgnores ()
+{
+  QStringList list;
+  IrcGetList ("select name from ircignore", list);
+  return list;
+}
+
+void
+CertStore::IrcGetList (const QString & qryCmd, QStringList & result)
+{
+  result.clear();
+  QSqlQuery query (certDB);
+  bool ok = query.exec (qryCmd);
+  while (ok && query.next()) {
+    result << query.value (0).toString();
+  }
 }
 
 QStringList
 CertStore::IrcChannels ()
 {
-  QString selectStr ("select channame from ircchannels");
-  QSqlQuery query (certDB);
-  bool ok = query.exec (selectStr);
   QStringList list;
-  while (ok && query.next ()) {
-    list << query.value (0).toString();
-  }
+  IrcGetList ("select channame from ircchannels", list);
   return list;
 }
 
@@ -1060,6 +1066,12 @@ bool
 CertStore::RemoveIrcChannel (const QString & chan)
 {
   return RemoveIrc ("channame", chan, "ircchannels");
+}
+
+bool
+CertStore::RemoveIrcIgnore (const QString & name)
+{
+  return RemoveIrc ("name", name, "ircignore");
 }
 
 void
@@ -1103,15 +1115,32 @@ CertStore::SaveIrcServer (const QString & server)
   qDebug () << " query " << ok << query.executedQuery ();
 }
 
-bool
-CertStore::GetIrcPass (const QString & nick, QString & pass)
+void
+CertStore::SaveIrcIgnore (const QString & name)
 {
-  QString cmdPat ("select ipass from ircnicks "
+  QString cmd ("insert or replace into ircignore "
+               " (name) "
+               " values (?) ");
+  QSqlQuery query (certDB);
+  query.prepare (cmd);
+  query.bindValue (0, QVariant (name));
+  bool ok = query.exec ();
+  qDebug () << " query " << ok << query.executedQuery ();
+}
+
+
+bool
+CertStore::GetIrcIdent(const QString & nick, 
+                             QString & pass,
+                             QString & realname)
+{
+  QString cmdPat ("select ipass, realname from ircnicks "
                   " where inick == \"%1\"");
   QSqlQuery query (certDB);
   bool ok = query.exec (cmdPat.arg (nick));
   if (ok && query.next ()) {
     pass = query.value (0).toString ();
+    realname = query.value (1).toString ();
   qDebug () << " query " << ok << query.executedQuery ();
     return true;
   }

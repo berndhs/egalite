@@ -103,6 +103,8 @@
     <addaction name="separator"/>
     <addaction name="actionBlacklisted"/>
     <addaction name="actionWhitelisted"/>
+    <addaction name="separator"/>
+    <addaction name="actionIRCIgnores"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -139,12 +141,12 @@
   </action>
   <action name="actionDirect">
    <property name="text">
-    <string>Direct</string>
+    <string>Direct Identities</string>
    </property>
   </action>
   <action name="contactDirectAction">
    <property name="text">
-    <string>Direct</string>
+    <string>Direct Contacts</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -215,6 +217,11 @@
   <action name="actionConnectIRC">
    <property name="text">
     <string>Connect IRC</string>
+   </property>
+  </action>
+  <action name="actionIRCIgnores">
+   <property name="text">
+    <string>IRC Ignores</string>
    </property>
   </action>
  </widget>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>IrcChannelGroup</class>
- <widget class="QDialog" name="IrcChannelGroup">
+ <class>IrcFloat</class>
+ <widget class="QDialog" name="IrcFloat">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,15 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>IRC Channels</string>
+   <string>IRC Channel</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="currentIndex">
-      <number>-1</number>
-     </property>
-    </widget>
+    <layout class="QGridLayout" name="mainLayout"/>
    </item>
   </layout>
  </widget>

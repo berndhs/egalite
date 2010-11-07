@@ -1,5 +1,5 @@
-#ifndef IRC_CHANNEL_GROUP_H
-#define ITC_CHANNEL_GROUP_H
+
+#include "irc-float.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -21,37 +21,34 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-channel-group.h"
-#include <QIcon>
 
 namespace egalite
 {
 
-class IrcChannelBox;
-
-class IrcChannelGroup : public QDialog
+IrcFloat::IrcFloat (QWidget *parent)
+  :QDialog (parent),
+   chanBox (0)
 {
-Q_OBJECT
+  ui.setupUi (this);
+}
 
-public:
+void
+IrcFloat::AddChannel (IrcChannelBox *chan)
+{
+  if (chanBox != 0) {
+    return;
+  }
+  chanBox = chan;
+  ui.mainLayout->addWidget (chanBox, 0,0,1,1);
+  chan->show ();
+}
 
-  IrcChannelGroup (QWidget *parent=0);
-
-  void AddChannel (IrcChannelBox * chan);
-  void RemoveChannel (IrcChannelBox * chan);
-  void MarkActive (IrcChannelBox * chan, bool active);
-  bool HaveChannel (IrcChannelBox * chan);
- 
-  void Close ();
-
-private:
-
-  Ui_IrcChannelGroup    ui;
-  QIcon                 activeIcon;
-  QIcon                 quiteIcon;
-
-};
+void
+IrcFloat::RemoveChannel (IrcChannelBox *chan)
+{
+  if (chanBox == chan) {
+    chanBox = 0;
+  }
+}
 
 } // namespace
-
-#endif

@@ -45,10 +45,10 @@ IrcChannelGroup::AddChannel (IrcChannelBox * newchan)
 }
 
 void
-IrcChannelGroup::DropChannel (IrcChannelBox * deadchan)
+IrcChannelGroup::RemoveChannel (IrcChannelBox * chan)
 {
-  if (deadchan) {
-    int index = ui.tabWidget->indexOf (deadchan);
+  if (chan) {
+    int index = ui.tabWidget->indexOf (chan);
     if (index >= 0) {
       ui.tabWidget->removeTab (index);
     }
@@ -67,6 +67,12 @@ IrcChannelGroup::MarkActive (IrcChannelBox * chan, bool active)
                                     ? activeIcon
                                     : quiteIcon));
   }
+}
+
+bool
+IrcChannelGroup::HaveChannel (IrcChannelBox * chan)
+{
+  return (ui.tabWidget->indexOf (chan) >= 0);
 }
 
 void

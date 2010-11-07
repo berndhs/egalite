@@ -47,10 +47,19 @@ void
 IrcChannelBox::SetupMenus ()
 {
   menuBar = new QMenuBar (this);
-  boxMenu = new QMenu ("Channel...", this);
-  menuBar->addMenu (boxMenu);
-  menuBar->addAction (boxMenu->menuAction());
-  actionPart = new QAction ("Leave Channel", this);
+  chanMenu = new QMenu ("Channel", this);
+  viewMenu = new QMenu ("View",this);
+  menuBar->addAction (chanMenu->menuAction());
+  menuBar->addAction (viewMenu->menuAction());
+  actionPart = new QAction ("Leave", this);
+  chanMenu->addAction (actionPart);
+  actionDock = new QAction (QIcon (":/ircicons/dock.png"),"Dock", this);
+  actionDock->setIconVisibleInMenu (true);
+  viewMenu->addAction (actionDock);
+  actionFloat = new QAction (QIcon(":/ircicons/float.png"),"Float",this);
+  actionFloat->setIconVisibleInMenu (true);
+  viewMenu->addAction (actionFloat);
+  
 }
 
 void
@@ -62,6 +71,10 @@ IrcChannelBox::Connect ()
            this, SLOT (TypingFinished ()));
   connect (actionPart, SIGNAL (triggered ()),
            this, SLOT (Part()));
+  connect (actionFloat, SIGNAL (triggered ()),
+           this, SLOT (Float()));
+  connect (actionDock, SIGNAL (triggered ()),
+           this, SLOT (Dock()));
 }
 
 void
@@ -77,9 +90,21 @@ IrcChannelBox::Close ()
 }
 
 void
+IrcChannelBox::Float ()
+{
+  emit WantFloat (this);
+}
+
+void
+IrcChannelBox::Dock ()
+{
+  emit WantDock (this);
+}
+
+void
 IrcChannelBox::Part ()
 {
-  emit Outgoing (name, QString ("PART %1").arg (name));
+  emit Outgoing (name, QString ("/part %1").arg (name));
 }
 
 void

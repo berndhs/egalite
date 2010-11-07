@@ -1,6 +1,7 @@
 tmp/
 bin/
 doxy/
+screenshots/
 *.gz
 *.log
 MakeDChat
