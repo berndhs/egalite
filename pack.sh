@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NAME=egalite
-VERSION=0.3.5
+VERSION=0.3.6
 PACKDIR=${HOME}/packaging/dchat
 
 makearchive.sh ${NAME}-${VERSION} master
