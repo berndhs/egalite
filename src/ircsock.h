@@ -155,6 +155,7 @@ private:
   QTimer      *scriptTimer;
   QString      currentChan;
   QString      currentServer;
+  QString      currentUser;
   bool         waitFirstReceive;
   QString      noNameServer;
   QString      noNameNick;

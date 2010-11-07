@@ -312,10 +312,6 @@ IrcSock::Send (QString data)
         TransformDefault (this, data, first, rest);
       }
     }
-  } else {
-    QString prefix ("PRIVMSG %1 :");
-qDebug () << " prefix " << prefix << " room " << currentChan << " data " << data;
-    data.prepend (prefix.arg (currentChan));
   }
   scriptLines += data;
   RollScript ();
@@ -412,6 +408,7 @@ IrcSock::FakeLogin ()
   scriptLines.append (QString ("USER %1 0 * :%2").arg (nick).arg(real));
   scriptLines.append (QString ("NICK %1").arg (nick));
   QTimer::singleShot (100, this, SLOT (RollScript ()));
+  currentUser = nick;
 }
 
 void
@@ -595,7 +592,6 @@ IrcSock::TransformJOIN (IrcSock * context,
                         QString & first,
                         QString & rest)
 {
-  context->currentChan = rest.split (",").at(0);
   result = first + rest;
 }
 
@@ -617,22 +613,41 @@ IrcSock::ReceiveJOIN (IrcSock * context,
                       const QString & cmd,
                       const QString & rest)
 {
-  Q_UNUSED (first)
   Q_UNUSED (cmd)
   QRegExp wordRx ("(\\S+)");
-  int pos = wordRx.indexIn (rest,0);
+  int pos, len;
+  QString user, chan;
+  pos = wordRx.indexIn (first, 0);
   if (pos >= 0) {
-    int len = wordRx.matchedLength ();
-    QString chan = rest.mid (pos,len);
-qDebug () << " JOIN received, rest is " << rest;
-qDebug () << " chan " << chan;
+    len = wordRx.matchedLength ();
+    user = first.mid (pos,len);
+    QRegExp leadRx ("([^!]+)");
+    pos = leadRx.indexIn (user,0);
+    if (pos >= 0) {
+      user = user.mid (pos, leadRx.matchedLength());
+    }
+    if (user.startsWith (QChar (':'))) {
+      user.remove (0,1);
+    }
+  }
+  pos = wordRx.indexIn (rest,0);
+  if (pos >= 0) {
+    len = wordRx.matchedLength ();
+    chan = rest.mid (pos,len);
+qDebug () << " JOIN received,  " << first << cmd << rest;
+qDebug () << "user " << user << " currentUser " 
+          << context->currentUser << " chan " << chan;
     if (chan.startsWith (QChar(':'))) {
       chan.remove (0,1);
     }
-    if (!context->channels.contains (chan)) {
-      context->AddChannel (chan);
+    if (user == context->currentUser) {
+      if (!context->channels.contains (chan)) {
+        context->AddChannel (chan);
+      }
+    } else {
+      context->mainUi.inLog->append (QString ("user %1 JOINs %2")
+                                    .arg (user) . arg (chan));
     }
-    context->currentChan = chan;
   }
 }
 
@@ -642,17 +657,39 @@ IrcSock::ReceivePART (IrcSock * context,
                      const QString & cmd,
                      const QString & rest)
 {
-  qDebug () << "receive PART " << first << cmd << rest;
+  qDebug () << " PART received " << first << cmd << rest;
   QRegExp wordRx ("(\\S+)");
-  int pos = wordRx.indexIn (rest,0);
+  int pos, len;
+  QString user, chan;
+  pos = wordRx.indexIn (first, 0);
   if (pos >= 0) {
-    int len = wordRx.matchedLength ();
-    QString chan = rest.mid (pos,len);
+    len = wordRx.matchedLength ();
+    user = first.mid (pos,len);
+    QRegExp leadRx ("([^!]+)");
+    pos = leadRx.indexIn (user,0);
+    if (pos >= 0) {
+      user = user.mid (pos, leadRx.matchedLength());
+    }
+    if (user.startsWith (QChar (':'))) {
+      user.remove (0,1);
+    }
+  }
+  pos = wordRx.indexIn (rest,0);
+  if (pos >= 0) {
+    len = wordRx.matchedLength ();
+    chan = rest.mid (pos,len);
     if (chan.startsWith (QChar (':'))) {
       chan.remove (0,1);
     }
 qDebug () << " PART received for channel " << chan;
-    context->DropChannel (chan);
+qDebug () << "user " << user << " currentUser " 
+          << context->currentUser << " chan " << chan;
+    if (user == context->currentUser) {
+      context->DropChannel (chan);
+    } else {
+      context->mainUi.inLog->append (QString ("user %1 PARTs %2")
+                                    .arg (user) . arg (chan));
+    }
   }
 }
 
