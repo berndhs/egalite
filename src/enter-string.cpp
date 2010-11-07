@@ -1,5 +1,5 @@
 
-#include "irc-channel-group.h"
+#include "enter-string.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -21,59 +21,54 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include <QIcon>
-#include "irc-channel-box.h"
 
 namespace egalite
 {
 
-IrcChannelGroup::IrcChannelGroup (QWidget *parent)
+EnterString::EnterString (QWidget *parent)
   :QDialog (parent)
 {
   ui.setupUi (this);
-  activeIcon = QIcon (":/ircicons/active.png");
-  quiteIcon = QIcon (":/ircicons/inactive.png");
-}
-
-void
-IrcChannelGroup::AddChannel (IrcChannelBox * newchan)
-{
-  if (newchan) {
-    QString tabtext = newchan->Name();
-    ui.tabWidget->addTab (newchan, tabtext);
-  }
-}
-
-void
-IrcChannelGroup::DropChannel (IrcChannelBox * deadchan)
-{
-  if (deadchan) {
-    int index = ui.tabWidget->indexOf (deadchan);
-    if (index >= 0) {
-      ui.tabWidget->removeTab (index);
-    }
-    if (ui.tabWidget->count() < 1) {
-      hide ();
-    }
-  }
-}
-
-void
-IrcChannelGroup::MarkActive (IrcChannelBox * chan, bool active)
-{
-  int ndx = ui.tabWidget->indexOf (chan);
-  if (ndx >= 0) {
-    ui.tabWidget->setTabIcon (ndx, (active
-                                    ? activeIcon
-                                    : quiteIcon));
-  }
-}
-
-void
-IrcChannelGroup::Close ()
-{
-  ui.tabWidget->clear ();
+  connect (ui.chooseButton, SIGNAL (clicked()),
+           this, SLOT (DoChoose ()));
+  connect (ui.cancelButton, SIGNAL (clicked()),
+           this, SLOT (DoCancel ()));
   hide ();
 }
+
+bool
+EnterString::Choose  (const QString & title,
+                      const QString & label,
+                      bool hideSave)
+{
+  setWindowTitle (title);
+  ui.textLabel->setText (label);
+  ui.textLine->clear ();
+  ui.saveBox->setChecked (false);
+  if (hideSave) {
+    ui.saveBox->hide ();
+  }
+  int retval = exec ();
+  return (retval != 0);
+}
+
+void
+EnterString::DoChoose ()
+{
+  saveIt = ui.saveBox->isChecked ();
+  value = ui.textLine->text ();
+  haveValue = true;
+  accept ();
+}
+
+void
+EnterString::DoCancel ()
+{
+  saveIt = false;
+  value.clear ();
+  haveValue = false;
+  reject ();
+}
+
 
 } // namespace

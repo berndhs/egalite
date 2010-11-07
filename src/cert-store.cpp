@@ -990,5 +990,133 @@ CertStore::StoreCert ( RemoteType rt,
   }
 }
 
+QStringList
+CertStore::IrcServers ()
+{
+  QString selectStr ("select name from ircservers");
+  QSqlQuery query (certDB);
+  bool ok = query.exec (selectStr);
+  QStringList list;
+  while (ok && query.next ()) {
+    list << query.value (0).toString();
+  }
+  return list;
+}
+
+QStringList
+CertStore::IrcNicks ()
+{
+  QString selectStr ("select inick from ircnicks");
+  QSqlQuery query (certDB);
+  bool ok = query.exec (selectStr);
+  QStringList list;
+  while (ok && query.next ()) {
+    list << query.value (0).toString();
+  }
+  return list;
+}
+
+QStringList
+CertStore::IrcChannels ()
+{
+  QString selectStr ("select channame from ircchannels");
+  QSqlQuery query (certDB);
+  bool ok = query.exec (selectStr);
+  QStringList list;
+  while (ok && query.next ()) {
+    list << query.value (0).toString();
+  }
+  return list;
+}
+
+bool
+CertStore::RemoveIrc (const QString & keytype,
+                      const QString & keyval,
+                      const QString & table)
+{
+  QString cmdString = QString ("delete from %1 where %2 == \"%3\"")
+                    .arg (table)
+                    .arg (keytype)
+                    .arg (keyval);
+  QSqlQuery query (certDB);
+  bool ok = query.exec (cmdString);
+qDebug () << " query " << ok << query.executedQuery();
+  return ok;
+}
+
+bool
+CertStore::RemoveIrcServer (const QString & server)
+{
+  return RemoveIrc ("name",server,"ircservers");
+}
+
+bool
+CertStore::RemoveIrcNick (const QString & nick)
+{
+  return RemoveIrc ("inick", nick, "ircnicks");
+}
+
+bool
+CertStore::RemoveIrcChannel (const QString & chan)
+{
+  return RemoveIrc ("channame", chan, "ircchannels");
+}
+
+void
+CertStore::SaveIrcNick (const QString & nick,
+                        const QString & pass)
+{
+  QString cmd ("insert or replace into ircnicks "
+                  " (inick, ipass) "
+                  " values (?, ?) ");
+  QSqlQuery query (certDB);
+  query.prepare (cmd);
+  query.bindValue (0, QVariant (nick));
+  query.bindValue (1, QVariant (pass));
+  bool ok = query.exec ();
+  qDebug () << " query " << ok << query.executedQuery ();
+}
+
+void
+CertStore::SaveIrcChannel (const QString & chan)
+{
+  QString cmd ("insert or replace into ircchannels "
+               " (channame) "
+               " values (?) ");
+  QSqlQuery query (certDB);
+  query.prepare (cmd);
+  query.bindValue (0, QVariant (chan));
+  bool ok = query.exec ();
+  qDebug () << " query " << ok << query.executedQuery ();
+}
+
+void
+CertStore::SaveIrcServer (const QString & server)
+{
+  QString cmd ("insert or replace into ircservers "
+               " (name) "
+               " values (?) ");
+  QSqlQuery query (certDB);
+  query.prepare (cmd);
+  query.bindValue (0, QVariant (server));
+  bool ok = query.exec ();
+  qDebug () << " query " << ok << query.executedQuery ();
+}
+
+bool
+CertStore::GetIrcPass (const QString & nick, QString & pass)
+{
+  QString cmdPat ("select ipass from ircnicks "
+                  " where inick == \"%1\"");
+  QSqlQuery query (certDB);
+  bool ok = query.exec (cmdPat.arg (nick));
+  if (ok && query.next ()) {
+    pass = query.value (0).toString ();
+  qDebug () << " query " << ok << query.executedQuery ();
+    return true;
+  }
+  return false;
+}
+
 } // namespace
 

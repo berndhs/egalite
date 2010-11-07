@@ -96,6 +96,18 @@ public:
 
   void        EnsureNobody ();
 
+  QStringList IrcServers ();
+  QStringList IrcNicks ();
+  QStringList IrcChannels ();
+  bool        GetIrcPass (const QString & nick, QString & pass);
+  void        SaveIrcServer (const QString & server);
+  void        SaveIrcChannel (const QString & chan);
+  void        SaveIrcNick (const QString & nick, 
+                           const QString & pass = QString());
+  bool        RemoveIrcServer (const QString & server);
+  bool        RemoveIrcNick (const QString & nick);
+  bool        RemoveIrcChannel (const QString & chan);
+
 public slots:
 
   /** \brief CertDialog - gui to add/remove/edit identities. */
@@ -154,6 +166,10 @@ private:
   QStringList  CertList (const QString &table);
 
   QString ElementType (QString name);
+ 
+  bool RemoveIrc (const QString & keytype,
+                  const QString & keyval,
+                  const QString & table);
 
   QWidget         *parentWidget;
   Ui_ListIdentity  uiListCert;

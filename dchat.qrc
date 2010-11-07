@@ -80,5 +80,9 @@
   <file alias="user-offline.png">images/64x64/status/user-offline.png</file>
   <file alias="user-online.png">images/64x64/status/user-online.png</file>
 </qresource>
+<qresource prefix="ircicons">
+  <file alias="active.png">images/irc/user-online.png</file>
+  <file alias="inactive.png">images/irc/user-invisible.png</file>
+</qresource>
 </RCC>
 

@@ -123,6 +123,7 @@ FORMS = \
         ui/irc-channel-group.ui \
         ui/irc-channel-box.ui \
         ui/irc-sock.ui \
+        ui/enter-string.ui \
 
 
 
@@ -157,6 +158,7 @@ SOURCES = src/main.cpp \
         src/irc-channel-group.cpp \
         src/irc-channel-box.cpp \
         src/ircsock.cpp \
+        src/enter-string.cpp \
 
 
 
@@ -193,6 +195,7 @@ HEADERS = \
         src/irc-channel-box.h \
         src/ircsock.h \
         src/irc-channel-group.h \
+        src/enter-string.h \
 
 
 

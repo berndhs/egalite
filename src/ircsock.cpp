@@ -27,6 +27,8 @@
 #include "helpview.h"
 #include "irc-channel-box.h"
 #include "irc-channel-group.h"
+#include "cert-store.h"
+#include "enter-string.h"
 #include <QSize>
 #include <QDebug>
 #include <QMessageBox>
@@ -84,11 +86,17 @@ IrcSock::Run ()
   groupBoxSize = Settings().value ("sizes/channelgroup", groupBoxSize)
                            .toSize();
   channelGroup->resize (groupBoxSize);
-  Settings().setValue ("sizes/ircsock",newsize);
-  QString defServ = Settings().value ("defaults/ircserver", 
-                     QString ("chat.freenode.net")).toString();
-  Settings().setValue ("defaults/ircserver",defServ);
-  mainUi.serverEdit->setText (defServ);
+  QStringList  servers = CertStore::IF().IrcServers ();
+  noNameServer = tr("--- New Server ---");
+  servers.append (noNameServer);
+  mainUi.serverCombo->clear ();
+  mainUi.serverCombo->insertItems (0,servers);
+  QStringList  nicks = CertStore::IF().IrcNicks ();
+  noNameNick = tr ("--- New Nick ---");
+  nicks.append (noNameNick);
+  mainUi.nickCombo->clear ();
+  mainUi.nickCombo->insertItems (0,nicks);
+
   show ();
   return true;
 }
@@ -112,6 +120,17 @@ IrcSock::Connect ()
            this, SLOT (SendScript ()));
   connect (mainUi.loginButton, SIGNAL (clicked()),
            this, SLOT (FakeLogin ()));
+  connect (mainUi.exitButton, SIGNAL (clicked ()),
+           this, SLOT (Exit ()));
+}
+
+void
+IrcSock::Exit ()
+{
+  TryDisconnect ();
+  CloseCleanup ();
+  channelGroup->Close ();
+  hide ();
 }
 
 
@@ -129,7 +148,7 @@ IrcSock::CloseCleanup ()
     logOutgoing->write (QByteArray ("\n"));
   }
   QSize currentSize = size();
-  Settings().setValue ("sizes/main",currentSize);
+  Settings().setValue ("sizes/ircsock",currentSize);
   QSize  groupBoxSize = channelGroup->size();
   Settings().setValue ("sizes/channelgroup", groupBoxSize);
   Settings().sync();
@@ -174,7 +193,19 @@ IrcSock::SetOutLog (const QString & filename)
 void
 IrcSock::TryConnect ()
 {
-  QString host = mainUi.serverEdit->text();
+  QString host = mainUi.serverCombo->currentText();
+  if (host == noNameServer) {
+    EnterString  enter (this);
+    bool picked = enter.Choose (tr("IRC Server"), tr("Server:"));
+    if (picked) {
+      host = enter.Value ();
+      if (enter.Save()) {
+        CertStore::IF().SaveIrcServer (host);
+      }
+    } else {
+      return;
+    }
+  }
   quint16 port = mainUi.portBox->value ();
   socket->connectToHost (host, port, QTcpSocket::ReadWrite);
   waitFirstReceive = true;
@@ -293,6 +324,13 @@ IrcSock::SendScript ()
 {
   scriptLines += mainUi.scriptEdit->toPlainText().split ("\n");
   mainUi.scriptEdit->clear ();
+  RollScript ();
+}
+
+void
+IrcSock::RollScript ()
+{
+  SendScriptHead ();
   scriptTimer->start (2000);
 }
 
@@ -347,17 +385,24 @@ IrcSock::SockError (QAbstractSocket::SocketError err)
 void
 IrcSock::FakeLogin ()
 {
-  QString defLogin = Settings().value ("defaults/login", 
-                     QString ("./login-script")).toString();
-  Settings().setValue ("defaults/login",defLogin);
-  QFile script (defLogin);
-  bool ok = script.open (QFile::ReadOnly);
-  if (ok) {
-    while (!script.atEnd()) {
-      QString line = script.readLine (1024);
-      mainUi.scriptEdit->append (line);
+  QString nick = mainUi.nickCombo->currentText();
+  if (nick == noNameNick) {
+    EnterString  enter (this);
+    bool picked = enter.Choose (tr("IRC Nick"), tr("Nick:"), true);
+    if (picked) {
+      nick = enter.Value ();
+    } else {
+      return; 
     }
   }
+  QString pass;
+  bool  havePass = CertStore::IF().GetIrcPass (nick, pass);
+  if (havePass) {
+    scriptLines.append (QString ("PASS :%1").arg(pass));
+  }
+  scriptLines.append (QString ("USER %1 0 * :%1").arg (nick));
+  scriptLines.append (QString ("NICK %1").arg (nick));
+  QTimer::singleShot (100, this, SLOT (RollScript ()));
 }
 
 void
@@ -423,6 +468,16 @@ IrcSock::InUserMsg (const QString & from,
                     const QString & to, 
                     const QString & msg)
 {
+  if (!channels.contains (from)) {
+    AddChannel (from);
+  }
+  if (channels.contains (from)) {
+    QString themsg = msg.trimmed();
+    if (themsg.startsWith (QChar (':'))) {
+      themsg.remove (0,1);
+    }
+    channels [from]->Incoming (QString ("%1: %2").arg(from).arg(themsg));
+  }
   mainUi.inLog->append (QString ("Message from %1 to %2 says %3")
                              .arg (from)
                              .arg (to)
@@ -537,7 +592,7 @@ IrcSock::ReceivePRIVMSG (IrcSock * context,
     if (context->channels.contains (dest)) {
       context->InChanMsg (dest, source, msg);
     } else {
-      context->InUserMsg (first, dest, msg);
+      context->InUserMsg (source, dest, msg);
     }
   }
 }

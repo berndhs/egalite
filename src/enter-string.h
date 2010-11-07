@@ -1,5 +1,5 @@
-#ifndef IRC_CHANNEL_GROUP_H
-#define ITC_CHANNEL_GROUP_H
+#ifndef ENTER_STRING_H
+#define ENTER_STRING_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -21,34 +21,39 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-channel-group.h"
-#include <QIcon>
+
+#include "ui_enter-string.h"
 
 namespace egalite
 {
 
-class IrcChannelBox;
-
-class IrcChannelGroup : public QDialog
+class EnterString : public QDialog
 {
 Q_OBJECT
 
 public:
 
-  IrcChannelGroup (QWidget *parent=0);
+  EnterString (QWidget *parent = 0);
 
-  void AddChannel (IrcChannelBox * newchan);
-  void DropChannel (IrcChannelBox * deadchan);
-  void MarkActive (IrcChannelBox * chan, bool active);
- 
-  void Close ();
+  bool Choose (const QString & title,
+               const QString & label,
+               bool  hideSave = false);
+  QString  Value () { return value; }
+  bool     Save ()  { return saveIt; }
+  bool     HaveValue () { return haveValue; }
+
+private slots:
+
+  void   DoChoose ();
+  void   DoCancel ();
 
 private:
 
-  Ui_IrcChannelGroup    ui;
-  QIcon                 activeIcon;
-  QIcon                 quiteIcon;
+  Ui_GetStringSave   ui;
 
+  bool    haveValue;
+  QString value;
+  bool    saveIt;
 };
 
 } // namespace

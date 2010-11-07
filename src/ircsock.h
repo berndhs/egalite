@@ -63,6 +63,7 @@ public slots:
 
 private slots:
 
+  void Exit ();
   void Exiting ();
   void TryConnect ();
   void TryDisconnect ();
@@ -77,6 +78,7 @@ private slots:
   void Outgoing (QString chan, QString msg);
   
   void SendScript ();
+  void RollScript ();
   void SendScriptHead ();
   void Send ();
   void Send (QString data);
@@ -144,6 +146,8 @@ private:
   QString      currentChan;
   QString      currentServer;
   bool         waitFirstReceive;
+  QString      noNameServer;
+  QString      noNameNick;
 
   QMap <QString, void (*) (IrcSock*, QString &, QString &, QString &)>  
                commandXform;

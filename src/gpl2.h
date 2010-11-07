@@ -1,5 +1,4 @@
-#ifndef IRC_CHANNEL_GROUP_H
-#define ITC_CHANNEL_GROUP_H
+
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -21,36 +20,4 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-channel-group.h"
-#include <QIcon>
 
-namespace egalite
-{
-
-class IrcChannelBox;
-
-class IrcChannelGroup : public QDialog
-{
-Q_OBJECT
-
-public:
-
-  IrcChannelGroup (QWidget *parent=0);
-
-  void AddChannel (IrcChannelBox * newchan);
-  void DropChannel (IrcChannelBox * deadchan);
-  void MarkActive (IrcChannelBox * chan, bool active);
- 
-  void Close ();
-
-private:
-
-  Ui_IrcChannelGroup    ui;
-  QIcon                 activeIcon;
-  QIcon                 quiteIcon;
-
-};
-
-} // namespace
-
-#endif
