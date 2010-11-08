@@ -40,7 +40,7 @@
 #include "ui_request-subscribe.h"
 #include "account-edit.h"
 #include "cert-list-edit.h"
-#include "ircsock.h"
+#include "irc-sock.h"
 
 #include <map>
 
