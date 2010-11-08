@@ -53,7 +53,7 @@ public:
   void DropName (const QString & name);
 
   QString Topic () { return topic; }
-  QString Name ()  { return name; }
+  QString Name ()  { return chanName; }
 
 public slots:
 
@@ -84,9 +84,11 @@ signals:
 private:
 
    void   Connect ();
+   void   BalanceSplitter ();
+   void   AppendSmall (QTextBrowser* log, const QString & line);
 
    Ui_IrcChannelBox    ui;
-   QString             name;
+   QString             chanName;
    QString             topic;
    QStringList         oldNames;
 

@@ -512,9 +512,13 @@ IrcSock::Outgoing (QString chan, QString msg)
   }
   if (trim.startsWith (QChar ('/')) ){
     Send (trim);
+    trim.prepend (QString (":%1!%1@localhost ").arg (currentUser));
+    ReceiveLine (trim.toUtf8());
   } else {
     QString data (QString ("PRIVMSG %1 :%2").arg (chan). arg (msg));
     SendData (data);
+    data.prepend (QString (":%1!%1@localhost ").arg (currentUser));
+    ReceiveLine (data.toUtf8());
   }
 }
 

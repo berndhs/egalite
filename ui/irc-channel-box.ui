@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>574</width>
-    <height>354</height>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -78,11 +78,78 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="4">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+    <widget class="QSplitter" name="horizonSplitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
       <widget class="QTextBrowser" name="chanHistory">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>8</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+      <widget class="QTextBrowser" name="rawLog">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>8</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Users</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="chanUsers">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>500</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="4">
+    <layout class="QHBoxLayout" name="sendlineLayout" stretch="0,1">
+     <item>
+      <widget class="QLineEdit" name="textEnter">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>90</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -90,30 +157,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="chanUsers">
+      <widget class="QPushButton" name="sendButton">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>20</horstretch>
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>10</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
-       <property name="alternatingRowColors">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0" colspan="4">
-    <layout class="QHBoxLayout" name="sendlineLayout" stretch="5,1">
-     <item>
-      <widget class="QLineEdit" name="textEnter"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="sendButton">
        <property name="text">
         <string>Send</string>
        </property>

@@ -39,7 +39,7 @@ namespace egalite
 
 IrcChannelBox::IrcChannelBox (const QString & name, QWidget *parent)
   :QWidget (parent),
-   name (name)
+   chanName (name)
 {
   ui.setupUi (this);
   ui.chanTopic->setOpenLinks (false);
@@ -51,8 +51,30 @@ IrcChannelBox::IrcChannelBox (const QString & name, QWidget *parent)
   ui.dockButton->setAutoDefault (false);
   ui.dockButton->setDefault (false);
   Connect ();
-  SetTopic (tr("Channel %1").arg (name));
+  SetTopic (tr("Channel %1").arg (chanName));
   show ();
+  BalanceSplitter ();
+}
+
+void
+IrcChannelBox::BalanceSplitter ()
+{
+  QList <int> widList = ui.horizonSplitter->sizes();
+  int numParts = widList.size();
+  int totWid (0);
+  for (int i=0; i<numParts; i++) {
+    totWid += widList[i];
+  }
+  int firstWid = (totWid * 80) / 100;
+  widList[0] = firstWid;
+  widList[1] = totWid - firstWid;
+  for (int i=2; i< numParts; i++) {
+    widList[i] = 0;
+  }
+qDebug () << " resized width list " << widList;
+  ui.horizonSplitter->setSizes (widList);
+  update ();
+qDebug () << " resulting width list " << ui.horizonSplitter->sizes();
 }
 
 
@@ -98,7 +120,7 @@ IrcChannelBox::Dock ()
 void
 IrcChannelBox::Part ()
 {
-  emit Outgoing (name, QString ("/part %1").arg (name));
+  emit Outgoing (chanName, QString ("/part %1").arg (chanName));
 }
 
 void
@@ -131,6 +153,7 @@ IrcChannelBox::AddNames (const QString & names)
   ui.chanUsers->clear();
   ui.chanUsers->addItems (oldNames);
   ui.chanUsers->sortItems();
+  QStringList::iterator sit;
 }
 
 void
@@ -142,6 +165,8 @@ IrcChannelBox::AddName (const QString & name)
   ui.chanUsers->clear();
   ui.chanUsers->addItems (oldNames);
   ui.chanUsers->sortItems();
+  ui.rawLog->append (tr("Enter: %1").arg(name));
+  AppendSmall (ui.chanHistory, tr("-> Enter: %1").arg(name));
 }
 
 void
@@ -151,6 +176,8 @@ IrcChannelBox::DropName (const QString & name)
   ui.chanUsers->clear();
   ui.chanUsers->addItems (oldNames);
   ui.chanUsers->sortItems();
+  ui.rawLog->append (tr("Exit: %1").arg(name));
+  AppendSmall (ui.chanHistory, tr("<- Exit: %1").arg(name));
 }
 
 void
@@ -158,8 +185,9 @@ IrcChannelBox::TypingFinished ()
 {
   QString msg = ui.textEnter->text();
   if (msg.trimmed().length() > 0) {
-    emit Outgoing (name, ui.textEnter->text());
+    emit Outgoing (chanName, msg);
   }
+  ui.rawLog->append (msg);
   ui.textEnter->clear ();
 }
 
@@ -174,6 +202,13 @@ IrcChannelBox::Link (const QUrl & url)
   } else {
     QDesktopServices::openUrl (url);
   }
+}
+
+void
+IrcChannelBox::AppendSmall (QTextBrowser * log, const QString & line)
+{
+  log->append (QString ("<span style=\"font-size: small\">%1</span>")
+                       .arg (line));
 }
 
 void
