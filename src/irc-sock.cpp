@@ -47,13 +47,15 @@ namespace egalite
 IrcSock::IrcSock (QWidget *parent)
   :QDialog (parent),
    initDone (false),
+   isRunning (false),
    socket (0),
+   isConnected (false),
    pingTimer (0),
    scriptTimer (0),
    waitFirstReceive (false)
 {
   mainUi.setupUi (this);
-  dockedChannels = new IrcChannelGroup (this);
+  dockedChannels = new IrcChannelGroup (parentWidget ());
   dockedChannels->hide ();
   socket = new QTcpSocket (this);
   pingTimer = new QTimer (this);
@@ -80,6 +82,9 @@ qDebug () << " IrcSock allocated and initialized";
 bool
 IrcSock::Run ()
 {
+  if (isRunning) {
+    return true;
+  }
   qDebug () << " Start IrcSock";
   QSize defaultSize = size();
   QSize newsize = Settings().value ("sizes/ircsock", defaultSize).toSize();
@@ -98,8 +103,8 @@ IrcSock::Run ()
   nicks.append (noNameNick);
   mainUi.nickCombo->clear ();
   mainUi.nickCombo->insertItems (0,nicks);
-
   show ();
+  isRunning = true;
   return true;
 }
 
@@ -173,6 +178,17 @@ IrcSock::TryConnect ()
   quint16 port = mainUi.portBox->value ();
   socket->connectToHost (host, port, QTcpSocket::ReadWrite);
   waitFirstReceive = true;
+}
+
+int
+IrcSock::OpenCount ()
+{
+  if (socket) {
+    if (isConnected) {
+      return 1;
+    }
+  }
+  return 0;
 }
 
 void
@@ -341,11 +357,13 @@ IrcSock::ConnectionReady ()
   font.setStrikeOut (false);
   mainUi.peerAddressLabel->setFont (font);
   ignoreSources = CertStore::IF().IrcIgnores ();
+  isConnected = true;
 }
 
 void
 IrcSock::ConnectionGone ()
 {
+  isConnected = false;
   pingTimer->stop ();
   qDebug () << " disconnect seen for " << socket;
   mainUi.logDisplay->append (QString ("!!! disconnected from %1")

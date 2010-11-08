@@ -72,9 +72,13 @@ DChatMain::DChatMain (QWidget *parent)
    debugTimer (0),
    xmppTimer (0),
    announceHeartbeat (0),
-   directHeartPeriod (60)
+   directHeartPeriod (60),
+   statusTimer (0)
 {
   ui.setupUi (this);
+  actionXmppStatus = ui.toolBar->addAction (tr("Xmpp"));
+  actionDirectStatus = ui.toolBar->addAction (tr("Direct"));
+  actionIrcStatus = ui.toolBar->addAction (tr("IRC"));
   ui.contactView->setModel (&contactListModel);
   Connect ();
   debugTimer = new QTimer (this);
@@ -86,6 +90,10 @@ DChatMain::DChatMain (QWidget *parent)
   announceHeartbeat = new QTimer (this);
   connect (announceHeartbeat, SIGNAL (timeout()), this, SLOT (AnnounceMe()));
   announceHeartbeat->start (1000*60*2); // 2 minutes
+  statusTimer = new QTimer (this);
+  connect (statusTimer, SIGNAL (timeout()), this, SLOT (StatusUpdate()));
+  statusTimer->start (10*1000);
+  QTimer::singleShot (1500, this, SLOT (StatusUpdate ()));
   xclientMap.clear ();
   ircSock = new IrcSock (this);
 }
@@ -124,6 +132,31 @@ DChatMain::Run ()
   show ();
   SetupListener ();
   Settings().sync ();
+}
+
+void
+DChatMain::StatusUpdate ()
+{
+  QString directMsg = tr("%1 Direct").arg (inDirect.size());
+  actionDirectStatus->setText (directMsg);
+  QString xmppMsg = tr("%1 Xmpp").arg (xclientMap.size());
+  actionXmppStatus->setText (xmppMsg);
+  QString ircMsg = tr ("%1 IRC").arg (ircSock->OpenCount());
+  actionIrcStatus->setText (ircMsg);
+}
+
+void
+DChatMain::ToggleIrcView ()
+{
+  if (ircSock) {
+    if (!ircSock->IsRunning()) {
+      ircSock->Run();
+    } else if (ircSock->isHidden ()) {
+      ircSock->show();
+    } else {
+      ircSock->hide ();
+    }
+  }
 }
 
 void
@@ -300,6 +333,8 @@ DChatMain::Connect ()
            this, SLOT (StartServerChat (QString, QString)));
   connect (&contactListModel, SIGNAL (NewAccountIndex (QModelIndex)),
            this, SLOT (ExpandAccountView (QModelIndex)));
+  connect (actionIrcStatus, SIGNAL (triggered()),
+           this, SLOT (ToggleIrcView ()));
 }
 
 void
@@ -352,7 +387,10 @@ void
 DChatMain::RunIrc ()
 {
   qDebug () << " start Egalite IRC ";
-  ircSock->Run ();
+  if (!ircSock->IsRunning()) {
+    ircSock->Run ();
+  }
+  ircSock->show();
 }
 
 void

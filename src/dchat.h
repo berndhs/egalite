@@ -105,6 +105,7 @@ private slots:
   void CloseServerChat (QString remoteName);
   void ClearDirect (SymmetricSocket *direct);
   void XmppPoll ();
+  void StatusUpdate ();
   void DebugCheck ();
   void Send (const QXmppMessage & msg);
   void XmppError (QXmppClient::Error err);
@@ -120,6 +121,8 @@ private slots:
   void XmppIqReceived (const QXmppIq & iq);
   void XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq);
   void ExpandAccountView (QModelIndex accountIndex);
+
+  void ToggleIrcView ();
 
 private:
 
@@ -165,7 +168,11 @@ private:
   QTimer       *debugTimer;
   QTimer       *xmppTimer;
   QTimer       *announceHeartbeat;
+  QTimer       *statusTimer;
   int           directHeartPeriod;
+  QAction      *actionDirectStatus;
+  QAction      *actionXmppStatus;
+  QAction      *actionIrcStatus;
 
 
   std::map <QString, XEgalClient*>    xclientMap;

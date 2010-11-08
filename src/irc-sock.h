@@ -48,6 +48,9 @@ public:
 
   IrcSock (QWidget *parent=0);
 
+  int   OpenCount ();
+  bool  IsRunning () { return isRunning; }
+
   void  CloseCleanup ();
 
   void  InChanMsg (const QString & chan, 
@@ -156,10 +159,12 @@ private:
 
   bool             initDone;
   Ui_IrcSockMain   mainUi;
+  bool             isRunning;
 
   IrcChannelGroup  *dockedChannels;
 
   QTcpSocket     *socket;
+  bool            isConnected;
   QByteArray      lineData;
 
   QStringList  scriptLines;
