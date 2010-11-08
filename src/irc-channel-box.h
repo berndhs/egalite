@@ -22,6 +22,7 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include "ui_irc-channel-box.h"
+#include <QStringListModel>
 
 class QMenuBar;
 class QMenu;
@@ -29,6 +30,8 @@ class QAction;
 class QFocusEvent;
 class QShowEvent;
 class QEvent;
+class QUrl;
+class QListWidgetItem;
 
 namespace egalite
 {
@@ -41,10 +44,13 @@ public:
 
   IrcChannelBox (const QString & name, QWidget *parent=0);
 
-  void Run ();
   void Close ();
 
   void SetTopic (const QString & newTopic);
+
+  void AddNames (const QString & names);
+  void AddName (const QString & name);
+  void DropName (const QString & name);
 
   QString Topic () { return topic; }
   QString Name ()  { return name; }
@@ -59,6 +65,8 @@ public slots:
 private slots:
 
   void TypingFinished ();
+  void Link (const QUrl & url);
+  void ClickedUser (QListWidgetItem * item);
 
 protected:
 
@@ -76,17 +84,12 @@ signals:
 private:
 
    void   Connect ();
-   void   SetupMenus ();
 
    Ui_IrcChannelBox    ui;
-   QMenuBar           *menuBar;
-   QMenu              *chanMenu;
-   QMenu              *viewMenu;
-   QAction            *actionPart;
-   QAction            *actionDock;
-   QAction            *actionFloat;
    QString             name;
    QString             topic;
+   QStringList         oldNames;
+
 
 };
 

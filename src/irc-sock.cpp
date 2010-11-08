@@ -1,4 +1,4 @@
-#include "ircsock.h"
+#include "irc-sock.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -48,8 +48,6 @@ IrcSock::IrcSock (QWidget *parent)
   :QDialog (parent),
    initDone (false),
    socket (0),
-   logIncoming (0),
-   logOutgoing (0),
    pingTimer (0),
    scriptTimer (0),
    waitFirstReceive (false)
@@ -72,6 +70,9 @@ IrcSock::IrcSock (QWidget *parent)
   receiveHandler ["PRIVMSG"] = IrcSock::ReceivePRIVMSG;
   receiveHandler ["JOIN"] = IrcSock::ReceiveJOIN;
   receiveHandler ["PART"] = IrcSock::ReceivePART;
+  receiveHandler ["332"] = IrcSock::Receive332;
+  receiveHandler ["353"] = IrcSock::Receive353;
+  receiveHandler ["366"] = IrcSock::Receive366;
   receiveHandler ["VERSION"] = IrcSock::ReceiveIgnore;
 qDebug () << " IrcSock allocated and initialized";
 }
@@ -117,8 +118,8 @@ IrcSock::Connect ()
            this, SLOT (TryDisconnect ()));
   connect (mainUi.sendButton, SIGNAL (clicked()),
            this, SLOT (Send ()));
-  connect (mainUi.sendScriptButton, SIGNAL (clicked()),
-           this, SLOT (SendScript ()));
+  connect (mainUi.sendEdit, SIGNAL (returnPressed()),
+           this, SLOT (Send ()));
   connect (mainUi.loginButton, SIGNAL (clicked()),
            this, SLOT (FakeLogin ()));
   connect (mainUi.exitButton, SIGNAL (clicked ()),
@@ -138,16 +139,6 @@ IrcSock::Exit ()
 void
 IrcSock::CloseCleanup ()
 {
-  if (logIncoming) {
-    logIncoming->write (QByteArray("Finished Logging Incoming "));
-    logIncoming->write (QDateTime::currentDateTime().toString().toUtf8());
-    logIncoming->write (QByteArray ("\n"));
-  }
-  if (logOutgoing) {
-    logOutgoing->write (QByteArray("Finished Logging Outgoing "));
-    logOutgoing->write (QDateTime::currentDateTime().toString().toUtf8());
-    logOutgoing->write (QByteArray ("\n"));
-  }
   QSize currentSize = size();
   Settings().setValue ("sizes/ircsock",currentSize);
   QSize  groupBoxSize = dockedChannels->size();
@@ -161,34 +152,6 @@ IrcSock::Exiting ()
   QSize currentSize = size();
   Settings().setValue ("sizes/ircsock",currentSize);
   Settings().sync();
-}
-
-void
-IrcSock::SetInLog (const QString & filename)
-{
-  logIncoming = new QFile (filename, this);
-  bool isopen = logIncoming->open (QFile::WriteOnly);
-  if (isopen) {
-    qDebug () << " Logging to file " << logIncoming->fileName();
-    logIncoming->write (QByteArray ("Start logging"));
-    logIncoming->write (QDateTime::currentDateTime().toString().toUtf8());
-  } else {
-    qDebug () << " Cannot open log file to write " << filename;
-  }
-}
-
-void
-IrcSock::SetOutLog (const QString & filename)
-{
-  logOutgoing = new QFile (filename, this);
-  bool isopen = logOutgoing->open (QFile::WriteOnly);
-  if (isopen) {
-    qDebug () << " Logging to file " << logOutgoing->fileName();
-    logOutgoing->write (QByteArray ("Start logging"));
-    logOutgoing->write (QDateTime::currentDateTime().toString().toUtf8());
-  } else {
-    qDebug () << " Cannot open log file to write " << filename;
-  }
 }
 
 void
@@ -221,10 +184,37 @@ IrcSock::TryDisconnect ()
 void
 IrcSock::Receive ()
 {
-  mainUi.inLog->append (QString ("!!! data ready %1 bytes")
+  mainUi.logDisplay->append (QString ("!!! data ready %1 bytes")
                           .arg (socket->bytesAvailable ()));
   QByteArray bytes = socket->readAll ();
-  QString data (bytes);
+qDebug () << " got " << bytes.size() << " bytes " << bytes;
+  QByteArray last2 = lineData.right(2);
+  if (last2.size () < 2) {
+    last2.prepend ("??");
+    last2 = last2.right (2);
+  }
+  int nb = bytes.size();
+  char byte;
+  char last0, last1;
+  last0 = last2[0];
+  last1 = last2[1];
+  for (int b=0; b< nb; b++) {
+    byte = bytes[b];
+    lineData.append (byte);
+    last0 = last1;
+    last1 = byte;
+    if (last0 == '\r' && last1 == '\n') {
+      QByteArray lineCopy = lineData;
+      ReceiveLine (lineCopy);
+      lineData.clear ();
+    }
+  }
+}
+
+void
+IrcSock::ReceiveLine (const QByteArray & line)
+{
+  QString data (QString::fromUtf8(line.data()));
 qDebug () << " received " << data;
   if (data.startsWith(QChar (':'))) {
     QRegExp wordRx ("(\\S+)");
@@ -240,6 +230,7 @@ qDebug () << " received " << data;
       if (waitFirstReceive) {
         waitFirstReceive = false;
         currentServer = first;
+        qDebug () << " set current server " << currentServer;
       }
       pos = wordRx.indexIn (data,pos+len+1);
       if (pos >= 0) {
@@ -259,10 +250,7 @@ qDebug () << " received " << data;
       ReceiveDefault (this, first, cmd, rest);
     }
   }  
-  mainUi.inLog->append (QString (bytes));
-  if (logIncoming) {
-    logIncoming->write (bytes);
-  }
+  mainUi.logDisplay->append (QString (line));\
 }
 
 void
@@ -282,11 +270,8 @@ IrcSock::SendData (const QString & data)
   QByteArray copy = copyStr.toUtf8();
   qint64 written = socket->write (copy);
 qDebug () << " sent to socket: " << copy;
-  mainUi.outLog->append (data);
-  mainUi.outLog->append (QString ("!!! wrote %1 bytes").arg (written));
-  if (logOutgoing) {
-    logOutgoing->write (copy);
-  }
+  mainUi.logDisplay->append (data);
+  mainUi.logDisplay->append (QString ("!!! wrote %1 bytes").arg (written));
 }
 
 void
@@ -318,14 +303,6 @@ IrcSock::Send (QString data)
 }
 
 void
-IrcSock::SendScript ()
-{
-  scriptLines += mainUi.scriptEdit->toPlainText().split ("\n");
-  mainUi.scriptEdit->clear ();
-  RollScript ();
-}
-
-void
 IrcSock::RollScript ()
 {
   SendScriptHead ();
@@ -346,15 +323,17 @@ IrcSock::SendScriptHead ()
 void
 IrcSock::DidSend (qint64 bytes)
 {
-  mainUi.outLog->append (QString ("!!! did send %1 bytes").arg(bytes));
+  mainUi.logDisplay->append (QString ("!!! did send %1 bytes").arg(bytes));
 }
 
 void
 IrcSock::ConnectionReady ()
 {
-  pingTimer->start (2*60*1000);
-  mainUi.outLog->append ("!!! Connection Ready");
-  mainUi.outLog->append (QString ("!!! peer address %1")
+  waitFirstReceive = true;
+  pingTimer->start (1*60*1000);
+  QTimer::singleShot (30000, this, SLOT (SendPing()));
+  mainUi.logDisplay->append ("!!! Connection Ready");
+  mainUi.logDisplay->append (QString ("!!! peer address %1")
                  .arg (socket->peerAddress().toString()));
   mainUi.peerAddressLabel->setText (socket->peerAddress().toString());
   qDebug () << " connection ready " << socket->peerAddress().toString();
@@ -369,7 +348,7 @@ IrcSock::ConnectionGone ()
 {
   pingTimer->stop ();
   qDebug () << " disconnect seen for " << socket;
-  mainUi.outLog->append (QString ("!!! disconnected from %1")
+  mainUi.logDisplay->append (QString ("!!! disconnected from %1")
                  .arg (socket->peerAddress().toString()));
   QFont font = mainUi.peerAddressLabel->font ();
   font.setStrikeOut (true);
@@ -499,7 +478,6 @@ void
 IrcSock::Outgoing (QString chan, QString msg)
 {
   QString trim = msg.trimmed ();
-qDebug () << " outgoing " << msg << trim;
   if (trim.length () < 1) {
     return;
   }
@@ -524,7 +502,8 @@ IrcSock::InChanMsg (const QString & chan,
     if (themsg.startsWith (QChar (':'))) {
       themsg.remove (0,1);
     }
-    channels [chan]->Incoming (QString ("%1: %2").arg(from).arg(themsg));
+    channels [chan]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
+                                  arg(from).arg(themsg));
   }
 }
 
@@ -545,9 +524,10 @@ IrcSock::InUserMsg (const QString & from,
     if (themsg.startsWith (QChar (':'))) {
       themsg.remove (0,1);
     }
-    channels [from]->Incoming (QString ("%1: %2").arg(from).arg(themsg));
+    channels [from]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
+                                  arg(from).arg(themsg));
   }
-  mainUi.inLog->append (QString ("Message from %1 to %2 says %3")
+  mainUi.logDisplay->append (QString ("Message from %1 to %2 says %3")
                              .arg (from)
                              .arg (to)
                              .arg (msg));
@@ -556,7 +536,47 @@ IrcSock::InUserMsg (const QString & from,
 void
 IrcSock::LogRaw (const QString & raw)
 {
-  mainUi.inLog->append (raw);
+  mainUi.logDisplay->append (raw);
+}
+
+void
+IrcSock::AddNames (const QString & chanName, const QString & names)
+{
+  if (!channels.contains (chanName)) {
+    return;
+  }
+  IrcChannelBox * chan = channels [chanName];
+  chan->AddNames (names);
+}
+
+void
+IrcSock::AddName (const QString & chanName, const QString & name)
+{
+  if (!channels.contains (chanName)) {
+    return;
+  }
+  IrcChannelBox * chan = channels [chanName];
+  chan->AddName (name);
+}
+
+void
+IrcSock::DropName (const QString & chanName, const QString & name)
+{
+  if (!channels.contains (chanName)) {
+    return;
+  }
+  IrcChannelBox * chan = channels [chanName];
+  chan->DropName (name);
+}
+
+void
+IrcSock::SetTopic (const QString & chanName, const QString & topic)
+{
+  if (!channels.contains (chanName)) {
+    return;
+  }
+  IrcChannelBox * chan = channels [chanName];
+  chan->SetTopic (topic);
 }
 
 void
@@ -645,7 +665,8 @@ qDebug () << "user " << user << " currentUser "
         context->AddChannel (chan);
       }
     } else {
-      context->mainUi.inLog->append (QString ("user %1 JOINs %2")
+      context->AddName (chan, user);
+      context->mainUi.logDisplay->append (QString ("user %1 JOINs %2")
                                     .arg (user) . arg (chan));
     }
   }
@@ -687,7 +708,8 @@ qDebug () << "user " << user << " currentUser "
     if (user == context->currentUser) {
       context->DropChannel (chan);
     } else {
-      context->mainUi.inLog->append (QString ("user %1 PARTs %2")
+      context->DropName (chan, user);
+      context->mainUi.logDisplay->append (QString ("user %1 PARTs %2")
                                     .arg (user) . arg (chan));
     }
   }
@@ -755,7 +777,74 @@ IrcSock::ReceiveIgnore (IrcSock * context,
   qDebug () << " Ignoring command " << cmd;
 }
 
+void
+IrcSock::Receive332 (IrcSock * context,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest)
+{
+  qDebug () << " Received 332 " << first << cmd << rest;
+  QRegExp wordRx ("(\\S+)");
+  int pos, len;
+  QString user, chan, topic;
+  pos = wordRx.indexIn (rest, 0);
+  if (pos >= 0) {
+    len = wordRx.matchedLength();
+    user = rest.mid (pos, len);
+    pos = wordRx.indexIn (rest, pos+len);
+    if (pos >= 0) {
+      len = wordRx.matchedLength ();
+      chan = rest.mid (pos, len);
+      topic = rest.mid (pos+len, -1).trimmed ();
+      if (topic.startsWith (QChar (':'))) {
+        topic.remove (0,1);
+      }
+      context->SetTopic (chan, topic);
+    }
+  }
+}
 
+void
+IrcSock::Receive353 (IrcSock * context,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest)
+{
+  qDebug () << " Received 353 " << first << cmd << rest;
+  QRegExp wordRx ("(\\S+)");
+  int pos, len;
+  QString user, marker, chan;
+  pos = wordRx.indexIn (rest, 0);
+  if (pos >= 0) {
+    len = wordRx.matchedLength();
+    user = rest.mid (pos, len);
+    pos = wordRx.indexIn (rest, pos+len);
+    if (pos >= 0) {
+      len = wordRx.matchedLength ();
+      marker = rest.mid (pos, len);
+      pos = wordRx.indexIn (rest, pos+len);
+      if (pos >= 0) {
+        len = wordRx.matchedLength ();
+        chan = rest.mid (pos,len);
+        QString nameData = rest.mid (pos+len,-1).trimmed ();
+        if (nameData.startsWith (QChar(':'))) {
+          nameData.remove (0,1);
+        }
+        context->AddNames (chan, nameData);
+      }
+    }
+  }
+}
+
+
+void
+IrcSock::Receive366 (IrcSock * context,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest)
+{
+  qDebug () << " Received 366 " << first << cmd << rest;
+}
 
 } // namespace
 

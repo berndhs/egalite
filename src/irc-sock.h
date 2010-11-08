@@ -50,9 +50,6 @@ public:
 
   void  CloseCleanup ();
 
-  void  SetInLog (const QString & filename);
-  void  SetOutLog (const QString & filename);
-
   void  InChanMsg (const QString & chan, 
                    const QString & form,
                    const QString & msg);
@@ -82,7 +79,6 @@ private slots:
 
   void Outgoing (QString chan, QString msg);
   
-  void SendScript ();
   void RollScript ();
   void SendScriptHead ();
   void Send ();
@@ -98,6 +94,11 @@ private:
   void DropChannel (const QString & chanName);
   void SendData (const QString & data);
   void LogRaw (const QString & raw);
+  void ReceiveLine (const QByteArray & line);
+  void AddNames (const QString & chanName, const QString & names);
+  void AddName (const QString & chanName, const QString & name);
+  void DropName (const QString & chanName, const QString & name);
+  void SetTopic (const QString & chanName, const QString & topic);
 
   static void TransformPRIVMSG (IrcSock * context,
                                 QString & result, 
@@ -132,6 +133,18 @@ private:
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
+  static void Receive332 (IrcSock * context,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest);
+  static void Receive353 (IrcSock * context,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest);
+  static void Receive366 (IrcSock * context,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest);
   static void ReceiveIgnore (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
@@ -147,9 +160,8 @@ private:
   IrcChannelGroup  *dockedChannels;
 
   QTcpSocket     *socket;
+  QByteArray      lineData;
 
-  QFile       *logIncoming;
-  QFile       *logOutgoing;
   QStringList  scriptLines;
   QTimer      *pingTimer;
   QTimer      *scriptTimer;
@@ -166,8 +178,10 @@ private:
   QMap <QString, void (*) (IrcSock*, const QString &,
                            const QString &, const QString &)>
                receiveHandler;
-  QMap <QString, IrcChannelBox *>     channels;
-  QMap <IrcChannelBox*, IrcFloat*>    floatingChannels;
+  QMap <QString, IrcChannelBox *>     
+               channels;
+  QMap <IrcChannelBox*, IrcFloat*>    
+               floatingChannels;
 
   QList <QString>  ignoreSources;
 

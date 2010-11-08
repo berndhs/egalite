@@ -160,7 +160,7 @@ SOURCES = src/main.cpp \
         src/irc-channel-group.cpp \
         src/irc-channel-box.cpp \
         src/irc-float.cpp \
-        src/ircsock.cpp \
+        src/irc-sock.cpp \
         src/enter-string.cpp \
 
 
@@ -196,7 +196,7 @@ HEADERS = \
 	src/audio-message.h \
 	src/cert-list-edit.h \
         src/irc-channel-box.h \
-        src/ircsock.h \
+        src/irc-sock.h \
         src/irc-channel-group.h \
         src/irc-float.h \
         src/enter-string.h \

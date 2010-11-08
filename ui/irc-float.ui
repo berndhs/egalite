@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <author>Bernd Stramm</author>
  <class>IrcFloat</class>
  <widget class="QDialog" name="IrcFloat">
   <property name="geometry">
@@ -19,6 +20,7 @@
    </item>
   </layout>
  </widget>
+ <layoutdefault spacing="1" margin="1"/>
  <resources/>
  <connections/>
 </ui>

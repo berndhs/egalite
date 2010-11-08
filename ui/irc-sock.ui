@@ -17,7 +17,7 @@
    <iconset resource="../dchat.qrc">
     <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
   </property>
-  <layout class="QGridLayout" name="gridLayout_4">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
@@ -137,69 +137,18 @@
     </layout>
    </item>
    <item row="1" column="0">
-    <widget class="QSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QTextBrowser" name="logDisplay">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>40</verstretch>
+      </sizepolicy>
      </property>
-     <widget class="QWidget" name="layoutWidget">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QPushButton" name="sendScriptButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>50</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Send
-Script</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTextEdit" name="scriptEdit"/>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget_2">
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="2" column="1" rowspan="2">
-        <widget class="QTextBrowser" name="outLog"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="outLabel">
-         <property name="text">
-          <string>Out:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget_3">
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="0">
-        <widget class="QLabel" name="inLabel">
-         <property name="text">
-          <string>In:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" rowspan="2">
-        <widget class="QTextBrowser" name="inLog"/>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
   </layout>
  </widget>
+ <layoutdefault spacing="1" margin="1"/>
  <resources>
   <include location="../dchat.qrc"/>
  </resources>

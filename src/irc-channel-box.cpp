@@ -29,6 +29,10 @@
 #include <QFocusEvent>
 #include <QShowEvent>
 #include <QEvent>
+#include <QUrl>
+#include <QDesktopServices>
+#include <QListWidgetItem>
+#include "link-mangle.h"
 
 namespace egalite
 {
@@ -38,29 +42,19 @@ IrcChannelBox::IrcChannelBox (const QString & name, QWidget *parent)
    name (name)
 {
   ui.setupUi (this);
-  SetupMenus ();
+  ui.chanTopic->setOpenLinks (false);
+  ui.chanHistory->setOpenLinks (false);
+  ui.partButton->setAutoDefault (false);
+  ui.partButton->setDefault (false);
+  ui.floatButton->setAutoDefault (false);
+  ui.floatButton->setDefault (false);
+  ui.dockButton->setAutoDefault (false);
+  ui.dockButton->setDefault (false);
   Connect ();
-  topic = name;
+  SetTopic (tr("Channel %1").arg (name));
+  show ();
 }
 
-void
-IrcChannelBox::SetupMenus ()
-{
-  menuBar = new QMenuBar (this);
-  chanMenu = new QMenu ("Channel", this);
-  viewMenu = new QMenu ("View",this);
-  menuBar->addAction (chanMenu->menuAction());
-  menuBar->addAction (viewMenu->menuAction());
-  actionPart = new QAction ("Leave", this);
-  chanMenu->addAction (actionPart);
-  actionDock = new QAction (QIcon (":/ircicons/dock.png"),"Dock", this);
-  actionDock->setIconVisibleInMenu (true);
-  viewMenu->addAction (actionDock);
-  actionFloat = new QAction (QIcon(":/ircicons/float.png"),"Float",this);
-  actionFloat->setIconVisibleInMenu (true);
-  viewMenu->addAction (actionFloat);
-  
-}
 
 void
 IrcChannelBox::Connect ()
@@ -69,18 +63,18 @@ IrcChannelBox::Connect ()
            this, SLOT (TypingFinished()));
   connect (ui.sendButton, SIGNAL (clicked ()),
            this, SLOT (TypingFinished ()));
-  connect (actionPart, SIGNAL (triggered ()),
+  connect (ui.partButton, SIGNAL (clicked ()),
            this, SLOT (Part()));
-  connect (actionFloat, SIGNAL (triggered ()),
+  connect (ui.floatButton, SIGNAL (clicked ()),
            this, SLOT (Float()));
-  connect (actionDock, SIGNAL (triggered ()),
+  connect (ui.dockButton, SIGNAL (clicked ()),
            this, SLOT (Dock()));
-}
-
-void
-IrcChannelBox::Run ()
-{
-  show ();
+  connect (ui.chanTopic, SIGNAL (anchorClicked (const QUrl &)),
+           this, SLOT (Link (const QUrl &)));
+  connect (ui.chanHistory, SIGNAL (anchorClicked (const QUrl &)),
+           this, SLOT (Link (const QUrl &)));
+  connect (ui.chanUsers, SIGNAL (itemClicked (QListWidgetItem *)),
+           this, SLOT (ClickedUser (QListWidgetItem *)));
 }
 
 void
@@ -110,8 +104,53 @@ IrcChannelBox::Part ()
 void
 IrcChannelBox::Incoming (const QString & message)
 {
-  ui.chanHistory->append (message);
+  QString cooked = LinkMangle::Anchorize (message, 
+                         LinkMangle::HttpExp(),
+                         LinkMangle::HttpAnchor);
+qDebug () << " cooked message " << cooked;
+  ui.chanHistory->append (cooked);
   emit Active (this);
+}
+
+void
+IrcChannelBox::SetTopic (const QString & newTopic)
+{
+  topic = newTopic;
+  QString cooked = LinkMangle::Anchorize (topic, 
+                         LinkMangle::HttpExp(),
+                         LinkMangle::HttpAnchor);
+  ui.chanTopic->setHtml (cooked);
+}
+
+void
+IrcChannelBox::AddNames (const QString & names)
+{
+  QStringList newNames = names.split (QRegExp ("(\\s+)"));
+  oldNames.append (newNames);
+  oldNames.removeDuplicates ();
+  ui.chanUsers->clear();
+  ui.chanUsers->addItems (oldNames);
+  ui.chanUsers->sortItems();
+}
+
+void
+IrcChannelBox::AddName (const QString & name)
+{
+  if (!oldNames.contains (name)) {
+    oldNames.append (name);
+  }
+  ui.chanUsers->clear();
+  ui.chanUsers->addItems (oldNames);
+  ui.chanUsers->sortItems();
+}
+
+void
+IrcChannelBox::DropName (const QString & name)
+{
+  oldNames.removeAll (name);
+  ui.chanUsers->clear();
+  ui.chanUsers->addItems (oldNames);
+  ui.chanUsers->sortItems();
 }
 
 void
@@ -124,6 +163,24 @@ IrcChannelBox::TypingFinished ()
   ui.textEnter->clear ();
 }
 
+void
+IrcChannelBox::Link (const QUrl & url)
+{
+  if (url.scheme () == "ircsender") {
+    QString msg = ui.textEnter->text ();
+    msg.append (url.authority());
+    msg.append (":");
+    ui.textEnter->setText (msg);
+  } else {
+    QDesktopServices::openUrl (url);
+  }
+}
+
+void
+IrcChannelBox::ClickedUser (QListWidgetItem *item)
+{
+  qDebug () << " clicked on user " << item->text ();
+}
 
 bool
 IrcChannelBox::event (QEvent *evt)
