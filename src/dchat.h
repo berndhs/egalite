@@ -39,6 +39,7 @@
 #include "ui_getpassword.h"
 #include "ui_request-subscribe.h"
 #include "account-edit.h"
+#include "irc-nick-edit.h"
 #include "cert-list-edit.h"
 #include "irc-sock.h"
 
@@ -47,6 +48,7 @@
 class QTimer;
 class QApplication;
 class QModelIndex;
+class QMenu;
 
 namespace egalite 
 {
@@ -96,6 +98,7 @@ private slots:
   void RunIrc ();
   void EditSettings ();
   void EditServerLogin ();
+  void EditIrcNick ();
   void RequestSubscribe ();
   void DoRequestSubscribe ();
   void CallDirect ();
@@ -122,13 +125,16 @@ private slots:
   void XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq);
   void ExpandAccountView (QModelIndex accountIndex);
 
-  void ToggleIrcView ();
+  void IrcMenu ();
+  void DirectMenu ();
+  void XmppMenu ();
 
 private:
 
   void    SetSettings ();
   void    SetupListener ();
   void    Connect ();
+  void    SetupToolbar ();
   bool    GetPass ();
   void    Poll (XEgalClient * xclient);
   void    CallDirectFrom (QString nick);
@@ -137,6 +143,7 @@ private:
   void    StartListener (QString ownAddress, 
                          QString directIdentity, 
                          int     publicPort);
+  void    DoMenu (QMenu * menu);
 
   Ui_DChatMain          ui;
   Ui_GetString          passui;
@@ -151,6 +158,7 @@ private:
   deliberate::HelpView  helpView;
   SubscriptionChange    subscriptionDialog;
   AccountEdit           serverAccountEdit;
+  IrcNickEdit           ircNickEdit;
   CertListEdit          certListEdit;
   IrcSock              *ircSock;
 
@@ -173,6 +181,9 @@ private:
   QAction      *actionDirectStatus;
   QAction      *actionXmppStatus;
   QAction      *actionIrcStatus;
+  QMenu        *ircMenu;
+  QMenu        *directMenu;
+  QMenu        *xmppMenu;
 
 
   std::map <QString, XEgalClient*>    xclientMap;

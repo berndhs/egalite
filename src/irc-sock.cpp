@@ -79,6 +79,15 @@ IrcSock::IrcSock (QWidget *parent)
 qDebug () << " IrcSock allocated and initialized";
 }
 
+void
+IrcSock::Show ()
+{
+  if (!isRunning) {
+    Run ();
+  }
+  show ();
+}
+
 bool
 IrcSock::Run ()
 {
@@ -358,6 +367,7 @@ IrcSock::ConnectionReady ()
   mainUi.peerAddressLabel->setFont (font);
   ignoreSources = CertStore::IF().IrcIgnores ();
   isConnected = true;
+  emit StatusChange ();
 }
 
 void
@@ -371,6 +381,7 @@ IrcSock::ConnectionGone ()
   QFont font = mainUi.peerAddressLabel->font ();
   font.setStrikeOut (true);
   mainUi.peerAddressLabel->setFont (font);
+  emit StatusChange ();
 }
 
 void 
@@ -395,7 +406,7 @@ IrcSock::FakeLogin ()
   }
   QString pass;
   QString real;
-  bool  havePass = CertStore::IF().GetIrcIdent (nick, pass, real);
+  bool  havePass = CertStore::IF().GetIrcIdent (nick, real, pass);
   if (real.length() == 0) {
     real = nick;
   }

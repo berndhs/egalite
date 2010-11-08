@@ -1076,15 +1076,21 @@ CertStore::RemoveIrcIgnore (const QString & name)
 
 void
 CertStore::SaveIrcNick (const QString & nick,
+                        const QString & realname,
                         const QString & pass)
 {
+  QString therealname (realname);
+  if (therealname.length() < 1) {
+    therealname = nick;
+  }
   QString cmd ("insert or replace into ircnicks "
-                  " (inick, ipass) "
-                  " values (?, ?) ");
+                  " (inick, ipass, realname) "
+                  " values (?, ?, ?) ");
   QSqlQuery query (certDB);
   query.prepare (cmd);
   query.bindValue (0, QVariant (nick));
   query.bindValue (1, QVariant (pass));
+  query.bindValue (2, QVariant (therealname));
   bool ok = query.exec ();
   qDebug () << " query " << ok << query.executedQuery ();
 }
@@ -1130,9 +1136,9 @@ CertStore::SaveIrcIgnore (const QString & name)
 
 
 bool
-CertStore::GetIrcIdent(const QString & nick, 
-                             QString & pass,
-                             QString & realname)
+CertStore::GetIrcIdent(const QString & nick,
+                             QString & realname, 
+                             QString & pass)
 {
   QString cmdPat ("select ipass, realname from ircnicks "
                   " where inick == \"%1\"");

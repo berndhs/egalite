@@ -72,14 +72,13 @@ DChatMain::DChatMain (QWidget *parent)
    debugTimer (0),
    xmppTimer (0),
    announceHeartbeat (0),
-   directHeartPeriod (60),
-   statusTimer (0)
+   statusTimer (0),
+   directHeartPeriod (60)
 {
   ui.setupUi (this);
-  actionXmppStatus = ui.toolBar->addAction (tr("Xmpp"));
-  actionDirectStatus = ui.toolBar->addAction (tr("Direct"));
-  actionIrcStatus = ui.toolBar->addAction (tr("IRC"));
   ui.contactView->setModel (&contactListModel);
+  ircSock = new IrcSock (this);
+  SetupToolbar ();
   Connect ();
   debugTimer = new QTimer (this);
   connect (debugTimer, SIGNAL (timeout()), this, SLOT (DebugCheck()));
@@ -92,10 +91,36 @@ DChatMain::DChatMain (QWidget *parent)
   announceHeartbeat->start (1000*60*2); // 2 minutes
   statusTimer = new QTimer (this);
   connect (statusTimer, SIGNAL (timeout()), this, SLOT (StatusUpdate()));
-  statusTimer->start (10*1000);
+  statusTimer->start (30*1000);
   QTimer::singleShot (1500, this, SLOT (StatusUpdate ()));
+  connect (ircSock, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
   xclientMap.clear ();
-  ircSock = new IrcSock (this);
+}
+
+void
+DChatMain::SetupToolbar ()
+{
+  actionXmppStatus = ui.toolBar->addAction (tr("Xmpp"));
+  actionDirectStatus = ui.toolBar->addAction (tr("Direct"));
+  actionIrcStatus = ui.toolBar->addAction (tr("IRC"));
+
+  ircMenu = new QMenu (this);
+  ircMenu->addAction (tr("Show Irc"), ircSock, SLOT (Show()));
+  ircMenu->addAction (tr("Hide Irc"), ircSock, SLOT (hide()));
+
+  directMenu = new QMenu (this);
+  directMenu->addAction (tr("Start Direct Chat"),
+                         this, SLOT (CallDirect ()));
+  directMenu->addAction (tr("Add Direct Listener"), 
+                         this, SLOT (ListenerAdd ()));
+  directMenu->addAction (tr("Drop Direct Listener"),
+                         this, SLOT (ListenerDrop ()));
+
+  xmppMenu = new QMenu (this);
+  xmppMenu->addAction (tr("Log In Xmpp"),
+                       this, SLOT (Login()));
+  xmppMenu->addAction (tr("Log Out Xmpp"),
+                       this, SLOT (Logout()));
 }
 
 void
@@ -146,18 +171,32 @@ DChatMain::StatusUpdate ()
 }
 
 void
-DChatMain::ToggleIrcView ()
+DChatMain::IrcMenu ()
 {
-  if (ircSock) {
-    if (!ircSock->IsRunning()) {
-      ircSock->Run();
-    } else if (ircSock->isHidden ()) {
-      ircSock->show();
-    } else {
-      ircSock->hide ();
-    }
-  }
+  DoMenu (ircMenu);
 }
+
+void
+DChatMain::DirectMenu ()
+{
+  DoMenu (directMenu);
+}
+
+void
+DChatMain::XmppMenu ()
+{
+  DoMenu (xmppMenu);
+}
+
+void
+DChatMain::DoMenu (QMenu * menu)
+{
+  QPoint here = QCursor::pos();
+  here.setY (mapToGlobal (ui.toolBar->pos()).y()
+               + ui.toolBar->size().height());
+  menu->exec (here);
+}
+
 
 void
 DChatMain::SetupListener ()
@@ -166,7 +205,6 @@ DChatMain::SetupListener ()
   ownAddress = Settings().value ("direct/listenAddress",ownAddress).toString();
   Settings().setValue ("direct/listenAddress",ownAddress);
   if (ownAddress.length () < 1) {
-qDebug () << " config has no listener";
     return;
   }
   publicPort = Settings().value ("direct/listenPort",publicPort).toInt ();
@@ -224,6 +262,7 @@ qDebug () << " cannot listen for identity " << directIdentity;
       delete listen;
     }
   }
+  StatusUpdate ();
 }
 
 void
@@ -263,6 +302,7 @@ DChatMain::ListenerDrop ()
       inDirect.erase (choice);
     }
   }
+  StatusUpdate ();
 }
 
 void
@@ -313,6 +353,8 @@ DChatMain::Connect ()
            CertStore::Object(), SLOT (CreateCertificate()));
   connect (ui.actionServer, SIGNAL (triggered()),
            this, SLOT (EditServerLogin ()));
+  connect (ui.actionIRCNicks, SIGNAL (triggered()),
+           this, SLOT (EditIrcNick ()));
   connect (ui.actionBlacklisted, SIGNAL (triggered()),
            &certListEdit, SLOT (EditBlacklist()));
   connect (ui.actionWhitelisted, SIGNAL (triggered()),
@@ -334,7 +376,11 @@ DChatMain::Connect ()
   connect (&contactListModel, SIGNAL (NewAccountIndex (QModelIndex)),
            this, SLOT (ExpandAccountView (QModelIndex)));
   connect (actionIrcStatus, SIGNAL (triggered()),
-           this, SLOT (ToggleIrcView ()));
+           this, SLOT (IrcMenu ()));
+  connect (actionDirectStatus, SIGNAL (triggered ()),
+           this, SLOT (DirectMenu ()));
+  connect (actionXmppStatus, SIGNAL (triggered ()),
+           this, SLOT (XmppMenu ()));
 }
 
 void
@@ -380,17 +426,14 @@ DChatMain::Login ()
     connect (xclient, SIGNAL (discoveryIqReceived (const QXmppDiscoveryIq &)),
              this, SLOT (XmppDiscoveryIqReceived (const QXmppDiscoveryIq &)));
     QTimer::singleShot (2500, this, SLOT (XmppPoll ()));
+    StatusUpdate ();
   }
 }
 
 void
 DChatMain::RunIrc ()
 {
-  qDebug () << " start Egalite IRC ";
-  if (!ircSock->IsRunning()) {
-    ircSock->Run ();
-  }
-  ircSock->show();
+  ircSock->Show();
 }
 
 void
@@ -439,6 +482,9 @@ bool
 DChatMain::GetPass ()
 {
   bool picked = PickServerAccount (user, server, password);
+  if (picked == 0) {
+    return false;
+  }
   if (passdial == 0) {
     passdial = new QDialog (this);
     passui.setupUi (passdial);
@@ -980,6 +1026,12 @@ void
 DChatMain::EditServerLogin ()
 {
   serverAccountEdit.Exec ();
+}
+
+void
+DChatMain::EditIrcNick ()
+{
+  ircNickEdit.Exec ();
 }
 
 

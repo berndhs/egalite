@@ -101,11 +101,12 @@ public:
   QStringList IrcChannels ();
   QStringList IrcIgnores ();
   bool        GetIrcIdent (const QString & nick, 
-                                 QString & pass, 
-                                 QString & realname);
+                                 QString & realname, 
+                                 QString & pass);
   void        SaveIrcServer (const QString & server);
   void        SaveIrcChannel (const QString & chan);
-  void        SaveIrcNick (const QString & nick, 
+  void        SaveIrcNick (const QString & nick,
+                           const QString & realname = QString(), 
                            const QString & pass = QString());
   void        SaveIrcIgnore (const QString & name);
   bool        RemoveIrcServer (const QString & server);

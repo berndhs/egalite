@@ -124,6 +124,7 @@ FORMS = \
         ui/irc-channel-box.ui \
         ui/irc-sock.ui \
         ui/irc-float.ui \
+        ui/irc-account.ui \
         ui/enter-string.ui \
 
 
@@ -161,6 +162,7 @@ SOURCES = src/main.cpp \
         src/irc-channel-box.cpp \
         src/irc-float.cpp \
         src/irc-sock.cpp \
+        src/irc-nick-edit.cpp \
         src/enter-string.cpp \
 
 
@@ -199,6 +201,7 @@ HEADERS = \
         src/irc-sock.h \
         src/irc-channel-group.h \
         src/irc-float.h \
+        src/irc-nick-edit.h \
         src/enter-string.h \
 
 

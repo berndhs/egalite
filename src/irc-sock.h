@@ -63,6 +63,7 @@ public:
 public slots:
 
   bool  Run ();
+  void  Show ();
 
 private slots:
 
@@ -89,6 +90,10 @@ private slots:
   void SendPing ();
 
   void SockError (QAbstractSocket::SocketError err);
+
+signals:
+
+  void StatusChange ();
 
 private:
 
