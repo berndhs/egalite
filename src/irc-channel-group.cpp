@@ -22,6 +22,7 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include <QIcon>
+#include <QCloseEvent>
 #include "irc-channel-box.h"
 
 namespace egalite
@@ -80,6 +81,20 @@ IrcChannelGroup::Close ()
 {
   ui.tabWidget->clear ();
   hide ();
+}
+
+void
+IrcChannelGroup::closeEvent (QCloseEvent *event)
+{
+  int nt = ui.tabWidget->count ();
+  for (int t=nt-1; t>=0; t--) {
+    QWidget * wid = ui.tabWidget->widget (t);
+    IrcChannelBox * chan = dynamic_cast <IrcChannelBox *> (wid);
+    if (chan) {
+      chan->Part ();
+    }
+  }
+  QDialog::closeEvent (event);
 }
 
 } // namespace

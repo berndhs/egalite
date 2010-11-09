@@ -24,6 +24,8 @@
 #include "ui_irc-channel-group.h"
 #include <QIcon>
 
+class QCloseEvent;
+
 namespace egalite
 {
 
@@ -43,6 +45,10 @@ public:
   bool HaveChannel (IrcChannelBox * chan);
  
   void Close ();
+
+protected:
+
+  void closeEvent (QCloseEvent *event);
 
 private:
 
