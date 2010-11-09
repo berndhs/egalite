@@ -90,6 +90,26 @@ IrcSock::Show ()
   show ();
 }
 
+void
+IrcSock::ShowGroup ()
+{
+  if (!isRunning) {
+    Run ();
+    show ();
+  }
+  if (dockedChannels) {
+    dockedChannels->show ();
+  }
+}
+
+void
+IrcSock::HideGroup ()
+{
+  if (dockedChannels) {
+    dockedChannels->hide ();
+  }
+}
+
 bool
 IrcSock::Run ()
 {

@@ -66,6 +66,9 @@ public slots:
 
   bool  Run ();
   void  Show ();
+  void  Hide () { hide (); }
+  void  ShowGroup ();
+  void  HideGroup ();
 
 private slots:
 
