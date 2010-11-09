@@ -22,6 +22,8 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include <QCloseEvent>
+
 namespace egalite
 {
 
@@ -49,6 +51,15 @@ IrcFloat::RemoveChannel (IrcChannelBox *chan)
   if (chanBox == chan) {
     chanBox = 0;
   }
+}
+
+void
+IrcFloat::closeEvent (QCloseEvent *event)
+{
+  if (chanBox) {
+    chanBox->Part ();
+  }
+  QDialog::closeEvent (event);
 }
 
 } // namespace

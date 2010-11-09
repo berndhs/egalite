@@ -24,6 +24,8 @@
 #include "ui_irc-float.h"
 #include "irc-channel-box.h"
 
+class QCloseEvent;
+
 namespace egalite
 {
 
@@ -39,6 +41,10 @@ public slots:
 
   void AddChannel (IrcChannelBox *chan);
   void RemoveChannel (IrcChannelBox *chan);
+
+protected:
+
+  void closeEvent (QCloseEvent * event);
 
 private:
 
