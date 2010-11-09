@@ -236,6 +236,7 @@ IrcSock::ReceiveDefault (IrcSock * context,
                          const QString & rest)
 {
   qDebug () << "Default Receiver " << context << first << cmd << rest;
+  context->LogRaw (QString ("%1 %2 %3").arg(first).arg (cmd). arg(rest));
 }
 
 void

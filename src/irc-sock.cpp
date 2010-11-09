@@ -268,8 +268,6 @@ IrcSock::SockDisconnect ()
 void
 IrcSock::Receive ()
 {
-  mainUi.logDisplay->append (QString ("!!! data ready %1 bytes")
-                          .arg (socket->bytesAvailable ()));
   QByteArray bytes = socket->readAll ();
 qDebug () << " got " << bytes.size() << " bytes " << bytes;
   QByteArray last2 = lineData.right(2);
@@ -353,9 +351,8 @@ IrcSock::SendData (const QString & data)
   copyStr.append ("\r\n");
   QByteArray copy = copyStr.toUtf8();
   qint64 written = socket->write (copy);
-qDebug () << " sent to socket: " << copy;
+qDebug () << " sent " << written << " bytes to socket: " << copy;
   mainUi.logDisplay->append (data);
-  mainUi.logDisplay->append (QString ("!!! wrote %1 bytes").arg (written));
 }
 
 void
@@ -407,7 +404,9 @@ IrcSock::SendScriptHead ()
 void
 IrcSock::DidSend (qint64 bytes)
 {
-  mainUi.logDisplay->append (QString ("!!! did send %1 bytes").arg(bytes));
+  if (bytes < 1) {
+    LogRaw (QString ("send failed reporting %1 bytes").arg(bytes));
+  }
 }
 
 void
@@ -416,8 +415,8 @@ IrcSock::ConnectionReady ()
   waitFirstReceive = true;
   pingTimer->start (1*60*1000);
   QTimer::singleShot (30000, this, SLOT (SendPing()));
-  mainUi.logDisplay->append ("!!! Connection Ready");
-  mainUi.logDisplay->append (QString ("!!! peer address %1")
+  mainUi.logDisplay->append ("Connection Ready");
+  mainUi.logDisplay->append (QString ("peer address %1")
                  .arg (socket->peerAddress().toString()));
   mainUi.peerAddressLabel->setText (socket->peerAddress().toString());
   qDebug () << " connection ready " << socket->peerAddress().toString();
