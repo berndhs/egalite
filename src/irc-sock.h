@@ -1,5 +1,5 @@
-#ifndef DENADA_H
-#define DENADA_H
+#ifndef IRC_SOCK_H
+#define IRC_SOCK_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -33,6 +33,8 @@
 #include <QList>
 
 using namespace deliberate;
+
+class QListWidgetItem;
 
 namespace egalite 
 {
@@ -71,6 +73,9 @@ private slots:
   void Exiting ();
   void TryConnect ();
   void TryDisconnect ();
+  void SockDisconnect ();
+  void TryJoin ();
+  void TryPart ();
   void ConnectionReady ();
   void ConnectionGone ();
   void Receive ();
@@ -80,6 +85,7 @@ private slots:
   void ChanInUse (IrcChannelBox * chan);
   void ChanWantsDock (IrcChannelBox * chan);
   void ChanWantsFloat (IrcChannelBox * chan);
+  void ChannelClicked (QListWidgetItem * item);
 
   void Outgoing (QString chan, QString msg);
   
@@ -96,6 +102,17 @@ signals:
   void StatusChange ();
 
 private:
+
+  typedef QMap <QString, void (*) (IrcSock*, QString &, 
+                                   QString &, QString &)>  
+          XformMapType;
+  typedef QMap <QString, void (*) (IrcSock*, const QString &,
+                           const QString &, const QString &)>
+          ReceiveMapType;
+  typedef QMap <QString, IrcChannelBox *>   
+          ChannelMapType;
+  typedef QMap <IrcChannelBox*, IrcFloat*>    
+          FloatingMapType;
 
   void Connect ();
   void AddChannel (const QString & chanName);
@@ -162,38 +179,34 @@ private:
                          const QString & cmd,
                          const QString & rest);
 
-  bool             initDone;
-  Ui_IrcSockMain   mainUi;
-  bool             isRunning;
+  bool                initDone;
+  Ui_IrcSockMain      mainUi;
+  bool                isRunning;
 
-  IrcChannelGroup  *dockedChannels;
+  IrcChannelGroup    *dockedChannels;
 
-  QTcpSocket     *socket;
-  bool            isConnected;
-  QByteArray      lineData;
+  QTcpSocket         *socket;
+  bool                isConnected;
+  QByteArray          lineData;
 
-  QStringList  scriptLines;
-  QTimer      *pingTimer;
-  QTimer      *scriptTimer;
-  QString      currentChan;
-  QString      currentServer;
-  QString      currentUser;
-  bool         waitFirstReceive;
-  QString      noNameServer;
-  QString      noNameNick;
+  QStringList         scriptLines;
+  QTimer             *pingTimer;
+  QTimer             *scriptTimer;
+  QString             currentChan;
+  QString             currentServer;
+  QString             currentUser;
+  bool                waitFirstReceive;
+  QString             noNameServer;
+  QString             noNameNick;
+  QString             noNameChannel;
 
-  QMap <QString, void (*) (IrcSock*, QString &, QString &, QString &)>  
-               commandXform;
+  XformMapType        commandXform;
+  ReceiveMapType      receiveHandler;
 
-  QMap <QString, void (*) (IrcSock*, const QString &,
-                           const QString &, const QString &)>
-               receiveHandler;
-  QMap <QString, IrcChannelBox *>     
-               channels;
-  QMap <IrcChannelBox*, IrcFloat*>    
-               floatingChannels;
+  ChannelMapType      channels;
+  FloatingMapType     floatingChannels;
 
-  QList <QString>  ignoreSources;
+  QList <QString>     ignoreSources;
 
 };
 

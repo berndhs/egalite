@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <author>Bernd Stramm</author>
  <class>IrcSockMain</class>
  <widget class="QDialog" name="IrcSockMain">
   <property name="geometry">
@@ -18,7 +19,7 @@
     <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="0" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <layout class="QGridLayout" name="gridLayout_3">
@@ -45,24 +46,31 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QComboBox" name="nickCombo"/>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QPushButton" name="loginButton">
          <property name="text">
           <string>Login Nick</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
-        <widget class="QPushButton" name="disconnectButton">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string>Disconnect</string>
+          <string>Address</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
+       <item row="4" column="2">
+        <widget class="QPushButton" name="hideButton">
+         <property name="text">
+          <string>Hide Control</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
           <widget class="QLabel" name="portLabel">
@@ -92,17 +100,27 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label">
+       <item row="2" column="2">
+        <widget class="QPushButton" name="disconnectButton">
          <property name="text">
-          <string>Address</string>
+          <string>Disconnect</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="QPushButton" name="exitButton">
+       <item row="5" column="1">
+        <widget class="QComboBox" name="chanCombo"/>
+       </item>
+       <item row="5" column="0">
+        <widget class="QPushButton" name="joinButton">
          <property name="text">
-          <string>Exit IRC</string>
+          <string>Join</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QPushButton" name="partButton">
+         <property name="text">
+          <string>Part</string>
          </property>
         </widget>
        </item>
@@ -137,10 +155,34 @@
     </layout>
    </item>
    <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Channels</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Log</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QListWidget" name="chanList">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>2</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
     <widget class="QTextBrowser" name="logDisplay">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
+       <horstretch>8</horstretch>
        <verstretch>40</verstretch>
       </sizepolicy>
      </property>

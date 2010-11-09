@@ -38,6 +38,7 @@
 #include <QTimer>
 #include <QFont>
 #include <QFile>
+#include <QListWidgetItem>
 
 using namespace deliberate;
 
@@ -102,16 +103,25 @@ IrcSock::Run ()
   groupBoxSize = Settings().value ("sizes/channelgroup", groupBoxSize)
                            .toSize();
   dockedChannels->resize (groupBoxSize);
+
   QStringList  servers = CertStore::IF().IrcServers ();
   noNameServer = tr("--- New Server ---");
   servers.append (noNameServer);
   mainUi.serverCombo->clear ();
   mainUi.serverCombo->insertItems (0,servers);
+
   QStringList  nicks = CertStore::IF().IrcNicks ();
   noNameNick = tr ("--- New Nick ---");
   nicks.append (noNameNick);
   mainUi.nickCombo->clear ();
   mainUi.nickCombo->insertItems (0,nicks);
+
+  QStringList  chans = CertStore::IF().IrcChannels ();
+  noNameChannel = tr("--- New Channel ---");
+  chans.append (noNameChannel);
+  mainUi.chanCombo->clear ();
+  mainUi.chanCombo->insertItems (0,chans);
+
   show ();
   isRunning = true;
   return true;
@@ -130,22 +140,28 @@ IrcSock::Connect ()
            this, SLOT (TryConnect ()));
   connect (mainUi.disconnectButton, SIGNAL (clicked()),
            this, SLOT (TryDisconnect ()));
+  connect (mainUi.joinButton, SIGNAL (clicked()),
+           this, SLOT (TryJoin ()));
   connect (mainUi.sendButton, SIGNAL (clicked()),
            this, SLOT (Send ()));
+  connect (mainUi.partButton, SIGNAL (clicked()),
+           this, SLOT (TryPart ()));
   connect (mainUi.sendEdit, SIGNAL (returnPressed()),
            this, SLOT (Send ()));
   connect (mainUi.loginButton, SIGNAL (clicked()),
            this, SLOT (FakeLogin ()));
-  connect (mainUi.exitButton, SIGNAL (clicked ()),
-           this, SLOT (Exit ()));
+  connect (mainUi.hideButton, SIGNAL (clicked ()),
+           this, SLOT (hide ()));
+  connect (mainUi.chanList, SIGNAL (itemClicked (QListWidgetItem *)),
+           this, SLOT (ChannelClicked (QListWidgetItem *)));
 }
 
 void
 IrcSock::Exit ()
 {
+  dockedChannels->Close ();
   TryDisconnect ();
   CloseCleanup ();
-  dockedChannels->Close ();
   hide ();
 }
 
@@ -189,6 +205,36 @@ IrcSock::TryConnect ()
   waitFirstReceive = true;
 }
 
+void
+IrcSock::TryJoin ()
+{
+  QString chan = mainUi.chanCombo->currentText ();
+  if (chan == noNameChannel) {
+    EnterString enter (this);
+    bool picked = enter.Choose (tr("IRC Channel"), tr("Channel:"));
+    if (picked) {
+      chan = enter.Value ();
+      if (enter.Save()) {
+        CertStore::IF().SaveIrcChannel (chan);
+        mainUi.chanCombo->clear ();
+        QStringList knownChans = CertStore::IF().IrcChannels ();
+        knownChans.append (noNameChannel);
+        mainUi.chanCombo->addItems (knownChans);
+      }
+    } else {
+      return;
+    }
+  }
+  Send (QString ("JOIN %1").arg(chan));
+}
+
+void
+IrcSock::TryPart ()
+{
+  QString chan = mainUi.chanCombo->currentText ();
+  Send (QString ("PART %1").arg (chan));
+}
+
 int
 IrcSock::OpenCount ()
 {
@@ -202,6 +248,18 @@ IrcSock::OpenCount ()
 
 void
 IrcSock::TryDisconnect ()
+{
+  ChannelMapType::iterator  cit;
+  for (cit=channels.begin(); cit != channels.end(); cit++) {
+    if (*cit) {
+      (*cit)->Part();
+    }
+  }
+  QTimer::singleShot (3000, this, SLOT (SockDisconnect()));
+}
+
+void
+IrcSock::SockDisconnect ()
 {
   socket->disconnectFromHost ();
 }
@@ -439,6 +497,7 @@ IrcSock::AddChannel (const QString & chanName)
            this, SLOT (ChanWantsFloat (IrcChannelBox *)));
   connect (newchan, SIGNAL (WantDock (IrcChannelBox *)),
            this, SLOT (ChanWantsDock (IrcChannelBox *)));
+  mainUi.chanList->addItem (chanName);
 }
 
 void
@@ -460,6 +519,26 @@ IrcSock::DropChannel (const QString & chanName)
   }
   channels.remove (chanName);
   chanBox->deleteLater ();
+  int nc = mainUi.chanList->count();
+  for (int c=nc-1; c>=0; c--) {
+    QListWidgetItem *item = mainUi.chanList->item (c);
+    if (item && item->text() == chanName) {
+      mainUi.chanList->takeItem (c);
+      delete item;
+    }
+  }
+}
+
+void
+IrcSock::ChannelClicked (QListWidgetItem *item)
+{
+  if (item) {
+    QString chanName = item->text ();
+    qDebug () << " clicked on channel " << chanName;
+    IrcChannelBox * chanBox = channels [chanName];
+    qDebug () << "       is in box " << chanBox;
+    chanBox->raise ();
+  }
 }
 
 void
@@ -610,273 +689,6 @@ IrcSock::SetTopic (const QString & chanName, const QString & topic)
   }
   IrcChannelBox * chan = channels [chanName];
   chan->SetTopic (topic);
-}
-
-void
-IrcSock::TransformDefault (IrcSock * context,
-                           QString & result, 
-                           QString & first, 
-                           QString & rest)
-{
-  Q_UNUSED (context)
-  result = first + rest;
-}
-
-void
-IrcSock::TransformPRIVMSG (IrcSock * context,
-                           QString & result, 
-                           QString & first, 
-                           QString & rest)
-{
-  Q_UNUSED (context)
-  first = "PRIVMSG";
-  QRegExp wordRx ("(\\S+)");
-  int pos = wordRx.indexIn (rest, 0);
-  if (pos >= 0) {
-    int len = wordRx.matchedLength ();
-    rest.insert (pos + len, " :");
-  }
-  result = first + " " + rest;
-}
-
-void 
-IrcSock::TransformJOIN (IrcSock * context,
-                        QString & result,
-                        QString & first,
-                        QString & rest)
-{
-  result = first + rest;
-}
-
-void
-IrcSock::ReceivePING (IrcSock * context,
-                      const QString & first,
-                      const QString & cmd,
-                      const QString & rest)
-{
-  Q_UNUSED (cmd)
-  Q_UNUSED (rest)
-  QString answer = QString ("PONG %1 %2").arg(first);
-  context->SendData (answer);
-}
-
-void
-IrcSock::ReceiveJOIN (IrcSock * context,
-                      const QString & first,
-                      const QString & cmd,
-                      const QString & rest)
-{
-  Q_UNUSED (cmd)
-  QRegExp wordRx ("(\\S+)");
-  int pos, len;
-  QString user, chan;
-  pos = wordRx.indexIn (first, 0);
-  if (pos >= 0) {
-    len = wordRx.matchedLength ();
-    user = first.mid (pos,len);
-    QRegExp leadRx ("([^!]+)");
-    pos = leadRx.indexIn (user,0);
-    if (pos >= 0) {
-      user = user.mid (pos, leadRx.matchedLength());
-    }
-    if (user.startsWith (QChar (':'))) {
-      user.remove (0,1);
-    }
-  }
-  pos = wordRx.indexIn (rest,0);
-  if (pos >= 0) {
-    len = wordRx.matchedLength ();
-    chan = rest.mid (pos,len);
-qDebug () << " JOIN received,  " << first << cmd << rest;
-qDebug () << "user " << user << " currentUser " 
-          << context->currentUser << " chan " << chan;
-    if (chan.startsWith (QChar(':'))) {
-      chan.remove (0,1);
-    }
-    if (user == context->currentUser) {
-      if (!context->channels.contains (chan)) {
-        context->AddChannel (chan);
-      }
-    } else {
-      context->AddName (chan, user);
-      context->mainUi.logDisplay->append (QString ("user %1 JOINs %2")
-                                    .arg (user) . arg (chan));
-    }
-  }
-}
-
-void
-IrcSock::ReceivePART (IrcSock * context,
-                     const QString & first,
-                     const QString & cmd,
-                     const QString & rest)
-{
-  qDebug () << " PART received " << first << cmd << rest;
-  QRegExp wordRx ("(\\S+)");
-  int pos, len;
-  QString user, chan;
-  pos = wordRx.indexIn (first, 0);
-  if (pos >= 0) {
-    len = wordRx.matchedLength ();
-    user = first.mid (pos,len);
-    QRegExp leadRx ("([^!]+)");
-    pos = leadRx.indexIn (user,0);
-    if (pos >= 0) {
-      user = user.mid (pos, leadRx.matchedLength());
-    }
-    if (user.startsWith (QChar (':'))) {
-      user.remove (0,1);
-    }
-  }
-  pos = wordRx.indexIn (rest,0);
-  if (pos >= 0) {
-    len = wordRx.matchedLength ();
-    chan = rest.mid (pos,len);
-    if (chan.startsWith (QChar (':'))) {
-      chan.remove (0,1);
-    }
-qDebug () << " PART received for channel " << chan;
-qDebug () << "user " << user << " currentUser " 
-          << context->currentUser << " chan " << chan;
-    if (user == context->currentUser) {
-      context->DropChannel (chan);
-    } else {
-      context->DropName (chan, user);
-      context->mainUi.logDisplay->append (QString ("user %1 PARTs %2")
-                                    .arg (user) . arg (chan));
-    }
-  }
-}
-
-void
-IrcSock::ReceivePRIVMSG (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest)
-{
-  Q_UNUSED (cmd)
-  int pos, len;
-  QRegExp sourceRx ("(\\S+)!");
-  QString source (first);
-  QString dest;
-  QString msg;
-  QRegExp wordRx ("(\\S+)");
-  pos = sourceRx.indexIn (first,0);
-  if (pos >= 0) {
-    len = sourceRx.matchedLength ();
-    source = first.mid (pos,len);
-    source.chop (1);
-    if (source.startsWith (QChar (':'))) {
-      source.remove (0,1);
-    }
-  }
-  pos = wordRx.indexIn (rest,0);
-  if (pos >= 0) {
-    len = wordRx.matchedLength ();
-    dest = rest.mid (pos,len);
-    msg = rest.mid (pos+len,-1);
-    if (context->channels.contains (dest)) {
-      context->InChanMsg (dest, source, msg);
-    } else {
-      context->InUserMsg (source, dest, msg);
-    }
-  }
-}
-
-void
-IrcSock::ReceiveNumeric (IrcSock * context,
-                        const QString & first,
-                        const QString & num,
-                        const QString & rest)
-{
-  context->LogRaw (QString ("numeric %1  %2 %3").arg(first).arg(num).arg(rest));
-}
-
-void
-IrcSock::ReceiveDefault (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest)
-{
-  qDebug () << "Default Receiver " << context << first << cmd << rest;
-}
-
-void
-IrcSock::ReceiveIgnore (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest)
-{
-  qDebug () << " Ignoring command " << cmd;
-}
-
-void
-IrcSock::Receive332 (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest)
-{
-  qDebug () << " Received 332 " << first << cmd << rest;
-  QRegExp wordRx ("(\\S+)");
-  int pos, len;
-  QString user, chan, topic;
-  pos = wordRx.indexIn (rest, 0);
-  if (pos >= 0) {
-    len = wordRx.matchedLength();
-    user = rest.mid (pos, len);
-    pos = wordRx.indexIn (rest, pos+len);
-    if (pos >= 0) {
-      len = wordRx.matchedLength ();
-      chan = rest.mid (pos, len);
-      topic = rest.mid (pos+len, -1).trimmed ();
-      if (topic.startsWith (QChar (':'))) {
-        topic.remove (0,1);
-      }
-      context->SetTopic (chan, topic);
-    }
-  }
-}
-
-void
-IrcSock::Receive353 (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest)
-{
-  qDebug () << " Received 353 " << first << cmd << rest;
-  QRegExp wordRx ("(\\S+)");
-  int pos, len;
-  QString user, marker, chan;
-  pos = wordRx.indexIn (rest, 0);
-  if (pos >= 0) {
-    len = wordRx.matchedLength();
-    user = rest.mid (pos, len);
-    pos = wordRx.indexIn (rest, pos+len);
-    if (pos >= 0) {
-      len = wordRx.matchedLength ();
-      marker = rest.mid (pos, len);
-      pos = wordRx.indexIn (rest, pos+len);
-      if (pos >= 0) {
-        len = wordRx.matchedLength ();
-        chan = rest.mid (pos,len);
-        QString nameData = rest.mid (pos+len,-1).trimmed ();
-        if (nameData.startsWith (QChar(':'))) {
-          nameData.remove (0,1);
-        }
-        context->AddNames (chan, nameData);
-      }
-    }
-  }
-}
-
-
-void
-IrcSock::Receive366 (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest)
-{
-  qDebug () << " Received 366 " << first << cmd << rest;
 }
 
 } // namespace

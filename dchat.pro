@@ -162,6 +162,7 @@ SOURCES = src/main.cpp \
         src/irc-channel-box.cpp \
         src/irc-float.cpp \
         src/irc-sock.cpp \
+        src/irc-sock-static.cpp \
         src/irc-nick-edit.cpp \
         src/enter-string.cpp \
 

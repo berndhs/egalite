@@ -166,7 +166,7 @@ IrcChannelBox::AddName (const QString & name)
   ui.chanUsers->addItems (oldNames);
   ui.chanUsers->sortItems();
   ui.rawLog->append (tr("Enter: %1").arg(name));
-  AppendSmall (ui.chanHistory, tr("-> Enter: %1").arg(name));
+  AppendSmall (ui.chanHistory, tr(" Enter: -&gt; %1").arg(name));
 }
 
 void
@@ -177,7 +177,7 @@ IrcChannelBox::DropName (const QString & name)
   ui.chanUsers->addItems (oldNames);
   ui.chanUsers->sortItems();
   ui.rawLog->append (tr("Exit: %1").arg(name));
-  AppendSmall (ui.chanHistory, tr("<- Exit: %1").arg(name));
+  AppendSmall (ui.chanHistory, tr(" Exit: &lt;- %1").arg(name));
 }
 
 void

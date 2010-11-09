@@ -845,7 +845,8 @@ CertStore::MakeElement (const QString elem)
   QSqlQuery qry (certDB);
   qry.prepare (querytext);
   qry.exec ();
-qDebug () << " making " << querytext;
+qDebug () << " making  element " << elem;
+qDebug () << "    using " << qry.executedQuery();
 }
 
 bool
