@@ -76,6 +76,7 @@ IrcSock::IrcSock (QWidget *parent)
   receiveHandler ["332"] = IrcSock::Receive332;
   receiveHandler ["353"] = IrcSock::Receive353;
   receiveHandler ["366"] = IrcSock::Receive366;
+  receiveHandler ["TOPIC"] = IrcSock::ReceiveTOPIC;
   receiveHandler ["VERSION"] = IrcSock::ReceiveIgnore;
 qDebug () << " IrcSock allocated and initialized";
 }

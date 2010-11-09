@@ -105,8 +105,8 @@ DChatMain::SetupToolbar ()
   actionIrcStatus = ui.toolBar->addAction (tr("IRC"));
 
   ircMenu = new QMenu (this);
-  ircMenu->addAction (tr("Show Irc"), ircSock, SLOT (Show()));
-  ircMenu->addAction (tr("Hide Irc"), ircSock, SLOT (hide()));
+  ircMenu->addAction (tr("Show Irc Control"), ircSock, SLOT (Show()));
+  ircMenu->addAction (tr("Hide Irc Control"), ircSock, SLOT (hide()));
 
   directMenu = new QMenu (this);
   directMenu->addAction (tr("Start Direct Chat"),

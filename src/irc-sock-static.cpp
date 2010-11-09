@@ -200,6 +200,27 @@ IrcSock::ReceivePRIVMSG (IrcSock * context,
 }
 
 void
+IrcSock::ReceiveTOPIC (IrcSock * context,
+                       const QString & first,
+                       const QString & cmd,
+                       const QString & rest)
+{
+  Q_UNUSED (cmd)
+  int pos, len;
+  QRegExp wordRx ("(\\S+)");
+  pos = wordRx.indexIn (rest,0);
+  if (pos >= 0) {
+    len = wordRx.matchedLength ();
+    QString chanName = rest.mid (pos,len);
+    QString topic = rest.mid (pos+len).trimmed ();
+    if (topic.startsWith (QChar (':'))) {
+      topic.remove (0,1);
+    }
+    context->SetTopic (chanName, topic);
+  }
+}
+
+void
 IrcSock::ReceiveNumeric (IrcSock * context,
                         const QString & first,
                         const QString & num,

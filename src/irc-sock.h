@@ -158,6 +158,10 @@ private:
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
+  static void ReceiveTOPIC (IrcSock * context,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest);
   static void Receive332 (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
