@@ -1,5 +1,5 @@
 
-#include "irc-sock.h"
+#include "irc-sock-static.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -22,6 +22,7 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include "irc-sock.h"
 #include <QRegExp>
 #include <QString>
 
@@ -29,7 +30,7 @@ namespace egalite
 {
 
 void
-IrcSock::TransformDefault (IrcSock * context,
+IrcSockStatic::TransformDefault (IrcSock * context,
                            QString & result, 
                            QString & first, 
                            QString & rest)
@@ -39,7 +40,7 @@ IrcSock::TransformDefault (IrcSock * context,
 }
 
 void
-IrcSock::TransformPRIVMSG (IrcSock * context,
+IrcSockStatic::TransformPRIVMSG (IrcSock * context,
                            QString & result, 
                            QString & first, 
                            QString & rest)
@@ -56,7 +57,7 @@ IrcSock::TransformPRIVMSG (IrcSock * context,
 }
 
 void 
-IrcSock::TransformJOIN (IrcSock * context,
+IrcSockStatic::TransformJOIN (IrcSock * context,
                         QString & result,
                         QString & first,
                         QString & rest)
@@ -65,7 +66,7 @@ IrcSock::TransformJOIN (IrcSock * context,
 }
 
 void
-IrcSock::ReceivePING (IrcSock * context,
+IrcSockStatic::ReceivePING (IrcSock * context,
                       const QString & first,
                       const QString & cmd,
                       const QString & rest)
@@ -77,7 +78,7 @@ IrcSock::ReceivePING (IrcSock * context,
 }
 
 void
-IrcSock::ReceiveJOIN (IrcSock * context,
+IrcSockStatic::ReceiveJOIN (IrcSock * context,
                       const QString & first,
                       const QString & cmd,
                       const QString & rest)
@@ -122,7 +123,7 @@ qDebug () << "user " << user << " currentUser "
 }
 
 void
-IrcSock::ReceivePART (IrcSock * context,
+IrcSockStatic::ReceivePART (IrcSock * context,
                      const QString & first,
                      const QString & cmd,
                      const QString & rest)
@@ -165,7 +166,7 @@ qDebug () << "user " << user << " currentUser "
 }
 
 void
-IrcSock::ReceivePRIVMSG (IrcSock * context,
+IrcSockStatic::ReceivePRIVMSG (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -200,7 +201,7 @@ IrcSock::ReceivePRIVMSG (IrcSock * context,
 }
 
 void
-IrcSock::ReceiveTOPIC (IrcSock * context,
+IrcSockStatic::ReceiveTOPIC (IrcSock * context,
                        const QString & first,
                        const QString & cmd,
                        const QString & rest)
@@ -221,7 +222,7 @@ IrcSock::ReceiveTOPIC (IrcSock * context,
 }
 
 void
-IrcSock::ReceiveNumeric (IrcSock * context,
+IrcSockStatic::ReceiveNumeric (IrcSock * context,
                         const QString & first,
                         const QString & num,
                         const QString & rest)
@@ -230,7 +231,7 @@ IrcSock::ReceiveNumeric (IrcSock * context,
 }
 
 void
-IrcSock::ReceiveDefault (IrcSock * context,
+IrcSockStatic::ReceiveDefault (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -240,7 +241,7 @@ IrcSock::ReceiveDefault (IrcSock * context,
 }
 
 void
-IrcSock::ReceiveIgnore (IrcSock * context,
+IrcSockStatic::ReceiveIgnore (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -249,7 +250,7 @@ IrcSock::ReceiveIgnore (IrcSock * context,
 }
 
 void
-IrcSock::Receive332 (IrcSock * context,
+IrcSockStatic::Receive332 (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -276,7 +277,7 @@ IrcSock::Receive332 (IrcSock * context,
 }
 
 void
-IrcSock::Receive353 (IrcSock * context,
+IrcSockStatic::Receive353 (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -309,7 +310,7 @@ IrcSock::Receive353 (IrcSock * context,
 
 
 void
-IrcSock::Receive366 (IrcSock * context,
+IrcSockStatic::Receive366 (IrcSock * context,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)

@@ -67,18 +67,18 @@ IrcSock::IrcSock (QWidget *parent)
   connect (scriptTimer, SIGNAL (timeout()), 
            this, SLOT (SendScriptHead()));
   Connect ();
-  commandXform ["MSG"] = IrcSock::TransformPRIVMSG;
-  commandXform ["JOIN"] = IrcSock::TransformJOIN;
-  receiveHandler ["PING"] = IrcSock::ReceivePING;
-  receiveHandler ["PONG"] = IrcSock::ReceiveIgnore;
-  receiveHandler ["PRIVMSG"] = IrcSock::ReceivePRIVMSG;
-  receiveHandler ["JOIN"] = IrcSock::ReceiveJOIN;
-  receiveHandler ["PART"] = IrcSock::ReceivePART;
-  receiveHandler ["332"] = IrcSock::Receive332;
-  receiveHandler ["353"] = IrcSock::Receive353;
-  receiveHandler ["366"] = IrcSock::Receive366;
-  receiveHandler ["TOPIC"] = IrcSock::ReceiveTOPIC;
-  receiveHandler ["VERSION"] = IrcSock::ReceiveIgnore;
+  commandXform ["MSG"] = IrcSockStatic::TransformPRIVMSG;
+  commandXform ["JOIN"] = IrcSockStatic::TransformJOIN;
+  receiveHandler ["PING"] = IrcSockStatic::ReceivePING;
+  receiveHandler ["PONG"] = IrcSockStatic::ReceiveIgnore;
+  receiveHandler ["PRIVMSG"] = IrcSockStatic::ReceivePRIVMSG;
+  receiveHandler ["JOIN"] = IrcSockStatic::ReceiveJOIN;
+  receiveHandler ["PART"] = IrcSockStatic::ReceivePART;
+  receiveHandler ["332"] = IrcSockStatic::Receive332;
+  receiveHandler ["353"] = IrcSockStatic::Receive353;
+  receiveHandler ["366"] = IrcSockStatic::Receive366;
+  receiveHandler ["TOPIC"] = IrcSockStatic::ReceiveTOPIC;
+  receiveHandler ["VERSION"] = IrcSockStatic::ReceiveIgnore;
 qDebug () << " IrcSock allocated and initialized";
 }
 

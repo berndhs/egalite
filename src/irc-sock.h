@@ -130,63 +130,6 @@ private:
   void DropName (const QString & chanName, const QString & name);
   void SetTopic (const QString & chanName, const QString & topic);
 
-  static void TransformPRIVMSG (IrcSock * context,
-                                QString & result, 
-                                QString & first, 
-                                QString & rest);
-  static void TransformJOIN    (IrcSock * context,
-                                QString & result, 
-                                QString & first, 
-                                QString & rest);
-  static void TransformDefault (IrcSock * context,
-                                QString & result, 
-                                QString & first, 
-                                QString & rest);
-
-  static void ReceiveNumeric (IrcSock * context,
-                         const QString & first,
-                         const QString & num,
-                         const QString & rest);
-  static void ReceivePING (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void ReceivePRIVMSG (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void ReceiveJOIN (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void ReceivePART (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void ReceiveTOPIC (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void Receive332 (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void Receive353 (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void Receive366 (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void ReceiveIgnore (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
-  static void ReceiveDefault (IrcSock * context,
-                         const QString & first,
-                         const QString & cmd,
-                         const QString & rest);
 
   bool                initDone;
   Ui_IrcSockMain      mainUi;
@@ -219,6 +162,8 @@ private:
   FloatingMapType     floatingChannels;
 
   QList <QString>     ignoreSources;
+
+  friend class IrcSockStatic;
 
 };
 

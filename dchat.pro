@@ -200,6 +200,7 @@ HEADERS = \
 	src/cert-list-edit.h \
         src/irc-channel-box.h \
         src/irc-sock.h \
+        src/irc-sock-static.h \
         src/irc-channel-group.h \
         src/irc-float.h \
         src/irc-nick-edit.h \
