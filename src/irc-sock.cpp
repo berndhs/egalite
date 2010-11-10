@@ -53,7 +53,8 @@ IrcSock::IrcSock (QWidget *parent)
    isConnected (false),
    pingTimer (0),
    scriptTimer (0),
-   waitFirstReceive (false)
+   waitFirstReceive (false),
+   hidSelf (false)
 {
   mainUi.setupUi (this);
   dockedChannels = new IrcChannelGroup (parentWidget ());
@@ -87,7 +88,21 @@ IrcSock::Show ()
   if (!isRunning) {
     Run ();
   }
+  if (hidSelf) {
+    resize (oldSize);
+    move (oldPos);
+    hidSelf = false;
+  }
   show ();
+}
+
+void
+IrcSock::Hide ()
+{
+  oldSize = size ();
+  oldPos = pos();
+  hidSelf = true;
+  hide ();
 }
 
 void
@@ -98,7 +113,7 @@ IrcSock::ShowGroup ()
     show ();
   }
   if (dockedChannels) {
-    dockedChannels->show ();
+    dockedChannels->Show ();
   }
 }
 
@@ -106,7 +121,7 @@ void
 IrcSock::HideGroup ()
 {
   if (dockedChannels) {
-    dockedChannels->hide ();
+    dockedChannels->Hide ();
   }
 }
 

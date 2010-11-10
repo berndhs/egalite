@@ -31,6 +31,8 @@
 #include <QStringList>
 #include <QMap>
 #include <QList>
+#include <QSize>
+#include <QPoint>
 
 using namespace deliberate;
 
@@ -66,7 +68,7 @@ public slots:
 
   bool  Run ();
   void  Show ();
-  void  Hide () { hide (); }
+  void  Hide ();
   void  ShowGroup ();
   void  HideGroup ();
 
@@ -206,6 +208,9 @@ private:
   QString             noNameServer;
   QString             noNameNick;
   QString             noNameChannel;
+  QSize               oldSize;
+  QPoint              oldPos;
+  bool                hidSelf;
 
   XformMapType        commandXform;
   ReceiveMapType      receiveHandler;

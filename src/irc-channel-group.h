@@ -23,6 +23,8 @@
  ****************************************************************/
 #include "ui_irc-channel-group.h"
 #include <QIcon>
+#include <QSize>
+#include <QPoint>
 
 class QCloseEvent;
 
@@ -46,6 +48,11 @@ public:
  
   void Close ();
 
+public slots:
+
+  void Show ();
+  void Hide ();
+
 protected:
 
   void closeEvent (QCloseEvent *event);
@@ -54,7 +61,10 @@ private:
 
   Ui_IrcChannelGroup    ui;
   QIcon                 activeIcon;
-  QIcon                 quiteIcon;
+  QIcon                 quietIcon;
+  QSize                 oldSize;
+  QPoint                oldPos;
+  bool                  hidSelf;
 
 };
 

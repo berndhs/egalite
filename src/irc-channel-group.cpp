@@ -29,11 +29,12 @@ namespace egalite
 {
 
 IrcChannelGroup::IrcChannelGroup (QWidget *parent)
-  :QDialog (parent)
+  :QDialog (parent),
+   hidSelf (false)
 {
   ui.setupUi (this);
   activeIcon = QIcon (":/ircicons/active.png");
-  quiteIcon = QIcon (":/ircicons/inactive.png");
+  quietIcon = QIcon (":/ircicons/inactive.png");
 }
 
 void
@@ -66,7 +67,7 @@ IrcChannelGroup::MarkActive (IrcChannelBox * chan, bool active)
   if (ndx >= 0) {
     ui.tabWidget->setTabIcon (ndx, (active
                                     ? activeIcon
-                                    : quiteIcon));
+                                    : quietIcon));
   }
 }
 
@@ -80,6 +81,26 @@ void
 IrcChannelGroup::Close ()
 {
   ui.tabWidget->clear ();
+  hide ();
+}
+
+void
+IrcChannelGroup::Show ()
+{
+  if (hidSelf) {
+    resize (oldSize);
+    move (oldPos);
+    hidSelf = false;
+  }
+  show ();
+}
+
+void
+IrcChannelGroup::Hide ()
+{
+  oldSize = size ();
+  oldPos = pos();
+  hidSelf = true;
   hide ();
 }
 
