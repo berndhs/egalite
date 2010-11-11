@@ -331,7 +331,12 @@ qDebug () << "       from " << sock->Name();
     } else {
       IrcSockStatic::ReceiveDefault (this, sock, first, cmd, rest);
     }
-  }  
+  } else {
+    if (data.startsWith ("PING")) {
+      QString retName = data.split (QRegExp("(\\s+)")).at(1);
+      sock->Send (QString ("PONG :%1").arg(retName));
+    }
+  }
   mainUi.logDisplay->append (QString (line));\
 }
 
