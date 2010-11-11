@@ -49,10 +49,13 @@ public:
                           quint16 port);
 
   void    DisconnectLater (int msecs=1000);
-  void    Disconnect ();
 
   void    Send (QString data);
   void    SendData (const QString & data);
+
+public slots:
+
+  void Disconnect ();
 
 private slots:
 

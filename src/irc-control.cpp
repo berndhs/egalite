@@ -296,7 +296,8 @@ void
 IrcControl::ReceiveLine (IrcSocket * sock, QByteArray line)
 {
   QString data (QString::fromUtf8(line.data()));
-qDebug () << " received " << data;
+qDebug () << " received Line " << data;
+qDebug () << "       from " << sock->Name();
   if (data.startsWith(QChar (':'))) {
     QRegExp wordRx ("(\\S+)");
     QString first, cmd, rest;
@@ -345,7 +346,7 @@ IrcControl::Send ()
       QString text = mainUi.sendEdit->text ();
       IrcSocket * sock = sockets [sname];
       TransformSend (sock, text);
-      sock -> Send (mainUi.sendEdit->text ());
+      sock->Send (text);
     }
   }
 }
@@ -397,7 +398,7 @@ IrcControl::AddConnect (IrcSocket *sock)
   item = new QTableWidgetItem (QString::number (sock->peerPort()),
                                int (Cell_Port));
   mainUi.serverTable->setItem (row, 3, item);
-  item = new QTableWidgetItem ("Disconnect", int (Cell_Action));
+  item = new QTableWidgetItem (tr("Disconnect"), int (Cell_Action));
   mainUi.serverTable->setItem (row, 0, item);
 }
 
@@ -446,6 +447,7 @@ IrcControl::FindRow (QTableWidget * table, const QString & sname)
       }
     }
   }
+  return -1;
 }
 
 void
@@ -455,6 +457,8 @@ IrcControl::ConnectionGone (IrcSocket * sock)
   mainUi.logDisplay->append (QString ("!!! disconnected from %1")
                  .arg (sock->peerAddress().toString()));
   RemoveConnect (sock);
+  sockets.remove (sock->Name());
+  sock->deleteLater ();
   emit StatusChange ();
 }
 
@@ -603,6 +607,32 @@ IrcControl::ServerClicked (QTableWidgetItem *item)
     qDebug () << " clicked socked table item " << item 
               << " row " << item->row()
               << " " << item->text ();
+    if (item->text () == tr("Disconnect")) {
+      QTableWidgetItem * aitem = FindType (mainUi.serverTable, 
+                                           item->row(), 
+                                           int (Cell_Addr));
+      if (aitem) {
+        QString sname = aitem->data (int (Data_ConnName)).toString();
+        if (sockets.contains (sname)) {
+          PartAll (sname);
+          sockets [sname] -> DisconnectLater (3000);
+        }
+      }
+    }
+  }
+}
+
+void
+IrcControl::PartAll (const QString & sockName)
+{
+  ChannelMapType::iterator cit;
+  for (cit=channels.begin(); cit != channels.end(); cit++) {
+    if (*cit) {
+      IrcChannelBox * chan = *cit;
+      if (chan->Sock() == sockName) {
+        chan->Part ();
+      }
+    }
   }
 }
 
@@ -665,8 +695,9 @@ IrcControl::Outgoing (QString chan, QString msg)
   if (trim.startsWith (QChar ('/')) ){
     QString cooked (trim);
     TransformSend (sock, cooked);
-    sock->Send (trim);
-    trim.prepend (QString (":%1!%1@localhost ").arg (currentUser));
+    sock->Send (cooked);
+qDebug () << " handed to socket: " << cooked;
+    trim.prepend (QString (":%1!%1@localhost ").arg (sock->Nick()));
     ReceiveLine (sock, trim.toUtf8());
   } else {
     QString data (QString ("PRIVMSG %1 :%2").arg (chan). arg (msg));

@@ -136,6 +136,7 @@ private:
   int  FindRow (QTableWidget * table, const QString & sname);
   void AddChannel (IrcSocket * sock, const QString & chanName);
   void DropChannel (IrcSocket * sock, const QString & chanName);
+  void PartAll (const QString & sockName);
   void SendData (const QString & data);
   void LogRaw (const QString & raw);
   void AddNames (const QString & chanName, const QString & names);

@@ -32,6 +32,7 @@
 #include <QUrl>
 #include <QDesktopServices>
 #include <QListWidgetItem>
+#include <QDateTime>
 #include "link-mangle.h"
 
 namespace egalite
@@ -133,7 +134,12 @@ IrcChannelBox::Incoming (const QString & message)
                          LinkMangle::HttpExp(),
                          LinkMangle::HttpAnchor);
 qDebug () << " cooked message " << cooked;
-  ui.chanHistory->append (cooked);
+  QDateTime now = QDateTime::currentDateTime ();
+  QString smalldate ("<span style=\"font-size:small\">"
+                     "%1</span> %2");
+  ui.chanHistory->append (smalldate
+                          .arg (now.toString ("hh:mm:ss"))
+                          .arg (cooked));
   emit Active (this);
 }
 

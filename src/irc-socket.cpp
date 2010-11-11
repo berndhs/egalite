@@ -134,7 +134,6 @@ qDebug () << " got " << bytes.size() << " bytes " << bytes;
       if (waitForName) {
         GetHostName (lineData);
       }
-qDebug () << " socket " << Name() << " hand off data \n" << lineData;
       emit ReceivedLine (this, lineData);
       lineData.clear ();
     }
