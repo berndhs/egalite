@@ -163,6 +163,7 @@ SOURCES = src/main.cpp \
         src/irc-float.cpp \
         src/irc-control.cpp \
         src/irc-socket.cpp \
+        src/irc-ctcp.cpp \
         src/irc-sock-static.cpp \
         src/irc-nick-edit.cpp \
         src/enter-string.cpp \
@@ -202,6 +203,7 @@ HEADERS = \
         src/irc-channel-box.h \
         src/irc-control.h \
         src/irc-socket.h \
+        src/irc-ctcp.h \
         src/irc-sock-static.h \
         src/irc-channel-group.h \
         src/irc-float.h \

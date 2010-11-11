@@ -1,5 +1,5 @@
-#ifndef SATVIEW_VERSION_H
-#define SATVIEW_VERSION_H
+#ifndef IRC_CTCP_H
+#define IRC_CTCP_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -22,32 +22,32 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include <QString>
-#include "delib-debug.h"
+class QString;
 
-namespace deliberate {
+namespace egalite
+{
 
-class ProgramVersion {
+class IrcSocket;
+class IrcControl;
 
-public:
+class IrcCtcp 
+{
 
-  ProgramVersion (QString pgmname);
-  
-  static QString Version (); 
-  static QString Number ();
-  static QString MyName ();
-  
-  static void ShowVersionWindow ();
-  static void CLIVersion ();
-  
 private:
 
-  static QString VersionNumber;
-  static QString ProgramName;
-  static QString copyright;
+  friend class IrcControl;
+
+  static void ReceiveVERSION (IrcControl * context, IrcSocket * sock,
+                              const QString & from,
+                              const QString & to,
+                              const QString & msg);
+  static void ReceiveACTION (IrcControl * context, IrcSocket * sock,
+                              const QString & from,
+                              const QString & to,
+                              const QString & msg);
 
 };
 
-}
+} // namespace
 
 #endif

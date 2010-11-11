@@ -48,6 +48,11 @@ namespace deliberate {
 		       + copyright;
   }
 
+  QString ProgramVersion::Number ()
+  {
+    return VersionNumber;
+  }
+
   void ProgramVersion::ShowVersionWindow ()
   {
     QString versionMessage(Version());

@@ -28,6 +28,7 @@
 #include "irc-channel-box.h"
 #include "irc-socket.h"
 #include "irc-sock-static.h"
+#include "irc-ctcp.h"
 #include <QSize>
 #include "cert-store.h"
 #include "irc-channel-group.h"
@@ -72,6 +73,8 @@ IrcControl::IrcControl (QWidget *parent)
   receiveHandler ["366"] = IrcSockStatic::Receive366;
   receiveHandler ["TOPIC"] = IrcSockStatic::ReceiveTOPIC;
   receiveHandler ["VERSION"] = IrcSockStatic::ReceiveIgnore;
+  ctcpHandler ["ACTION"] = IrcCtcp::ReceiveACTION;
+  ctcpHandler ["VERSION"] = IrcCtcp::ReceiveVERSION;
 qDebug () << " IrcControl allocated and initialized";
 }
 
@@ -773,20 +776,15 @@ IrcControl::InUserMsg (IrcSocket * sock,
   if (ignoreSources.contains (from)) {
     return;
   }
-  if (!channels.contains (from)) {
-    AddChannel (sock, from);
+  QString themsg = msg.trimmed();
+  if (themsg.startsWith (QChar (':'))) {
+    themsg.remove (0,1);
   }
-  if (channels.contains (from)) {
-    QString themsg = msg.trimmed();
-    if (themsg.startsWith (QChar (':'))) {
-      themsg.remove (0,1);
-    }
-    if (themsg.startsWith (QChar (1))) {
-      IncomingCtcpUser (sock, from, to, themsg);
-    } else {
-      channels [from]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
-                                  arg(from).arg(themsg));
-    }
+  if (themsg.startsWith (QChar (1))) {
+    IncomingCtcpUser (sock, from, to, themsg);
+  } else {
+    IncomingRaw (sock, from, QString ("<a href=\"ircsender://%1\">%1</a>: %2").
+                                arg(from).arg(themsg));
   }
   mainUi.logDisplay->append (QString ("Message from %1 to %2 says %3")
                              .arg (from)
@@ -795,11 +793,37 @@ IrcControl::InUserMsg (IrcSocket * sock,
 }
 
 void
+IrcControl::IncomingRaw (IrcSocket * sock, 
+                         const QString & from, 
+                         const QString & msg)
+{
+  if (!channels.contains (from)) {
+    AddChannel (sock, from);
+  }
+  channels [from]->Incoming (msg);
+}
+
+void
 IrcControl::IncomingCtcpChan (IrcSocket * sock, 
                     const QString & from, 
                     const QString & chan, 
                     const QString & msg)
 {
+  QString themsg (msg);
+  themsg.chop (1);
+  themsg.remove (0,1);
+  QRegExp cmdRx ("(\\S+)");
+  int pos, len;
+qDebug () << " Ctcp CHAN " << msg;
+  pos = cmdRx.indexIn (msg, 0);
+  if (pos >=0 ) {
+    len = cmdRx.matchedLength ();
+    QString cmd = themsg.mid (pos,len);
+    if (ctcpHandler.contains (cmd)) {
+      (*ctcpHandler [cmd]) (this, sock, from, chan, themsg.mid (pos+len,-1));
+      return;
+    }
+  }
   channels [chan]->Incoming (QString 
                      ("<a href=\"ircsender://%1\">%1</a>:"
                       "<span style=\"font-size:small\">CTCP</span> %2").
@@ -814,10 +838,27 @@ IrcControl::IncomingCtcpUser (IrcSocket * sock,
                     const QString & to, 
                     const QString & msg)
 {
-   channels [from]->Incoming (QString 
+  QString themsg (msg);
+  themsg.chop (1);
+  themsg.remove (0,1);
+  QRegExp cmdRx ("(\\S+)");
+  int pos, len;
+  pos = cmdRx.indexIn (msg, 0);
+qDebug () << " Ctcp USER " << msg;
+  if (pos >=0 ) {
+    len = cmdRx.matchedLength ();
+    QString cmd = themsg.mid (pos,len);
+    if (ctcpHandler.contains (cmd)) {
+      (*ctcpHandler [cmd]) (this, sock, from, to, themsg.mid (pos+len,-1));
+      return;
+    }
+  }
+  if (channels.contains (from)) {
+    channels [from]->Incoming (QString 
                       ("<a href=\"ircsender://%1\">%1</a>:"
                       "<span style=\"font-size:small\">CTCP</span> %2").
                                   arg(from).arg(msg));
+  }
 }
 
 void

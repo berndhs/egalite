@@ -134,6 +134,9 @@ private:
   typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, QString &, 
                                    QString &, QString &)>  
           XformMapType;
+  typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, const QString &,
+                           const QString &, const QString &)>
+          CtcpMapType;
 
   void Connect ();
   void AddConnect (IrcSocket * sock);
@@ -161,6 +164,9 @@ private:
                  const QString & msg);
   void SetTopic (IrcSocket * sock, 
                  const QString & chanName, const QString & topic);
+  void IncomingRaw (IrcSocket * sock, 
+                    const QString & from,
+                    const QString & msg);
 
 
   bool                initDone;
@@ -181,6 +187,7 @@ private:
 
   XformMapType        commandXform;
   ReceiveMapType      receiveHandler;
+  CtcpMapType         ctcpHandler;
 
   ChannelMapType      channels;
   FloatingMapType     floatingChannels;
@@ -188,6 +195,7 @@ private:
   QList <QString>     ignoreSources;
 
   friend class IrcSockStatic;
+  friend class IrcCtcp;
 
 };
 
