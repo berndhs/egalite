@@ -415,6 +415,14 @@ qDebug () << " have new host name " << name << " for " << sock;
   if (item) {
     item->setText (name);
   }
+  ChannelMapType::iterator cit;
+  for (cit=channels.begin(); cit!=channels.end(); cit++) {
+    if (*cit) {
+      if ((*cit)->Sock() == sname) {
+        (*cit)->SetHost (name);
+      }
+    }
+  }
 }
 
 QTableWidgetItem *
@@ -546,6 +554,7 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
   channels [chanName] = newchan;
   dockedChannels->AddChannel (newchan);
   dockedChannels->show ();
+  newchan->SetHost (sock->HostName());
   connect (newchan, SIGNAL (Outgoing (QString, QString)),
            this, SLOT (Outgoing (QString, QString)));
   connect (newchan, SIGNAL (Active (IrcChannelBox *)),

@@ -104,6 +104,12 @@ IrcChannelBox::Connect ()
 }
 
 void
+IrcChannelBox::SetHost (const QString & hostName)
+{
+  ui.serverLabel->setText (hostName);
+}
+
+void
 IrcChannelBox::Close ()
 {
   hide ();

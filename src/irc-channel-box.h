@@ -48,6 +48,7 @@ public:
   void Close ();
 
   void SetTopic (const QString & newTopic);
+  void SetHost (const QString & hostName);
 
   void AddNames (const QString & names);
   void AddName (const QString & name);
