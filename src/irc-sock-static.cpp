@@ -154,8 +154,8 @@ IrcSockStatic::ReceivePART (IrcControl * context, IrcSocket *sock,
     }
 qDebug () << " PART received for channel " << chan;
 qDebug () << "user " << user << " currentUser " 
-          << context->currentUser << " chan " << chan;
-    if (user == context->currentUser) {
+          << sock->Nick() << " chan " << chan;
+    if (user == sock->Nick()) {
       context->DropChannel (sock, chan);
     } else {
       context->DropName (sock, chan, user);

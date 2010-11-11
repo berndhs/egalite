@@ -41,9 +41,9 @@ public:
 
   QString Name ();
   QString HostName ();
-  QString Nick () { return currentUser; }
+  QString Nick () { return currentNick; }
 
-  void    SetNick (const QString & nick) { currentUser = nick; }
+  void    SetNick (const QString & nick) { currentNick = nick; }
   void    SetHostName (const QString & name);
   void    connectToHost ( const QString & hostName, 
                           quint16 port);
@@ -80,7 +80,7 @@ private:
 
   QString          hostName;
   bool             knowHostName;
-  QString          currentUser;
+  QString          currentNick;
   QByteArray       lineData;
   QStringList      scriptLines;
   QTimer          *pingTimer;

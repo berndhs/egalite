@@ -309,11 +309,6 @@ qDebug () << "       from " << sock->Name();
       len = wordRx.matchedLength ();
       restlen = totallen - (pos + len);
       first = data.mid (pos,len);
-      if (waitFirstReceive) {
-        waitFirstReceive = false;
-        currentServer = first;
-        qDebug () << " set current server " << currentServer;
-      }
       pos = wordRx.indexIn (data,pos+len+1);
       if (pos >= 0) {
         len = wordRx.matchedLength ();
@@ -711,7 +706,7 @@ qDebug () << " handed to socket: " << cooked;
   } else {
     QString data (QString ("PRIVMSG %1 :%2").arg (chan). arg (msg));
     sock->SendData (data);
-    data.prepend (QString (":%1!%1@localhost ").arg (currentUser));
+    data.prepend (QString (":%1!%1@localhost ").arg (sock->Nick()));
     ReceiveLine (sock, data.toUtf8());
   }
 }

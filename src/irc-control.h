@@ -156,10 +156,6 @@ private:
   SocketMapType       sockets;
   bool                isConnected;
 
-  QString             currentChan;
-  QString             currentServer;
-  QString             currentUser;
-  bool                waitFirstReceive;
   QString             noNameServer;
   QString             noNameNick;
   QString             noNameChannel;
