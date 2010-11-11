@@ -22,11 +22,11 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include <QMainWindow>
-#include "ui_irc-sock.h"
+#include "ui_irc-control.h"
 #include "config-edit.h"
 #include "helpview.h"
 #include "irc-float.h"
-#include <QTcpSocket>
+#include "irc-socket.h"
 #include <QFile>
 #include <QStringList>
 #include <QMap>
@@ -44,23 +44,25 @@ namespace egalite
 class IrcChannelBox;
 class IrcChannelGroup;
 
-class IrcSock : public QDialog
+class IrcControl : public QDialog
 {
 Q_OBJECT
 
 public:
 
-  IrcSock (QWidget *parent=0);
+  IrcControl (QWidget *parent=0);
 
   int   OpenCount ();
   bool  IsRunning () { return isRunning; }
 
   void  CloseCleanup ();
 
-  void  InChanMsg (const QString & chan, 
+  void  InChanMsg (IrcSocket * sock,
+                   const QString & chan, 
                    const QString & form,
                    const QString & msg);
-  void  InUserMsg (const QString & from, 
+  void  InUserMsg (IrcSocket * sock,
+                   const QString & from, 
                    const QString & to, 
                    const QString & msg);
 
@@ -78,29 +80,22 @@ private slots:
   void Exiting ();
   void TryConnect ();
   void TryDisconnect ();
-  void SockDisconnect ();
   void TryJoin ();
   void TryPart ();
-  void ConnectionReady ();
-  void ConnectionGone ();
-  void Receive ();
-  void DidSend (qint64 bytes);
-  void FakeLogin ();
+  void ConnectionReady (IrcSocket * sock);
+  void ConnectionGone (IrcSocket * sock);
+  void ReceiveLine (IrcSocket * sock, QByteArray line);
+  void NickLogin ();
+  void ChangedHostName (IrcSocket * sock, QString name);
   void ChanActive (IrcChannelBox * chan);
   void ChanInUse (IrcChannelBox * chan);
   void ChanWantsDock (IrcChannelBox * chan);
   void ChanWantsFloat (IrcChannelBox * chan);
   void ChannelClicked (QListWidgetItem * item);
+  void ServerClicked (QTableWidgetItem * item);
+  void Send ();
 
   void Outgoing (QString chan, QString msg);
-  
-  void RollScript ();
-  void SendScriptHead ();
-  void Send ();
-  void Send (QString data);
-  void SendPing ();
-
-  void SockError (QAbstractSocket::SocketError err);
 
 signals:
 
@@ -108,42 +103,58 @@ signals:
 
 private:
 
-  typedef QMap <QString, void (*) (IrcSock*, QString &, 
-                                   QString &, QString &)>  
-          XformMapType;
-  typedef QMap <QString, void (*) (IrcSock*, const QString &,
-                           const QString &, const QString &)>
-          ReceiveMapType;
+  enum CellType {
+       Cell_None = 0,
+       Cell_Action = 1,
+       Cell_Name = 2,
+       Cell_Addr = 3,
+       Cell_Port = 4
+       };
+  enum DataType {
+       Data_ConnName = Qt::UserRole+1
+       };
+
   typedef QMap <QString, IrcChannelBox *>   
           ChannelMapType;
   typedef QMap <IrcChannelBox*, IrcFloat*>    
           FloatingMapType;
+  typedef QMap <QString, IrcSocket *>
+          SocketMapType;
+  typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, const QString &,
+                           const QString &, const QString &)>
+          ReceiveMapType;
+  typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, QString &, 
+                                   QString &, QString &)>  
+          XformMapType;
 
   void Connect ();
-  void AddChannel (const QString & chanName);
-  void DropChannel (const QString & chanName);
+  void AddConnect (IrcSocket * sock);
+  void RemoveConnect (IrcSocket * sock);
+  void TransformSend (IrcSocket * sock, QString & data);
+  IrcSocket * CurrentSock (QTableWidget * table);
+  QTableWidgetItem* FindType (QTableWidget * table, int row, int type);
+  int  FindRow (QTableWidget * table, const QString & sname);
+  void AddChannel (IrcSocket * sock, const QString & chanName);
+  void DropChannel (IrcSocket * sock, const QString & chanName);
   void SendData (const QString & data);
   void LogRaw (const QString & raw);
-  void ReceiveLine (const QByteArray & line);
   void AddNames (const QString & chanName, const QString & names);
   void AddName (const QString & chanName, const QString & name);
-  void DropName (const QString & chanName, const QString & name);
-  void SetTopic (const QString & chanName, const QString & topic);
+  void DropName (IrcSocket * sock, const QString & chanName, 
+                  const QString & name);
+  void SetTopic (IrcSocket * sock, 
+                 const QString & chanName, const QString & topic);
 
 
   bool                initDone;
-  Ui_IrcSockMain      mainUi;
+  Ui_IrcControl       mainUi;
   bool                isRunning;
 
   IrcChannelGroup    *dockedChannels;
 
-  QTcpSocket         *socket;
+  SocketMapType       sockets;
   bool                isConnected;
-  QByteArray          lineData;
 
-  QStringList         scriptLines;
-  QTimer             *pingTimer;
-  QTimer             *scriptTimer;
   QString             currentChan;
   QString             currentServer;
   QString             currentUser;

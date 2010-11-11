@@ -1,4 +1,3 @@
-
 #include "irc-sock-static.h"
 
 /****************************************************************
@@ -22,7 +21,8 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include "irc-sock.h"
+#include "irc-control.h"
+#include "irc-socket.h"
 #include <QRegExp>
 #include <QString>
 
@@ -30,7 +30,7 @@ namespace egalite
 {
 
 void
-IrcSockStatic::TransformDefault (IrcSock * context,
+IrcSockStatic::TransformDefault (IrcControl * context, IrcSocket *sock,
                            QString & result, 
                            QString & first, 
                            QString & rest)
@@ -40,7 +40,7 @@ IrcSockStatic::TransformDefault (IrcSock * context,
 }
 
 void
-IrcSockStatic::TransformPRIVMSG (IrcSock * context,
+IrcSockStatic::TransformPRIVMSG (IrcControl * context, IrcSocket *sock,
                            QString & result, 
                            QString & first, 
                            QString & rest)
@@ -57,7 +57,7 @@ IrcSockStatic::TransformPRIVMSG (IrcSock * context,
 }
 
 void 
-IrcSockStatic::TransformJOIN (IrcSock * context,
+IrcSockStatic::TransformJOIN (IrcControl * context, IrcSocket *sock,
                         QString & result,
                         QString & first,
                         QString & rest)
@@ -66,7 +66,7 @@ IrcSockStatic::TransformJOIN (IrcSock * context,
 }
 
 void
-IrcSockStatic::ReceivePING (IrcSock * context,
+IrcSockStatic::ReceivePING (IrcControl * context, IrcSocket *sock,
                       const QString & first,
                       const QString & cmd,
                       const QString & rest)
@@ -74,11 +74,11 @@ IrcSockStatic::ReceivePING (IrcSock * context,
   Q_UNUSED (cmd)
   Q_UNUSED (rest)
   QString answer = QString ("PONG %1 %2").arg(first);
-  context->SendData (answer);
+  sock->SendData (answer);
 }
 
 void
-IrcSockStatic::ReceiveJOIN (IrcSock * context,
+IrcSockStatic::ReceiveJOIN (IrcControl * context, IrcSocket *sock,
                       const QString & first,
                       const QString & cmd,
                       const QString & rest)
@@ -105,14 +105,14 @@ IrcSockStatic::ReceiveJOIN (IrcSock * context,
     len = wordRx.matchedLength ();
     chan = rest.mid (pos,len);
 qDebug () << " JOIN received,  " << first << cmd << rest;
-qDebug () << "user " << user << " currentUser " 
-          << context->currentUser << " chan " << chan;
+qDebug () << "user " << user << " sock user " 
+          << sock->Nick() << " chan " << chan;
     if (chan.startsWith (QChar(':'))) {
       chan.remove (0,1);
     }
-    if (user == context->currentUser) {
+    if (user == sock->Nick()) {
       if (!context->channels.contains (chan)) {
-        context->AddChannel (chan);
+        context->AddChannel (sock, chan);
       }
     } else {
       context->AddName (chan, user);
@@ -123,7 +123,7 @@ qDebug () << "user " << user << " currentUser "
 }
 
 void
-IrcSockStatic::ReceivePART (IrcSock * context,
+IrcSockStatic::ReceivePART (IrcControl * context, IrcSocket *sock,
                      const QString & first,
                      const QString & cmd,
                      const QString & rest)
@@ -156,9 +156,9 @@ qDebug () << " PART received for channel " << chan;
 qDebug () << "user " << user << " currentUser " 
           << context->currentUser << " chan " << chan;
     if (user == context->currentUser) {
-      context->DropChannel (chan);
+      context->DropChannel (sock, chan);
     } else {
-      context->DropName (chan, user);
+      context->DropName (sock, chan, user);
       context->mainUi.logDisplay->append (QString ("user %1 PARTs %2")
                                     .arg (user) . arg (chan));
     }
@@ -166,7 +166,7 @@ qDebug () << "user " << user << " currentUser "
 }
 
 void
-IrcSockStatic::ReceivePRIVMSG (IrcSock * context,
+IrcSockStatic::ReceivePRIVMSG (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -193,15 +193,15 @@ IrcSockStatic::ReceivePRIVMSG (IrcSock * context,
     dest = rest.mid (pos,len);
     msg = rest.mid (pos+len,-1);
     if (context->channels.contains (dest)) {
-      context->InChanMsg (dest, source, msg);
+      context->InChanMsg (sock, dest, source, msg);
     } else {
-      context->InUserMsg (source, dest, msg);
+      context->InUserMsg (sock, source, dest, msg);
     }
   }
 }
 
 void
-IrcSockStatic::ReceiveTOPIC (IrcSock * context,
+IrcSockStatic::ReceiveTOPIC (IrcControl * context, IrcSocket *sock,
                        const QString & first,
                        const QString & cmd,
                        const QString & rest)
@@ -217,12 +217,12 @@ IrcSockStatic::ReceiveTOPIC (IrcSock * context,
     if (topic.startsWith (QChar (':'))) {
       topic.remove (0,1);
     }
-    context->SetTopic (chanName, topic);
+    context->SetTopic (sock, chanName, topic);
   }
 }
 
 void
-IrcSockStatic::ReceiveNumeric (IrcSock * context,
+IrcSockStatic::ReceiveNumeric (IrcControl * context, IrcSocket *sock,
                         const QString & first,
                         const QString & num,
                         const QString & rest)
@@ -231,7 +231,7 @@ IrcSockStatic::ReceiveNumeric (IrcSock * context,
 }
 
 void
-IrcSockStatic::ReceiveDefault (IrcSock * context,
+IrcSockStatic::ReceiveDefault (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -241,7 +241,7 @@ IrcSockStatic::ReceiveDefault (IrcSock * context,
 }
 
 void
-IrcSockStatic::ReceiveIgnore (IrcSock * context,
+IrcSockStatic::ReceiveIgnore (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -250,7 +250,7 @@ IrcSockStatic::ReceiveIgnore (IrcSock * context,
 }
 
 void
-IrcSockStatic::Receive332 (IrcSock * context,
+IrcSockStatic::Receive332 (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -271,13 +271,13 @@ IrcSockStatic::Receive332 (IrcSock * context,
       if (topic.startsWith (QChar (':'))) {
         topic.remove (0,1);
       }
-      context->SetTopic (chan, topic);
+      context->SetTopic (sock, chan, topic);
     }
   }
 }
 
 void
-IrcSockStatic::Receive353 (IrcSock * context,
+IrcSockStatic::Receive353 (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)
@@ -310,7 +310,7 @@ IrcSockStatic::Receive353 (IrcSock * context,
 
 
 void
-IrcSockStatic::Receive366 (IrcSock * context,
+IrcSockStatic::Receive366 (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest)

@@ -122,7 +122,7 @@ FORMS = \
 	ui/cert-list.ui \
         ui/irc-channel-group.ui \
         ui/irc-channel-box.ui \
-        ui/irc-sock.ui \
+        ui/irc-control.ui \
         ui/irc-float.ui \
         ui/irc-account.ui \
         ui/enter-string.ui \
@@ -161,7 +161,8 @@ SOURCES = src/main.cpp \
         src/irc-channel-group.cpp \
         src/irc-channel-box.cpp \
         src/irc-float.cpp \
-        src/irc-sock.cpp \
+        src/irc-control.cpp \
+        src/irc-socket.cpp \
         src/irc-sock-static.cpp \
         src/irc-nick-edit.cpp \
         src/enter-string.cpp \
@@ -199,7 +200,8 @@ HEADERS = \
 	src/audio-message.h \
 	src/cert-list-edit.h \
         src/irc-channel-box.h \
-        src/irc-sock.h \
+        src/irc-control.h \
+        src/irc-socket.h \
         src/irc-sock-static.h \
         src/irc-channel-group.h \
         src/irc-float.h \

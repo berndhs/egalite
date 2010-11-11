@@ -21,73 +21,81 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-namepsace egalite
+
+class QString;
+
+namespace egalite
 {
 
-class IrcSock;
+class IrcControl;
+class IrcSocket;
 
 class IrcSockStatic {
 
 private:
 
+  friend class IrcControl;
 
-  static void TransformPRIVMSG (IrcSock * context,
+
+  static void TransformPRIVMSG (IrcControl * context, IrcSocket *sock,
                                 QString & result, 
                                 QString & first, 
                                 QString & rest);
-  static void TransformJOIN    (IrcSock * context,
+  static void TransformJOIN    (IrcControl * context, IrcSocket *sock,
                                 QString & result, 
                                 QString & first, 
                                 QString & rest);
-  static void TransformDefault (IrcSock * context,
+  static void TransformDefault (IrcControl * context, IrcSocket *sock,
                                 QString & result, 
                                 QString & first, 
                                 QString & rest);
 
-  static void ReceiveNumeric (IrcSock * context,
+  static void ReceiveNumeric (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & num,
                          const QString & rest);
-  static void ReceivePING (IrcSock * context,
+  static void ReceivePING (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void ReceivePRIVMSG (IrcSock * context,
+  static void ReceivePRIVMSG (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void ReceiveJOIN (IrcSock * context,
+  static void ReceiveJOIN (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void ReceivePART (IrcSock * context,
+  static void ReceivePART (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void ReceiveTOPIC (IrcSock * context,
+  static void ReceiveTOPIC (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void Receive332 (IrcSock * context,
+  static void Receive332 (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void Receive353 (IrcSock * context,
+  static void Receive353 (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void Receive366 (IrcSock * context,
+  static void Receive366 (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void ReceiveIgnore (IrcSock * context,
+  static void ReceiveIgnore (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
-  static void ReceiveDefault (IrcSock * context,
+  static void ReceiveDefault (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
+};
 
 } // namespace
 
+#endif

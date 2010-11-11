@@ -37,9 +37,12 @@
 namespace egalite
 {
 
-IrcChannelBox::IrcChannelBox (const QString & name, QWidget *parent)
+IrcChannelBox::IrcChannelBox (const QString & name,
+                              const QString & sock,
+                              QWidget *parent)
   :QWidget (parent),
-   chanName (name)
+   chanName (name),
+   sockName (sock)
 {
   ui.setupUi (this);
   ui.chanTopic->setOpenLinks (false);

@@ -22,7 +22,6 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include "ui_irc-channel-box.h"
-#include <QStringListModel>
 
 class QMenuBar;
 class QMenu;
@@ -42,7 +41,9 @@ Q_OBJECT
 
 public:
 
-  IrcChannelBox (const QString & name, QWidget *parent=0);
+  IrcChannelBox (const QString & name, 
+                 const QString & sockName,
+                 QWidget *parent=0);
 
   void Close ();
 
@@ -54,6 +55,7 @@ public:
 
   QString Topic () { return topic; }
   QString Name ()  { return chanName; }
+  QString Sock () { return sockName; }
 
 public slots:
 
@@ -89,11 +91,12 @@ private:
 
    Ui_IrcChannelBox    ui;
    QString             chanName;
+   QString             sockName;
    QString             topic;
    QStringList         oldNames;
 
-
 };
+
 
 } // namespace
 

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>Bernd Stramm</author>
- <class>IrcSockMain</class>
- <widget class="QDialog" name="IrcSockMain">
+ <class>IrcControl</class>
+ <widget class="QDialog" name="IrcControl">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>588</width>
-    <height>387</height>
+    <height>388</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,19 +23,6 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="2" column="1">
-        <widget class="QLabel" name="peerAddressLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1">
         <widget class="QComboBox" name="serverCombo"/>
        </item>
@@ -46,24 +33,24 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QComboBox" name="nickCombo"/>
+       <item row="5" column="1">
+        <widget class="QComboBox" name="nickCombo">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QPushButton" name="loginButton">
          <property name="text">
           <string>Login Nick</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Address</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
+       <item row="5" column="2">
         <widget class="QPushButton" name="hideButton">
          <property name="text">
           <string>Hide Control</string>
@@ -100,28 +87,61 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="2">
-        <widget class="QPushButton" name="disconnectButton">
-         <property name="text">
-          <string>Disconnect</string>
+       <item row="6" column="1">
+        <widget class="QComboBox" name="chanCombo">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="QComboBox" name="chanCombo"/>
-       </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QPushButton" name="joinButton">
          <property name="text">
           <string>Join</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
+       <item row="6" column="2">
         <widget class="QPushButton" name="partButton">
          <property name="text">
           <string>Part</string>
          </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="3">
+        <widget class="QTableWidget" name="serverTable">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>80</number>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Action</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Address</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Port</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>
@@ -154,21 +174,21 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Channels</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="2" column="1">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Log</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QListWidget" name="chanList">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -178,7 +198,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="3" column="1">
     <widget class="QTextBrowser" name="logDisplay">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">

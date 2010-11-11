@@ -63,7 +63,7 @@ DChatMain::DChatMain (QWidget *parent)
    subscriptionDialog (this),
    serverAccountEdit (this),
    certListEdit (this),
-   ircSock (0),
+   ircControl (0),
    publicPort (29999),
    defaultPort (29999),
    passdial (0),
@@ -77,7 +77,7 @@ DChatMain::DChatMain (QWidget *parent)
 {
   ui.setupUi (this);
   ui.contactView->setModel (&contactListModel);
-  ircSock = new IrcSock (this);
+  ircControl = new IrcControl (this);
   SetupToolbar ();
   Connect ();
   debugTimer = new QTimer (this);
@@ -93,7 +93,7 @@ DChatMain::DChatMain (QWidget *parent)
   connect (statusTimer, SIGNAL (timeout()), this, SLOT (StatusUpdate()));
   statusTimer->start (30*1000);
   QTimer::singleShot (1500, this, SLOT (StatusUpdate ()));
-  connect (ircSock, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
+  connect (ircControl, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
   xclientMap.clear ();
 }
 
@@ -105,10 +105,10 @@ DChatMain::SetupToolbar ()
   actionIrcStatus = ui.toolBar->addAction (tr("IRC"));
 
   ircMenu = new QMenu (this);
-  ircMenu->addAction (tr("Show Irc Control"), ircSock, SLOT (Show()));
-  ircMenu->addAction (tr("Hide Irc Control"), ircSock, SLOT (Hide()));
-  ircMenu->addAction (tr("Show Irc Channels"), ircSock, SLOT (ShowGroup()));
-  ircMenu->addAction (tr("Hide Irc Channels"), ircSock, SLOT (HideGroup()));
+  ircMenu->addAction (tr("Show Irc Control"), ircControl, SLOT (Show()));
+  ircMenu->addAction (tr("Hide Irc Control"), ircControl, SLOT (Hide()));
+  ircMenu->addAction (tr("Show Irc Channels"), ircControl, SLOT (ShowGroup()));
+  ircMenu->addAction (tr("Hide Irc Channels"), ircControl, SLOT (HideGroup()));
 
 
   directMenu = new QMenu (this);
@@ -169,7 +169,7 @@ DChatMain::StatusUpdate ()
   actionDirectStatus->setText (directMsg);
   QString xmppMsg = tr("%1 Xmpp").arg (xclientMap.size());
   actionXmppStatus->setText (xmppMsg);
-  QString ircMsg = tr ("%1 IRC").arg (ircSock->OpenCount());
+  QString ircMsg = tr ("%1 IRC").arg (ircControl->OpenCount());
   actionIrcStatus->setText (ircMsg);
 }
 
@@ -436,7 +436,7 @@ DChatMain::Login ()
 void
 DChatMain::RunIrc ()
 {
-  ircSock->Show();
+  ircControl->Show();
 }
 
 void

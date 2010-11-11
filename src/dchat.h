@@ -41,7 +41,7 @@
 #include "account-edit.h"
 #include "irc-nick-edit.h"
 #include "cert-list-edit.h"
-#include "irc-sock.h"
+#include "irc-control.h"
 
 #include <map>
 
@@ -160,7 +160,7 @@ private:
   AccountEdit           serverAccountEdit;
   IrcNickEdit           ircNickEdit;
   CertListEdit          certListEdit;
-  IrcSock              *ircSock;
+  IrcControl           *ircControl;
 
   QXmppConfiguration  xmppConfig;
   int           publicPort;

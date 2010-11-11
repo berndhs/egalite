@@ -1,4 +1,4 @@
-#include "irc-sock.h"
+#include "irc-control.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -26,10 +26,12 @@
 #include "version.h"
 #include "helpview.h"
 #include "irc-channel-box.h"
-#include "irc-channel-group.h"
-#include "cert-store.h"
-#include "enter-string.h"
+#include "irc-socket.h"
+#include "irc-sock-static.h"
 #include <QSize>
+#include "cert-store.h"
+#include "irc-channel-group.h"
+#include "enter-string.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QTimer>
@@ -45,27 +47,16 @@ using namespace deliberate;
 namespace egalite
 {
 
-IrcSock::IrcSock (QWidget *parent)
+IrcControl::IrcControl (QWidget *parent)
   :QDialog (parent),
    initDone (false),
    isRunning (false),
-   socket (0),
    isConnected (false),
-   pingTimer (0),
-   scriptTimer (0),
-   waitFirstReceive (false),
    hidSelf (false)
 {
   mainUi.setupUi (this);
   dockedChannels = new IrcChannelGroup (parentWidget ());
   dockedChannels->hide ();
-  socket = new QTcpSocket (this);
-  pingTimer = new QTimer (this);
-  scriptTimer = new QTimer (this);
-  connect (pingTimer, SIGNAL (timeout()),
-           this, SLOT (SendPing()));
-  connect (scriptTimer, SIGNAL (timeout()), 
-           this, SLOT (SendScriptHead()));
   Connect ();
   commandXform ["MSG"] = IrcSockStatic::TransformPRIVMSG;
   commandXform ["JOIN"] = IrcSockStatic::TransformJOIN;
@@ -79,11 +70,11 @@ IrcSock::IrcSock (QWidget *parent)
   receiveHandler ["366"] = IrcSockStatic::Receive366;
   receiveHandler ["TOPIC"] = IrcSockStatic::ReceiveTOPIC;
   receiveHandler ["VERSION"] = IrcSockStatic::ReceiveIgnore;
-qDebug () << " IrcSock allocated and initialized";
+qDebug () << " IrcControl allocated and initialized";
 }
 
 void
-IrcSock::Show ()
+IrcControl::Show ()
 {
   if (!isRunning) {
     Run ();
@@ -97,7 +88,7 @@ IrcSock::Show ()
 }
 
 void
-IrcSock::Hide ()
+IrcControl::Hide ()
 {
   oldSize = size ();
   oldPos = pos();
@@ -106,7 +97,7 @@ IrcSock::Hide ()
 }
 
 void
-IrcSock::ShowGroup ()
+IrcControl::ShowGroup ()
 {
   if (!isRunning) {
     Run ();
@@ -118,7 +109,7 @@ IrcSock::ShowGroup ()
 }
 
 void
-IrcSock::HideGroup ()
+IrcControl::HideGroup ()
 {
   if (dockedChannels) {
     dockedChannels->Hide ();
@@ -126,12 +117,12 @@ IrcSock::HideGroup ()
 }
 
 bool
-IrcSock::Run ()
+IrcControl::Run ()
 {
   if (isRunning) {
     return true;
   }
-  qDebug () << " Start IrcSock";
+  qDebug () << " Start IrcControl";
   QSize defaultSize = size();
   QSize newsize = Settings().value ("sizes/ircsock", defaultSize).toSize();
   resize (newsize);
@@ -164,18 +155,10 @@ IrcSock::Run ()
 }
 
 void
-IrcSock::Connect ()
+IrcControl::Connect ()
 {
-  connect (socket, SIGNAL (readyRead()),
-           this, SLOT (Receive ()));
-  connect (socket, SIGNAL (connected ()),
-           this, SLOT (ConnectionReady ()));
-  connect (socket, SIGNAL (disconnected ()),
-           this, SLOT (ConnectionGone ())); 
   connect (mainUi.connectButton, SIGNAL (clicked()),
            this, SLOT (TryConnect ()));
-  connect (mainUi.disconnectButton, SIGNAL (clicked()),
-           this, SLOT (TryDisconnect ()));
   connect (mainUi.joinButton, SIGNAL (clicked()),
            this, SLOT (TryJoin ()));
   connect (mainUi.sendButton, SIGNAL (clicked()),
@@ -185,15 +168,17 @@ IrcSock::Connect ()
   connect (mainUi.sendEdit, SIGNAL (returnPressed()),
            this, SLOT (Send ()));
   connect (mainUi.loginButton, SIGNAL (clicked()),
-           this, SLOT (FakeLogin ()));
+           this, SLOT (NickLogin ()));
   connect (mainUi.hideButton, SIGNAL (clicked ()),
            this, SLOT (hide ()));
   connect (mainUi.chanList, SIGNAL (itemClicked (QListWidgetItem *)),
            this, SLOT (ChannelClicked (QListWidgetItem *)));
+  connect (mainUi.serverTable, SIGNAL (itemClicked (QTableWidgetItem *)),
+           this, SLOT (ServerClicked (QTableWidgetItem *)));
 }
 
 void
-IrcSock::Exit ()
+IrcControl::Exit ()
 {
   dockedChannels->Close ();
   TryDisconnect ();
@@ -203,7 +188,7 @@ IrcSock::Exit ()
 
 
 void
-IrcSock::CloseCleanup ()
+IrcControl::CloseCleanup ()
 {
   QSize currentSize = size();
   Settings().setValue ("sizes/ircsock",currentSize);
@@ -213,7 +198,7 @@ IrcSock::CloseCleanup ()
 }
 
 void
-IrcSock::Exiting ()
+IrcControl::Exiting ()
 {
   QSize currentSize = size();
   Settings().setValue ("sizes/ircsock",currentSize);
@@ -221,7 +206,7 @@ IrcSock::Exiting ()
 }
 
 void
-IrcSock::TryConnect ()
+IrcControl::TryConnect ()
 {
   QString host = mainUi.serverCombo->currentText();
   if (host == noNameServer) {
@@ -236,13 +221,23 @@ IrcSock::TryConnect ()
       return;
     }
   }
+qDebug () << " try connect to " << host;
+  IrcSocket *socket = new IrcSocket (this);
+  sockets [socket->Name()] = socket;
+  connect (socket, SIGNAL (connected (IrcSocket*)),
+           this, SLOT (ConnectionReady (IrcSocket*)));
+  connect (socket, SIGNAL (disconnected (IrcSocket*)),
+           this, SLOT (ConnectionGone (IrcSocket*)));
+  connect (socket, SIGNAL (ReceivedLine (IrcSocket*, QByteArray)),
+           this, SLOT (ReceiveLine (IrcSocket *, QByteArray)));
+  connect (socket, SIGNAL (ChangedHostName (IrcSocket*, QString)),
+           this, SLOT (ChangedHostName (IrcSocket*, QString)));
   quint16 port = mainUi.portBox->value ();
-  socket->connectToHost (host, port, QTcpSocket::ReadWrite);
-  waitFirstReceive = true;
+  socket->connectToHost (host, port);
 }
 
 void
-IrcSock::TryJoin ()
+IrcControl::TryJoin ()
 {
   QString chan = mainUi.chanCombo->currentText ();
   if (chan == noNameChannel) {
@@ -261,75 +256,44 @@ IrcSock::TryJoin ()
       return;
     }
   }
-  Send (QString ("JOIN %1").arg(chan));
+  IrcSocket * sock = CurrentSock (mainUi.serverTable);
+  if (sock == 0) {
+    return;
+  }
+  sock->Send (QString ("JOIN %1").arg(chan));
 }
 
 void
-IrcSock::TryPart ()
+IrcControl::TryPart ()
 {
   QString chan = mainUi.chanCombo->currentText ();
-  Send (QString ("PART %1").arg (chan));
+  IrcSocket * sock = CurrentSock (mainUi.serverTable);
+  sock->Send (QString ("PART %1").arg (chan));
 }
 
 int
-IrcSock::OpenCount ()
+IrcControl::OpenCount ()
 {
-  if (socket) {
-    if (isConnected) {
-      return 1;
-    }
-  }
-  return 0;
+  return sockets.size();
 }
 
 void
-IrcSock::TryDisconnect ()
+IrcControl::TryDisconnect ()
 {
   ChannelMapType::iterator  cit;
   for (cit=channels.begin(); cit != channels.end(); cit++) {
-    if (*cit) {
-      (*cit)->Part();
-    }
+    (*cit)->Part();
   }
-  QTimer::singleShot (3000, this, SLOT (SockDisconnect()));
-}
-
-void
-IrcSock::SockDisconnect ()
-{
-  socket->disconnectFromHost ();
-}
-
-void
-IrcSock::Receive ()
-{
-  QByteArray bytes = socket->readAll ();
-qDebug () << " got " << bytes.size() << " bytes " << bytes;
-  QByteArray last2 = lineData.right(2);
-  if (last2.size () < 2) {
-    last2.prepend ("??");
-    last2 = last2.right (2);
-  }
-  int nb = bytes.size();
-  char byte;
-  char last0, last1;
-  last0 = last2[0];
-  last1 = last2[1];
-  for (int b=0; b< nb; b++) {
-    byte = bytes[b];
-    lineData.append (byte);
-    last0 = last1;
-    last1 = byte;
-    if (last0 == '\r' && last1 == '\n') {
-      QByteArray lineCopy = lineData;
-      ReceiveLine (lineCopy);
-      lineData.clear ();
+  SocketMapType::iterator  sit;
+  for (sit = sockets.begin (); sit != sockets.end(); sit++) {
+    if (*sit) {
+     (*sit)->Disconnect ();
     }
   }
 }
 
 void
-IrcSock::ReceiveLine (const QByteArray & line)
+IrcControl::ReceiveLine (IrcSocket * sock, QByteArray line)
 {
   QString data (QString::fromUtf8(line.data()));
 qDebug () << " received " << data;
@@ -360,46 +324,35 @@ qDebug () << " received " << data;
     cmd = cmd.trimmed ();
     QRegExp numericRx ("\\d\\d\\d");
     if (receiveHandler.contains (cmd.toUpper())) {
-      (*receiveHandler [cmd]) (this, first, cmd, rest);
+      (*receiveHandler [cmd]) (this, sock, first, cmd, rest);
     } else if (numericRx.exactMatch (cmd)) {
-      ReceiveNumeric (this, first, cmd, rest);
+      IrcSockStatic::ReceiveNumeric (this, sock, first, cmd, rest);
     } else {
-      ReceiveDefault (this, first, cmd, rest);
+      IrcSockStatic::ReceiveDefault (this, sock, first, cmd, rest);
     }
   }  
   mainUi.logDisplay->append (QString (line));\
 }
 
 void
-IrcSock::SendPing ()
+IrcControl::Send ()
 {
-  qDebug () << "send ping goes to " << currentServer;
-  QString msg (QString ("PING %1").arg (currentServer));
-  SendData (msg);
-  
+  int row = mainUi.serverTable->currentRow ();
+  QTableWidgetItem * item = FindType (mainUi.serverTable, row, int (Cell_Addr));
+  if (item) {
+    QString sname = item->data (int(Data_ConnName)).toString();
+    if (sockets.contains (sname)) {
+      QString text = mainUi.sendEdit->text ();
+      IrcSocket * sock = sockets [sname];
+      TransformSend (sock, text);
+      sock -> Send (mainUi.sendEdit->text ());
+    }
+  }
 }
 
 void
-IrcSock::SendData (const QString & data)
-{
-  QString copyStr (data);
-  copyStr.append ("\r\n");
-  QByteArray copy = copyStr.toUtf8();
-  qint64 written = socket->write (copy);
-qDebug () << " sent " << written << " bytes to socket: " << copy;
-  mainUi.logDisplay->append (data);
-}
-
-void
-IrcSock::Send ()
-{
-  Send (mainUi.sendEdit->text());
-}
-
-
-void
-IrcSock::Send (QString data)
-{
+IrcControl::TransformSend (IrcSocket * sock, QString & data)
+{ 
   if (data.startsWith(QChar ('/'))) {
     QRegExp wordRx ("(\\S+)");
     int pos = wordRx.indexIn (data, 1);
@@ -408,85 +361,131 @@ IrcSock::Send (QString data)
       QString first = data.mid (1,len).toUpper();
       QString rest = data.mid (len+1,-1);
       if (commandXform.contains (first)) {
-        (*commandXform[first]) (this, data, first, rest);
+        (*commandXform[first]) (this, sock, data, first, rest);
       } else {
-        TransformDefault (this, data, first, rest);
+        IrcSockStatic::TransformDefault (this, sock, data, first, rest);
       }
     }
   }
-  scriptLines += data;
-  RollScript ();
 }
 
-void
-IrcSock::RollScript ()
-{
-  SendScriptHead ();
-  scriptTimer->start (1000);
-}
 
 void
-IrcSock::SendScriptHead ()
+IrcControl::ConnectionReady (IrcSocket * sock)
 {
-  if (scriptLines.isEmpty()) {
-    scriptTimer->stop ();
-    return;
-  }
-  QString line = scriptLines.takeFirst();
-  SendData (line);
-}
-
-void
-IrcSock::DidSend (qint64 bytes)
-{
-  if (bytes < 1) {
-    LogRaw (QString ("send failed reporting %1 bytes").arg(bytes));
-  }
-}
-
-void
-IrcSock::ConnectionReady ()
-{
-  waitFirstReceive = true;
-  pingTimer->start (1*60*1000);
-  QTimer::singleShot (30000, this, SLOT (SendPing()));
   mainUi.logDisplay->append ("Connection Ready");
   mainUi.logDisplay->append (QString ("peer address %1")
-                 .arg (socket->peerAddress().toString()));
-  mainUi.peerAddressLabel->setText (socket->peerAddress().toString());
-  qDebug () << " connection ready " << socket->peerAddress().toString();
-  QFont font = mainUi.peerAddressLabel->font ();
-  font.setStrikeOut (false);
-  mainUi.peerAddressLabel->setFont (font);
-  ignoreSources = CertStore::IF().IrcIgnores ();
-  isConnected = true;
+                 .arg (sock->peerAddress().toString()));
+  qDebug () << " connection ready " << sock->peerAddress().toString();
+  AddConnect (sock);
   emit StatusChange ();
 }
 
 void
-IrcSock::ConnectionGone ()
+IrcControl::AddConnect (IrcSocket *sock)
 {
-  isConnected = false;
-  pingTimer->stop ();
-  qDebug () << " disconnect seen for " << socket;
+  int nrows = mainUi.serverTable->rowCount();
+  QTableWidgetItem * item = 
+          new QTableWidgetItem (sock->HostName(), int(Cell_Name));
+  int row (nrows);
+  mainUi.serverTable->setRowCount (nrows+1);
+  mainUi.serverTable->setItem (row, 1, item);
+  item = new QTableWidgetItem (sock->peerAddress().toString(),
+                               int (Cell_Addr));
+  item->setData (Data_ConnName, sock->Name());
+  mainUi.serverTable->setItem (row, 2, item);
+  item = new QTableWidgetItem (QString::number (sock->peerPort()),
+                               int (Cell_Port));
+  mainUi.serverTable->setItem (row, 3, item);
+  item = new QTableWidgetItem ("Disconnect", int (Cell_Action));
+  mainUi.serverTable->setItem (row, 0, item);
+}
+
+void
+IrcControl::ChangedHostName (IrcSocket * sock, QString name)
+{
+qDebug () << " have new host name " << name << " for " << sock;
+  if (sock == 0) {
+    return;
+  }
+  QString sname = sock->Name();
+  int row = FindRow (mainUi.serverTable, sname);
+  QTableWidgetItem * item = FindType (mainUi.serverTable, row, int(Cell_Name));
+  if (item) {
+    item->setText (name);
+  }
+}
+
+QTableWidgetItem *
+IrcControl::FindType (QTableWidget * table, int row, int type)
+{
+  if (table == 0) {
+    return 0;
+  }
+  int ncols = table->columnCount();
+  for (int col=0; col < ncols; col++) {
+    QTableWidgetItem * item = table->item (row, col);
+    if (item && item->type() == type) {
+      return item;
+    }
+  }
+  return 0;
+}
+
+int
+IrcControl::FindRow (QTableWidget * table, const QString & sname)
+{
+  int nrows = table->rowCount ();
+  int ncols = table->columnCount ();
+  for (int row = 0; row< nrows; row++) {
+    for (int col=0; col < ncols; col++) {
+      QTableWidgetItem * item = table->item (row, col);
+      if (item && item->type() == int (Cell_Addr)
+          && item->data (int (Data_ConnName)).toString() == sname) {
+        return row;
+      }
+    }
+  }
+}
+
+void
+IrcControl::ConnectionGone (IrcSocket * sock)
+{
+  qDebug () << " disconnect seen for " << sock;
   mainUi.logDisplay->append (QString ("!!! disconnected from %1")
-                 .arg (socket->peerAddress().toString()));
-  QFont font = mainUi.peerAddressLabel->font ();
-  font.setStrikeOut (true);
-  mainUi.peerAddressLabel->setFont (font);
+                 .arg (sock->peerAddress().toString()));
+  RemoveConnect (sock);
   emit StatusChange ();
 }
 
-void 
-IrcSock::SockError (QAbstractSocket::SocketError err)
+void
+IrcControl::RemoveConnect (IrcSocket * sock)
 {
-  qDebug () << " socket error " << err;
-  qDebug () << " socket error text " << socket->errorString ();
+  int row, col;
+  int nrows = mainUi.serverTable->rowCount ();
+  int ncols = mainUi.serverTable->columnCount ();
+  QString sname = sock->Name();
+  QTableWidgetItem *item;  
+  bool looking (true);
+  for (row=0; looking && row< nrows; row++) {
+    for (col=0; looking && col< ncols; col++) {
+      item = FindType (mainUi.serverTable, row, int (Cell_Addr));
+      if (item && item->data (int(Data_ConnName)).toString() == sname) {
+        mainUi.serverTable->removeRow (row);
+        looking = false;
+      }
+    }
+  }
 }
 
+
 void
-IrcSock::FakeLogin ()
+IrcControl::NickLogin ()
 {
+  IrcSocket * sock = CurrentSock (mainUi.serverTable);
+  if (sock == 0) {
+    return;
+  }
   QString nick = mainUi.nickCombo->currentText();
   if (nick == noNameNick) {
     EnterString  enter (this);
@@ -504,21 +503,42 @@ IrcSock::FakeLogin ()
     real = nick;
   }
   if (havePass) {
-    scriptLines.append (QString ("PASS :%1").arg(pass));
+    sock->Send (QString ("PASS :%1").arg(pass));
   }
-  scriptLines.append (QString ("USER %1 0 * :%2").arg (nick).arg(real));
-  scriptLines.append (QString ("NICK %1").arg (nick));
-  QTimer::singleShot (100, this, SLOT (RollScript ()));
-  currentUser = nick;
+  sock->Send (QString ("USER %1 0 * :%2").arg (nick).arg(real));
+  sock->Send (QString ("NICK %1").arg (nick));
+  sock->SetNick (nick);
+}
+
+IrcSocket *
+IrcControl::CurrentSock (QTableWidget * table)
+{
+  int row = table->currentRow ();
+  if (row < 0) {
+    return 0;
+  }
+  for (int col=0; col < table->columnCount(); col++) {
+    QTableWidgetItem * item = FindType (table, row, int(Cell_Addr));
+    if (item) {    
+      QString sname = item->data (int(Data_ConnName)).toString ();
+      if (sockets.contains (sname)) {
+        return sockets [sname];
+      }
+    }
+  }
+  return 0;
 }
 
 void
-IrcSock::AddChannel (const QString & chanName)
+IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
 {
   if (channels.contains (chanName)) {
     return;
   }
-  IrcChannelBox * newchan  = new IrcChannelBox (chanName, this);
+  if (sock == 0) {
+    return;
+  }
+  IrcChannelBox * newchan  = new IrcChannelBox (chanName, sock->Name(), this);
   channels [chanName] = newchan;
   dockedChannels->AddChannel (newchan);
   dockedChannels->show ();
@@ -536,7 +556,7 @@ IrcSock::AddChannel (const QString & chanName)
 }
 
 void
-IrcSock::DropChannel (const QString & chanName)
+IrcControl::DropChannel (IrcSocket * sock, const QString & chanName)
 {
   if (!channels.contains (chanName)) {
     return;
@@ -565,7 +585,7 @@ IrcSock::DropChannel (const QString & chanName)
 }
 
 void
-IrcSock::ChannelClicked (QListWidgetItem *item)
+IrcControl::ChannelClicked (QListWidgetItem *item)
 {
   if (item) {
     QString chanName = item->text ();
@@ -577,19 +597,29 @@ IrcSock::ChannelClicked (QListWidgetItem *item)
 }
 
 void
-IrcSock::ChanActive (IrcChannelBox *chan)
+IrcControl::ServerClicked (QTableWidgetItem *item)
+{
+  if (item) {
+    qDebug () << " clicked socked table item " << item 
+              << " row " << item->row()
+              << " " << item->text ();
+  }
+}
+
+void
+IrcControl::ChanActive (IrcChannelBox *chan)
 {
   dockedChannels->MarkActive (chan, true);
 }
 
 void
-IrcSock::ChanInUse (IrcChannelBox *chan)
+IrcControl::ChanInUse (IrcChannelBox *chan)
 {
   dockedChannels->MarkActive (chan, false);
 }
 
 void
-IrcSock::ChanWantsFloat (IrcChannelBox *chan)
+IrcControl::ChanWantsFloat (IrcChannelBox *chan)
 {
   if (dockedChannels->HaveChannel (chan)) {
     dockedChannels->RemoveChannel (chan);
@@ -603,7 +633,7 @@ IrcSock::ChanWantsFloat (IrcChannelBox *chan)
 }
 
 void
-IrcSock::ChanWantsDock (IrcChannelBox *chan)
+IrcControl::ChanWantsDock (IrcChannelBox *chan)
 {
   if (floatingChannels.contains (chan)) {
     IrcFloat * oldFloat = floatingChannels [chan];
@@ -618,26 +648,37 @@ IrcSock::ChanWantsDock (IrcChannelBox *chan)
 }
 
 void
-IrcSock::Outgoing (QString chan, QString msg)
+IrcControl::Outgoing (QString chan, QString msg)
 {
   QString trim = msg.trimmed ();
   if (trim.length () < 1) {
     return;
   }
+  if (!channels.contains (chan)) {
+    return;
+  }
+  QString sname = channels[chan]->Sock ();
+  if (!sockets.contains (sname)) {
+    return;
+  }
+  IrcSocket * sock = sockets [sname];
   if (trim.startsWith (QChar ('/')) ){
-    Send (trim);
+    QString cooked (trim);
+    TransformSend (sock, cooked);
+    sock->Send (trim);
     trim.prepend (QString (":%1!%1@localhost ").arg (currentUser));
-    ReceiveLine (trim.toUtf8());
+    ReceiveLine (sock, trim.toUtf8());
   } else {
     QString data (QString ("PRIVMSG %1 :%2").arg (chan). arg (msg));
-    SendData (data);
+    sock->SendData (data);
     data.prepend (QString (":%1!%1@localhost ").arg (currentUser));
-    ReceiveLine (data.toUtf8());
+    ReceiveLine (sock, data.toUtf8());
   }
 }
 
 void
-IrcSock::InChanMsg (const QString & chan, 
+IrcControl::InChanMsg (IrcSocket * sock,
+                    const QString & chan, 
                     const QString & from, 
                     const QString & msg)
 {
@@ -656,7 +697,8 @@ IrcSock::InChanMsg (const QString & chan,
 
 
 void
-IrcSock::InUserMsg (const QString & from, 
+IrcControl::InUserMsg (IrcSocket * sock, 
+                    const QString & from, 
                     const QString & to, 
                     const QString & msg)
 {
@@ -664,7 +706,7 @@ IrcSock::InUserMsg (const QString & from,
     return;
   }
   if (!channels.contains (from)) {
-    AddChannel (from);
+    AddChannel (sock, from);
   }
   if (channels.contains (from)) {
     QString themsg = msg.trimmed();
@@ -681,13 +723,13 @@ IrcSock::InUserMsg (const QString & from,
 }
 
 void
-IrcSock::LogRaw (const QString & raw)
+IrcControl::LogRaw (const QString & raw)
 {
   mainUi.logDisplay->append (raw);
 }
 
 void
-IrcSock::AddNames (const QString & chanName, const QString & names)
+IrcControl::AddNames (const QString & chanName, const QString & names)
 {
   if (!channels.contains (chanName)) {
     return;
@@ -697,7 +739,7 @@ IrcSock::AddNames (const QString & chanName, const QString & names)
 }
 
 void
-IrcSock::AddName (const QString & chanName, const QString & name)
+IrcControl::AddName (const QString & chanName, const QString & name)
 {
   if (!channels.contains (chanName)) {
     return;
@@ -707,7 +749,8 @@ IrcSock::AddName (const QString & chanName, const QString & name)
 }
 
 void
-IrcSock::DropName (const QString & chanName, const QString & name)
+IrcControl::DropName (IrcSocket * sock,
+                      const QString & chanName, const QString & name)
 {
   if (!channels.contains (chanName)) {
     return;
@@ -717,7 +760,8 @@ IrcSock::DropName (const QString & chanName, const QString & name)
 }
 
 void
-IrcSock::SetTopic (const QString & chanName, const QString & topic)
+IrcControl::SetTopic (IrcSocket * sock,
+                      const QString & chanName, const QString & topic)
 {
   if (!channels.contains (chanName)) {
     return;
