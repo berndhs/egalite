@@ -73,7 +73,8 @@ IrcSockStatic::ReceivePING (IrcControl * context, IrcSocket *sock,
 {
   Q_UNUSED (cmd)
   Q_UNUSED (rest)
-  QString answer = QString ("PONG %1 %2").arg(first);
+qDebug () << " answring PING from " << first;
+  QString answer = QString ("PONG %1 %2").arg(first).arg(rest);
   sock->SendData (answer);
 }
 
@@ -158,9 +159,11 @@ qDebug () << "user " << user << " currentUser "
     if (user == sock->Nick()) {
       context->DropChannel (sock, chan);
     } else {
-      context->DropName (sock, chan, user);
-      context->mainUi.logDisplay->append (QString ("user %1 PARTs %2")
-                                    .arg (user) . arg (chan));
+      context->DropName (sock, chan, user, rest.mid (pos+len,-1));
+      context->mainUi.logDisplay->append 
+                             (QString ("user %1 PARTs %2 saying %3")
+                               .arg (user) . arg (chan)
+                               .arg (rest.mid (pos+len,-1)));
     }
   }
 }
@@ -171,7 +174,6 @@ IrcSockStatic::ReceivePRIVMSG (IrcControl * context, IrcSocket *sock,
                          const QString & cmd,
                          const QString & rest)
 {
-  Q_UNUSED (cmd)
   int pos, len;
   QRegExp sourceRx ("(\\S+)!");
   QString source (first);
@@ -197,6 +199,31 @@ IrcSockStatic::ReceivePRIVMSG (IrcControl * context, IrcSocket *sock,
     } else {
       context->InUserMsg (sock, source, dest, msg);
     }
+  }
+}
+
+void
+IrcSockStatic::ReceiveQUIT (IrcControl * context, IrcSocket *sock,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest)
+{
+  Q_UNUSED (cmd)
+  int pos, len;
+  QRegExp sourceRx ("(\\S+)!");
+  QString user (first);
+  QString dest;
+  QString msg;
+  QRegExp wordRx ("(\\S+)");
+  pos = sourceRx.indexIn (first,0);
+  if (pos >= 0) {
+    len = sourceRx.matchedLength ();
+    user = first.mid (pos,len);
+    user.chop (1);
+    if (user.startsWith (QChar (':'))) {
+      user.remove (0,1);
+    }
+    context->UserQuit (sock, user, rest);
   }
 }
 
@@ -246,7 +273,36 @@ IrcSockStatic::ReceiveIgnore (IrcControl * context, IrcSocket *sock,
                          const QString & cmd,
                          const QString & rest)
 {
+  Q_UNUSED (context)
+  Q_UNUSED (sock)
+  Q_UNUSED (first)
+  Q_UNUSED (cmd)
+  Q_UNUSED (rest)
   qDebug () << " Ignoring command " << cmd;
+}
+
+void
+IrcSockStatic::Receive004 (IrcControl * context, IrcSocket *sock,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest)
+{
+  Q_UNUSED (cmd)
+  Q_UNUSED (first)
+  QRegExp wordRx ("(\\S+)");
+  int pos, len;
+  pos = wordRx.indexIn (rest,0);
+  if (pos >= 0) {
+    len = wordRx.matchedLength ();
+    QString dest = rest.mid (pos, len);
+    pos = wordRx.indexIn (rest, pos+len);
+    if (pos >= 0) {
+      len = wordRx.matchedLength ();
+      QString host = rest.mid (pos, len);
+      context->ChangedHostName (sock, host);
+      sock->SetHostName (host);
+    }
+  }
 }
 
 void

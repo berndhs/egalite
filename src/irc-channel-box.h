@@ -52,7 +52,7 @@ public:
 
   void AddNames (const QString & names);
   void AddName (const QString & name);
-  void DropName (const QString & name);
+  void DropName (const QString & name, const QString & msg = QString());
 
   QString Topic () { return topic; }
   QString Name ()  { return chanName; }

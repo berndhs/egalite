@@ -34,7 +34,7 @@ int IrcSocket::sockCount (0);
 
 IrcSocket::IrcSocket (QObject *parent)
   :QTcpSocket (parent),
-   waitForName (false)
+   needPing (true)
 {
   sockCount++;
   setObjectName (QString("IrcSocket-%1").arg(sockCount));
@@ -91,17 +91,17 @@ void
 IrcSocket::SetHostName (const QString & name)
 {
   hostName = name;
+  knowHostName = true;
 }
 
 void
 IrcSocket::DidConnect ()
 {
-  waitForName = true;
   hostName = peerAddress().toString();
   emit connected (this);
   emit ChangedHostName (this, hostName);
   scriptTimer->start (1000);
-  pingTimer->start (90*1000);
+  pingTimer->start (2*60*1000);
 }
 
 void
@@ -131,9 +131,6 @@ qDebug () << " got " << bytes.size() << " bytes " << bytes;
     last0 = last1;
     last1 = byte;
     if (last0 == '\r' && last1 == '\n') {
-      if (waitForName) {
-        GetHostName (lineData);
-      }
       emit ReceivedLine (this, lineData);
       lineData.clear ();
     }
@@ -154,6 +151,9 @@ IrcSocket::SendData (const QString & data)
   copyStr.append ("\r\n");
   QByteArray copy = copyStr.toUtf8();
   qint64 written = write (copy);
+  if (written > 0) {
+    needPing = false;
+  }
 qDebug () << " sent " << written << " bytes to socket: " << copy;
 }
 
@@ -181,11 +181,15 @@ void
 IrcSocket::SendPing ()
 {
   if (knowHostName) {
-    qDebug () << "send ping goes to " << peerAddress();  
-    QString msg (QString ("PING %1").arg (hostName));
-    SendData (msg);
+    if (needPing) {
+      qDebug () << "send ping goes to " << peerAddress();  
+      QString msg (QString ("PING %1").arg (hostName));
+      SendData (msg);
+    }
+    needPing = true;
   } else {
     qDebug () << " cannot PING, unknown host name for " << peerAddress();
+    qDebug () << "      guess is " << hostName;
   }
 }
 
@@ -197,23 +201,6 @@ IrcSocket::SockError (QAbstractSocket::SocketError err)
   qDebug () << " socket error text " << errorString ();
 }
 
-void
-IrcSocket::GetHostName (const QString & lineData)
-{
-qDebug () << " try to get host from " << lineData;
-  QRegExp sourceRx (":(\\S+)");
-  int pos = sourceRx.indexIn (lineData, 0);
-  if (pos >= 0) {
-    int len = sourceRx.matchedLength ();
-    QString host = lineData.mid (pos+1,len-1);
-    if (host.length () > 0) {
-      hostName = host;
-      waitForName = false;
-      emit ChangedHostName (this, hostName);
-qDebug () << " got host " << hostName;
-    }
-  }
-}
 
 } // namespace
 

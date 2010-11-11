@@ -76,7 +76,6 @@ signals:
 
 private:
 
-  void     GetHostName (const QString & lineData);
 
   QString          hostName;
   bool             knowHostName;
@@ -85,7 +84,7 @@ private:
   QStringList      scriptLines;
   QTimer          *pingTimer;
   QTimer          *scriptTimer;
-  bool             waitForName;
+  bool             needPing;
 
   static int sockCount;
 

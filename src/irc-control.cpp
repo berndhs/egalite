@@ -63,8 +63,10 @@ IrcControl::IrcControl (QWidget *parent)
   receiveHandler ["PING"] = IrcSockStatic::ReceivePING;
   receiveHandler ["PONG"] = IrcSockStatic::ReceiveIgnore;
   receiveHandler ["PRIVMSG"] = IrcSockStatic::ReceivePRIVMSG;
+  receiveHandler ["QUIT"] = IrcSockStatic::ReceiveQUIT;
   receiveHandler ["JOIN"] = IrcSockStatic::ReceiveJOIN;
   receiveHandler ["PART"] = IrcSockStatic::ReceivePART;
+  receiveHandler ["004"] = IrcSockStatic::Receive004;
   receiveHandler ["332"] = IrcSockStatic::Receive332;
   receiveHandler ["353"] = IrcSockStatic::Receive353;
   receiveHandler ["366"] = IrcSockStatic::Receive366;
@@ -149,7 +151,10 @@ IrcControl::Run ()
   mainUi.chanCombo->clear ();
   mainUi.chanCombo->insertItems (0,chans);
 
+  ignoreSources = CertStore::IF().IrcIgnores ();
+
   show ();
+
   isRunning = true;
   return true;
 }
@@ -395,6 +400,7 @@ IrcControl::AddConnect (IrcSocket *sock)
   mainUi.serverTable->setItem (row, 3, item);
   item = new QTableWidgetItem (tr("Disconnect"), int (Cell_Action));
   mainUi.serverTable->setItem (row, 0, item);
+  mainUi.serverTable->selectRow (row);
 }
 
 void
@@ -641,6 +647,24 @@ IrcControl::PartAll (const QString & sockName)
 }
 
 void
+IrcControl::UserQuit (IrcSocket * sock,
+                      const QString & user,
+                      const QString & msg)
+{
+  QString sockName = sock->Name();
+  QString quitMsg = QString (tr("QUIT ") + msg);
+  ChannelMapType::iterator cit;
+  for (cit=channels.begin(); cit != channels.end(); cit++) {
+    if (*cit) {
+      IrcChannelBox * chan = *cit;
+      if (chan->Sock() == sockName) {
+        chan->DropName (user, quitMsg);
+      }
+    }
+  }
+}
+
+void
 IrcControl::ChanActive (IrcChannelBox *chan)
 {
   dockedChannels->MarkActive (chan, true);
@@ -725,8 +749,12 @@ IrcControl::InChanMsg (IrcSocket * sock,
     if (themsg.startsWith (QChar (':'))) {
       themsg.remove (0,1);
     }
-    channels [chan]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
+    if (themsg.startsWith (QChar (1))) {
+      IncomingCtcpChan (sock, from, chan, themsg);
+    } else {
+      channels [chan]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
                                   arg(from).arg(themsg));
+    }
   }
 }
 
@@ -748,13 +776,43 @@ IrcControl::InUserMsg (IrcSocket * sock,
     if (themsg.startsWith (QChar (':'))) {
       themsg.remove (0,1);
     }
-    channels [from]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
+    if (themsg.startsWith (QChar (1))) {
+      IncomingCtcpUser (sock, from, to, themsg);
+    } else {
+      channels [from]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
                                   arg(from).arg(themsg));
+    }
   }
   mainUi.logDisplay->append (QString ("Message from %1 to %2 says %3")
                              .arg (from)
                              .arg (to)
                              .arg (msg));
+}
+
+void
+IrcControl::IncomingCtcpChan (IrcSocket * sock, 
+                    const QString & from, 
+                    const QString & chan, 
+                    const QString & msg)
+{
+  channels [chan]->Incoming (QString 
+                     ("<a href=\"ircsender://%1\">%1</a>:"
+                      "<span style=\"font-size:small\">CTCP</span> %2").
+                                  arg(from).arg(msg));
+}
+
+
+
+void
+IrcControl::IncomingCtcpUser (IrcSocket * sock, 
+                    const QString & from, 
+                    const QString & to, 
+                    const QString & msg)
+{
+   channels [from]->Incoming (QString 
+                      ("<a href=\"ircsender://%1\">%1</a>:"
+                      "<span style=\"font-size:small\">CTCP</span> %2").
+                                  arg(from).arg(msg));
 }
 
 void
@@ -785,13 +843,15 @@ IrcControl::AddName (const QString & chanName, const QString & name)
 
 void
 IrcControl::DropName (IrcSocket * sock,
-                      const QString & chanName, const QString & name)
+                      const QString & chanName, 
+                      const QString & name,
+                      const QString & msg)
 {
   if (!channels.contains (chanName)) {
     return;
   }
   IrcChannelBox * chan = channels [chanName];
-  chan->DropName (name);
+  chan->DropName (name, msg);
 }
 
 void

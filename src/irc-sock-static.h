@@ -62,6 +62,10 @@ private:
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
+  static void ReceiveQUIT (IrcControl * context, IrcSocket *sock,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest);
   static void ReceiveJOIN (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
@@ -71,6 +75,10 @@ private:
                          const QString & cmd,
                          const QString & rest);
   static void ReceiveTOPIC (IrcControl * context, IrcSocket *sock,
+                         const QString & first,
+                         const QString & cmd,
+                         const QString & rest);
+  static void Receive004 (IrcControl * context, IrcSocket *sock,
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);

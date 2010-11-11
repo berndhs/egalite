@@ -174,9 +174,10 @@ IrcChannelBox::AddNames (const QString & names)
 void
 IrcChannelBox::AddName (const QString & name)
 {
-  if (!oldNames.contains (name)) {
-    oldNames.append (name);
+  if (oldNames.contains (name)) {
+    return;
   }
+  oldNames.append (name);
   ui.chanUsers->clear();
   ui.chanUsers->addItems (oldNames);
   ui.chanUsers->sortItems();
@@ -185,14 +186,17 @@ IrcChannelBox::AddName (const QString & name)
 }
 
 void
-IrcChannelBox::DropName (const QString & name)
+IrcChannelBox::DropName (const QString & name, const QString & msg)
 {
+  if (!oldNames.contains (name)) {  // not mine - don't care
+    return;
+  }
   oldNames.removeAll (name);
   ui.chanUsers->clear();
   ui.chanUsers->addItems (oldNames);
   ui.chanUsers->sortItems();
-  ui.rawLog->append (tr("Exit: %1").arg(name));
-  AppendSmall (ui.chanHistory, tr(" Exit: &lt;- %1").arg(name));
+  ui.rawLog->append (tr("Exit: %1 %2").arg(name). arg (msg));
+  AppendSmall (ui.chanHistory, tr(" Exit: &lt;- %1 %2").arg(name).arg(msg));
 }
 
 void

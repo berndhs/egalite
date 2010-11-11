@@ -65,6 +65,14 @@ public:
                    const QString & from, 
                    const QString & to, 
                    const QString & msg);
+  void  IncomingCtcpChan (IrcSocket * sock,
+                   const QString & from, 
+                   const QString & chan,
+                   const QString & msg);
+  void  IncomingCtcpUser (IrcSocket * sock,
+                   const QString & from, 
+                   const QString & to,
+                   const QString & msg);
 
 public slots:
 
@@ -135,14 +143,22 @@ private:
   QTableWidgetItem* FindType (QTableWidget * table, int row, int type);
   int  FindRow (QTableWidget * table, const QString & sname);
   void AddChannel (IrcSocket * sock, const QString & chanName);
-  void DropChannel (IrcSocket * sock, const QString & chanName);
+  void DropChannel (IrcSocket * sock, 
+                    const QString & chanName);
   void PartAll (const QString & sockName);
   void SendData (const QString & data);
   void LogRaw (const QString & raw);
-  void AddNames (const QString & chanName, const QString & names);
-  void AddName (const QString & chanName, const QString & name);
-  void DropName (IrcSocket * sock, const QString & chanName, 
-                  const QString & name);
+  void AddNames (const QString & chanName, 
+                 const QString & names);
+  void AddName (const QString & chanName, 
+                const QString & name);
+  void DropName (IrcSocket * sock, 
+                  const QString & chanName, 
+                  const QString & name,
+                  const QString & msg = QString());
+  void UserQuit (IrcSocket * sock, 
+                 const QString & user, 
+                 const QString & msg);
   void SetTopic (IrcSocket * sock, 
                  const QString & chanName, const QString & topic);
 
