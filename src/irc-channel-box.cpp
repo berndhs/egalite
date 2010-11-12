@@ -42,22 +42,37 @@ IrcChannelBox::IrcChannelBox (const QString & name,
                               const QString & sock,
                               QWidget *parent)
   :QWidget (parent),
+   chanMenu (0),
    chanName (name),
    sockName (sock)
 {
   ui.setupUi (this);
-  ui.chanTopic->setOpenLinks (false);
-  ui.chanHistory->setOpenLinks (false);
-  ui.partButton->setAutoDefault (false);
-  ui.partButton->setDefault (false);
-  ui.floatButton->setAutoDefault (false);
-  ui.floatButton->setDefault (false);
-  ui.dockButton->setAutoDefault (false);
-  ui.dockButton->setDefault (false);
+  SetupMenu ();
   Connect ();
   SetTopic (tr("Channel %1").arg (chanName));
   show ();
   BalanceSplitter ();
+}
+
+void
+IrcChannelBox::SetupMenu ()
+{
+  ui.chanTopic->setOpenLinks (false);
+  ui.chanHistory->setOpenLinks (false);
+  ui.chanButton->setAutoDefault (false);
+  ui.chanButton->setDefault (false);
+  ui.floatButton->setAutoDefault (false);
+  ui.floatButton->setDefault (false);
+  ui.dockButton->setAutoDefault (false);
+  ui.dockButton->setDefault (false);
+
+  chanMenu = new QMenu (this);
+  chanMenu->addAction (tr("Float"), this, SLOT (Float ()));
+  chanMenu->addAction (tr("Dock"), this, SLOT (Dock ()));
+  chanMenu->addAction (tr("Hide"), this, SLOT (HideMe ()));
+  chanMenu->addAction (tr("Hide Dock"), this, SLOT (HideGroup ()));
+  chanMenu->addAction (tr("Hide All"), this, SLOT (HideAll ()));
+  chanMenu->addAction (tr("Leave Channel"), this, SLOT (Part ()));
 }
 
 void
@@ -89,8 +104,8 @@ IrcChannelBox::Connect ()
            this, SLOT (TypingFinished()));
   connect (ui.sendButton, SIGNAL (clicked ()),
            this, SLOT (TypingFinished ()));
-  connect (ui.partButton, SIGNAL (clicked ()),
-           this, SLOT (Part()));
+  connect (ui.chanButton, SIGNAL (clicked ()),
+           this, SLOT (Menu ()));
   connect (ui.floatButton, SIGNAL (clicked ()),
            this, SLOT (Float()));
   connect (ui.dockButton, SIGNAL (clicked ()),
@@ -234,6 +249,34 @@ void
 IrcChannelBox::ClickedUser (QListWidgetItem *item)
 {
   qDebug () << " clicked on user " << item->text ();
+}
+
+void
+IrcChannelBox::Menu ()
+{
+  QPoint here;
+  here.setX (mapToGlobal (ui.chanButton->pos()).x());
+  here.setY (mapToGlobal (ui.chanButton->pos()).y()
+                          + ui.chanButton->size().height ());
+  chanMenu->exec (here);
+}
+
+void
+IrcChannelBox::HideMe ()
+{
+  emit HideChannel (this);
+}
+
+void
+IrcChannelBox::HideGroup ()
+{
+  emit HideDock ();
+}
+
+void
+IrcChannelBox::HideAll ()
+{
+  emit HideAllChannels ();
 }
 
 bool

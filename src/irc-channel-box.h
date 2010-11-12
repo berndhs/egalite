@@ -70,6 +70,10 @@ private slots:
   void TypingFinished ();
   void Link (const QUrl & url);
   void ClickedUser (QListWidgetItem * item);
+  void Menu ();
+  void HideMe ();
+  void HideGroup ();
+  void HideAll ();
 
 protected:
 
@@ -83,18 +87,23 @@ signals:
   void InUse (IrcChannelBox * box);
   void WantFloat (IrcChannelBox * box);
   void WantDock (IrcChannelBox * box);
+  void HideAllChannels ();
+  void HideDock ();
+  void HideChannel (IrcChannelBox * box);
 
 private:
 
-   void   Connect ();
-   void   BalanceSplitter ();
-   void   AppendSmall (QTextBrowser* log, const QString & line);
+  void   SetupMenu ();
+  void   Connect ();
+  void   BalanceSplitter ();
+  void   AppendSmall (QTextBrowser* log, const QString & line);
 
-   Ui_IrcChannelBox    ui;
-   QString             chanName;
-   QString             sockName;
-   QString             topic;
-   QStringList         oldNames;
+  Ui_IrcChannelBox    ui;
+  QMenu              *chanMenu;
+  QString             chanName;
+  QString             sockName;
+  QString             topic;
+  QStringList         oldNames;
 
 };
 

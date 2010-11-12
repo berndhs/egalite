@@ -123,6 +123,24 @@ IrcControl::HideGroup ()
   }
 }
 
+void
+IrcControl::ShowFloats ()
+{
+  FloatingMapType::iterator fit;
+  for (fit=floatingChannels.begin (); fit != floatingChannels.end(); fit++) {
+    fit.value()->Show ();
+  }
+}
+
+void
+IrcControl::HideFloats ()
+{
+  FloatingMapType::iterator fit;
+  for (fit=floatingChannels.begin (); fit != floatingChannels.end(); fit++) {
+    fit.value()->Hide ();
+  }
+}
+
 bool
 IrcControl::Run ()
 {
@@ -209,6 +227,20 @@ IrcControl::CloseCleanup ()
   QSize  groupBoxSize = dockedChannels->size();
   Settings().setValue ("sizes/channelgroup", groupBoxSize);
   Settings().sync();
+}
+
+void
+IrcControl::HideAll ()
+{
+  HideGroup ();
+  HideFloats ();
+}
+
+void
+IrcControl::ShowAll ()
+{
+  ShowGroup ();
+  ShowFloats ();
 }
 
 void
@@ -582,12 +614,19 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
            this, SLOT (ChanWantsFloat (IrcChannelBox *)));
   connect (newchan, SIGNAL (WantDock (IrcChannelBox *)),
            this, SLOT (ChanWantsDock (IrcChannelBox *)));
+  connect (newchan, SIGNAL (HideAllChannels ()),
+           this, SLOT (HideAll ()));
+  connect (newchan, SIGNAL (HideDock ()),
+           this, SLOT (HideGroup ()));
+  connect (newchan, SIGNAL (HideChannel (IrcChannelBox *)),
+           this, SLOT (HideChannel (IrcChannelBox *)));
   mainUi.chanList->addItem (chanName);
 }
 
 void
 IrcControl::DropChannel (IrcSocket * sock, const QString & chanName)
 {
+  Q_UNUSED (sock)
   if (!channels.contains (chanName)) {
     return;
   }
@@ -622,7 +661,26 @@ IrcControl::ChannelClicked (QListWidgetItem *item)
     qDebug () << " clicked on channel " << chanName;
     IrcChannelBox * chanBox = channels [chanName];
     qDebug () << "       is in box " << chanBox;
+    ShowChannel (chanBox);
     chanBox->raise ();
+  }
+}
+
+void
+IrcControl::ShowChannel (IrcChannelBox * chanBox)
+{
+  if (dockedChannels->HaveChannel (chanBox)) {
+    dockedChannels->Show ();
+  } else if (floatingChannels.contains (chanBox)) {
+    floatingChannels [chanBox]->Show ();
+  } 
+}
+
+void
+IrcControl::HideChannel (IrcChannelBox * chanBox)
+{
+  if (floatingChannels.contains (chanBox)) {
+    floatingChannels [chanBox]->Hide();
   }
 }
 

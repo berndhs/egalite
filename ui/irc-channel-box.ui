@@ -15,12 +15,12 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QPushButton" name="partButton">
+    <widget class="QPushButton" name="chanButton">
      <property name="toolTip">
-      <string>Leave Channel</string>
+      <string> Channel Menu</string>
      </property>
      <property name="text">
-      <string>Leave</string>
+      <string>Channel</string>
      </property>
      <property name="flat">
       <bool>true</bool>

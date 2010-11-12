@@ -35,6 +35,18 @@ IrcFloat::IrcFloat (QWidget *parent)
 }
 
 void
+IrcFloat::Hide ()
+{
+  hide ();
+}
+
+void
+IrcFloat::Show ()
+{
+  show ();
+}
+
+void
 IrcFloat::AddChannel (IrcChannelBox *chan)
 {
   if (chanBox != 0) {
@@ -42,6 +54,8 @@ IrcFloat::AddChannel (IrcChannelBox *chan)
   }
   chanBox = chan;
   ui.mainLayout->addWidget (chanBox, 0,0,1,1);
+  setWindowTitle (chan->Name());
+  connect (chanBox, SIGNAL (HideMe()), this, SLOT (Hide()));
   chan->show ();
 }
 
@@ -49,6 +63,7 @@ void
 IrcFloat::RemoveChannel (IrcChannelBox *chan)
 {
   if (chanBox == chan) {
+    disconnect (chanBox, 0, this, 0);
     chanBox = 0;
   }
 }

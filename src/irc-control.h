@@ -80,7 +80,11 @@ public slots:
   void  Show ();
   void  Hide ();
   void  ShowGroup ();
+  void  ShowFloats ();
+  void  ShowAll ();
   void  HideGroup ();
+  void  HideFloats ();
+  void  HideAll ();
 
 private slots:
 
@@ -99,6 +103,8 @@ private slots:
   void ChanInUse (IrcChannelBox * chan);
   void ChanWantsDock (IrcChannelBox * chan);
   void ChanWantsFloat (IrcChannelBox * chan);
+  void HideChannel (IrcChannelBox * chanBox);
+  void ShowChannel (IrcChannelBox * chanBox);
   void ChannelClicked (QListWidgetItem * item);
   void ServerClicked (QTableWidgetItem * item);
   void Send ();

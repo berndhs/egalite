@@ -41,6 +41,8 @@ public slots:
 
   void AddChannel (IrcChannelBox *chan);
   void RemoveChannel (IrcChannelBox *chan);
+  void Hide ();
+  void Show ();
 
 protected:
 
