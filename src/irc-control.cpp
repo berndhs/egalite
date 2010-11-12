@@ -58,7 +58,7 @@ IrcControl::IrcControl (QWidget *parent)
   mainUi.setupUi (this);
   dockedChannels = new IrcChannelGroup (parentWidget ());
   dockedChannels->hide ();
-  Connect ();
+  ConnectGui ();
   commandXform ["MSG"] = IrcSockStatic::TransformPRIVMSG;
   commandXform ["ME"] = IrcSockStatic::TransformME;
   commandXform ["JOIN"] = IrcSockStatic::TransformJOIN;
@@ -82,7 +82,9 @@ qDebug () << " IrcControl allocated and initialized";
 void
 IrcControl::Show ()
 {
-  if (!isRunning) {
+  if (isRunning) {
+    LoadLists ();
+  } else {
     Run ();
   }
   if (hidSelf) {
@@ -107,7 +109,6 @@ IrcControl::ShowGroup ()
 {
   if (!isRunning) {
     Run ();
-    show ();
   }
   if (dockedChannels) {
     dockedChannels->Show ();
@@ -125,18 +126,27 @@ IrcControl::HideGroup ()
 bool
 IrcControl::Run ()
 {
-  if (isRunning) {
-    return true;
+  if (!isRunning) {
+    qDebug () << " Start IrcControl";
+    QSize defaultSize = size();
+    QSize newsize = Settings().value ("sizes/ircsock", defaultSize).toSize();
+    resize (newsize);
+    QSize  groupBoxSize = dockedChannels->size();
+    groupBoxSize = Settings().value ("sizes/channelgroup", groupBoxSize)
+                             .toSize();
+    dockedChannels->resize (groupBoxSize);
   }
-  qDebug () << " Start IrcControl";
-  QSize defaultSize = size();
-  QSize newsize = Settings().value ("sizes/ircsock", defaultSize).toSize();
-  resize (newsize);
-  QSize  groupBoxSize = dockedChannels->size();
-  groupBoxSize = Settings().value ("sizes/channelgroup", groupBoxSize)
-                           .toSize();
-  dockedChannels->resize (groupBoxSize);
 
+  LoadLists ();
+  show ();
+
+  isRunning = true;
+  return true;
+}
+
+void
+IrcControl::LoadLists ()
+{
   QStringList  servers = CertStore::IF().IrcServers ();
   noNameServer = tr("--- New Server ---");
   servers.append (noNameServer);
@@ -156,15 +166,10 @@ IrcControl::Run ()
   mainUi.chanCombo->insertItems (0,chans);
 
   ignoreSources = CertStore::IF().IrcIgnores ();
-
-  show ();
-
-  isRunning = true;
-  return true;
 }
 
 void
-IrcControl::Connect ()
+IrcControl::ConnectGui ()
 {
   connect (mainUi.connectButton, SIGNAL (clicked()),
            this, SLOT (TryConnect ()));

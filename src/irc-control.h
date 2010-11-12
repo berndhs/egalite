@@ -138,7 +138,8 @@ private:
                            const QString &, const QString &)>
           CtcpMapType;
 
-  void Connect ();
+  void ConnectGui ();
+  void LoadLists ();
   void AddConnect (IrcSocket * sock);
   void RemoveConnect (IrcSocket * sock);
   void TransformSend (IrcSocket * sock, const QString & chan, QString & data);
