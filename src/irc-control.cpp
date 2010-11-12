@@ -815,7 +815,7 @@ IrcControl::IncomingCtcpChan (IrcSocket * sock,
   QRegExp cmdRx ("(\\S+)");
   int pos, len;
 qDebug () << " Ctcp CHAN " << msg;
-  pos = cmdRx.indexIn (msg, 0);
+  pos = cmdRx.indexIn (themsg, 0);
   if (pos >=0 ) {
     len = cmdRx.matchedLength ();
     QString cmd = themsg.mid (pos,len);
@@ -826,7 +826,7 @@ qDebug () << " Ctcp CHAN " << msg;
   }
   channels [chan]->Incoming (QString 
                      ("<a href=\"ircsender://%1\">%1</a>:"
-                      "<span style=\"font-size:small\">CTCP</span> %2").
+                      "<span style=\"font-size:small\">CTCPc</span> %2").
                                   arg(from).arg(msg));
 }
 
@@ -843,20 +843,20 @@ IrcControl::IncomingCtcpUser (IrcSocket * sock,
   themsg.remove (0,1);
   QRegExp cmdRx ("(\\S+)");
   int pos, len;
-  pos = cmdRx.indexIn (msg, 0);
+  pos = cmdRx.indexIn (themsg, 0);
 qDebug () << " Ctcp USER " << msg;
   if (pos >=0 ) {
     len = cmdRx.matchedLength ();
     QString cmd = themsg.mid (pos,len);
     if (ctcpHandler.contains (cmd)) {
-      (*ctcpHandler [cmd]) (this, sock, from, to, themsg.mid (pos+len,-1));
+      (*ctcpHandler [cmd]) (this, sock, from, from, themsg.mid (pos+len,-1));
       return;
     }
   }
   if (channels.contains (from)) {
     channels [from]->Incoming (QString 
                       ("<a href=\"ircsender://%1\">%1</a>:"
-                      "<span style=\"font-size:small\">CTCP</span> %2").
+                      "<span style=\"font-size:small\">CTCPu</span> %2").
                                   arg(from).arg(msg));
   }
 }

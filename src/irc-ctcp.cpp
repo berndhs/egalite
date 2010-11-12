@@ -33,11 +33,10 @@ namespace egalite
 void
 IrcCtcp::ReceiveACTION(IrcControl * context, IrcSocket * sock,
                               const QString & from,
-                              const QString & to,
+                              const QString & dest,
                               const QString & msg)
 {
-  Q_UNUSED (to)
-  context->IncomingRaw (sock, from, QString ("%1 %2")
+  context->IncomingRaw (sock, dest, QString ("%1 %2")
                    .arg (from)
                    .arg (msg));
 }
@@ -45,10 +44,10 @@ IrcCtcp::ReceiveACTION(IrcControl * context, IrcSocket * sock,
 void
 IrcCtcp::ReceiveVERSION (IrcControl * context, IrcSocket * sock,
                               const QString & from,
-                              const QString & to,
+                              const QString & dest,
                               const QString & msg)
 {
-  Q_UNUSED (to)
+  Q_UNUSED (dest)
   QString reply ("\001VERSION %1:%2:%3\001");
   QString remsg = QString ("PRIVMSG %1 :%2")
                      .arg (from)
