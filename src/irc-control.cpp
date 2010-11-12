@@ -670,7 +670,7 @@ void
 IrcControl::ShowChannel (IrcChannelBox * chanBox)
 {
   if (dockedChannels->HaveChannel (chanBox)) {
-    dockedChannels->Show ();
+    dockedChannels->ShowChannel (chanBox);
   } else if (floatingChannels.contains (chanBox)) {
     floatingChannels [chanBox]->Show ();
   } 

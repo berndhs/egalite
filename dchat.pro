@@ -126,6 +126,7 @@ FORMS = \
         ui/irc-float.ui \
         ui/irc-account.ui \
         ui/enter-string.ui \
+        ui/edit-simple.ui \
 
 
 
@@ -167,6 +168,7 @@ SOURCES = src/main.cpp \
         src/irc-sock-static.cpp \
         src/irc-nick-edit.cpp \
         src/enter-string.cpp \
+        src/edit-simple.cpp \
 
 
 
@@ -209,6 +211,7 @@ HEADERS = \
         src/irc-float.h \
         src/irc-nick-edit.h \
         src/enter-string.h \
+        src/edit-simple.h \
 
 
 

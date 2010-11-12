@@ -96,6 +96,16 @@ IrcChannelGroup::Show ()
 }
 
 void
+IrcChannelGroup::ShowChannel (IrcChannelBox *chan)
+{
+  Show ();
+  if (HaveChannel (chan)) {
+    ui.tabWidget->setCurrentWidget (chan);
+  }
+}
+
+
+void
 IrcChannelGroup::Hide ()
 {
   oldSize = size ();

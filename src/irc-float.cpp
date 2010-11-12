@@ -44,6 +44,7 @@ void
 IrcFloat::Show ()
 {
   show ();
+  raise ();
 }
 
 void

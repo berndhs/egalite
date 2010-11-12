@@ -45,6 +45,7 @@ public:
   void RemoveChannel (IrcChannelBox * chan);
   void MarkActive (IrcChannelBox * chan, bool active);
   bool HaveChannel (IrcChannelBox * chan);
+  void ShowChannel (IrcChannelBox * chan);
  
   void Close ();
 
