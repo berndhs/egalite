@@ -105,6 +105,8 @@
     <addaction name="actionWhitelisted"/>
     <addaction name="separator"/>
     <addaction name="actionIRCIgnores"/>
+    <addaction name="actionIRCServers"/>
+    <addaction name="actionIRCChannels"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -233,6 +235,16 @@
   <action name="actionIRCIgnores">
    <property name="text">
     <string>IRC Ignores</string>
+   </property>
+  </action>
+  <action name="actionIRCServers">
+   <property name="text">
+    <string>IRC Servers</string>
+   </property>
+  </action>
+  <action name="actionIRCChannels">
+   <property name="text">
+    <string>IRC Channels</string>
    </property>
   </action>
  </widget>

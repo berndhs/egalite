@@ -85,6 +85,9 @@ public slots:
   void  HideGroup ();
   void  HideFloats ();
   void  HideAll ();
+  void  EditServers ();
+  void  EditChannels ();
+  void  EditIgnores ();
 
 private slots:
 
@@ -174,6 +177,16 @@ private:
   void IncomingRaw (IrcSocket * sock, 
                     const QString & from,
                     const QString & msg);
+
+  static void SaveServer (const QString & name);
+  static void SaveChannel (const QString & name);
+  static void SaveIgnore (const QString & name);
+  static void RemoveServer (const QString & name);
+  static void RemoveChannel (const QString & name);
+  static void RemoveIgnore (const QString & name);
+  static QStringList LoadServers ();
+  static QStringList LoadChannels ();
+  static QStringList LoadIgnores ();
 
 
   bool                initDone;

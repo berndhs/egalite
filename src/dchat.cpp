@@ -374,6 +374,12 @@ DChatMain::Connect ()
            this, SLOT (RequestSubscribe ()));
   connect (ui.actionConnectIRC, SIGNAL (triggered ()),
            this, SLOT (RunIrc ()));
+  connect (ui.actionIRCServers, SIGNAL (triggered ()),
+           ircControl, SLOT (EditServers()));
+  connect (ui.actionIRCChannels, SIGNAL (triggered ()),
+           ircControl, SLOT (EditChannels ()));
+  connect (ui.actionIRCIgnores, SIGNAL (triggered ()),
+           ircControl, SLOT (EditIgnores ()));
   connect (&contactListModel, SIGNAL (StartServerChat (QString, QString)),
            this, SLOT (StartServerChat (QString, QString)));
   connect (&contactListModel, SIGNAL (NewAccountIndex (QModelIndex)),

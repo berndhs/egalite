@@ -36,6 +36,7 @@ Q_OBJECT
 public:
 
   EditSimple (QWidget *parent=0);
+  EditSimple (const QString & title, QWidget *parent=0);
 
   void SetTitle (const QString & newTitle);
   void SetAcceptText (const QString & newText);
@@ -43,6 +44,9 @@ public:
   void SetSaver (void (*saveFunc) (const QString&));
   void SetRemover (void (*deleteFunc) (const QString&));
   void SetLoader (QStringList (*loadFunc) ());
+  void SetFuncs (void (*saveFunc) (const QString &),
+                 void (*deleteFunc) (const QString &),
+                 QStringList (*loadFunc) ());
 
   int  Exec (bool allowNew = true);
   int  Exec (const QStringList & choiceList,
@@ -68,6 +72,7 @@ private:
 
   void AddNew ();
   void SetChoices (const QStringList & newList);
+  void Connect ();
 
   Ui_EditSimple   ui;
 

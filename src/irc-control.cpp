@@ -25,6 +25,7 @@
 #include "deliberate.h"
 #include "version.h"
 #include "helpview.h"
+#include "edit-simple.h"
 #include "irc-channel-box.h"
 #include "irc-socket.h"
 #include "irc-sock-static.h"
@@ -975,6 +976,84 @@ IrcControl::SetTopic (IrcSocket * sock,
   }
   IrcChannelBox * chan = channels [chanName];
   chan->SetTopic (topic);
+}
+
+void
+IrcControl::EditServers ()
+{
+  EditSimple  edit (tr("IRC Servers"), this);
+  edit.SetFuncs (SaveServer, RemoveServer, LoadServers);
+  edit.Exec ();
+}
+
+void
+IrcControl::EditChannels ()
+{
+  EditSimple  edit (tr("IRC Channels"), this);
+  edit.SetFuncs (SaveChannel, RemoveChannel, LoadChannels);
+  edit.Exec ();
+}
+
+void
+IrcControl::EditIgnores ()
+{
+  EditSimple  edit (tr("IRC Ignores"), this);
+  edit.SetFuncs (SaveIgnore, RemoveIgnore, LoadIgnores);
+  edit.Exec ();
+}
+
+void
+IrcControl::SaveServer (const QString & name)
+{
+  CertStore::IF().SaveIrcServer (name);
+}
+
+void
+IrcControl::SaveChannel (const QString & name)
+{
+  CertStore::IF().SaveIrcChannel (name);
+}
+
+void
+IrcControl::SaveIgnore (const QString & name)
+{
+  CertStore::IF().SaveIrcIgnore (name);
+}
+
+void
+IrcControl::RemoveServer (const QString & name)
+{
+  CertStore::IF().RemoveIrcServer (name);
+}
+
+void
+IrcControl::RemoveChannel (const QString & name)
+{
+  CertStore::IF().RemoveIrcChannel (name);
+}
+
+void
+IrcControl::RemoveIgnore (const QString & name)
+{
+  CertStore::IF().RemoveIrcIgnore (name);
+}
+
+QStringList
+IrcControl::LoadServers ()
+{
+  return CertStore::IF().IrcServers ();
+}
+
+QStringList
+IrcControl::LoadChannels ()
+{
+  return CertStore::IF().IrcChannels ();
+}
+
+QStringList
+IrcControl::LoadIgnores ()
+{
+  return CertStore::IF().IrcIgnores ();
 }
 
 } // namespace

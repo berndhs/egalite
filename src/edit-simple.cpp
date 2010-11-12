@@ -22,6 +22,8 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+#include <QListWidgetItem>
+
 namespace egalite
 {
 
@@ -31,6 +33,27 @@ EditSimple::EditSimple (QWidget *parent)
    remover (0),
    loader (0)
 {
+  ui.setupUi (this);
+  Connect ();
+}
+
+EditSimple::EditSimple (const QString & title, QWidget *parent)
+  :QDialog (parent),
+   saver (0),
+   remover (0),
+   loader (0)
+{
+  ui.setupUi (this);
+  Connect ();
+  setWindowTitle (title);
+}
+
+void
+EditSimple::Connect ()
+{
+  connect (ui.saveButton, SIGNAL (clicked()), this, SLOT (Save()));
+  connect (ui.deleteButton, SIGNAL (clicked()), this, SLOT (Remove()));
+  connect (ui.cancelButton, SIGNAL (clicked()), this, SLOT (Cancel()));
 }
 
 void
@@ -76,10 +99,25 @@ EditSimple::SetLoader (QStringList (*loadFunc) ())
 }
 
 void
+EditSimple::SetFuncs (void (*saveFunc) (const QString &),
+                      void (*deleteFunc) (const QString &),
+                      QStringList (*loadFunc) ())
+{
+  saver = saveFunc;
+  remover = deleteFunc;
+  loader = loadFunc;
+}
+
+void
 EditSimple::AddNew ()
 {
   newName = tr ("--- New ---");
   choices.append (newName);
+  QListWidgetItem * item = new QListWidgetItem ((newName), ui.stringList);
+  Qt::ItemFlags flags = item->flags ();
+  flags |= Qt::ItemIsEditable;
+  item->setFlags (flags);
+  ui.stringList->addItem (item);
 }
 
 void
@@ -116,11 +154,11 @@ EditSimple::Exec (bool allowNew)
   if (loader) {
     choices = (*loader) ();
   }
+  ui.stringList->clear ();
+  ui.stringList->addItems (choices);
   if (allowNew) {
     AddNew ();
   }
-  ui.stringList->clear ();
-  ui.stringList->addItems (choices);
   return exec ();
 }
 
@@ -129,11 +167,11 @@ EditSimple::Exec (const QStringList & choiceList,
                   bool allowNew)
 {
   choices = choiceList;
+  ui.stringList->clear ();
+  ui.stringList->addItems (choices);
   if (allowNew) {
     AddNew ();
   }
-  ui.stringList->clear ();
-  ui.stringList->addItems (choices);
   return exec ();
 }
 
