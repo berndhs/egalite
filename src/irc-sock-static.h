@@ -38,15 +38,19 @@ private:
 
 
   static void TransformPRIVMSG (IrcControl * context, IrcSocket *sock,
-                                QString & result, 
+                                QString & result, QString & chan, 
+                                QString & first, 
+                                QString & rest);
+  static void TransformME (IrcControl * context, IrcSocket *sock,
+                                QString & result, QString & chan, 
                                 QString & first, 
                                 QString & rest);
   static void TransformJOIN    (IrcControl * context, IrcSocket *sock,
-                                QString & result, 
+                                QString & result, QString & chan, 
                                 QString & first, 
                                 QString & rest);
   static void TransformDefault (IrcControl * context, IrcSocket *sock,
-                                QString & result, 
+                                QString & result, QString & chan, 
                                 QString & first, 
                                 QString & rest);
 

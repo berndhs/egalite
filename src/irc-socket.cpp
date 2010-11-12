@@ -160,8 +160,8 @@ qDebug () << " sent " << written << " bytes to socket: " << copy;
 void
 IrcSocket::RollScript ()
 {
-  SendScriptHead ();
   if (!scriptTimer->isActive()) {
+    SendScriptHead ();
     scriptTimer->start (1000);
   }
 }

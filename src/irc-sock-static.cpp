@@ -31,7 +31,7 @@ namespace egalite
 
 void
 IrcSockStatic::TransformDefault (IrcControl * context, IrcSocket *sock,
-                           QString & result, 
+                           QString & result, QString & chan, 
                            QString & first, 
                            QString & rest)
 {
@@ -41,11 +41,12 @@ IrcSockStatic::TransformDefault (IrcControl * context, IrcSocket *sock,
 
 void
 IrcSockStatic::TransformPRIVMSG (IrcControl * context, IrcSocket *sock,
-                           QString & result, 
+                           QString & result, QString & chan, 
                            QString & first, 
                            QString & rest)
 {
   Q_UNUSED (context)
+  Q_UNUSED (chan)
   first = "PRIVMSG";
   QRegExp wordRx ("(\\S+)");
   int pos = wordRx.indexIn (rest, 0);
@@ -54,11 +55,27 @@ IrcSockStatic::TransformPRIVMSG (IrcControl * context, IrcSocket *sock,
     rest.insert (pos + len, " :");
   }
   result = first + " " + rest;
+qDebug () << " PRIVMSG result " << result;
+}
+
+void
+IrcSockStatic::TransformME (IrcControl * context, IrcSocket *sock,
+                           QString & result, QString & chan, 
+                           QString & first, 
+                           QString & rest)
+{
+  Q_UNUSED (context)
+qDebug () << "ME data " << result << chan << first << rest;
+  first = "PRIVMSG";
+  rest.prepend (QString (" %1 :\001ACTION ").arg(chan));
+  rest.append ("\001");
+  result = first + " " + rest;
+qDebug () << " PRIVMSG ME result " << result;
 }
 
 void 
 IrcSockStatic::TransformJOIN (IrcControl * context, IrcSocket *sock,
-                        QString & result,
+                        QString & result, QString & chan,
                         QString & first,
                         QString & rest)
 {

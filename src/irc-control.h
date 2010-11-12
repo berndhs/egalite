@@ -132,7 +132,7 @@ private:
                            const QString &, const QString &)>
           ReceiveMapType;
   typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, QString &, 
-                                   QString &, QString &)>  
+                                   QString &, QString &, QString &)>  
           XformMapType;
   typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, const QString &,
                            const QString &, const QString &)>
@@ -141,7 +141,7 @@ private:
   void Connect ();
   void AddConnect (IrcSocket * sock);
   void RemoveConnect (IrcSocket * sock);
-  void TransformSend (IrcSocket * sock, QString & data);
+  void TransformSend (IrcSocket * sock, const QString & chan, QString & data);
   IrcSocket * CurrentSock (QTableWidget * table);
   QTableWidgetItem* FindType (QTableWidget * table, int row, int type);
   int  FindRow (QTableWidget * table, const QString & sname);

@@ -60,6 +60,7 @@ IrcControl::IrcControl (QWidget *parent)
   dockedChannels->hide ();
   Connect ();
   commandXform ["MSG"] = IrcSockStatic::TransformPRIVMSG;
+  commandXform ["ME"] = IrcSockStatic::TransformME;
   commandXform ["JOIN"] = IrcSockStatic::TransformJOIN;
   receiveHandler ["PING"] = IrcSockStatic::ReceivePING;
   receiveHandler ["PONG"] = IrcSockStatic::ReceiveIgnore;
@@ -353,14 +354,15 @@ IrcControl::Send ()
     if (sockets.contains (sname)) {
       QString text = mainUi.sendEdit->text ();
       IrcSocket * sock = sockets [sname];
-      TransformSend (sock, text);
+      TransformSend (sock, "", text);
       sock->Send (text);
     }
   }
 }
 
 void
-IrcControl::TransformSend (IrcSocket * sock, QString & data)
+IrcControl::TransformSend (IrcSocket * sock, const QString & chan, 
+                           QString & data)
 { 
   if (data.startsWith(QChar ('/'))) {
     QRegExp wordRx ("(\\S+)");
@@ -369,10 +371,11 @@ IrcControl::TransformSend (IrcSocket * sock, QString & data)
       int len = wordRx.matchedLength ();
       QString first = data.mid (1,len).toUpper();
       QString rest = data.mid (len+1,-1);
+      QString copyChan (chan);
       if (commandXform.contains (first)) {
-        (*commandXform[first]) (this, sock, data, first, rest);
+        (*commandXform[first]) (this, sock, data, copyChan, first, rest);
       } else {
-        IrcSockStatic::TransformDefault (this, sock, data, first, rest);
+        IrcSockStatic::TransformDefault (this, sock, data, copyChan, first, rest);
       }
     }
   }
@@ -730,7 +733,7 @@ IrcControl::Outgoing (QString chan, QString msg)
   IrcSocket * sock = sockets [sname];
   if (trim.startsWith (QChar ('/')) ){
     QString cooked (trim);
-    TransformSend (sock, cooked);
+    TransformSend (sock, chan, cooked);
     sock->Send (cooked);
 qDebug () << " handed to socket: " << cooked;
     trim.prepend (QString (":%1!%1@localhost ").arg (sock->Nick()));
