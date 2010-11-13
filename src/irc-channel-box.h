@@ -98,6 +98,8 @@ private:
   void   BalanceSplitter ();
   void   AppendSmall (QTextBrowser* log, const QString & line);
 
+  static bool Less (const QString & left, const QString & right);
+
   Ui_IrcChannelBox    ui;
   QMenu              *chanMenu;
   QString             chanName;

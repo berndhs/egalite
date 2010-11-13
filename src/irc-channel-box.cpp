@@ -33,6 +33,7 @@
 #include <QDesktopServices>
 #include <QListWidgetItem>
 #include <QDateTime>
+#include <QtAlgorithms>
 #include "link-mangle.h"
 
 namespace egalite
@@ -181,8 +182,8 @@ IrcChannelBox::AddNames (const QString & names)
   oldNames.append (newNames);
   oldNames.removeDuplicates ();
   ui.chanUsers->clear();
+  qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
   ui.chanUsers->addItems (oldNames);
-  ui.chanUsers->sortItems();
   QStringList::iterator sit;
 }
 
@@ -194,8 +195,8 @@ IrcChannelBox::AddName (const QString & name)
   }
   oldNames.append (name);
   ui.chanUsers->clear();
+  qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
   ui.chanUsers->addItems (oldNames);
-  ui.chanUsers->sortItems();
   ui.rawLog->append (tr("Enter: %1").arg(name));
   AppendSmall (ui.chanHistory, tr(" Enter: -&gt; %1").arg(name));
 }
@@ -208,8 +209,8 @@ IrcChannelBox::DropName (const QString & name, const QString & msg)
   }
   oldNames.removeAll (name);
   ui.chanUsers->clear();
+  qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
   ui.chanUsers->addItems (oldNames);
-  ui.chanUsers->sortItems();
   ui.rawLog->append (tr("Exit: %1 %2").arg(name). arg (msg));
   AppendSmall (ui.chanHistory, tr(" Exit: &lt;- %1 %2").arg(name).arg(msg));
 }
@@ -291,6 +292,12 @@ IrcChannelBox::event (QEvent *evt)
     break;
   }
   return QWidget::event (evt);
+}
+
+bool
+IrcChannelBox::Less (const  QString & left, const QString & right)
+{
+  return left.toLower() < right.toLower ();
 }
 
 } // namespace
