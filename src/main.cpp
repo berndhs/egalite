@@ -168,5 +168,6 @@ main (int argc, char* argv[])
   chatmain.AddConfigMessages (configMessages);
 
   chatmain.Run ();
-  return app.exec ();
+  int result = app.exec ();
+  qDebug () << " application returns " << result;
 }
