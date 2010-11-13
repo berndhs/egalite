@@ -24,6 +24,8 @@
   <file alias="uniqueircnick.sql">schemafiles/uniqueircnick.sql</file>
   <file alias="ircignore.sql">schemafiles/ircignore.sql</file>
   <file alias="uniqueircignore.sql">schemafiles/uniqueircignore.sql</file>
+  <file alias="ircmessages.sql">schemafiles/ircmessages.sql</file>
+  <file alias="uniqueircmsgs.sql">schemafiles/uniqueircmsgs.sql</file>
 
 </qresource>
 <qresource prefix="/data">

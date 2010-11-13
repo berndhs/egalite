@@ -146,7 +146,9 @@ IrcChannelBox::Dock ()
 void
 IrcChannelBox::Part ()
 {
-  emit Outgoing (chanName, QString ("/part %1").arg (chanName));
+  emit Outgoing (chanName, QString ("/part %1 :%2")
+                                    .arg (chanName)
+                                    .arg (partMsg));
 }
 
 void

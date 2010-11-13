@@ -103,11 +103,17 @@ public:
   bool        GetIrcIdent (const QString & nick, 
                                  QString & realname, 
                                  QString & pass);
+  bool        GetIrcMessages (const QString & nick,
+                                    QString & partMsg,
+                                    QString & quitMsg);
   void        SaveIrcServer (const QString & server);
   void        SaveIrcChannel (const QString & chan);
   void        SaveIrcNick (const QString & nick,
                            const QString & realname = QString(), 
                            const QString & pass = QString());
+  void        SaveIrcMessages (const QString & nick,
+                               const QString & partMsg,
+                               const QString & quitMsg);
   void        SaveIrcIgnore (const QString & name);
   bool        RemoveIrcServer (const QString & server);
   bool        RemoveIrcNick (const QString & nick);

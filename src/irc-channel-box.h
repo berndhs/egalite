@@ -49,6 +49,8 @@ public:
 
   void SetTopic (const QString & newTopic);
   void SetHost (const QString & hostName);
+  void SetPartMsg (const QString & part)
+               { partMsg = part; }
 
   void AddNames (const QString & names);
   void AddName (const QString & name);
@@ -104,6 +106,7 @@ private:
   QMenu              *chanMenu;
   QString             chanName;
   QString             sockName;
+  QString             partMsg;
   QString             topic;
   QStringList         oldNames;
 

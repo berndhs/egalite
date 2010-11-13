@@ -90,7 +90,9 @@ CertStore::CertStore ()
                 << "ircnicks"
                 << "uniqueircnick"
                 << "ircignore"
-                << "uniqueircignore";
+                << "uniqueircignore"
+                << "ircmessages"
+                << "uniqueircmsgs";
 }
 
 void
@@ -1060,7 +1062,9 @@ CertStore::RemoveIrcServer (const QString & server)
 bool
 CertStore::RemoveIrcNick (const QString & nick)
 {
-  return RemoveIrc ("inick", nick, "ircnicks");
+  bool ok = RemoveIrc ("inick", nick, "ircnicks");
+  ok |= RemoveIrc ("inick", nick, "ircmessages");
+  return ok;
 }
 
 bool
@@ -1092,6 +1096,23 @@ CertStore::SaveIrcNick (const QString & nick,
   query.bindValue (0, QVariant (nick));
   query.bindValue (1, QVariant (pass));
   query.bindValue (2, QVariant (therealname));
+  bool ok = query.exec ();
+  qDebug () << " query " << ok << query.executedQuery ();
+}
+
+void
+CertStore::SaveIrcMessages (const QString & nick,
+                        const QString & partMsg,
+                        const QString & quitMsg)
+{
+  QString cmd ("insert or replace into ircmessages "
+                  " (inick, partmsg, quitmsg) "
+                  " values (?, ?, ?) ");
+  QSqlQuery query (certDB);
+  query.prepare (cmd);
+  query.bindValue (0, QVariant (nick));
+  query.bindValue (1, QVariant (partMsg));
+  query.bindValue (2, QVariant (quitMsg));
   bool ok = query.exec ();
   qDebug () << " query " << ok << query.executedQuery ();
 }
@@ -1148,6 +1169,24 @@ CertStore::GetIrcIdent(const QString & nick,
   if (ok && query.next ()) {
     pass = query.value (0).toString ();
     realname = query.value (1).toString ();
+  qDebug () << " query " << ok << query.executedQuery ();
+    return true;
+  }
+  return false;
+}
+
+bool
+CertStore::GetIrcMessages(const QString & nick,
+                             QString & partMsg, 
+                             QString & quitMsg)
+{
+  QString cmdPat ("select partmsg, quitmsg from ircmessages "
+                  " where inick == \"%1\"");
+  QSqlQuery query (certDB);
+  bool ok = query.exec (cmdPat.arg (nick));
+  if (ok && query.next ()) {
+    partMsg = query.value (0).toString ();
+    quitMsg = query.value (1).toString ();
   qDebug () << " query " << ok << query.executedQuery ();
     return true;
   }

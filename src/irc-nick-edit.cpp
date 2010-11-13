@@ -94,6 +94,9 @@ IrcNickEdit::SaveNick ()
   QString nick (ui.nickEdit->text());
   QString pass (ui.passwordEdit->text());
   CertStore::IF().SaveIrcNick (nick, ircUser, pass);
+  QString pmsg (ui.partEdit->text());
+  QString qmsg (ui.quitEdit->text());
+  CertStore::IF().SaveIrcMessages (nick, pmsg, qmsg);
   hide ();
   haveNick = true;
 }
@@ -119,11 +122,16 @@ IrcNickEdit::Lookup (QString nick)
 {
   QString ircUser;
   QString pass;
+  QString pmsg;
+  QString qmsg;
   haveNick = CertStore::IF().GetIrcIdent (nick, ircUser, pass);
+  CertStore::IF().GetIrcMessages (nick, pmsg, qmsg);
   if (haveNick) {
     ui.userNameEdit->setText (ircUser);
     ui.nickEdit->setText (nick);
     ui.passwordEdit->setText (pass);
+    ui.partEdit->setText (pmsg);
+    ui.quitEdit->setText (qmsg);
   } else {
     ui.userNameEdit->clear ();
     ui.nickEdit->clear ();

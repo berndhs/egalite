@@ -72,6 +72,7 @@ IrcSocket::DisconnectLater (int msecs)
 void
 IrcSocket::Disconnect ()
 {
+  SendData (QString ("QUIT :%1").arg (quitMsg));
   disconnectFromHost ();
 }
 

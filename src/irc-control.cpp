@@ -570,6 +570,13 @@ IrcControl::NickLogin ()
   sock->Send (QString ("USER %1 0 * :%2").arg (nick).arg(real));
   sock->Send (QString ("NICK %1").arg (nick));
   sock->SetNick (nick);
+  QString part;
+  QString quit;
+  bool haveMsgs = CertStore::IF().GetIrcMessages (nick, part, quit);
+  if (haveMsgs) { 
+    sock->SetPartMsg (part);
+    sock->SetQuitMsg (quit);
+  }
 }
 
 IrcSocket *
@@ -605,6 +612,7 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
   dockedChannels->AddChannel (newchan);
   dockedChannels->show ();
   newchan->SetHost (sock->HostName());
+  newchan->SetPartMsg (sock->PartMsg ());
   connect (newchan, SIGNAL (Outgoing (QString, QString)),
            this, SLOT (Outgoing (QString, QString)));
   connect (newchan, SIGNAL (Active (IrcChannelBox *)),
