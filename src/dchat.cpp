@@ -39,6 +39,7 @@
 #include <QXmlStreamWriter>
 #include <QDateTime>
 #include <QMessageBox>
+#include <QSystemTrayIcon>
 #include <set>
 
 #include "direct-listener.h"
@@ -79,6 +80,7 @@ DChatMain::DChatMain (QWidget *parent)
   ui.contactView->setModel (&contactListModel);
   ircControl = new IrcControl (this);
   SetupToolbar ();
+  CreateSystemTrayStuff ();
   Connect ();
   debugTimer = new QTimer (this);
   connect (debugTimer, SIGNAL (timeout()), this, SLOT (DebugCheck()));
@@ -95,6 +97,7 @@ DChatMain::DChatMain (QWidget *parent)
   QTimer::singleShot (1500, this, SLOT (StatusUpdate ()));
   connect (ircControl, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
   xclientMap.clear ();
+  trayIcon->show ();
 }
 
 void
@@ -338,6 +341,7 @@ DChatMain::Connect ()
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (Quit()));
   connect (ui.directButton, SIGNAL (clicked()), this, SLOT (CallDirect()));
   connect (ui.actionQuit, SIGNAL (triggered()), this, SLOT (Quit()));
+  connect (ui.actionHide, SIGNAL (triggered()), this, SLOT (hide()));
   connect (ui.actionSettings, SIGNAL (triggered()),
            this, SLOT (EditSettings ()));
   connect (ui.actionLog_In, SIGNAL (triggered()),
@@ -1037,6 +1041,69 @@ void
 DChatMain::EditIrcNick ()
 {
   ircNickEdit.Exec ();
+}
+
+void
+DChatMain::Show ()
+{
+  show ();
+  showNormal ();
+}
+
+void 
+DChatMain::CreateSystemTrayStuff ()
+{
+  trayMenu = new QMenu(this);
+  trayMenu->addAction (tr("Show %1").arg (QString::fromUtf8("Égalité")),
+                       this, SLOT (Show()));
+  trayMenu->addAction (tr("Show IRC Control"), ircControl, SLOT (Show()));
+  trayMenu->addAction (tr("Show IRC Dock"), ircControl, SLOT (ShowGroup()));
+  trayMenu->addAction (tr("Show IRC Floats"), ircControl, SLOT (ShowFloats()));
+  trayMenu->addAction (tr ("Hide %1").arg (QString::fromUtf8("Égalité")),
+                       this, SLOT (hide()));
+  trayMenu->addAction (tr ("Quit %1").arg (QString::fromUtf8("Égalité")),
+                       this, SLOT (Quit()));
+  trayIcon = new QSystemTrayIcon(QIcon (":/dchatlogo.png"),this);
+  trayIcon->setContextMenu(trayMenu);
+  connect (trayIcon, SIGNAL (activated (QSystemTrayIcon::ActivationReason)),
+             this, SLOT(TrayActivated(QSystemTrayIcon::ActivationReason)));
+}
+
+void
+DChatMain::TrayMenu ()
+{
+  QPoint here = QCursor::pos();
+  trayMenu->exec (here);
+}
+
+void 
+DChatMain::TrayActivated (QSystemTrayIcon::ActivationReason reason)
+{
+qDebug () << " Tray Icon activated reason " << reason;
+  TrayMenu ();
+}
+
+void
+DChatMain::ShowTrayMessage (const QString & msg)
+{
+  if (trayIcon) { 
+    QString title (QString::fromUtf8("Égalité"));
+    trayIcon->showMessage (title,msg);                           
+  }
+}
+
+void 
+DChatMain::closeEvent(QCloseEvent *event)
+{
+  if (trayIcon && trayIcon->isVisible()) {
+    QMessageBox::information(this, QString::fromUtf8("Égalité"),
+                             tr("The program will keep running in the "
+                                 "system tray. To terminate the program, "
+                                 "choose <b>Quit</b> in the main menu "
+                                 "or in the system tray entry."));
+    hide();
+    event->ignore();
+  }
 }
 
 

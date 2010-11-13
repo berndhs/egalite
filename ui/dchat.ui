@@ -81,6 +81,7 @@
     <addaction name="actionConnectIRC"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
+    <addaction name="actionHide"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuIdentities">
@@ -245,6 +246,11 @@
   <action name="actionIRCChannels">
    <property name="text">
     <string>IRC Channels</string>
+   </property>
+  </action>
+  <action name="actionHide">
+   <property name="text">
+    <string>Hide</string>
    </property>
   </action>
  </widget>

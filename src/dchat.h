@@ -28,6 +28,8 @@
 #include <QXmppIq.h>
 #include <QXmppDiscoveryIq.h>
 #include <QDomElement>
+#include <QSystemTrayIcon>
+#include <QCloseEvent>
 #include "contact-list-model.h"
 
 #include "config-edit.h"
@@ -83,6 +85,8 @@ public slots:
   void Quit ();
   void GetMessage (const QXmppMessage  & msg);
   void GetRaw (const QByteArray &data);
+  void Show ();
+  void ShowTrayMessage (const QString & msg);
 
 private slots:
 
@@ -128,6 +132,12 @@ private slots:
   void IrcMenu ();
   void DirectMenu ();
   void XmppMenu ();
+  void TrayActivated(QSystemTrayIcon::ActivationReason);
+  void TrayMenu ();
+
+protected:
+
+  void closeEvent (QCloseEvent * event);
 
 private:
 
@@ -144,6 +154,7 @@ private:
                          QString directIdentity, 
                          int     publicPort);
   void    DoMenu (QMenu * menu);
+  void    CreateSystemTrayStuff ();
 
   Ui_DChatMain          ui;
   Ui_GetString          passui;
@@ -184,6 +195,8 @@ private:
   QMenu        *ircMenu;
   QMenu        *directMenu;
   QMenu        *xmppMenu;
+  QMenu        *trayMenu;
+  QSystemTrayIcon  *trayIcon;
 
 
   std::map <QString, XEgalClient*>    xclientMap;
