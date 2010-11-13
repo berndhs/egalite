@@ -30,6 +30,7 @@
 #include <QDomElement>
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
+#include <QEvent>
 #include "contact-list-model.h"
 
 #include "config-edit.h"
@@ -138,6 +139,7 @@ private slots:
 protected:
 
   void closeEvent (QCloseEvent * event);
+  bool event (QEvent *event);
 
 private:
 

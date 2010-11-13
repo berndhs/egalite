@@ -330,6 +330,7 @@ DChatMain::Quit ()
   QSize currentSize = size();
   Settings().setValue ("sizes/main",currentSize);
   Settings().sync();
+qDebug () << "DChaiMain Quit ";
   if (pApp) {
     pApp->quit ();
   }
@@ -792,6 +793,7 @@ Q_UNUSED (localNick);
     newCont->Start (ChatContent::ChatModeRaw,
                     sock->RemoteName(),
                     sock->LocalName());
+    Show ();
   }
 }
 
@@ -1095,6 +1097,7 @@ DChatMain::ShowTrayMessage (const QString & msg)
 void 
 DChatMain::closeEvent(QCloseEvent *event)
 {
+qDebug () << " ------------- DChatMain caught close event  " << event;
   if (trayIcon && trayIcon->isVisible()) {
     QMessageBox::information(this, QString::fromUtf8("Égalité"),
                              tr("The program will keep running in the "
@@ -1103,7 +1106,17 @@ DChatMain::closeEvent(QCloseEvent *event)
                                  "or in the system tray entry."));
     hide();
     event->ignore();
+  } else {
+qDebug () << "------------  closing DChatMain";
+    QMainWindow::closeEvent (event);
   }
+}
+
+bool
+DChatMain::event (QEvent *evt)
+{
+//  qDebug () << " DChaiMain event " << evt;
+  return QMainWindow::event (evt);
 }
 
 
