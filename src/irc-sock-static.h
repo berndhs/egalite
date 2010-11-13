@@ -23,6 +23,7 @@
  ****************************************************************/
 
 class QString;
+class QRegExp;
 
 namespace egalite
 {
@@ -106,6 +107,8 @@ private:
                          const QString & first,
                          const QString & cmd,
                          const QString & rest);
+
+  static bool Chomp (QRegExp & pattern, QString & result, QString & data);
 };
 
 } // namespace

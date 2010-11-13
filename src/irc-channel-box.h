@@ -31,6 +31,7 @@ class QShowEvent;
 class QEvent;
 class QUrl;
 class QListWidgetItem;
+class QTreeWidgetItem;
 
 namespace egalite
 {
@@ -66,6 +67,9 @@ public slots:
   void Part ();
   void Float ();
   void Dock ();
+  void WhoisData (const QString & otherUser, 
+                  const QString & numeric,
+                  const QString & data);
 
 private slots:
 
@@ -76,6 +80,9 @@ private slots:
   void HideMe ();
   void HideGroup ();
   void HideAll ();
+  void CopyClip ();
+  void Whois ();
+  void UserInfoDetail (QTreeWidgetItem *, int);
 
 protected:
 
@@ -85,6 +92,8 @@ protected:
 signals:
 
   void Outgoing (QString channel, QString message);
+  void OutRaw (QString sockName, QString data);
+  void WantWhois (QString channel, QString otherUser, bool want);
   void Active (IrcChannelBox * box);
   void InUse (IrcChannelBox * box);
   void WantFloat (IrcChannelBox * box);
@@ -95,20 +104,24 @@ signals:
 
 private:
 
-  void   SetupMenu ();
+  void   SetupMenus ();
   void   Connect ();
-  void   BalanceSplitter ();
+  void   BalanceWidths ();
   void   AppendSmall (QTextBrowser* log, const QString & line);
 
   static bool Less (const QString & left, const QString & right);
 
   Ui_IrcChannelBox    ui;
   QMenu              *chanMenu;
+  QMenu              *userMenu;
+  QMenu              *infoMenu;
   QString             chanName;
   QString             sockName;
   QString             partMsg;
   QString             topic;
   QStringList         oldNames;
+  QString             queryUser;
+  QString             clipSave;
 
 };
 

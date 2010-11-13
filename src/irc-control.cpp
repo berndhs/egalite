@@ -615,6 +615,8 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
   newchan->SetPartMsg (sock->PartMsg ());
   connect (newchan, SIGNAL (Outgoing (QString, QString)),
            this, SLOT (Outgoing (QString, QString)));
+  connect (newchan, SIGNAL (OutRaw (QString, QString)),
+           this, SLOT (SendRaw (QString, QString )));
   connect (newchan, SIGNAL (Active (IrcChannelBox *)),
            this, SLOT (ChanActive (IrcChannelBox *)));
   connect (newchan, SIGNAL (InUse (IrcChannelBox *)),
@@ -629,6 +631,8 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
            this, SLOT (HideGroup ()));
   connect (newchan, SIGNAL (HideChannel (IrcChannelBox *)),
            this, SLOT (HideChannel (IrcChannelBox *)));
+  connect (newchan, SIGNAL (WantWhois (QString, QString, bool)),
+           this, SLOT (WantsWhois (QString, QString, bool)));
   mainUi.chanList->addItem (chanName);
 }
 
@@ -658,6 +662,31 @@ IrcControl::DropChannel (IrcSocket * sock, const QString & chanName)
     if (item && item->text() == chanName) {
       mainUi.chanList->takeItem (c);
       delete item;
+    }
+  }
+}
+
+void
+IrcControl::WantsWhois (QString channel, QString otherUser, bool wantsit)
+{
+  if (wantsit) {
+    whoisWait [otherUser] = channel;
+  } else {
+    whoisWait.remove (otherUser);
+  }
+}
+
+void
+IrcControl::WhoisData (const QString & thisUser,
+                  const QString & otherUser,
+                  const QString & numeric,
+                  const QString & data)
+{
+  if (whoisWait.contains (otherUser)) {
+    QString chan = whoisWait[otherUser];
+    if (channels.contains (chan)) {
+      IrcChannelBox * box = channels[chan];
+      box->WhoisData (otherUser, numeric, data);
     }
   }
 }
@@ -876,6 +905,14 @@ IrcControl::IncomingRaw (IrcSocket * sock,
     AddChannel (sock, from);
   }
   channels [from]->Incoming (msg);
+}
+
+void
+IrcControl::SendRaw (QString sockName, QString data)
+{
+  if (sockets.contains (sockName)) {
+    sockets [sockName] -> Send (data);
+  }
 }
 
 void

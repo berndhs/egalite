@@ -272,6 +272,22 @@ IrcSockStatic::ReceiveNumeric (IrcControl * context, IrcSocket *sock,
                         const QString & rest)
 {
   context->LogRaw (QString ("numeric %1  %2 %3").arg(first).arg(num).arg(rest));
+  if (num == "311" || num == "312" || num == "313" || num == "319") {
+    QString theRest (rest);
+    QString thisUser, otherUser;
+    QRegExp wordRx ("(\\S+)");
+    bool haveThis = Chomp (wordRx, thisUser, theRest);
+    if (haveThis) {
+      bool haveOther = Chomp (wordRx, otherUser, theRest);
+      if (haveOther) {
+        while (theRest.endsWith (QChar('\n')) 
+            || theRest.endsWith (QChar('\r'))) {
+          theRest.chop (1);
+        }
+        context->WhoisData (thisUser, otherUser, num, theRest);
+      }
+    }
+  }
 }
 
 void
@@ -389,6 +405,22 @@ IrcSockStatic::Receive366 (IrcControl * context, IrcSocket *sock,
                          const QString & rest)
 {
   qDebug () << " Received 366 " << first << cmd << rest;
+}
+
+bool
+IrcSockStatic::Chomp (QRegExp & pattern, QString & result, QString & data)
+{
+  int pos, len;
+  pos = pattern.indexIn (data);
+  if (pos < 0) {
+    result = "";
+    return false;
+  } else {
+    len = pattern.matchedLength ();
+    result = data.mid (pos,len);
+    data.remove (0,pos+len);
+    return true;
+  }
 }
 
 } // namespace

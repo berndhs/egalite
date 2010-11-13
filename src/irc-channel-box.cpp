@@ -34,6 +34,10 @@
 #include <QListWidgetItem>
 #include <QDateTime>
 #include <QtAlgorithms>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QApplication>
+#include <QClipboard>
 #include "link-mangle.h"
 
 namespace egalite
@@ -44,19 +48,22 @@ IrcChannelBox::IrcChannelBox (const QString & name,
                               QWidget *parent)
   :QWidget (parent),
    chanMenu (0),
+   userMenu (0),
    chanName (name),
    sockName (sock)
 {
   ui.setupUi (this);
-  SetupMenu ();
+  ui.chanButton->setText (name);
+  SetupMenus ();
   Connect ();
   SetTopic (tr("Channel %1").arg (chanName));
   show ();
-  BalanceSplitter ();
+  BalanceWidths ();
+  ui.userinfoWidget->hide();
 }
 
 void
-IrcChannelBox::SetupMenu ()
+IrcChannelBox::SetupMenus ()
 {
   ui.chanTopic->setOpenLinks (false);
   ui.chanHistory->setOpenLinks (false);
@@ -74,10 +81,16 @@ IrcChannelBox::SetupMenu ()
   chanMenu->addAction (tr("Hide Dock"), this, SLOT (HideGroup ()));
   chanMenu->addAction (tr("Hide All"), this, SLOT (HideAll ()));
   chanMenu->addAction (tr("Leave Channel"), this, SLOT (Part ()));
+
+  userMenu = new QMenu (this);
+  userMenu->addAction (tr("WhoIs"), this, SLOT (Whois()));
+
+  infoMenu = new QMenu (this);
+  infoMenu->addAction (tr("Copy"), this, SLOT (CopyClip()));
 }
 
 void
-IrcChannelBox::BalanceSplitter ()
+IrcChannelBox::BalanceWidths ()
 {
   QList <int> widList = ui.horizonSplitter->sizes();
   int numParts = widList.size();
@@ -93,6 +106,10 @@ IrcChannelBox::BalanceSplitter ()
   }
 qDebug () << " resized width list " << widList;
   ui.horizonSplitter->setSizes (widList);
+
+  int infoWidth = ui.userinfoWidget->size().width ();
+  int leftWidth = (infoWidth * 33) / 100;
+  ui.userinfoWidget->setColumnWidth (0,leftWidth);
   update ();
 qDebug () << " resulting width list " << ui.horizonSplitter->sizes();
 }
@@ -117,6 +134,29 @@ IrcChannelBox::Connect ()
            this, SLOT (Link (const QUrl &)));
   connect (ui.chanUsers, SIGNAL (itemClicked (QListWidgetItem *)),
            this, SLOT (ClickedUser (QListWidgetItem *)));
+  connect (ui.userinfoWidget, SIGNAL (itemPressed(QTreeWidgetItem *, int)),
+           this, SLOT (UserInfoDetail (QTreeWidgetItem *, int)));
+}
+
+void
+IrcChannelBox::UserInfoDetail (QTreeWidgetItem * item, int col)
+{
+  if (col == 0) {
+    ui.userinfoWidget->hide ();
+  } else if (col == 1) {
+    clipSave = item->text (col);
+    QPoint here = QCursor::pos ();
+    infoMenu->exec (here);
+  }
+}
+
+void
+IrcChannelBox::CopyClip ()
+{
+  QClipboard * clip = QApplication::clipboard ();
+  if (clip) {
+    clip->setText (clipSave);
+  }
 }
 
 void
@@ -252,6 +292,57 @@ void
 IrcChannelBox::ClickedUser (QListWidgetItem *item)
 {
   qDebug () << " clicked on user " << item->text ();
+  if (item) {
+    queryUser = item->text ();
+    if (queryUser.startsWith (QChar ('@'))
+        || queryUser.startsWith (QChar ('+'))) {
+      queryUser.remove (0,1);
+    }
+    QPoint here = QCursor::pos();
+    userMenu->exec (here);
+  }
+}
+
+void
+IrcChannelBox::Whois ()
+{
+  QStringList head;
+  head << tr ("Whois info on");
+  head << queryUser;
+  ui.userinfoWidget->clear ();
+  QTreeWidgetItem * item = new QTreeWidgetItem (head);
+  ui.userinfoWidget->addTopLevelItem (item);
+  ui.userinfoWidget->show ();
+  QString query ("WHOIS %1");
+  emit WantWhois (chanName, queryUser, true);
+  emit OutRaw (sockName, query.arg (queryUser));
+}
+
+void
+IrcChannelBox::WhoisData (const QString &otherUser,
+                          const QString &numeric,
+                          const QString &data)
+{
+  QStringList newinfo;
+  QString theData (data.trimmed());
+  if (numeric == "318") {
+    emit WantWhois (chanName, otherUser, false);
+    return;
+  } else if (numeric == "311") { 
+    newinfo << tr("User Name ") << theData;
+  } else if (numeric == "312") { 
+    newinfo << tr("Server") << theData;
+  } else if (numeric == "313") {
+    newinfo << tr("Op") << theData;
+  } else if (numeric == "319") {
+    if (theData.startsWith (QChar (':'))) {
+      theData.remove (0,1);
+    }
+    newinfo << tr("Channels") << theData;
+  }
+  QTreeWidgetItem * item = new QTreeWidgetItem (newinfo);
+  ui.userinfoWidget->addTopLevelItem (item);
+  ui.rawLog->append (QString ("WHOIS %1 %2").arg (otherUser).arg (data));
 }
 
 void

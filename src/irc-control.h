@@ -88,6 +88,7 @@ public slots:
   void  EditServers ();
   void  EditChannels ();
   void  EditIgnores ();
+  void  SendRaw (QString sockName, QString data);
 
 private slots:
 
@@ -111,6 +112,7 @@ private slots:
   void ChannelClicked (QListWidgetItem * item);
   void ServerClicked (QTableWidgetItem * item);
   void Send ();
+  void WantsWhois (QString chan, QString otherUser, bool wantsit);
 
   void Outgoing (QString chan, QString msg);
 
@@ -177,6 +179,10 @@ private:
   void IncomingRaw (IrcSocket * sock, 
                     const QString & from,
                     const QString & msg);
+  void WhoisData (const QString & thisUser,
+                  const QString & otherUser,
+                  const QString & numeric,
+                  const QString & data);
 
   static void SaveServer (const QString & name);
   static void SaveChannel (const QString & name);
@@ -213,6 +219,8 @@ private:
   FloatingMapType     floatingChannels;
 
   QList <QString>     ignoreSources;
+
+  QMap <QString, QString>  whoisWait;
 
   friend class IrcSockStatic;
   friend class IrcCtcp;
