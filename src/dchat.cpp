@@ -824,6 +824,7 @@ qDebug () << "                              local  " << serverLogin;
   newCont->SetProtoVersion ("0.1");
   newCont->SetHeartbeat (0);
   newCont->Start ();
+  Show ();
 }
 
 void
