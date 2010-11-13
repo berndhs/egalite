@@ -58,6 +58,7 @@ namespace egalite {
 DChatMain::DChatMain (QWidget *parent)
   :QMainWindow (parent),
    pApp (0),
+   haveOldPos (false),
    contactListModel (this),
    configEdit (this),
    helpView (this),
@@ -98,6 +99,7 @@ DChatMain::DChatMain (QWidget *parent)
   connect (ircControl, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
   xclientMap.clear ();
   trayIcon->show ();
+  oldPos = pos();
 }
 
 void
@@ -1049,22 +1051,34 @@ DChatMain::EditIrcNick ()
 void
 DChatMain::Show ()
 {
+  if (haveOldPos) {
+    move (oldPos);
+    haveOldPos = false;
+  }
   show ();
   showNormal ();
+}
+
+void
+DChatMain::hide ()
+{
+  oldPos = pos ();
+  haveOldPos = true;
+  QMainWindow::hide ();
 }
 
 void 
 DChatMain::CreateSystemTrayStuff ()
 {
   trayMenu = new QMenu(this);
-  trayMenu->addAction (tr("Show %1").arg (QString::fromUtf8("Égalité")),
+  trayMenu->addAction (tr("Show %1").arg (QString::fromUtf8("Egalite")),
                        this, SLOT (Show()));
   trayMenu->addAction (tr("Show IRC Control"), ircControl, SLOT (Show()));
   trayMenu->addAction (tr("Show IRC Dock"), ircControl, SLOT (ShowGroup()));
   trayMenu->addAction (tr("Show IRC Floats"), ircControl, SLOT (ShowFloats()));
-  trayMenu->addAction (tr ("Hide %1").arg (QString::fromUtf8("Égalité")),
+  trayMenu->addAction (tr ("Hide %1").arg (QString::fromUtf8("Egalite")),
                        this, SLOT (hide()));
-  trayMenu->addAction (tr ("Quit %1").arg (QString::fromUtf8("Égalité")),
+  trayMenu->addAction (tr ("Quit %1").arg (QString::fromUtf8("Egalite")),
                        this, SLOT (Quit()));
   trayIcon = new QSystemTrayIcon(QIcon (":/dchatlogo.png"),this);
   trayIcon->setContextMenu(trayMenu);
@@ -1090,7 +1104,7 @@ void
 DChatMain::ShowTrayMessage (const QString & msg)
 {
   if (trayIcon) { 
-    QString title (QString::fromUtf8("Égalité"));
+    QString title (QString::fromUtf8("Egalite"));
     trayIcon->showMessage (title,msg);                           
   }
 }
@@ -1100,7 +1114,7 @@ DChatMain::closeEvent(QCloseEvent *event)
 {
 qDebug () << " ------------- DChatMain caught close event  " << event;
   if (trayIcon && trayIcon->isVisible()) {
-    QMessageBox::information(this, QString::fromUtf8("Égalité"),
+    QMessageBox::information(this, QString::fromUtf8("Egalite"),
                              tr("The program will keep running in the "
                                  "system tray. To terminate the program, "
                                  "choose <b>Quit</b> in the main menu "

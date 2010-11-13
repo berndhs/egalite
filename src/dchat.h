@@ -87,6 +87,7 @@ public slots:
   void GetMessage (const QXmppMessage  & msg);
   void GetRaw (const QByteArray &data);
   void Show ();
+  void hide ();
   void ShowTrayMessage (const QString & msg);
 
 private slots:
@@ -162,6 +163,8 @@ private:
   Ui_GetString          passui;
   Ui_RequestSubscribe   reqSubUi;
   QApplication         *pApp;
+  QPoint                oldPos;
+  bool                  haveOldPos;
 
   QStringList           configMessages;
 
