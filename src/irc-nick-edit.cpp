@@ -57,6 +57,8 @@ IrcNickEdit::ClearForm ()
   ui.userNameEdit->clear ();
   ui.nickEdit->clear ();
   ui.passwordEdit->clear ();
+  ui.partEdit->clear ();
+  ui.quitEdit->clear ();
 }
 
 void
@@ -133,9 +135,7 @@ IrcNickEdit::Lookup (QString nick)
     ui.partEdit->setText (pmsg);
     ui.quitEdit->setText (qmsg);
   } else {
-    ui.userNameEdit->clear ();
-    ui.nickEdit->clear ();
-    ui.passwordEdit->clear();
+    ClearForm ();
   }
   return haveNick;
 }
