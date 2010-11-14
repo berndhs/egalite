@@ -49,12 +49,14 @@ main (int argc, char* argv[])
   QCoreApplication::setOrganizationDomain ("bernd-stramm.com");
   deliberate::ProgramVersion pv ("Egalite");
   QCoreApplication::setApplicationVersion (pv.Version());
+
+  QCA::Initializer  qcaInit;
+  QApplication  app (argc,argv);
+
   QSettings  settings;
   deliberate::SetSettings (settings);
   settings.setValue ("program",pv.MyName());
 
-  QCA::Initializer  qcaInit;
-  QApplication  app (argc,argv);
 
   QStringList  configMessages;
   QCA::scanForPlugins ();
