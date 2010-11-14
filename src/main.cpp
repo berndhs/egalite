@@ -39,31 +39,6 @@
 #include "deliberate.h"
 #include "version.h"
 
-namespace deliberate {
-
-void
-SetStyle (QSettings &zett)
-{
-  QStringList avail = QStyleFactory::keys();
-  QString     normal("oxygen");
-  normal = zett.value ("style/windowstyle",normal).toString();
-  if (normal == "gtk+") {
-    qDebug () << "Windows style " << normal << " is broken, not supported";
-    return;
-  }
-  if (avail.contains (normal, Qt::CaseInsensitive)) {
-    QApplication::setStyle (normal);
-    zett.setValue ("style/windowstyle",normal);
-  } else {
-    QStyle * pSt = QApplication::style();
-    if (pSt) {
-      QString defaultname = pSt->objectName();
-      zett.setValue ("style/windowstyle",defaultname);
-    }
-  }
-}
-
-} // namespace
 
 int
 main (int argc, char* argv[])
@@ -77,8 +52,6 @@ main (int argc, char* argv[])
   QSettings  settings;
   deliberate::SetSettings (settings);
   settings.setValue ("program",pv.MyName());
-
- // deliberate::SetStyle (settings);
 
   QCA::Initializer  qcaInit;
   QApplication  app (argc,argv);
@@ -102,7 +75,7 @@ main (int argc, char* argv[])
   QTranslator  translate;
   QString xlateFile (QString ("egalite_") + locale);
   QString langDir (":/translate");
-  bool found = translate.load (xlateFile, langDir);
+  translate.load (xlateFile, langDir);
   QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
   app.installTranslator (&translate);
 
@@ -152,7 +125,7 @@ main (int argc, char* argv[])
     if (newlocale != locale) {   
       QString xlateFile (QString ("egalite_") + newlocale);
       QString langDir (":/translate");
-      bool found = translate.load (xlateFile, langDir);
+      translate.load (xlateFile, langDir);
       QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
       app.installTranslator (&translate);
     }
