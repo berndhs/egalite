@@ -613,7 +613,7 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
   dockedChannels->show ();
   newchan->SetHost (sock->HostName());
   newchan->SetPartMsg (sock->PartMsg ());
-  newchan->StartWatching (QRegExp (sock->Nick()));
+  newchan->StartWatching (QRegExp (QString ("\\b%1\\b").arg(sock->Nick())));
   connect (newchan, SIGNAL (Outgoing (QString, QString)),
            this, SLOT (Outgoing (QString, QString)));
   connect (newchan, SIGNAL (OutRaw (QString, QString)),
@@ -821,10 +821,9 @@ IrcControl::ChanWantsDock (IrcChannelBox *chan)
 }
 
 void
-IrcControl::SeenWatchAlert (QString pattern, QString data)
+IrcControl::SeenWatchAlert (QString chanName, QString data)
 {
-  Q_UNUSED (pattern)
-  emit WatchAlert (tr ("IRC: %1").arg(data));
+  emit WatchAlert (tr ("IRC (%2): %1").arg(data).arg(chanName));
 }
 
 void

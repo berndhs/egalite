@@ -115,7 +115,7 @@ private slots:
   void WantsWhois (QString chan, QString otherUser, bool wantsit);
 
   void Outgoing (QString chan, QString msg);
-  void SeenWatchAlert (QString pattern, QString data);
+  void SeenWatchAlert (QString chanName, QString data);
 
 signals:
 

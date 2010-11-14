@@ -183,10 +183,12 @@ void
 IrcChannelBox::CheckWatch (const QString & data)
 {
   QList<QRegExp>::iterator lit;
-  for (lit=watchList.begin(); lit != watchList.end(); lit++) {
+  bool notSeen (true);
+  for (lit=watchList.begin(); notSeen && lit != watchList.end(); lit++) {
     QRegExp rX = *lit;
     if (rX.indexIn (data,0) >= 0) {
-      emit WatchAlert (rX.pattern(), data);
+      emit WatchAlert (chanName, data);
+      notSeen = false;
     }
   }
 }
