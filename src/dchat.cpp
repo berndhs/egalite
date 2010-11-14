@@ -97,6 +97,8 @@ DChatMain::DChatMain (QWidget *parent)
   statusTimer->start (30*1000);
   QTimer::singleShot (1500, this, SLOT (StatusUpdate ()));
   connect (ircControl, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
+  connect (ircControl, SIGNAL (WatchAlert (QString)),
+            this, SLOT (ShowTrayMessage (QString)));
   xclientMap.clear ();
   trayIcon->show ();
   oldPos = pos();
@@ -1105,7 +1107,7 @@ DChatMain::ShowTrayMessage (const QString & msg)
 {
   if (trayIcon) { 
     QString title (QString::fromUtf8("Egalite"));
-    trayIcon->showMessage (title,msg);                           
+    trayIcon->showMessage (title,msg,QSystemTrayIcon::NoIcon);                           
   }
 }
 

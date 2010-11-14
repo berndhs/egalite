@@ -613,6 +613,7 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
   dockedChannels->show ();
   newchan->SetHost (sock->HostName());
   newchan->SetPartMsg (sock->PartMsg ());
+  newchan->StartWatching (QRegExp (sock->Nick()));
   connect (newchan, SIGNAL (Outgoing (QString, QString)),
            this, SLOT (Outgoing (QString, QString)));
   connect (newchan, SIGNAL (OutRaw (QString, QString)),
@@ -633,6 +634,8 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
            this, SLOT (HideChannel (IrcChannelBox *)));
   connect (newchan, SIGNAL (WantWhois (QString, QString, bool)),
            this, SLOT (WantsWhois (QString, QString, bool)));
+  connect (newchan, SIGNAL (WatchAlert (QString, QString)),
+           this, SLOT (SeenWatchAlert (QString, QString)));
   mainUi.chanList->addItem (chanName);
 }
 
@@ -818,6 +821,13 @@ IrcControl::ChanWantsDock (IrcChannelBox *chan)
 }
 
 void
+IrcControl::SeenWatchAlert (QString pattern, QString data)
+{
+  Q_UNUSED (pattern)
+  emit WatchAlert (tr ("IRC: %1").arg(data));
+}
+
+void
 IrcControl::Outgoing (QString chan, QString msg)
 {
   QString trim = msg.trimmed ();
@@ -865,7 +875,8 @@ IrcControl::InChanMsg (IrcSocket * sock,
       IncomingCtcpChan (sock, from, chan, themsg);
     } else {
       channels [chan]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
-                                  arg(from).arg(themsg));
+                                  arg(from).arg(themsg),
+                                 themsg);
     }
   }
 }
@@ -939,7 +950,8 @@ qDebug () << " Ctcp CHAN " << msg;
   channels [chan]->Incoming (QString 
                      ("<a href=\"ircsender://%1\">%1</a>:"
                       "<span style=\"font-size:small\">CTCPc</span> %2").
-                                  arg(from).arg(msg));
+                                  arg(from).arg(msg),
+                      msg);
 }
 
 
@@ -969,7 +981,8 @@ qDebug () << " Ctcp USER " << msg;
     channels [from]->Incoming (QString 
                       ("<a href=\"ircsender://%1\">%1</a>:"
                       "<span style=\"font-size:small\">CTCPu</span> %2").
-                                  arg(from).arg(msg));
+                                  arg(from).arg(msg),
+                      msg);
   }
 }
 

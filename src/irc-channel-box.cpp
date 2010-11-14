@@ -166,6 +166,32 @@ IrcChannelBox::SetHost (const QString & hostName)
 }
 
 void
+IrcChannelBox::StartWatching (const QRegExp & watch)
+{
+  if (!watchList.contains (watch)) {
+    watchList.append (watch);
+  }
+}
+
+void
+IrcChannelBox::StopWatching (const QRegExp & watch)
+{
+  watchList.removeAll (watch);
+}
+
+void
+IrcChannelBox::CheckWatch (const QString & data)
+{
+  QList<QRegExp>::iterator lit;
+  for (lit=watchList.begin(); lit != watchList.end(); lit++) {
+    QRegExp rX = *lit;
+    if (rX.indexIn (data,0) >= 0) {
+      emit WatchAlert (rX.pattern(), data);
+    }
+  }
+}
+
+void
 IrcChannelBox::Close ()
 {
   hide ();
@@ -192,7 +218,8 @@ IrcChannelBox::Part ()
 }
 
 void
-IrcChannelBox::Incoming (const QString & message)
+IrcChannelBox::Incoming (const QString & message,
+                         const QString & raw)
 {
   QString cooked = LinkMangle::Anchorize (message, 
                          LinkMangle::HttpExp(),
@@ -204,6 +231,7 @@ qDebug () << " cooked message " << cooked;
   ui.chanHistory->append (smalldate
                           .arg (now.toString ("hh:mm:ss"))
                           .arg (cooked));
+  CheckWatch (raw.length() > 0 ? raw : message);
   emit Active (this);
 }
 

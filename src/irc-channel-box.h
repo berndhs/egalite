@@ -22,6 +22,8 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include "ui_irc-channel-box.h"
+#include <QList>
+#include <QRegExp>
 
 class QMenuBar;
 class QMenu;
@@ -61,9 +63,12 @@ public:
   QString Name ()  { return chanName; }
   QString Sock () { return sockName; }
 
+  void StartWatching (const QRegExp & watch);
+  void StopWatching  (const QRegExp & watch);
+
 public slots:
 
-  void Incoming (const QString & message);
+  void Incoming (const QString & message, const QString & raw = QString());
   void Part ();
   void Float ();
   void Dock ();
@@ -101,6 +106,7 @@ signals:
   void HideAllChannels ();
   void HideDock ();
   void HideChannel (IrcChannelBox * box);
+  void WatchAlert (QString pattern, QString line);
 
 private:
 
@@ -108,6 +114,7 @@ private:
   void   Connect ();
   void   BalanceWidths ();
   void   AppendSmall (QTextBrowser* log, const QString & line);
+  void   CheckWatch (const QString & data);
 
   static bool Less (const QString & left, const QString & right);
 
@@ -122,6 +129,8 @@ private:
   QStringList         oldNames;
   QString             queryUser;
   QString             clipSave;
+
+  QList <QRegExp>     watchList;
 
 };
 
