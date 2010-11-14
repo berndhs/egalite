@@ -178,6 +178,10 @@ DChatMain::StatusUpdate ()
   actionXmppStatus->setText (xmppMsg);
   QString ircMsg = tr ("%1 IRC").arg (ircControl->OpenCount());
   actionIrcStatus->setText (ircMsg);
+  if (trayIcon) {
+    QString trayMsg = "Egalite\n" + directMsg + "\n" + xmppMsg + "\n" + ircMsg;
+    trayIcon->setToolTip (trayMsg);
+  }
 }
 
 void
@@ -1084,8 +1088,11 @@ DChatMain::CreateSystemTrayStuff ()
                        this, SLOT (Quit()));
   trayIcon = new QSystemTrayIcon(QIcon (":/dchatlogo.png"),this);
   trayIcon->setContextMenu(trayMenu);
+  trayIcon->setToolTip (QString::fromUtf8("Egalite"));
   connect (trayIcon, SIGNAL (activated (QSystemTrayIcon::ActivationReason)),
              this, SLOT(TrayActivated(QSystemTrayIcon::ActivationReason)));
+  connect (trayIcon, SIGNAL (messageClicked ()),
+             this, SLOT (TrayMessageClicked ()));
 }
 
 void
@@ -1099,7 +1106,13 @@ void
 DChatMain::TrayActivated (QSystemTrayIcon::ActivationReason reason)
 {
 qDebug () << " Tray Icon activated reason " << reason;
-  TrayMenu ();
+  switch (reason) {
+  case QSystemTrayIcon::Trigger:
+    Show ();
+    break;
+  default:
+    TrayMenu ();
+  }
 }
 
 void
@@ -1109,6 +1122,12 @@ DChatMain::ShowTrayMessage (const QString & msg)
     QString title (QString::fromUtf8("Egalite"));
     trayIcon->showMessage (title,msg,QSystemTrayIcon::NoIcon);                           
   }
+}
+
+void
+DChatMain::TrayMessageClicked ()
+{
+  Show ();
 }
 
 void 
@@ -1132,7 +1151,7 @@ qDebug () << "------------  closing DChatMain";
 bool
 DChatMain::event (QEvent *evt)
 {
-//  qDebug () << " DChaiMain event " << evt;
+  //qDebug () << " DChaiMain event " << evt;
   return QMainWindow::event (evt);
 }
 

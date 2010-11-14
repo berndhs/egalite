@@ -136,6 +136,7 @@ private slots:
   void XmppMenu ();
   void TrayActivated(QSystemTrayIcon::ActivationReason);
   void TrayMenu ();
+  void TrayMessageClicked ();
 
 protected:
 

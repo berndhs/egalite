@@ -125,7 +125,8 @@ IrcChannelGroup::closeEvent (QCloseEvent *event)
       chan->Part ();
     }
   }
-  QDialog::closeEvent (event);
+  Hide ();
+  event->ignore ();
 }
 
 } // namespace
