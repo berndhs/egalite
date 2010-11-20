@@ -3,7 +3,9 @@
 #include "chat-content.h"
 #include "direct-message.h"
 #include "direct-parser.h"
+#if DO_AUDIO
 #include "audio-message.h"
+#endif
 #include <QXmppMessage.h>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
@@ -66,7 +68,9 @@ ChatContent::ChatContent (QWidget *parent)
    qtAudioOk (false),
    sendFileWindow (1),
    sendChunkSize (4*1024),
+#if DO_AUDIO
    audio (this),
+#endif
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -74,8 +78,12 @@ ChatContent::ChatContent (QWidget *parent)
    remoteHtmlColor ("red")
 {
   ui.setupUi (this);
+  #if DO_AUDIO
   #if DELIBERATE_QT_AUDIO_OK
   qtAudioOk = true;
+  #else
+  qtAudioOk = false;
+  #endif
   #else
   qtAudioOk = false;
   #endif
@@ -91,10 +99,12 @@ ChatContent::ChatContent (QWidget *parent)
           this, SLOT (StartAudioSend ()));
   connect (ui.textHistory, SIGNAL (anchorClicked (const QUrl&)),
           this, SLOT (HandleAnchor (const QUrl&)));
+#if DO_AUDIO
   connect (&audio, SIGNAL (HaveAudio(qint64)), 
           this, SLOT (SendAudioRequest(qint64)));
   connect (&audio, SIGNAL (PlayStarting()), this, SLOT (AudioStarted()));
   connect (&audio, SIGNAL (PlayFinished()), this, SLOT (AudioStopped()));
+#endif
   ui.quitButton->setDefault (false);
   ui.saveButton->setDefault (false);
   ui.sendFileButton->setDefault (false);
@@ -562,13 +572,16 @@ ChatContent::HandleAnchor (const QUrl & url)
 void
 ChatContent::StartAudioSend ()
 {
+#if DO_AUDIO
   ui.samButton->setEnabled  (false);
   audio.Record (ui.textHistory->pos(), ui.chatInput->size());
+#endif
 }
 
 void
 ChatContent::SendAudioRequest (qint64 usecs)
 {
+#if DO_AUDIO
 qDebug () << " have audio " << audio.Filename();
   XferInfo  info;
   info.id = QUuid::createUuid ().toString();
@@ -583,27 +596,6 @@ qDebug () << " file open " << isopen << " size " << fp->size();
   if (isopen) {
     xferFile [info.id] = fp;
     xferState [info.id] = info;  
-#if 0
-    QDomDocument requestDoc ("egalite");
-    QDomElement  request = requestDoc.createElement ("egalite");
-    request.setAttribute ("version", protoVersion);
-    requestDoc.appendChild (request);
-    QDomElement cmd = requestDoc.createElement ("cmd");
-    cmd.setAttribute ("op","sendfile");
-    cmd.setAttribute ("subop","samreq");
-    cmd.setAttribute ("xferid",info.id);
-    cmd.setAttribute ("size",info.fileSize);
-    cmd.setAttribute ("usecs",usecs);
-    cmd.setAttribute ("name",audio.OutFormat().codec());
-    cmd.setAttribute ("rate",audio.OutFormat().frequency());
-    cmd.setAttribute ("channels",audio.OutFormat().channels ());
-    cmd.setAttribute ("samplesize",audio.OutFormat().sampleSize());
-    cmd.setAttribute ("codec",audio.OutFormat().codec ());
-    cmd.setAttribute ("byteorder",audio.OutFormat().byteOrder());
-    cmd.setAttribute ("sampletype",audio.OutFormat().sampleType());
-    request.appendChild (cmd);
-    SendDomDoc (requestDoc);
-#endif
 
     DirectMessage req;
     req.SetOp ("sendfile");
@@ -626,6 +618,7 @@ qDebug () << " file open " << isopen << " size " << fp->size();
     SendDirectMessage (req);
     StartXferDisplay ();
   }
+#endif
 }
 
 void
@@ -807,11 +800,13 @@ ChatContent::CloseTransfer (const QString & id, bool good)
     finished.exec ();
     break;
   case XferInfo::Xfer_Audio:
+#if DO_AUDIO
     if (inout == XferInfo::Xfer_In) {
       audio.FinishReceive ();
     } else if (inout == XferInfo::Xfer_Out) {
       ui.samButton->setEnabled (qtAudioOk);
     }
+#endif
     break;
   default:
     qDebug () << " invalid transfer type " << kind << " finished"; 
@@ -909,6 +904,7 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
   qDebug () << " received SAM request";
   QString subop ("deny");
   QString xferId = msg.Attribute ("xferid");
+#if DO_AUDIO
   if (qtAudioOk && (!audio.BusyReceive())) {   
     XferInfo info;
     info.id = xferId;
@@ -936,17 +932,6 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
       StartXferDisplay ();
     }
   }
-#if 0
-  QDomDocument  responseDoc ("egalite");
-  QDomElement response = responseDoc.createElement ("egalite");
-  response.setAttribute ("version",protoVersion);
-  responseDoc.appendChild (response);
-  QDomElement cmd = responseDoc.createElement ("cmd");
-  cmd.setAttribute ("op","sendfile");
-  cmd.setAttribute ("subop",subop);
-  cmd.setAttribute ("xferid",xferId);
-  response.appendChild (cmd);
-  SendDomDoc (responseDoc);
 #endif
   DirectMessage resp;
   resp.SetOp ("sendfile");

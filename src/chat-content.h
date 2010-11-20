@@ -22,8 +22,9 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-
+#if DO_AUDIO
 #include "audio-message.h"
+#endif
 #include "ui_chat-content.h"
 #include "direct-parser.h"
 #include <QDialog>
@@ -211,7 +212,9 @@ private:
   int              sendChunkSize;
   XferStateMap     xferState;
   XferFileMap      xferFile;
+#if DO_AUDIO
   AudioMessage     audio;
+#endif
 
   QString          dateMask;
   QString          chatLine;

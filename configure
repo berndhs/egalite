@@ -172,7 +172,6 @@ case $ac_option in
    ;;
   --noaudio)
    DO_AUDIO=0
-   $ac_shift
    ;;
   *)
    echo "Bad option " $ac_option " " $ac_optarg
@@ -220,6 +219,12 @@ echo "LRELEASE = ${LRELEASE}" >> Makefile
 echo "QXMPP_BASE = ${QXMPP_BASE}" > ${OPTIONS_FILE}
 echo "QXMPP_NAME = ${QXMPP_NAME}" >> ${OPTIONS_FILE}
 echo "DO_AUDIO = ${DO_AUDIO}" >> ${OPTIONS_FILE}
+if [ $DO_AUDIO -eq 1 ]
+then
+  echo "CONFIG += audio" >> ${OPTIONS_FILE}
+else 
+  echo "CONFIG -= audio" >> ${OPTIONS_FILE}
+fi
 #
 # next concatenate the Makefile.in content
 #

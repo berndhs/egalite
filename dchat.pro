@@ -160,7 +160,6 @@ SOURCES = src/main.cpp \
 	src/account-edit.cpp \
 	src/direct-message.cpp \
 	src/direct-parser.cpp \
-	src/audio-message.cpp \
 	src/cert-list-edit.cpp \
         src/irc-channel-group.cpp \
         src/irc-channel-box.cpp \
@@ -172,7 +171,6 @@ SOURCES = src/main.cpp \
         src/irc-nick-edit.cpp \
         src/enter-string.cpp \
         src/edit-simple.cpp \
-
 
 
 HEADERS = \
@@ -203,7 +201,6 @@ HEADERS = \
 	src/account-edit.h \
 	src/direct-message.h \
 	src/direct-parser.h \
-	src/audio-message.h \
 	src/cert-list-edit.h \
         src/irc-channel-box.h \
         src/irc-control.h \
@@ -216,6 +213,11 @@ HEADERS = \
         src/enter-string.h \
         src/edit-simple.h \
 
+
+audio {
+	SOURCES += src/audio-message.cpp
+	HEADERS += src/audio-message.h
+}
 
 
 

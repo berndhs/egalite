@@ -23,9 +23,11 @@
  ****************************************************************/
 
 #include <QObject>
+#if DO_AUDIO
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QAudioFormat>
+#endif
 #include <QFile>
 #include <QString>
 #include <QPoint>
@@ -91,12 +93,16 @@ private:
 
   QWidget       *parentWidget;
   QString        filename;
+#if DO_AUDIO
   QAudioFormat   outFormat;
   QAudioFormat   inFormat;
+#endif
   QFile          outFile;
   QFile          inFile;
+#if DO_AUDIO
   QAudioInput   *record;
   QAudioOutput  *player;
+#endif
   double         recTime;
   double         tick;
   double         secsLeft;
