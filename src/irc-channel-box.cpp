@@ -303,8 +303,8 @@ IrcChannelBox::Link (const QUrl & url)
 {
   if (url.scheme () == "ircsender") {
     QString msg = ui.textEnter->text ();
-    msg.append (url.authority());
-    msg.append (":");
+    msg.append (url.userName());
+    msg.append (": ");
     ui.textEnter->setText (msg);
   } else {
     QDesktopServices::openUrl (url);

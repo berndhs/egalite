@@ -873,7 +873,7 @@ IrcControl::InChanMsg (IrcSocket * sock,
     if (themsg.startsWith (QChar (1))) {
       IncomingCtcpChan (sock, from, chan, themsg);
     } else {
-      channels [chan]->Incoming (QString ("<a href=\"ircsender://%1\">%1</a>: %2").
+      channels [chan]->Incoming (QString ("<a href=\"ircsender://%1@egalite\">%1</a>: %2").
                                   arg(from).arg(themsg),
                                  themsg);
     }
@@ -897,7 +897,7 @@ IrcControl::InUserMsg (IrcSocket * sock,
   if (themsg.startsWith (QChar (1))) {
     IncomingCtcpUser (sock, from, to, themsg);
   } else {
-    IncomingRaw (sock, from, QString ("<a href=\"ircsender://%1\">%1</a>: %2").
+    IncomingRaw (sock, from, QString ("<a href=\"ircsender://%1@egalite\">%1</a>: %2").
                                 arg(from).arg(themsg));
   }
   mainUi.logDisplay->append (QString ("Message from %1 to %2 says %3")

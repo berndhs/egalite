@@ -16,6 +16,7 @@
 TEMPLATE = app
 MAKEFILE = MakeDChat
 TARGET = bin/egalite
+QMAKE_LFLAGS += "-z noexecstack"
 unix {
   CONFIG += debug
   CONFIG += crypto
