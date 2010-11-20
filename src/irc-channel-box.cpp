@@ -50,10 +50,12 @@ IrcChannelBox::IrcChannelBox (const QString & name,
    chanMenu (0),
    userMenu (0),
    chanName (name),
-   sockName (sock)
+   sockName (sock),
+   historyIndex (-1)
 {
   ui.setupUi (this);
   ui.chanButton->setText (name);
+  ui.textEnter->installEventFilter (this);
   SetupMenus ();
   Connect ();
   SetTopic (tr("Channel %1").arg (chanName));
@@ -256,6 +258,7 @@ IrcChannelBox::AddNames (const QString & names)
   ui.chanUsers->clear();
   qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
   ui.chanUsers->addItems (oldNames);
+  ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
   QStringList::iterator sit;
 }
 
@@ -270,6 +273,7 @@ IrcChannelBox::AddName (const QString & name)
   qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
   ui.chanUsers->addItems (oldNames);
   ui.rawLog->append (tr("Enter: %1").arg(name));
+  ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
   AppendSmall (ui.chanHistory, tr(" Enter: -&gt; %1").arg(name));
 }
 
@@ -284,6 +288,7 @@ IrcChannelBox::DropName (const QString & name, const QString & msg)
   qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
   ui.chanUsers->addItems (oldNames);
   ui.rawLog->append (tr("Exit: %1 %2").arg(name). arg (msg));
+  ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
   AppendSmall (ui.chanHistory, tr(" Exit: &lt;- %1 %2").arg(name).arg(msg));
 }
 
@@ -293,9 +298,12 @@ IrcChannelBox::TypingFinished ()
   QString msg = ui.textEnter->text();
   if (msg.trimmed().length() > 0) {
     emit Outgoing (chanName, msg);
+    ui.rawLog->append (msg);
+    ui.textEnter->clear ();
+    history.append (msg);
+    history.removeDuplicates ();
+    historyIndex = history.size();
   }
-  ui.rawLog->append (msg);
-  ui.textEnter->clear ();
 }
 
 void
@@ -401,6 +409,57 @@ void
 IrcChannelBox::HideAll ()
 {
   emit HideAllChannels ();
+}
+
+bool
+IrcChannelBox::DoHistory (QLineEdit   * edit, 
+                       QStringList & hist,
+                       QEvent      * evt,
+                       int         & index,
+                       QString     & bottom)
+{
+  QKeyEvent * kevt = static_cast<QKeyEvent *>(evt);
+  if (kevt->key() == Qt::Key_Up) {
+    if (hist.size() == 0) {
+      return true;
+    }
+    if (index >= hist.size()) { // at bottom
+      bottom = edit->text();
+    } 
+    index--;
+    if (index < 0) {
+      index = -1;
+    } else {
+      edit->setText (hist.at(historyIndex));
+    }
+    return true;
+  } else if (kevt->key() == Qt::Key_Down) {
+    if (hist.size() == 0) {
+      return true;
+    }
+    index++;
+    if (index >= hist.size()) {
+      index = hist.size();
+      edit->setText (bottom);
+    } else {
+      edit->setText (hist.at(index));
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool
+IrcChannelBox::eventFilter (QObject * obj, QEvent * evt)
+{
+  if (obj == ui.textEnter) {
+    if (evt->type() == QEvent::KeyPress) {
+      return DoHistory (ui.textEnter, history, evt, 
+                        historyIndex, historyBottom);
+    }
+  }
+  return QWidget::eventFilter (obj, evt);
 }
 
 bool

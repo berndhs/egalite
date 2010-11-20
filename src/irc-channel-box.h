@@ -92,6 +92,7 @@ private slots:
 protected:
 
   bool event (QEvent * evt);
+  bool eventFilter (QObject * obj, QEvent *evt);
  
 
 signals:
@@ -115,6 +116,11 @@ private:
   void   BalanceWidths ();
   void   AppendSmall (QTextBrowser* log, const QString & line);
   void   CheckWatch (const QString & data);
+  bool   DoHistory (QLineEdit * edit, 
+                    QStringList & hist,
+                    QEvent      * evt,
+                    int         & index,
+                    QString     & bottom);
 
   static bool Less (const QString & left, const QString & right);
 
@@ -131,6 +137,10 @@ private:
   QString             clipSave;
 
   QList <QRegExp>     watchList;
+
+  QStringList         history;
+  QString             historyBottom;
+  int                 historyIndex;
 
 };
 

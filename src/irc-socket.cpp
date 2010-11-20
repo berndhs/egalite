@@ -163,7 +163,7 @@ IrcSocket::RollScript ()
 {
   if (!scriptTimer->isActive()) {
     SendScriptHead ();
-    scriptTimer->start (1000);
+    scriptTimer->start (250);
   }
 }
 
