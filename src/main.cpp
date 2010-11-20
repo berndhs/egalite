@@ -66,12 +66,16 @@ main (int argc, char* argv[])
   } else {
     configMessages << " Certificate support available ";
   }
-  #if DELIBERATE_QT_AUDIO_OK
-  configMessages << QString(" Audio enabled with Qt %1") 
-                    .arg (DELIBERATE_QT_NUM) ;
+  #if DO_AUDIO
+    #if DELIBERATE_QT_AUDIO_OK
+    configMessages << QString(" Audio enabled with Qt %1") 
+                      .arg (DELIBERATE_QT_NUM) ;
+    #else
+    configMessages << QString(" No Audio Input with Qt %1") 
+                       .arg (DELIBERATE_QT_NUM) ;
+    #endif
   #else
-  configMessages << QString(" No Audio Input with Qt %1") 
-                     .arg (DELIBERATE_QT_NUM) ;
+  configMessages << QString (" Audio Disabled in Build Configuration");
   #endif
   QString locale = QLocale::system().name();
   QTranslator  translate;

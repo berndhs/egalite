@@ -118,6 +118,7 @@ usage () {
    echo "--prefix=PREFIX    Install into PREFIX [${PREFIX}]"
    echo "--qxmppbase=QXDIR  qxmpp base directory [${QXMPP_BASE}]"
    echo "--qxmppname=QXNAME qxmpp basic name [${QXMPP_NAME}]"
+   echo "--noaudio          Build without audio input support"
    echo
 }
 
@@ -131,6 +132,7 @@ PREFIX=/usr
 QXMPP_BASE=/usr
 QXMPP_NAME=qxmppclient
 OPTIONS_FILE=options.pri
+DO_AUDIO=1
 
 # 
 # command line arguments:
@@ -166,6 +168,10 @@ case $ac_option in
    ;;
   --qxmppname)
    QXMPP_NAME=$ac_optarg
+   $ac_shift
+   ;;
+  --noaudio)
+   DO_AUDIO=0
    $ac_shift
    ;;
   *)
@@ -213,6 +219,7 @@ echo "MAKE = ${MAKE_PROGRAM}" >> Makefile
 echo "LRELEASE = ${LRELEASE}" >> Makefile
 echo "QXMPP_BASE = ${QXMPP_BASE}" > ${OPTIONS_FILE}
 echo "QXMPP_NAME = ${QXMPP_NAME}" >> ${OPTIONS_FILE}
+echo "DO_AUDIO = ${DO_AUDIO}" >> ${OPTIONS_FILE}
 #
 # next concatenate the Makefile.in content
 #
