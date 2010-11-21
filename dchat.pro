@@ -32,7 +32,7 @@ message ("translations in $$TRANS_DIR/")
 CODEFORTR = UTF-8
 
 message ("generating MAKEFILE as $$MAKEFILE")
-QT += core gui network xml xmlpatterns sql webkit multimedia
+QT += core gui network xml xmlpatterns sql webkit 
 
 DEFINES += DELIBERATE_QTM1=$$QT_MAJOR_VERSION
 DEFINES += DELIBERATE_QTM2=$$QT_MINOR_VERSION
@@ -215,6 +215,7 @@ HEADERS = \
 
 
 audio {
+	QT += multimedia
 	SOURCES += src/audio-message.cpp
 	HEADERS += src/audio-message.h
 }
