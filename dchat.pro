@@ -44,14 +44,14 @@ unix {
   !include ( options.pri ) {
     INCLUDEPATH += /usr/include/qxmpp
     INCLUDEPATH += /usr/include/QtMultimediaKit
-    message ("Added to default include; $$INCLUDEPATH");
+    message ("Added to default include; $$INCLUDEPATH")
     LIBS += -l$$QXMPP_NAME
     DEFINES += DO_AUDIO=0
     message ("Now options.pri, using default $$INCLUDEPATH")
   } else {
     INCLUDEPATH += $$QXMPP_BASE/include/qxmpp
     INCLUDEPATH += /usr/include/QtMultimediaKit
-    message ("Added to optional include; $$INCLUDEPATH");
+    message ("Added to optional include; $$INCLUDEPATH")
     DEFINES += DO_AUDIO=$$DO_AUDIO
     exists ("$$QXMPP_BASE/lib64") {
       LIBS += -L$$QXMPP_BASE/lib64 -l$$QXMPP_NAME
