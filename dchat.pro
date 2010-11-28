@@ -32,7 +32,7 @@ message ("translations in $$TRANS_DIR/")
 CODEFORTR = UTF-8
 
 message ("generating MAKEFILE as $$MAKEFILE")
-QT += core gui network xml xmlpatterns sql webkit 
+QT += core gui network xml xmlpatterns sql webkit multimediakit
 
 DEFINES += DELIBERATE_QTM1=$$QT_MAJOR_VERSION
 DEFINES += DELIBERATE_QTM2=$$QT_MINOR_VERSION
@@ -43,11 +43,13 @@ unix {
   message ("Applying Unix settings")
   !include ( options.pri ) {
     INCLUDEPATH += /usr/include/qxmpp
+    INCLUDEPATH += /usr/include/QtMultimediaKit
     LIBS += -l$$QXMPP_NAME
     DEFINES += DO_AUDIO=0
     message ("Now options.pri, using default $$INCLUDEPATH")
   } else {
     INCLUDEPATH += $$QXMPP_BASE/include/qxmpp
+    INCLUDEPATH += /usr/include/QtMultimediaKit
     DEFINES += DO_AUDIO=$$DO_AUDIO
     exists ("$$QXMPP_BASE/lib64") {
       LIBS += -L$$QXMPP_BASE/lib64 -l$$QXMPP_NAME
@@ -215,7 +217,8 @@ HEADERS = \
 
 
 audio {
-	QT += multimedia
+	QT += multimediakit
+        LIBS += -lQtMultimediaKit
 	SOURCES += src/audio-message.cpp
 	HEADERS += src/audio-message.h
 }
