@@ -715,6 +715,7 @@ DChatMain::Logout ()
     delete xclient;
   }
   xclientMap.erase (expired);
+  QTimer::singleShot (1500, this, SLOT (StatusUpdate()));
 }
 
 void
