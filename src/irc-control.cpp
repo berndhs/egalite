@@ -315,7 +315,9 @@ IrcControl::TryPart ()
 {
   QString chan = mainUi.chanCombo->currentText ();
   IrcSocket * sock = CurrentSock (mainUi.serverTable);
-  sock->Send (QString ("PART %1").arg (chan));
+  if (sock) {
+    sock->Send (QString ("PART %1").arg (chan));
+  }
 }
 
 int
