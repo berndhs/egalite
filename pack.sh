@@ -1,7 +1,9 @@
 #!/bin/bash
 
 NAME=egalite
-VERSION=0.4.2
+VERSION=`grep "ProgramVersion::VersionNumber" src/version.cpp \
+        | awk '{print $3;}' \
+        | sed s/[\(\"\;\)]//g`
 PACKDIR=${HOME}/packaging/dchat
 
 makearchive.sh ${NAME}-${VERSION} master
