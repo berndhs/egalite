@@ -16,7 +16,6 @@
 TEMPLATE = app
 MAKEFILE = MakeDChat
 TARGET = bin/egalite
-QMAKE_LFLAGS += "-z noexecstack"
 unix {
   CONFIG += debug
   CONFIG += crypto
@@ -75,7 +74,8 @@ unix {
 }
 
 win32 {
-  message ("Applying Windows 32 bit settings")
+  message ("Applying Windows 32 bit mingw settings")
+  CONFIG += build_x86
   INCLUDEPATH += ../../software/qca/qca-2.0.2/include/QtCrypto
   INCLUDEPATH += ../qxmpp-0.2.0/src
   QTDIR = C:/Qt/2010.05/qt
@@ -96,6 +96,10 @@ win32 {
   }
 }
 message ("using extra libs $$LIBS")
+
+build_x86 {
+  QMAKE_LFLAGS += "-z noexecstack"
+}
 
 RESOURCES = dchat.qrc
 

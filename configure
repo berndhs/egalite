@@ -202,6 +202,12 @@ else
 fi
 
 #
+#  see if we build for x86 or ARM
+#
+MACHINE=`uname -m`
+IS_X86=`expr index 86 $MACHINE`
+IS_ARM=`expr index arm $MACHINE`
+#
 # generate Makefile
 #
 # first shove in everything we found out
@@ -225,6 +231,18 @@ then
 else 
   echo "CONFIG -= audio" >> ${OPTIONS_FILE}
 fi
+if [ $IS_ARM -eq 1 ]
+then
+  echo "CONFIG += build_arm" >> ${OPTIONS_FILE}
+else
+  echo "CONFIG -= build_arm" >> ${OPTIONS_FILE}
+fi
+if [ $IS_X86 -eq 1 ]
+then
+  echo "CONFIG += build_x86" >> ${OPTIONS_FILE}
+else
+  echo "CONFIG -= build_x86" >> ${OPTIONS_FILE}
+fi
 #
 # next concatenate the Makefile.in content
 #
@@ -238,5 +256,7 @@ echo "qmake is                  " $QMAKE
 echo "Installation prefix is    " $PREFIX
 echo "Qxmpp base dir is         " $QXMPP_BASE
 echo "Qxmpp name is             " $QXMPP_NAME
+echo "IS_ARM is                 " $IS_ARM
+echo "IS_X86 is                 " $IS_X86
 echo "Now you can build with    " $MAKE_PROGRAM
 
