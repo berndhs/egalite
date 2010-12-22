@@ -51,7 +51,7 @@ SetSettings (QSettings & settings)
 QSettings &
 Settings ()
 {
-  if (mySettings) {
+  if (mySettings == 0) {
     mySettings = new QSettings;
   }
   return *mySettings;
