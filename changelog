@@ -1,0 +1,63 @@
+* Thu Jan 27 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.4.5
+- bug fixes
+
+* Sun Nov 21 2010 Bernd Stramm <berng.stramm@gmail.com> - 0.4.2
+- history in IRC chat commands
+
+* Mon Nov 13 2010 Bernd Stramm <berng.stramm@gmail.com> - 0.4.1
+- WHOIS for IRC chat users
+- system tray icon
+- notification on IRC chat mentions of logged in nick
+- misc cosmetic things
+
+* Fri Nov 12 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.4.0-1
+- add support for IRC
+
+* Tue Oct 12 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.3.5-1
+- provide "nobody" certificate
+- check if db is complete at start
+
+* Thu Sep 30 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.3.3-1
+- shortcut to using newly generated certificate
+- bug fix to show new certificate sooner
+
+* Sun Sep 12 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.3.2-1
+- short audio messages when build with Qt >=  4.7
+
+* Wed Sep 08 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.3.1-1
+- fixed bug crashing xmpp chat
+
+* Tue Sep 07 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.3.0-1
+- new direct protocol XML parser replaces use of QDomDocument setContent
+- new DirectMessage structure (class) 
+
+* Sun Sep 05 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.2.1-1
+- file transfer for direct chat, multiple files in both directions
+
+* Fri Sep 03 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.2.0-1
+- store and manage multiple server accounts
+
+* Thu Aug 12 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.1.4-9
+- maintain list of know rejected certificates
+- add background image to contact view
+- tell user when certificate is expired
+- make default file name for saving conversation
+- some updates in the manual
+- more french translation
+- added german translation
+
+* Fri Aug 06 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.1.2-1
+- bigger Send button
+- allow entry of new direct destination address, without editing contact db
+- display confirm or failure when saving contacts in db
+- check if cert generate is suppored by QCA before attempting
+
+* Thu Aug 05 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.1.1-1
+- Better RPM release
+
+* Tue Jul 27 2010 Bernd Stramm <bernd.stramm@gmail.com> - 0.1.0-1
+- Initial RPM release
+
+
+
+
