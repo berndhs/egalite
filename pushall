@@ -1,0 +1,6 @@
+#!/bin/bash
+for tgt in `git remote show`
+do
+  echo "Push to -----------> " ${tgt}
+  git push ${tgt} master
+done
