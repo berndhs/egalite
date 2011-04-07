@@ -31,10 +31,9 @@ message ("translations in $$TRANS_DIR/")
 CODEFORTR = UTF-8
 
 message ("generating MAKEFILE as $$MAKEFILE")
-QT += core gui network xml xmlpatterns sql webkit mobility
-audio {
-  QT += multimedia
-}
+QT += core gui network xml xmlpatterns sql webkit
+
+
 
 DEFINES += DELIBERATE_QTM1=$$QT_MAJOR_VERSION
 DEFINES += DELIBERATE_QTM2=$$QT_MINOR_VERSION
@@ -100,6 +99,12 @@ win32 {
 }
 message ("using extra libs $$LIBS")
 
+audio {
+        message ("---width audio")
+	QT += multimedia
+}
+message ("QT variable is $$QT")
+
 build_x86 {
   QMAKE_LFLAGS += "-z noexecstack"
 }
@@ -143,8 +148,6 @@ FORMS = \
         ui/edit-simple.ui \
 
 
-
-
 SOURCES = src/main.cpp \
 	src/dchat.cpp \
 	src/cmdoptions.cpp \
@@ -183,8 +186,13 @@ SOURCES = src/main.cpp \
         src/enter-string.cpp \
         src/edit-simple.cpp \
 
+audio {
+	SOURCES += src/audio-message.cpp
+}
 
-HEADERS = \
+
+
+HEADERS += \
 	src/dchat.h \
 	src/cmdoptions.h \
 	src/delib-debug.h \
@@ -224,13 +232,8 @@ HEADERS = \
         src/enter-string.h \
         src/edit-simple.h \
 
-
 audio {
-	QT += multimediakit
-        LIBS += -lQtMultimediaKit
-	SOURCES += src/audio-message.cpp
 	HEADERS += src/audio-message.h
 }
-
 
 
