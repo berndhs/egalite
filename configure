@@ -69,6 +69,28 @@ findqmake () {
     fi
   fi
 }
+
+
+#
+# function to find distro
+#
+find_distro () {
+DISTRO=linux
+if [ -e /etc/system-release ]
+then
+  DISTRO=`head -1 /etc/system-release \
+         | awk '{print $1}' \
+         | tr '[:upper:]' '[:lower:]'`
+else
+  if [ -e /etc/issue ]
+  then
+    DISTRO=`head -1 /etc/issue \
+	| awk '{print $1}' \
+	| tr '[:upper:]' '[:lower:]'`
+  fi
+fi
+}
+
 find_lrelease () {
 
   LREL=`which lrelease`
@@ -118,7 +140,7 @@ usage () {
    echo "--prefix=PREFIX    Install into PREFIX [${PREFIX}]"
    echo "--qxmppbase=QXDIR  qxmpp base directory [${QXMPP_BASE}]"
    echo "--qxmppname=QXNAME qxmpp basic name [${QXMPP_NAME}]"
-   echo "--noaudio          Build without audio input support"
+   echo "--audio=<0|1>      Build with audio input support [${DO_AUDIO}]"
    echo
 }
 
@@ -127,12 +149,14 @@ usage () {
 # main configure script
 #
 
-COPYRIGHT=" Copyright (C) 2010 Bernd Stramm"
+COPYRIGHT=" Copyright (C) 2011 Bernd Stramm"
 PREFIX=/usr
 QXMPP_BASE=/usr
 QXMPP_NAME=qxmppclient
 OPTIONS_FILE=options.pri
-DO_AUDIO=1
+DO_AUDIO=0
+COMMAND_LINE="$0 $*"
+find_distro
 
 # 
 # command line arguments:
@@ -170,8 +194,13 @@ case $ac_option in
    QXMPP_NAME=$ac_optarg
    $ac_shift
    ;;
-  --noaudio)
-   DO_AUDIO=0
+  --audio)
+   DO_AUDIO=$ac_optarg
+   $ac_shift
+   ;;
+  --distro)
+   DISTRO=$ac_optarg
+   $ac_shift
    ;;
   *)
    echo "Bad option " $ac_option " " $ac_optarg
@@ -207,6 +236,7 @@ fi
 MACHINE=`uname -m`
 IS_X86=`expr index 86 $MACHINE`
 IS_ARM=`expr index arm $MACHINE`
+
 #
 # generate Makefile
 #
@@ -222,7 +252,14 @@ echo "DESTDIR=\${PREFIX}/bin" >> Makefile
 echo "QMAKE = $QMAKE" >> Makefile
 echo "MAKE = ${MAKE_PROGRAM}" >> Makefile
 echo "LRELEASE = ${LRELEASE}" >> Makefile
-echo "QXMPP_BASE = ${QXMPP_BASE}" > ${OPTIONS_FILE}
+
+#
+# make options include file for qmake
+#
+echo "DISTRO = ${DISTRO}" > ${OPTIONS_FILE}
+echo "CONFIG += ${DISTRO}" >> ${OPTIONS_FILE}
+echo "DEFINES += DISTRO_${DISTRO}=1" >> ${OPTIONS_FILE}
+echo "QXMPP_BASE = ${QXMPP_BASE}" >> ${OPTIONS_FILE}
 echo "QXMPP_NAME = ${QXMPP_NAME}" >> ${OPTIONS_FILE}
 echo "DO_AUDIO = ${DO_AUDIO}" >> ${OPTIONS_FILE}
 if [ $DO_AUDIO -eq 1 ]
@@ -251,12 +288,22 @@ cat Makefile.in >> Makefile
 #
 # tell the user what to do next
 #
-echo ""
-echo "qmake is                  " $QMAKE
-echo "Installation prefix is    " $PREFIX
-echo "Qxmpp base dir is         " $QXMPP_BASE
-echo "Qxmpp name is             " $QXMPP_NAME
-echo "IS_ARM is                 " $IS_ARM
-echo "IS_X86 is                 " $IS_X86
-echo "Now you can build with    " $MAKE_PROGRAM
+showmsg () {
+  echo "     " $* 
+  echo $* >> config.last
+}
+
+echo "" > config.last
+showmsg `date -R`
+showmsg $COMMAND_LINE
+showmsg ""
+showmsg 'qmake is..................' $QMAKE
+showmsg 'Installation prefix is....' $PREFIX 
+showmsg 'Distro setting is.........' $DISTRO
+showmsg 'DO_AUDIO is...............' $DO_AUDIO
+showmsg 'Qxmpp base dir is.........' $QXMPP_BASE
+showmsg 'Qxmpp name is.............' $QXMPP_NAME
+showmsg 'IS_ARM is.................' $IS_ARM
+showmsg 'IS_X86 is.................' $IS_X86
+showmsg 'Now you can build with....' $MAKE_PROGRAM 
 
