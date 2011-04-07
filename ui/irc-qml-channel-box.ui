@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>Bernd Stramm</author>
+ <class>IrcChannelBox</class>
+ <widget class="QWidget" name="IrcChannelBox">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>574</width>
+    <height>476</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QDeclarativeView" name="qmlChannelView"/>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="1" margin="1"/>
+ <customwidgets>
+  <customwidget>
+   <class>QDeclarativeView</class>
+   <extends>QGraphicsView</extends>
+   <header>QtDeclarative/QDeclarativeView</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../dchat.qrc"/>
+ </resources>
+ <connections/>
+</ui>

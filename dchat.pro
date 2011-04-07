@@ -141,6 +141,7 @@ FORMS = \
 	ui/cert-list.ui \
         ui/irc-channel-group.ui \
         ui/irc-channel-box.ui \
+        ui/irc-qml-channel-box.ui \
         ui/irc-control.ui \
         ui/irc-float.ui \
         ui/irc-account.ui \
