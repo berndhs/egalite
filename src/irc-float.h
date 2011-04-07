@@ -22,7 +22,7 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 #include "ui_irc-float.h"
-#include "irc-channel-box.h"
+#include "irc-abstract-channel.h"
 
 class QCloseEvent;
 
@@ -39,8 +39,8 @@ public:
 
 public slots:
 
-  void AddChannel (IrcChannelBox *chan);
-  void RemoveChannel (IrcChannelBox *chan);
+  void AddChannel (IrcAbstractChannel *chan);
+  void RemoveChannel (IrcAbstractChannel *chan);
   void Hide ();
   void Show ();
 
@@ -51,7 +51,7 @@ protected:
 private:
 
   Ui_IrcFloat         ui;
-  IrcChannelBox      *chanBox;
+  IrcAbstractChannel      *chanBox;
 
 };
 

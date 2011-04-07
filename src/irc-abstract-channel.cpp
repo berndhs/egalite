@@ -1,5 +1,5 @@
 
-#include "irc-channel-box.h"
+#include "irc-abstract-channel.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -43,117 +43,24 @@
 namespace egalite
 {
 
-IrcChannelBox::IrcChannelBox (const QString & name,
+IrcAbstractChannel::IrcAbstractChannel (const QString & name,
                               const QString & sock,
-                              QWidget *parent)
-  :QWidget (parent),
-   chanMenu (0),
-   userMenu (0),
+                              QObject *parent)
+  :QObject (parent),
    chanName (name),
    sockName (sock),
    historyIndex (-1)
 {
-  ui.setupUi (this);
-  ui.chanButton->setText (name);
-  ui.textEnter->installEventFilter (this);
-  SetupMenus ();
   Connect ();
   SetTopic (tr("Channel %1").arg (chanName));
-  show ();
-  BalanceWidths ();
-  ui.userinfoWidget->hide();
 }
 
 void
-IrcChannelBox::SetupMenus ()
+IrcAbstractChannel::Connect ()
 {
-  ui.chanTopic->setOpenLinks (false);
-  ui.chanHistory->setOpenLinks (false);
-  ui.chanButton->setAutoDefault (false);
-  ui.chanButton->setDefault (false);
-  ui.floatButton->setAutoDefault (false);
-  ui.floatButton->setDefault (false);
-  ui.dockButton->setAutoDefault (false);
-  ui.dockButton->setDefault (false);
-
-  chanMenu = new QMenu (this);
-  chanMenu->addAction (tr("Float"), this, SLOT (Float ()));
-  chanMenu->addAction (tr("Dock"), this, SLOT (Dock ()));
-  chanMenu->addAction (tr("Hide"), this, SLOT (HideMe ()));
-  chanMenu->addAction (tr("Hide Dock"), this, SLOT (HideGroup ()));
-  chanMenu->addAction (tr("Hide All"), this, SLOT (HideAll ()));
-  chanMenu->addAction (tr("Leave Channel"), this, SLOT (Part ()));
-
-  userMenu = new QMenu (this);
-  userMenu->addAction (tr("WhoIs"), this, SLOT (Whois()));
-
-  infoMenu = new QMenu (this);
-  infoMenu->addAction (tr("Copy"), this, SLOT (CopyClip()));
 }
-
 void
-IrcChannelBox::BalanceWidths ()
-{
-  QList <int> widList = ui.horizonSplitter->sizes();
-  int numParts = widList.size();
-  int totWid (0);
-  for (int i=0; i<numParts; i++) {
-    totWid += widList[i];
-  }
-  int firstWid = (totWid * 80) / 100;
-  widList[0] = firstWid;
-  widList[1] = totWid - firstWid;
-  for (int i=2; i< numParts; i++) {
-    widList[i] = 0;
-  }
-qDebug () << " resized width list " << widList;
-  ui.horizonSplitter->setSizes (widList);
-
-  int infoWidth = ui.userinfoWidget->size().width ();
-  int leftWidth = (infoWidth * 33) / 100;
-  ui.userinfoWidget->setColumnWidth (0,leftWidth);
-  update ();
-qDebug () << " resulting width list " << ui.horizonSplitter->sizes();
-}
-
-
-void
-IrcChannelBox::Connect ()
-{
-  connect (ui.textEnter, SIGNAL (returnPressed()),
-           this, SLOT (TypingFinished()));
-  connect (ui.sendButton, SIGNAL (clicked ()),
-           this, SLOT (TypingFinished ()));
-  connect (ui.chanButton, SIGNAL (clicked ()),
-           this, SLOT (Menu ()));
-  connect (ui.floatButton, SIGNAL (clicked ()),
-           this, SLOT (Float()));
-  connect (ui.dockButton, SIGNAL (clicked ()),
-           this, SLOT (Dock()));
-  connect (ui.chanTopic, SIGNAL (anchorClicked (const QUrl &)),
-           this, SLOT (Link (const QUrl &)));
-  connect (ui.chanHistory, SIGNAL (anchorClicked (const QUrl &)),
-           this, SLOT (Link (const QUrl &)));
-  connect (ui.chanUsers, SIGNAL (itemClicked (QListWidgetItem *)),
-           this, SLOT (ClickedUser (QListWidgetItem *)));
-  connect (ui.userinfoWidget, SIGNAL (itemPressed(QTreeWidgetItem *, int)),
-           this, SLOT (UserInfoDetail (QTreeWidgetItem *, int)));
-}
-
-void
-IrcChannelBox::UserInfoDetail (QTreeWidgetItem * item, int col)
-{
-  if (col == 0) {
-    ui.userinfoWidget->hide ();
-  } else if (col == 1) {
-    clipSave = item->text (col);
-    QPoint here = QCursor::pos ();
-    infoMenu->exec (here);
-  }
-}
-
-void
-IrcChannelBox::CopyClip ()
+IrcAbstractChannel::CopyClip ()
 {
   QClipboard * clip = QApplication::clipboard ();
   if (clip) {
@@ -162,13 +69,13 @@ IrcChannelBox::CopyClip ()
 }
 
 void
-IrcChannelBox::SetHost (const QString & hostName)
+IrcAbstractChannel::SetHost (const QString & hostName)
 {
-  ui.serverLabel->setText (hostName);
+  //ui.serverLabel->setText (hostName);
 }
 
 void
-IrcChannelBox::StartWatching (const QRegExp & watch)
+IrcAbstractChannel::StartWatching (const QRegExp & watch)
 {
   if (!watchList.contains (watch)) {
     watchList.append (watch);
@@ -176,13 +83,13 @@ IrcChannelBox::StartWatching (const QRegExp & watch)
 }
 
 void
-IrcChannelBox::StopWatching (const QRegExp & watch)
+IrcAbstractChannel::StopWatching (const QRegExp & watch)
 {
   watchList.removeAll (watch);
 }
 
 void
-IrcChannelBox::CheckWatch (const QString & data)
+IrcAbstractChannel::CheckWatch (const QString & data)
 {
   QList<QRegExp>::iterator lit;
   bool notSeen (true);
@@ -196,25 +103,24 @@ IrcChannelBox::CheckWatch (const QString & data)
 }
 
 void
-IrcChannelBox::Close ()
+IrcAbstractChannel::Close ()
 {
-  hide ();
 }
 
 void
-IrcChannelBox::Float ()
+IrcAbstractChannel::Float ()
 {
   emit WantFloat (this);
 }
 
 void
-IrcChannelBox::Dock ()
+IrcAbstractChannel::Dock ()
 {
   emit WantDock (this);
 }
 
 void
-IrcChannelBox::Part ()
+IrcAbstractChannel::Part ()
 {
   emit Outgoing (chanName, QString ("/part %1 :%2")
                                     .arg (chanName)
@@ -222,7 +128,7 @@ IrcChannelBox::Part ()
 }
 
 void
-IrcChannelBox::Incoming (const QString & message,
+IrcAbstractChannel::Incoming (const QString & message,
                          const QString & raw)
 {
   QString cooked = LinkMangle::Anchorize (message, 
@@ -232,69 +138,81 @@ qDebug () << " cooked message " << cooked;
   QDateTime now = QDateTime::currentDateTime ();
   QString smalldate ("<span style=\"font-size:small\">"
                      "%1</span> %2");
+  #if 0
   ui.chanHistory->append (smalldate
                           .arg (now.toString ("hh:mm:ss"))
                           .arg (cooked));
+  #endif
   CheckWatch (raw.length() > 0 ? raw : message);
   emit Active (this);
 }
 
 void
-IrcChannelBox::SetTopic (const QString & newTopic)
+IrcAbstractChannel::SetTopic (const QString & newTopic)
 {
   topic = newTopic;
   QString cooked = LinkMangle::Anchorize (topic, 
                          LinkMangle::HttpExp(),
                          LinkMangle::HttpAnchor);
+  #if 0
   ui.chanTopic->setHtml (cooked);
+  #endif
 }
 
 void
-IrcChannelBox::AddNames (const QString & names)
+IrcAbstractChannel::AddNames (const QString & names)
 {
   QStringList newNames = names.split (QRegExp ("(\\s+)"));
   oldNames.append (newNames);
   oldNames.removeDuplicates ();
+  #if 0
   ui.chanUsers->clear();
-  qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
+  #endif
+  qSort (oldNames.begin(), oldNames.end(), IrcAbstractChannel::Less);
+  #if 0
   ui.chanUsers->addItems (oldNames);
   ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
-  QStringList::iterator sit;
+  #endif
 }
 
 void
-IrcChannelBox::AddName (const QString & name)
+IrcAbstractChannel::AddName (const QString & name)
 {
+#if 0
   if (oldNames.contains (name)) {
     return;
   }
   oldNames.append (name);
   ui.chanUsers->clear();
-  qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
+  qSort (oldNames.begin(), oldNames.end(), IrcAbstractChannel::Less);
   ui.chanUsers->addItems (oldNames);
   ui.rawLog->append (tr("Enter: %1").arg(name));
   ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
   AppendSmall (ui.chanHistory, tr(" Enter: -&gt; %1").arg(name));
+#endif
 }
 
 void
-IrcChannelBox::DropName (const QString & name, const QString & msg)
+IrcAbstractChannel::DropName (const QString & name, const QString & msg)
 {
+#if 0
   if (!oldNames.contains (name)) {  // not mine - don't care
     return;
   }
   oldNames.removeAll (name);
   ui.chanUsers->clear();
-  qSort (oldNames.begin(), oldNames.end(), IrcChannelBox::Less);
+  qSort (oldNames.begin(), oldNames.end(), IrcAbstractChannel::Less);
   ui.chanUsers->addItems (oldNames);
   ui.rawLog->append (tr("Exit: %1 %2").arg(name). arg (msg));
   ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
   AppendSmall (ui.chanHistory, tr(" Exit: &lt;- %1 %2").arg(name).arg(msg));
+#endif
 }
 
 void
-IrcChannelBox::TypingFinished ()
+IrcAbstractChannel::TypingFinished ()
 {
+#if 0
   QString msg = ui.textEnter->text();
   if (msg.trimmed().length() > 0) {
     emit Outgoing (chanName, msg);
@@ -304,11 +222,13 @@ IrcChannelBox::TypingFinished ()
     history.removeDuplicates ();
     historyIndex = history.size();
   }
+#endif
 }
 
 void
-IrcChannelBox::Link (const QUrl & url)
+IrcAbstractChannel::Link (const QUrl & url)
 {
+#if 0
   if (url.scheme () == "ircsender") {
     QString msg = ui.textEnter->text ();
     msg.append (url.userName());
@@ -317,18 +237,22 @@ IrcChannelBox::Link (const QUrl & url)
   } else {
     QDesktopServices::openUrl (url);
   }
+#endif
 }
 
 void
-IrcChannelBox::AppendSmall (QTextBrowser * log, const QString & line)
+IrcAbstractChannel::AppendSmall (const QString & line)
 {
+#if 0
   log->append (QString ("<span style=\"font-size: small\">%1</span>")
                        .arg (line));
+#endif
 }
 
 void
-IrcChannelBox::ClickedUser (QListWidgetItem *item)
+IrcAbstractChannel::ClickedUser (const QString & userName)
 {
+#if 0
   qDebug () << " clicked on user " << item->text ();
   if (item) {
     queryUser = item->text ();
@@ -339,11 +263,13 @@ IrcChannelBox::ClickedUser (QListWidgetItem *item)
     QPoint here = QCursor::pos();
     userMenu->exec (here);
   }
+#endif
 }
 
 void
-IrcChannelBox::Whois ()
+IrcAbstractChannel::Whois ()
 {
+#if 0
   QStringList head;
   head << tr ("Whois info on");
   head << queryUser;
@@ -354,13 +280,15 @@ IrcChannelBox::Whois ()
   QString query ("WHOIS %1");
   emit WantWhois (chanName, queryUser, true);
   emit OutRaw (sockName, query.arg (queryUser));
+#endif
 }
 
 void
-IrcChannelBox::WhoisData (const QString &otherUser,
+IrcAbstractChannel::WhoisData (const QString &otherUser,
                           const QString &numeric,
                           const QString &data)
 {
+#if 0
   QStringList newinfo;
   QString theData (data.trimmed());
   if (numeric == "318") {
@@ -381,89 +309,42 @@ IrcChannelBox::WhoisData (const QString &otherUser,
   QTreeWidgetItem * item = new QTreeWidgetItem (newinfo);
   ui.userinfoWidget->addTopLevelItem (item);
   ui.rawLog->append (QString ("WHOIS %1 %2").arg (otherUser).arg (data));
+#endif
 }
 
 void
-IrcChannelBox::Menu ()
-{
-  QPoint here;
-  here.setX (mapToGlobal (ui.chanButton->pos()).x());
-  here.setY (mapToGlobal (ui.chanButton->pos()).y()
-                          + ui.chanButton->size().height ());
-  chanMenu->exec (here);
-}
-
-void
-IrcChannelBox::HideMe ()
+IrcAbstractChannel::HideMe ()
 {
   emit HideChannel (this);
 }
 
 void
-IrcChannelBox::HideGroup ()
+IrcAbstractChannel::HideGroup ()
 {
   emit HideDock ();
 }
 
 void
-IrcChannelBox::HideAll ()
+IrcAbstractChannel::HideAll ()
 {
   emit HideAllChannels ();
 }
-
 bool
-IrcChannelBox::DoHistory (QLineEdit   * edit, 
-                       QStringList & hist,
-                       QEvent      * evt,
-                       int         & index,
-                       QString     & bottom)
+IrcAbstractChannel::eventFilter (QObject * obj, QEvent * evt)
 {
-  QKeyEvent * kevt = static_cast<QKeyEvent *>(evt);
-  if (kevt->key() == Qt::Key_Up) {
-    if (hist.size() == 0) {
-      return true;
-    }
-    if (index >= hist.size()) { // at bottom
-      bottom = edit->text();
-    } 
-    index--;
-    if (index < 0) {
-      index = -1;
-    } else {
-      edit->setText (hist.at(historyIndex));
-    }
-    return true;
-  } else if (kevt->key() == Qt::Key_Down) {
-    if (hist.size() == 0) {
-      return true;
-    }
-    index++;
-    if (index >= hist.size()) {
-      index = hist.size();
-      edit->setText (bottom);
-    } else {
-      edit->setText (hist.at(index));
-    }
-    return true;
-  } else {
-    return false;
-  }
-}
-
-bool
-IrcChannelBox::eventFilter (QObject * obj, QEvent * evt)
-{
+#if 0
   if (obj == ui.textEnter) {
     if (evt->type() == QEvent::KeyPress) {
       return DoHistory (ui.textEnter, history, evt, 
                         historyIndex, historyBottom);
     }
   }
-  return QWidget::eventFilter (obj, evt);
+#endif
+  return QObject::eventFilter (obj, evt);
 }
 
 bool
-IrcChannelBox::event (QEvent *evt)
+IrcAbstractChannel::event (QEvent *evt)
 {
   QEvent::Type  tipo = evt->type();
   switch (tipo) {
@@ -473,11 +354,11 @@ IrcChannelBox::event (QEvent *evt)
   default:
     break;
   }
-  return QWidget::event (evt);
+  return QObject::event (evt);
 }
 
 bool
-IrcChannelBox::Less (const  QString & left, const QString & right)
+IrcAbstractChannel::Less (const  QString & left, const QString & right)
 {
   return left.toLower() < right.toLower ();
 }

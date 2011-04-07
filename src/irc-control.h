@@ -41,8 +41,8 @@ class QListWidgetItem;
 namespace egalite 
 {
 
-class IrcChannelBox;
-class IrcChannelGroup;
+class IrcAbstractChannel;
+class QmlIrcChannelGroup;
 
 class IrcControl : public QDialog
 {
@@ -103,12 +103,12 @@ private slots:
   void ReceiveLine (IrcSocket * sock, QByteArray line);
   void NickLogin ();
   void ChangedHostName (IrcSocket * sock, QString name);
-  void ChanActive (IrcChannelBox * chan);
-  void ChanInUse (IrcChannelBox * chan);
-  void ChanWantsDock (IrcChannelBox * chan);
-  void ChanWantsFloat (IrcChannelBox * chan);
-  void HideChannel (IrcChannelBox * chanBox);
-  void ShowChannel (IrcChannelBox * chanBox);
+  void ChanActive (IrcAbstractChannel * chan);
+  void ChanInUse (IrcAbstractChannel * chan);
+  void ChanWantsDock (IrcAbstractChannel * chan);
+  void ChanWantsFloat (IrcAbstractChannel * chan);
+  void HideChannel (IrcAbstractChannel * chanBox);
+  void ShowChannel (IrcAbstractChannel * chanBox);
   void ChannelClicked (QListWidgetItem * item);
   void ServerClicked (QTableWidgetItem * item);
   void Send ();
@@ -135,9 +135,9 @@ private:
        Data_ConnName = Qt::UserRole+1
        };
 
-  typedef QMap <QString, IrcChannelBox *>   
+  typedef QMap <QString, IrcAbstractChannel *>   
           ChannelMapType;
-  typedef QMap <IrcChannelBox*, IrcFloat*>    
+  typedef QMap <IrcAbstractChannel*, IrcFloat*>    
           FloatingMapType;
   typedef QMap <QString, IrcSocket *>
           SocketMapType;
@@ -201,7 +201,7 @@ private:
   Ui_IrcControl       mainUi;
   bool                isRunning;
 
-  IrcChannelGroup    *dockedChannels;
+  QmlIrcChannelGroup    *dockedChannels;
 
   SocketMapType       sockets;
   bool                isConnected;

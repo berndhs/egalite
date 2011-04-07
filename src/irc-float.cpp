@@ -48,20 +48,20 @@ IrcFloat::Show ()
 }
 
 void
-IrcFloat::AddChannel (IrcChannelBox *chan)
+IrcFloat::AddChannel (IrcAbstractChannel *chan)
 {
   if (chanBox != 0) {
     return;
   }
   chanBox = chan;
-  ui.mainLayout->addWidget (chanBox, 0,0,1,1);
+  //ui.mainLayout->addWidget (chanBox, 0,0,1,1);
   setWindowTitle (chan->Name());
   connect (chanBox, SIGNAL (HideMe()), this, SLOT (Hide()));
-  chan->show ();
+  //chan->show ();
 }
 
 void
-IrcFloat::RemoveChannel (IrcChannelBox *chan)
+IrcFloat::RemoveChannel (IrcAbstractChannel *chan)
 {
   if (chanBox == chan) {
     disconnect (chanBox, 0, this, 0);

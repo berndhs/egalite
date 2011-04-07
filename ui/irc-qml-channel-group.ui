@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>Bernd Stramm</author>
- <class>IrcChannelBox</class>
- <widget class="QWidget" name="IrcChannelBox">
+ <class>IrcQmlChannelGroup</class>
+ <widget class="QWidget" name="IrcQmlChannelGroup">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -12,11 +12,15 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Égalité! - IRC</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QDeclarativeView" name="qmlChannelView"/>
+    <widget class="QDeclarativeView" name="qmlChannelView">
+     <property name="resizeMode">
+      <enum>QDeclarativeView::SizeRootObjectToView</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

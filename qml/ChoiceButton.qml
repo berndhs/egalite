@@ -18,7 +18,7 @@ Rectangle {
   MouseArea {
     anchors.fill: parent
     onClicked: { parent.clicked () }
-    onPressAndHold: { parent: pressAndHold () }
+    onPressAndHold: { parent.pressAndHold () }
   }
   Text { 
     id: label

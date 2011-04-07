@@ -21,31 +21,34 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-channel-group.h"
+#include "ui_irc-qml-channel-group.h"
 #include <QIcon>
-#include <QSize>
-#include <QPoint>
+#include <QWidget>
+#include <QGraphicsObject>
+#include <QDeclarativeItem>
 
 class QCloseEvent;
 
 namespace egalite
 {
 
-class IrcChannelBox;
+class IrcAbstractChannel;
 
-class IrcChannelGroup : public QDialog
+class QmlIrcChannelGroup : public QWidget
 {
 Q_OBJECT
 
 public:
 
-  IrcChannelGroup (QWidget *parent=0);
+  QmlIrcChannelGroup (QWidget *parent=0);
 
-  void AddChannel (IrcChannelBox * chan);
-  void RemoveChannel (IrcChannelBox * chan);
-  void MarkActive (IrcChannelBox * chan, bool active);
-  bool HaveChannel (IrcChannelBox * chan);
-  void ShowChannel (IrcChannelBox * chan);
+  void Start ();
+
+  void AddChannel (IrcAbstractChannel * chan);
+  void RemoveChannel (IrcAbstractChannel * chan);
+  void MarkActive (IrcAbstractChannel * chan, bool active);
+  bool HaveChannel (IrcAbstractChannel * chan);
+  void ShowChannel (IrcAbstractChannel * chan);
  
   void Close ();
 
@@ -60,12 +63,10 @@ protected:
 
 private:
 
-  Ui_IrcChannelGroup    ui;
-  QIcon                 activeIcon;
-  QIcon                 quietIcon;
-  QSize                 oldSize;
-  QPoint                oldPos;
-  bool                  hidSelf;
+  Ui_IrcQmlChannelGroup   ui;
+  QIcon                   activeIcon;
+  QIcon                   quietIcon;
+  QGraphicsObject        *qmlRoot;
 
 };
 

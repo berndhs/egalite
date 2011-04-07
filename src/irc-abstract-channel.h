@@ -21,32 +21,26 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-channel-box.h"
 #include <QList>
 #include <QRegExp>
+#include <QObject>
+#include <QUrl>
+#include <QString>
+#include <QStringList>
 
-class QMenuBar;
-class QMenu;
-class QAction;
-class QFocusEvent;
-class QShowEvent;
-class QEvent;
-class QUrl;
-class QListWidgetItem;
-class QTreeWidgetItem;
 
 namespace egalite
 {
 
-class IrcChannelBox : public QWidget
+class IrcAbstractChannel : public QObject
 {
 Q_OBJECT
 
 public:
 
-  IrcChannelBox (const QString & name, 
+  IrcAbstractChannel (const QString & name, 
                  const QString & sockName,
-                 QWidget *parent=0);
+                 QObject *parent=0);
 
   void Close ();
 
@@ -80,14 +74,12 @@ private slots:
 
   void TypingFinished ();
   void Link (const QUrl & url);
-  void ClickedUser (QListWidgetItem * item);
-  void Menu ();
+  void ClickedUser (const QString & userName);
   void HideMe ();
   void HideGroup ();
   void HideAll ();
   void CopyClip ();
   void Whois ();
-  void UserInfoDetail (QTreeWidgetItem *, int);
 
 protected:
 
@@ -100,34 +92,23 @@ signals:
   void Outgoing (QString channel, QString message);
   void OutRaw (QString sockName, QString data);
   void WantWhois (QString channel, QString otherUser, bool want);
-  void Active (IrcChannelBox * box);
-  void InUse (IrcChannelBox * box);
-  void WantFloat (IrcChannelBox * box);
-  void WantDock (IrcChannelBox * box);
+  void Active (IrcAbstractChannel * box);
+  void InUse (IrcAbstractChannel * box);
+  void WantFloat (IrcAbstractChannel * box);
+  void WantDock (IrcAbstractChannel * box);
   void HideAllChannels ();
   void HideDock ();
-  void HideChannel (IrcChannelBox * box);
+  void HideChannel (IrcAbstractChannel * box);
   void WatchAlert (QString pattern, QString line);
 
 private:
 
-  void   SetupMenus ();
   void   Connect ();
-  void   BalanceWidths ();
-  void   AppendSmall (QTextBrowser* log, const QString & line);
+  void   AppendSmall (const QString & line);
   void   CheckWatch (const QString & data);
-  bool   DoHistory (QLineEdit * edit, 
-                    QStringList & hist,
-                    QEvent      * evt,
-                    int         & index,
-                    QString     & bottom);
 
   static bool Less (const QString & left, const QString & right);
 
-  Ui_IrcChannelBox    ui;
-  QMenu              *chanMenu;
-  QMenu              *userMenu;
-  QMenu              *infoMenu;
   QString             chanName;
   QString             sockName;
   QString             partMsg;
