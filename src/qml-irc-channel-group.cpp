@@ -56,8 +56,6 @@ QmlIrcChannelGroup::Start ()
 void
 QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
 {
-  qDebug () << " QmlIrcChannelGroup:: AddChannel " << newchan;
-  qDebug () << "                      name     " << newchan->Name();
   QVariant chanObjVar;
   QMetaObject::invokeMethod (qmlRoot, "addChannel",
               Qt::DirectConnection,
@@ -65,10 +63,14 @@ QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
   qDebug () << "     addChannel returns " << chanObjVar;
   QObject *chanObj = chanObjVar.value<QObject*>();
   if (chanObj) {
-    qDebug () << "   item color / width " << chanObj->property("color")
-              << chanObj->property ("width");
     chanObj->setProperty ("color",QString("green"));
     chanObj->setProperty ("boxLabel",newchan->Name());
+    QObject * model = qobject_cast<QObject*>(newchan->userNamesModel());
+   qDebug () << " model pointer " << model;
+   qDebug () << " model pointer " <<qVariantFromValue(model);
+    QMetaObject::invokeMethod (chanObj, "setModel",
+        Q_ARG (QVariant, qVariantFromValue (model)));
+    newchan->SetQmlItem (qobject_cast<QDeclarativeItem*>(chanObj));
   }
 }
 

@@ -1,4 +1,5 @@
-
+#ifndef EGALITE_USER_LIST_MODEL_H
+#define EGALITE_USER_LIST_MODEL_H
 
 
 /****************************************************************
@@ -23,37 +24,21 @@
  ****************************************************************/
 
 
-import QtQuick 1.0
+#include <QStringListModel>
 
-Rectangle {
-  id: channelGroup
-  height: 300
-  width: 300
-  color: "yellow"
-  function addChannel () {
-    console.log ("  channelGroup add ")
-    var compo =  Qt.createComponent("IrcChannelBox.qml")
-    console.log (" create returns " + compo + "  status " + compo.status)
-    if (compo.status == Component.Error) {
-      console.log ("    create error " + compo.errorString())
-    }
-    if (compo.status == Component.Ready) {
-      var newBox = compo.createObject (channelGroup)
-      return newBox
-    }
-    return null
-  }
-  Rectangle {
-    id: emptyBox
-    width: 200; height: 100
-    anchors.centerIn: parent
-    Text {
-      anchors.centerIn: parent
-      text: "empty channel group"
-    }
-  }
-  Component.onCompleted: {
-    var nullChannel = addChannel ()
-    nullChannel.boxLabel = "Null Channel"
-  }
-}
+namespace egalite
+{
+
+class UserListModel : public QStringListModel 
+{
+Q_OBJECT
+public:
+  
+  UserListModel (QObject *parent);
+
+};
+
+} // namespace
+
+
+#endif

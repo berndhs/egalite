@@ -27,6 +27,9 @@
 #include <QUrl>
 #include <QString>
 #include <QStringList>
+#include <QDeclarativeItem>
+
+#include "user-list-model.h"
 
 
 namespace egalite
@@ -44,6 +47,8 @@ public:
 
   void Close ();
 
+  UserListModel * userNamesModel ();
+
   void SetTopic (const QString & newTopic);
   void SetHost (const QString & hostName);
   void SetPartMsg (const QString & part)
@@ -56,6 +61,9 @@ public:
   QString Topic () { return topic; }
   QString Name ()  { return chanName; }
   QString Sock () { return sockName; }
+  QDeclarativeItem * QmlItem () { return qmlItem; }
+
+  void SetQmlItem (QDeclarativeItem * item) { qmlItem = item; }
 
   void StartWatching (const QRegExp & watch);
   void StopWatching  (const QRegExp & watch);
@@ -122,6 +130,8 @@ private:
   QStringList         history;
   QString             historyBottom;
   int                 historyIndex;
+  UserListModel       namesModel;
+  QDeclarativeItem   *qmlItem;
 
 };
 

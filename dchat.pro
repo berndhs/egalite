@@ -184,6 +184,7 @@ SOURCES = src/main.cpp \
         src/irc-nick-edit.cpp \
         src/enter-string.cpp \
         src/edit-simple.cpp \
+        src/user-list-model.cpp \
 
 audio {
 	SOURCES += src/audio-message.cpp
@@ -231,6 +232,7 @@ HEADERS += \
         src/irc-nick-edit.h \
         src/enter-string.h \
         src/edit-simple.h \
+        src/user-list-model.h \
 
 audio {
 	HEADERS += src/audio-message.h

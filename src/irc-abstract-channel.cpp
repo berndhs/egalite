@@ -49,10 +49,18 @@ IrcAbstractChannel::IrcAbstractChannel (const QString & name,
   :QObject (parent),
    chanName (name),
    sockName (sock),
-   historyIndex (-1)
+   historyIndex (-1),
+   namesModel (this),
+   qmlItem (0)
 {
   Connect ();
   SetTopic (tr("Channel %1").arg (chanName));
+}
+
+UserListModel *
+IrcAbstractChannel::userNamesModel ()
+{
+  return & namesModel;
 }
 
 void
@@ -163,31 +171,32 @@ void
 IrcAbstractChannel::AddNames (const QString & names)
 {
   QStringList newNames = names.split (QRegExp ("(\\s+)"));
+qDebug () << " IrcAbstractChannel :: AddNames " << newNames;
   oldNames.append (newNames);
   oldNames.removeDuplicates ();
-  #if 0
-  ui.chanUsers->clear();
-  #endif
   qSort (oldNames.begin(), oldNames.end(), IrcAbstractChannel::Less);
-  #if 0
-  ui.chanUsers->addItems (oldNames);
-  ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
-  #endif
+  namesModel.setStringList (oldNames);
+  if (qmlItem) {
+    qmlItem->setProperty ("userListCounter",
+      tr("%1 Users").arg (oldNames.size()));
+  }
 }
 
 void
 IrcAbstractChannel::AddName (const QString & name)
 {
-#if 0
+qDebug () << " IrcAbstractChannel :: AddName " << name;
   if (oldNames.contains (name)) {
     return;
   }
   oldNames.append (name);
-  ui.chanUsers->clear();
   qSort (oldNames.begin(), oldNames.end(), IrcAbstractChannel::Less);
-  ui.chanUsers->addItems (oldNames);
-  ui.rawLog->append (tr("Enter: %1").arg(name));
-  ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
+  namesModel.setStringList (oldNames);
+  if (qmlItem) {
+    qmlItem->setProperty ("userListCounter",
+      tr("%1 Users").arg (oldNames.size()));
+  }
+#if 0
   AppendSmall (ui.chanHistory, tr(" Enter: -&gt; %1").arg(name));
 #endif
 }
