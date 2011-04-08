@@ -16,7 +16,6 @@ Rectangle {
     }
     if (compo.status == Component.Ready) {
       var newBox = compo.createObject (channelGroup)
-      newBox.color = "green"
       return newBox
     }
     return null
@@ -31,7 +30,7 @@ Rectangle {
     }
   }
   Component.onCompleted: {
-    console.log ("loaded ChannelGroup.qml")
-    addChannel ()
+    var nullChannel = addChannel ()
+    nullChannel.boxLabel = "Null Channel"
   }
 }

@@ -6,10 +6,10 @@ Rectangle {
   property real labelHeight:32
   property real countWidth: 0.3 * width
   property alias userListModel: userList.model
-  height: 200
-  width: 200
+  property alias boxLabel: channelBoxLabel.text
+  height: parent.height
+  width: parent.width
   color: "red"
-  function setColor (theColor) { color = theColor }
   Text {
     id: channelBoxLabel
     height: channelBox.labelHeight

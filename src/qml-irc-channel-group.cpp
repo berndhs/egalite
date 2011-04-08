@@ -64,12 +64,11 @@ QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
               Q_RETURN_ARG (QVariant, chanObjVar));
   qDebug () << "     addChannel returns " << chanObjVar;
   QObject *chanObj = chanObjVar.value<QObject*>();
-  QDeclarativeComponent * chanItem = 
-             qobject_cast<QDeclarativeComponent*> (chanObj);
-  qDebug () << "  added qml item " << chanItem;
-  if (chanItem) {
-    qDebug () << "   item color / width " << chanItem->property("color")
-              << chanItem->property ("width");
+  if (chanObj) {
+    qDebug () << "   item color / width " << chanObj->property("color")
+              << chanObj->property ("width");
+    chanObj->setProperty ("color",QString("green"));
+    chanObj->setProperty ("boxLabel",newchan->Name());
   }
 }
 
