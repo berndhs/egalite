@@ -34,6 +34,10 @@ Rectangle {
   property alias boxLabel: channelBoxLabel.text
   property alias userListCounter: userListCount.text
 
+  signal userSend ()
+  signal userUp ()
+  signal userDown ()
+
   function selectUser (user) {
     console.log ("selected user " + user)
   }
@@ -41,27 +45,62 @@ Rectangle {
     console.log ("deallocate channelBox")
     channelBox.destroy()
   }
+  function setCookedLog (theText) {
+    cookedLogBox.text = theText
+    cookedFlickBox.alignBottom ()
+  }
+  function userData () { return textEnter.text }
+  function clearUserData () { textEnter.text = "" }
 
   function setModel (theModel) { userList.model = theModel }
 
   height: parent.height
   width: parent.width
   color: "red"
-  Text {
-    id: channelBoxLabel
-    height: channelBox.labelHeight
-    width: channelBox.width
+  Rectangle {
+    id: channelBoxLabelRect
+    height: childrenRect.height
+    width: childrenRect.width
     anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }
-    text: "Channel Group Box"
+    color: "#eeaaaa"
+    z: parent.z+1
+    MouseArea {
+      anchors.fill: parent
+      onClicked: {
+        console.log ("clicked channel name")
+        cookedFlickBox.alignBottom()
+      }
+    }
+    Text {
+      id: channelBoxLabel
+      text: "Channel Group Box"
+    }
   }
-  TextEdit {
-    id: historyBox
-    anchors { top: channelBoxLabel.bottom; left: parent.left }
-    text : "Chat Hstory"
+  Flickable {
+    id: cookedFlickBox
+    anchors { top: channelBoxLabel.bottom; left: parent.left; leftMargin: 2 }
+    width: parent.width-2
+    contentWidth: Math.max(parent.width,cookedLogBox.width)
+    contentHeight: Math.max(parent.height,cookedLogBox.height)
+
+    function alignBottom () {
+      if (flicking) return   // not while moving
+      contentY = Math.max (0, cookedLogBox.height - cookedFlickBox.height - 2)
+      console.log ("cooked box contentY set to " + contentY)
+    }
+    interactive: true
+    height: channelBox.height - channelBoxLabel.height - rawLogBox.height - userInfoBox.height
+    Text {
+      id: cookedLogBox
+      anchors {top: parent.top; left: parent.left }
+      width: parent.width
+      text : "Chat Hstory"
+      onLinkActivated: { console.log (" cooked link activated " + link) }
+    }
   }
   TextEdit {
     id: rawLogBox
-    anchors { top: historyBox.bottom; left: parent.left }
+    anchors { top: cookedFlickBox.bottom; left: parent.left }
     text : "Chat Raw Log"
   }
   TextEdit {
@@ -69,10 +108,21 @@ Rectangle {
     anchors { top: rawLogBox.bottom; left: parent.left }
     text : "User Query Info"
   }
-  TextInput {
-    id: textEnter
-    anchors { top: userInfoBox.bottom; left: parent.left }
-    text: "User Input to Send"
+  Rectangle {
+    id: textEnterBox
+    height: parent.height
+    width: parent.width
+    anchors { left: parent.left; top: userInfoBox.bottom }
+    color: "#ffcccc"
+    TextInput {
+      id: textEnter
+      anchors.fill: parent
+      text: "User Input to Send"
+      Keys.onEnterPressed: channelBox.userSend ()
+      Keys.onReturnPressed: channelBox.userSend ()
+      Keys.onUpPressed: channelBox.userUp ()
+      Keys.onDownPressed: channelBox.userDown ()
+    }
   }
   Rectangle {
     id: userListBox
@@ -86,6 +136,7 @@ Rectangle {
       height: userListCount.height
       width: parent.width
       color: "#0099ee"
+      opacity: 0.7
       Text {
         id: userListCount
         horizontalAlignment: Text.AlignHCenter

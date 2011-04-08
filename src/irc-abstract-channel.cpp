@@ -64,6 +64,18 @@ IrcAbstractChannel::~IrcAbstractChannel ()
   }
 }
 
+void
+IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
+{
+  if (qmlItem) {
+    disconnect (qmlItem, 0,0,0);
+  }
+  qmlItem = item;
+  connect (qmlItem, SIGNAL (userSend ()), this, SLOT (UserSend()));
+  connect (qmlItem, SIGNAL (userUp()), this, SLOT (UserUp()));
+  connect (qmlItem, SIGNAL (userDown()), this, SLOT (UserDown ()));
+}
+
 UserListModel *
 IrcAbstractChannel::userNamesModel ()
 {
@@ -74,6 +86,7 @@ void
 IrcAbstractChannel::Connect ()
 {
 }
+
 void
 IrcAbstractChannel::CopyClip ()
 {
@@ -153,11 +166,11 @@ qDebug () << " cooked message " << cooked;
   QDateTime now = QDateTime::currentDateTime ();
   QString smalldate ("<span style=\"font-size:small\">"
                      "%1</span> %2");
-  #if 0
-  ui.chanHistory->append (smalldate
+  cookedLog.append (smalldate
                           .arg (now.toString ("hh:mm:ss"))
                           .arg (cooked));
-  #endif
+  cookedLog.append ("<br>\n");
+  UpdateCooked ();
   CheckWatch (raw.length() > 0 ? raw : message);
   emit Active (this);
 }
@@ -203,42 +216,25 @@ qDebug () << " IrcAbstractChannel :: AddName " << name;
     qmlItem->setProperty ("userListCounter",
       tr("%1 Users").arg (oldNames.size()));
   }
-#if 0
-  AppendSmall (ui.chanHistory, tr(" Enter: -&gt; %1").arg(name));
-#endif
+  AppendSmall (cookedLog, tr(" Enter: -&gt; %1").arg(name));
+  UpdateCooked ();
 }
 
 void
 IrcAbstractChannel::DropName (const QString & name, const QString & msg)
 {
-#if 0
   if (!oldNames.contains (name)) {  // not mine - don't care
     return;
   }
   oldNames.removeAll (name);
-  ui.chanUsers->clear();
   qSort (oldNames.begin(), oldNames.end(), IrcAbstractChannel::Less);
-  ui.chanUsers->addItems (oldNames);
-  ui.rawLog->append (tr("Exit: %1 %2").arg(name). arg (msg));
-  ui.usersLabel->setText (tr("%1 Users").arg (oldNames.size()));
-  AppendSmall (ui.chanHistory, tr(" Exit: &lt;- %1 %2").arg(name).arg(msg));
-#endif
-}
-
-void
-IrcAbstractChannel::TypingFinished ()
-{
-#if 0
-  QString msg = ui.textEnter->text();
-  if (msg.trimmed().length() > 0) {
-    emit Outgoing (chanName, msg);
-    ui.rawLog->append (msg);
-    ui.textEnter->clear ();
-    history.append (msg);
-    history.removeDuplicates ();
-    historyIndex = history.size();
+  namesModel.setStringList (oldNames);
+  if (qmlItem) {
+    qmlItem->setProperty ("userListCounter",
+      tr("%1 Users").arg (oldNames.size()));
   }
-#endif
+  AppendSmall (cookedLog, tr(" Exit: &lt;- %1 %2").arg(name).arg(msg));
+  UpdateCooked ();
 }
 
 void
@@ -257,12 +253,19 @@ IrcAbstractChannel::Link (const QUrl & url)
 }
 
 void
-IrcAbstractChannel::AppendSmall (const QString & line)
+IrcAbstractChannel::AppendSmall (QString & log, const QString & line)
 {
-#if 0
-  log->append (QString ("<span style=\"font-size: small\">%1</span>")
+  log.append (QString ("<span style=\"font-size: small\">%1</span><br>\n")
                        .arg (line));
-#endif
+}
+
+void
+IrcAbstractChannel::UpdateCooked ()
+{
+  if (qmlItem) {
+    QMetaObject::invokeMethod (qmlItem, "setCookedLog",
+            Q_ARG (QVariant, cookedLog));
+  }
 }
 
 void
@@ -377,6 +380,38 @@ bool
 IrcAbstractChannel::Less (const  QString & left, const QString & right)
 {
   return left.toLower() < right.toLower ();
+}
+
+void
+IrcAbstractChannel::UserSend ()
+{
+  qDebug () << " User sending " ;
+  if (qmlItem) {
+    QVariant userData;
+    QMetaObject::invokeMethod (qmlItem, "userData",
+        Q_RETURN_ARG (QVariant, userData));
+    QString data = userData.toString();
+    qDebug () << "   user data " << data;
+    if (data.trimmed().length() > 0) {
+      QMetaObject::invokeMethod (qmlItem, "clearUserData");
+      emit Outgoing (chanName, data);
+      history.append (data);
+      history.removeDuplicates ();
+      historyIndex = history.size();
+    }
+  }
+}
+
+void
+IrcAbstractChannel::UserUp ()
+{
+  qDebug () << " User Up arrow ";
+}
+
+void
+IrcAbstractChannel::UserDown ()
+{
+  qDebug () << " User Down arrow ";
 }
 
 } // namespace

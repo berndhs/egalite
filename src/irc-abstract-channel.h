@@ -65,7 +65,7 @@ public:
   QString Sock () { return sockName; }
   QDeclarativeItem * QmlItem () { return qmlItem; }
 
-  void SetQmlItem (QDeclarativeItem * item) { qmlItem = item; }
+  void SetQmlItem (QDeclarativeItem * item);
 
   void StartWatching (const QRegExp & watch);
   void StopWatching  (const QRegExp & watch);
@@ -82,7 +82,6 @@ public slots:
 
 private slots:
 
-  void TypingFinished ();
   void Link (const QUrl & url);
   void ClickedUser (const QString & userName);
   void HideMe ();
@@ -90,6 +89,9 @@ private slots:
   void HideAll ();
   void CopyClip ();
   void Whois ();
+  void UserSend ();
+  void UserUp ();
+  void UserDown ();
 
 protected:
 
@@ -114,7 +116,8 @@ signals:
 private:
 
   void   Connect ();
-  void   AppendSmall (const QString & line);
+  void   AppendSmall (QString & log, const QString & line);
+  void   UpdateCooked ();
   void   CheckWatch (const QString & data);
 
   static bool Less (const QString & left, const QString & right);
@@ -126,6 +129,7 @@ private:
   QStringList         oldNames;
   QString             queryUser;
   QString             clipSave;
+  QString             cookedLog;
 
   QList <QRegExp>     watchList;
 
