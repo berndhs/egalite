@@ -37,6 +37,10 @@ Rectangle {
   function selectUser (user) {
     console.log ("selected user " + user)
   }
+  function deallocateSelf () {
+    console.log ("deallocate channelBox")
+    channelBox.destroy()
+  }
 
   function setModel (theModel) { userList.model = theModel }
 
