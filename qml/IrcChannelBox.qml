@@ -59,7 +59,8 @@ Rectangle {
 
   height: parent.height - parentHeightReserve
   width: parent.width - parentWidthReserve
-  color: "red"
+  anchors { topMargin: parentHeightReserve }
+  color: "#f3f6f6"
   Rectangle {
     id: channelBoxLabelRect
     height: childrenRect.height

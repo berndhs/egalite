@@ -62,6 +62,7 @@ public slots:
 private slots:
 
   void ClickedChannel (QString link);
+  void HeadHeightChanged (int newHeight);
 
 protected:
 

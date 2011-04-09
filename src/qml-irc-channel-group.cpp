@@ -55,6 +55,8 @@ QmlIrcChannelGroup::Start ()
   }
   connect (qmlRoot, SIGNAL (selectedChannel (QString)),
            this, SLOT (ClickedChannel (QString)));
+  connect (qmlRoot, SIGNAL (changedHeadHeight (int)),
+           this, SLOT (HeadHeightChanged (int)));
 }
 
 void
@@ -73,14 +75,10 @@ QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
   QMetaObject::invokeMethod (qmlRoot, "addChannel",
               Qt::DirectConnection,
               Q_RETURN_ARG (QVariant, chanObjVar));
-  qDebug () << "     addChannel returns " << chanObjVar;
   QObject *chanObj = chanObjVar.value<QObject*>();
   if (chanObj) {
-    chanObj->setProperty ("color",QString("green"));
     chanObj->setProperty ("boxLabel",newchan->Name());
     QObject * model = qobject_cast<QObject*>(newchan->userNamesModel());
-   qDebug () << " model pointer " << model;
-   qDebug () << " model pointer " <<qVariantFromValue(model);
     QMetaObject::invokeMethod (chanObj, "setModel",
         Q_ARG (QVariant, qVariantFromValue (model)));
     newchan->SetQmlItem (qobject_cast<QDeclarativeItem*>(chanObj));
@@ -103,6 +101,9 @@ void
 QmlIrcChannelGroup::RemoveChannel (IrcAbstractChannel * chan)
 {
   if (chan) {
+    if (chan->Topmost() && !channelList.isEmpty()) {
+      SetTopmostChannel (channelList.last());
+    }
     channelAnchorList.removeAll (ChannelAnchor (chan->Name()));
     channelList.removeAll (chan);
     SetChannelList ();
@@ -137,6 +138,15 @@ QmlIrcChannelGroup::ClickedChannel (QString link)
     QString name (link);
     name.remove (0,chanLinkPrefix.length());
     SetTopmostChannel (name);
+  }
+}
+
+void
+QmlIrcChannelGroup::HeadHeightChanged (int newHeight)
+{
+  int nc = channelList.count();
+  for (int i=0; i<nc; i++) {
+    channelList.at(i)->HeadHeightChanged (newHeight);
   }
 }
 

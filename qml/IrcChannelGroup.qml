@@ -30,9 +30,10 @@ Rectangle {
   property real channelTopMargin: 24
   height: 300
   width: 300
-  color: "yellow"
+  color: "#f0f0f3"
 
   signal selectedChannel (string link)
+  signal changedHeadHeight (int newHeight)
 
   function addChannel () {
     console.log ("  channelGroup add ")
@@ -43,9 +44,8 @@ Rectangle {
     }
     if (compo.status == Component.Ready) {
       var newBox = compo.createObject (channelGroup)
-      newBox.parentHeightReserve = channelTopMargin
+      newBox.parentHeightReserve = channelList.height
       newBox.anchors.top = channelGroup.top
-      newBox.anchors.topMargin = channelTopMargin
       return newBox
     }
     return null
@@ -57,17 +57,22 @@ Rectangle {
   Rectangle {
     id: channelList
     width: channelGroup.width
-    height: Math.min (childrenRect.height, channelTopMargin)
-    color: "sandybrown"
+    height: childrenRect.height
+    color: "transparent"
+    z: channelGroup.z + 2
     anchors {top: channelGroup.top; left: channelGroup.left}
     Text {
       id: channelListText
       anchors {top: parent.top; left: parent.left}
       width: parent.width
+      wrapMode: Text.Wrap
       text: ""
       onLinkActivated: {
         console.log (" ChannelGroup link activated " + link)
         channelGroup.selectedChannel (link)
+      }
+      onHeightChanged: {
+        channelGroup.changedHeadHeight (height)
       }
     }
   }
@@ -77,11 +82,10 @@ Rectangle {
     anchors.centerIn: parent
     Text {
       anchors.centerIn: parent
-      text: "empty channel group"
+      text: qsTr ("No Channels")
     }
   }
   Component.onCompleted: {
-    var nullChannel = addChannel ()
-    nullChannel.boxLabel = "Null Channel"
+    console.log ("loaded IrcChannelGroup")
   }
 }

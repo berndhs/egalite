@@ -72,6 +72,7 @@ public:
 
   bool Topmost ();
   void SetTopmost (bool top);
+  void HeadHeightChanged (int newHeight);
 
 public slots:
 

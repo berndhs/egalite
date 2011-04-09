@@ -86,6 +86,15 @@ IrcAbstractChannel::SetTopmost (bool top)
   }
 }
 
+void
+IrcAbstractChannel::HeadHeightChanged (int newHeight)
+{
+  qDebug () << "IrcAbstractChannel :: HeadHeightChanged " << newHeight;
+  if (qmlItem) {
+    qmlItem->setProperty ("parentHeightReserve", newHeight);
+  }
+}
+
 bool
 IrcAbstractChannel::Topmost ()
 {
