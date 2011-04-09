@@ -81,7 +81,6 @@ private:
   QIcon                   quietIcon;
   QGraphicsObject        *qmlRoot;
   QList <IrcAbstractChannel*>  channelList;
-  QStringList             channelAnchorList;
   QString                 chanLinkPrefix;
 
 };

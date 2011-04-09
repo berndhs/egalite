@@ -73,8 +73,19 @@ void
 QmlIrcChannelGroup::SetChannelList ()
 {
   if (qmlRoot) {
+    QString chanAnchList;
+    int nc = channelList.count ();
+    for (int i=0; i<nc; i++) {
+       IrcAbstractChannel * chan = channelList.at(i);
+       if (chan) {
+         chanAnchList.append (
+             (chan->IsActive() ? QString ("%1<b>-!</b> ") : QString ("%1 "))
+               .arg(ChannelAnchor (chan->Name()))
+             );
+       }
+    }
     QMetaObject::invokeMethod (qmlRoot, "setChannelList",
-             Q_ARG (QVariant, channelAnchorList.join (" ")));
+             Q_ARG (QVariant, chanAnchList));
   }
 }
 
@@ -92,11 +103,9 @@ QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
     QMetaObject::invokeMethod (chanObj, "setModel",
         Q_ARG (QVariant, qVariantFromValue (model)));
     newchan->SetQmlItem (qobject_cast<QDeclarativeItem*>(chanObj));
-    channelAnchorList << ChannelAnchor (newchan->Name());
     channelList << newchan;
     SetTopmostChannel (newchan);
     SetChannelList ();
-    qDebug () << "  Channel List " << channelAnchorList;
   }
 }
 
@@ -111,11 +120,10 @@ void
 QmlIrcChannelGroup::RemoveChannel (IrcAbstractChannel * chan)
 {
   if (chan) {
+    channelList.removeAll (chan);
     if (chan->Topmost() && !channelList.isEmpty()) {
       SetTopmostChannel (channelList.last());
     }
-    channelAnchorList.removeAll (ChannelAnchor (chan->Name()));
-    channelList.removeAll (chan);
     SetChannelList ();
   }
 }
@@ -163,6 +171,10 @@ QmlIrcChannelGroup::HeadHeightChanged (int newHeight)
 void
 QmlIrcChannelGroup::MarkActive (IrcAbstractChannel * chan, bool active)
 {
+  if (chan) {
+    chan->SetActive (active);
+    SetChannelList ();
+  }
 }
 
 bool

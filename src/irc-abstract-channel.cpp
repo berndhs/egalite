@@ -52,7 +52,8 @@ IrcAbstractChannel::IrcAbstractChannel (const QString & name,
    historyIndex (-1),
    namesModel (this),
    qmlItem (0),
-   topmost (false)
+   topmost (false),
+   active (false)
 {
   Connect ();
   SetTopic (tr("Channel %1").arg (chanName));
@@ -101,6 +102,18 @@ bool
 IrcAbstractChannel::Topmost ()
 {
   return topmost;
+}
+
+bool
+IrcAbstractChannel::IsActive ()
+{
+  return active;
+}
+
+void
+IrcAbstractChannel::SetActive (bool a)
+{
+  active = a;
 }
 
 UserListModel *
@@ -289,7 +302,6 @@ IrcAbstractChannel::ActivatedCookedLink (const QString & link)
       QMetaObject::invokeMethod (qmlItem, "userData",
          Q_RETURN_ARG (QVariant, msgVar));
       QString msg (msgVar.toString());
-qDebug () << " IrcAbstractChannel :: old userData " << msg;
       msg.append (url.userName());
       msg.append (": ");
       QMetaObject::invokeMethod (qmlItem, "writeUserData",

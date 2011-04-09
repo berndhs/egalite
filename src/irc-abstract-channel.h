@@ -73,6 +73,8 @@ public:
   bool Topmost ();
   void SetTopmost (bool top);
   void HeadHeightChanged (int newHeight);
+  bool IsActive ();
+  void SetActive (bool a);
 
 public slots:
 
@@ -144,6 +146,7 @@ private:
   UserListModel       namesModel;
   QDeclarativeItem   *qmlItem;
   bool                topmost;
+  bool                active;
 
 };
 
