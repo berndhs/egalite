@@ -27,9 +27,13 @@ import QtQuick 1.0
 
 Rectangle {
   id: channelGroup
+  property real channelTopMargin: 24
   height: 300
   width: 300
   color: "yellow"
+
+  signal selectedChannel (string link)
+
   function addChannel () {
     console.log ("  channelGroup add ")
     var compo =  Qt.createComponent("IrcChannelBox.qml")
@@ -39,9 +43,33 @@ Rectangle {
     }
     if (compo.status == Component.Ready) {
       var newBox = compo.createObject (channelGroup)
+      newBox.parentHeightReserve = channelTopMargin
+      newBox.anchors.top = channelGroup.top
+      newBox.anchors.topMargin = channelTopMargin
       return newBox
     }
     return null
+  }
+  function setChannelList (theList) {
+    console.log ("Channel Group list " + theList)
+    channelListText.text = theList
+  }
+  Rectangle {
+    id: channelList
+    width: channelGroup.width
+    height: Math.min (childrenRect.height, channelTopMargin)
+    color: "sandybrown"
+    anchors {top: channelGroup.top; left: channelGroup.left}
+    Text {
+      id: channelListText
+      anchors {top: parent.top; left: parent.left}
+      width: parent.width
+      text: ""
+      onLinkActivated: {
+        console.log (" ChannelGroup link activated " + link)
+        channelGroup.selectedChannel (link)
+      }
+    }
   }
   Rectangle {
     id: emptyBox

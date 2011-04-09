@@ -70,6 +70,9 @@ public:
   void StartWatching (const QRegExp & watch);
   void StopWatching  (const QRegExp & watch);
 
+  bool Topmost ();
+  void SetTopmost (bool top);
+
 public slots:
 
   void Incoming (const QString & message, const QString & raw = QString());
@@ -138,6 +141,7 @@ private:
   int                 historyIndex;
   UserListModel       namesModel;
   QDeclarativeItem   *qmlItem;
+  bool                topmost;
 
 };
 

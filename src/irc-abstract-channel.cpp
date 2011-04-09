@@ -51,7 +51,8 @@ IrcAbstractChannel::IrcAbstractChannel (const QString & name,
    sockName (sock),
    historyIndex (-1),
    namesModel (this),
-   qmlItem (0)
+   qmlItem (0),
+   topmost (false)
 {
   Connect ();
   SetTopic (tr("Channel %1").arg (chanName));
@@ -74,6 +75,21 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
   connect (qmlItem, SIGNAL (userSend ()), this, SLOT (UserSend()));
   connect (qmlItem, SIGNAL (userUp()), this, SLOT (UserUp()));
   connect (qmlItem, SIGNAL (userDown()), this, SLOT (UserDown ()));
+}
+ 
+void
+IrcAbstractChannel::SetTopmost (bool top)
+{
+  if (qmlItem) {
+    topmost = top;
+    qmlItem->setProperty ("z", top ? 1 : -1);
+  }
+}
+
+bool
+IrcAbstractChannel::Topmost ()
+{
+  return topmost;
 }
 
 UserListModel *

@@ -651,6 +651,7 @@ IrcControl::DropChannel (IrcSocket * sock, const QString & chanName)
   }
   IrcAbstractChannel * chanBox = channels [chanName];
   disconnect (chanBox, 0,0,0);
+  qDebug () << " dropping channel " << chanName << chanBox->Name();
   if (dockedChannels->HaveChannel (chanBox)) {
     dockedChannels->RemoveChannel (chanBox);
   }

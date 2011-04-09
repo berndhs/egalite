@@ -32,7 +32,9 @@ namespace egalite
 {
 
 QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
-  :QWidget (parent)
+  :QWidget (parent),
+   qmlRoot (0),
+   chanLinkPrefix ("chanlink://channel_")
 {
   ui.setupUi (this);
   activeIcon = QIcon (":/ircicons/active.png");
@@ -50,6 +52,17 @@ QmlIrcChannelGroup::Start ()
   if (qmlRoot == 0) {
     QMessageBox::critical (this, "Fatal", "QML Load Failure");
     return;
+  }
+  connect (qmlRoot, SIGNAL (selectedChannel (QString)),
+           this, SLOT (ClickedChannel (QString)));
+}
+
+void
+QmlIrcChannelGroup::SetChannelList ()
+{
+  if (qmlRoot) {
+    QMetaObject::invokeMethod (qmlRoot, "setChannelList",
+             Q_ARG (QVariant, channelAnchorList.join (" ")));
   }
 }
 
@@ -71,12 +84,60 @@ QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
     QMetaObject::invokeMethod (chanObj, "setModel",
         Q_ARG (QVariant, qVariantFromValue (model)));
     newchan->SetQmlItem (qobject_cast<QDeclarativeItem*>(chanObj));
+    channelAnchorList << ChannelAnchor (newchan->Name());
+    channelList << newchan;
+    SetTopmostChannel (newchan);
+    SetChannelList ();
+    qDebug () << "  Channel List " << channelAnchorList;
   }
+}
+
+QString
+QmlIrcChannelGroup::ChannelAnchor (const QString & name)
+{
+  return QString("<a href=\"%2%1\">%1</a>")
+         .arg(name).arg (chanLinkPrefix);
 }
 
 void
 QmlIrcChannelGroup::RemoveChannel (IrcAbstractChannel * chan)
 {
+  if (chan) {
+    channelAnchorList.removeAll (ChannelAnchor (chan->Name()));
+    channelList.removeAll (chan);
+    SetChannelList ();
+  }
+}
+
+void
+QmlIrcChannelGroup::SetTopmostChannel (IrcAbstractChannel * topChan)
+{
+  int nc = channelList.count();
+  for (int i=0; i<nc; i++) {
+    IrcAbstractChannel *chan = channelList.at(i);
+    chan->SetTopmost (chan == topChan);
+  }
+}
+
+void
+QmlIrcChannelGroup::SetTopmostChannel (const QString & topName)
+{
+  int nc = channelList.count();
+  for (int i=0; i<nc; i++) {
+    IrcAbstractChannel *chan = channelList.at(i);
+    chan->SetTopmost (chan->Name() == topName);
+  }
+  
+}
+
+void
+QmlIrcChannelGroup::ClickedChannel (QString link)
+{
+  if (link.startsWith (chanLinkPrefix)) {
+    QString name (link);
+    name.remove (0,chanLinkPrefix.length());
+    SetTopmostChannel (name);
+  }
 }
 
 void
@@ -87,6 +148,9 @@ QmlIrcChannelGroup::MarkActive (IrcAbstractChannel * chan, bool active)
 bool
 QmlIrcChannelGroup::HaveChannel (IrcAbstractChannel * chan)
 {
+  if (chan) {
+    return channelList.contains (chan);
+  }
   return false;
 }
 

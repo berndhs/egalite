@@ -26,6 +26,8 @@
 #include <QWidget>
 #include <QGraphicsObject>
 #include <QDeclarativeItem>
+#include <QStringList>
+#include <QList>
 
 class QCloseEvent;
 
@@ -57,16 +59,28 @@ public slots:
   void Show ();
   void Hide ();
 
+private slots:
+
+  void ClickedChannel (QString link);
+
 protected:
 
   void closeEvent (QCloseEvent *event);
 
 private:
 
+  QString  ChannelAnchor (const QString & name);
+  void     SetChannelList ();
+  void     SetTopmostChannel (IrcAbstractChannel * topChan);
+  void     SetTopmostChannel (const QString & topName);
+
   Ui_IrcQmlChannelGroup   ui;
   QIcon                   activeIcon;
   QIcon                   quietIcon;
   QGraphicsObject        *qmlRoot;
+  QList <IrcAbstractChannel*>  channelList;
+  QStringList             channelAnchorList;
+  QString                 chanLinkPrefix;
 
 };
 

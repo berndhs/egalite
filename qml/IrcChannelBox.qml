@@ -27,9 +27,12 @@ import QtQuick 1.0
 Rectangle {
   id: channelBox
   property real labelHeight:32
+  property real inputHeight: 28
   property real userNameHeight: 20
   property real countWidth: 0.3 * width
-  property real rollDelay: 250
+  property real rollDelay: 200
+  property real parentHeightReserve: 0
+  property real parentWidthReserve: 0
   property alias userListModel: userList.model
   property alias boxLabel: channelBoxLabel.text
   property alias userListCounter: userListCount.text
@@ -54,8 +57,8 @@ Rectangle {
 
   function setModel (theModel) { userList.model = theModel }
 
-  height: parent.height
-  width: parent.width
+  height: parent.height - parentHeightReserve
+  width: parent.width - parentWidthReserve
   color: "red"
   Rectangle {
     id: channelBoxLabelRect
@@ -78,7 +81,7 @@ Rectangle {
   }
   Flickable {
     id: cookedFlickBox
-    anchors { top: channelBoxLabel.bottom; left: parent.left; leftMargin: 2 }
+    anchors { top: channelBoxLabelRect.bottom; left: parent.left; leftMargin: 2 }
     width: parent.width-2
     contentWidth: Math.max(parent.width,cookedLogBox.width)
     contentHeight: Math.max(parent.height,cookedLogBox.height)
@@ -89,7 +92,8 @@ Rectangle {
       console.log ("cooked box contentY set to " + contentY)
     }
     interactive: true
-    height: channelBox.height - channelBoxLabel.height - rawLogBox.height - userInfoBox.height
+    height: channelBox.height - (channelBoxLabel.height + rawLogBox.height 
+           + userInfoBox.height + textEnterBox.height)
     Text {
       id: cookedLogBox
       anchors {top: parent.top; left: parent.left }
@@ -110,7 +114,7 @@ Rectangle {
   }
   Rectangle {
     id: textEnterBox
-    height: parent.height
+    height:inputHeight
     width: parent.width
     anchors { left: parent.left; top: userInfoBox.bottom }
     color: "#ffcccc"
@@ -130,10 +134,10 @@ Rectangle {
     anchors { top: channelBox.top; right: channelBox.right }
     height: channelBox.height
     width: countWidth
-    property bool shortView: false
+    property bool shortView: true
     Rectangle {
       id: userListCountRect
-      height: userListCount.height
+      height: childrenRect.height
       width: parent.width
       color: "#0099ee"
       opacity: 0.7
@@ -143,7 +147,7 @@ Rectangle {
         anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }
         //height: labelHeight
         width: parent.width
-        text: "User Count"
+        text: qsTr("No Users")
       }
       MouseArea {
         anchors.fill: parent
@@ -179,14 +183,19 @@ Rectangle {
     Rectangle {
       id: userListDataRect
       property alias yScale: rollupScale.yScale
+      property alias xScale: rollupScale.xScale
       height: userListBox.height - userListCountRect.height
       width: parent.width
       color: Qt.lighter(channelBox.color)
-      anchors {top: userListCountRect.bottom; left: parent.left}
+      opacity: 0.7
+      anchors {top: userListCountRect.bottom; right: parent.right}
       transform: Scale {
         id: rollupScale
         xScale: 1
-        yScale: 1
+        yScale: 0
+        Behavior  on xScale {
+          NumberAnimation { duration: rollDelay }
+        }
         Behavior  on yScale {
           NumberAnimation { duration: rollDelay }
         }
