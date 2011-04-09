@@ -28,6 +28,14 @@ IrcTextBrowser::DebugCheck ()
 }
 
 void
+IrcTextBrowser::setWidth (qreal wid)
+{
+  setTextWidth (wid);
+  qDebug () << " IrcTextBrowser set Width " << wid 
+            << " is now " << textWidth();
+}
+
+void
 IrcTextBrowser::setHtml (const QString & html)
 {
   QGraphicsTextItem::setHtml (html);

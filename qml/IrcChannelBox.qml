@@ -72,7 +72,7 @@ Rectangle {
     anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }
     color: "#eeaaaa"
     z: parent.z+1
-    MouseArea {      //text : "Chat Hstory"
+    MouseArea { 
       anchors.fill: parent
       onClicked: {
         console.log ("clicked channel name")
@@ -81,7 +81,7 @@ Rectangle {
     }
     Text {
       id: channelBoxLabel
-      text: "Channel Group Box"
+      text: " "
     }
   }
   Flickable {
@@ -98,35 +98,23 @@ Rectangle {
       console.log ("cooked box contentY set to " + contentY)
     }
     interactive: true
-    height: channelBox.height - (channelBoxLabel.height + rawLogBox.height 
-           + userInfoBox.height + textEnterBox.height)
+    height: channelBox.height - channelBoxLabel.height - textEnterBox.height
     IrcTextBrowser {
       id: cookedLogBox
-      //anchors {top: parent.top; left: parent.left }
-      z: 1
-      //width: parent.width
-      //text : "Chat Hstory"
       onActivatedLink: { 
-        console.log (" ^^^^ cooked link activated " + link) 
         channelBox.activatedLink (link)
       }
     }
-  }
-  TextEdit {
-    id: rawLogBox
-    anchors { top: cookedFlickBox.bottom; left: parent.left }
-    text : "Chat Raw Log"
-  }
-  TextEdit {
-    id: userInfoBox
-    anchors { top: rawLogBox.bottom; left: parent.left }
-    text : "User Query Info"
+    onWidthChanged: cookedLogBox.setWidth (width)
+    Component.onCompleted: {
+      cookedLogBox.setWidth (cookedFlickBox.width)
+    }
   }
   Rectangle {
     id: textEnterBox
     height:inputHeight
     width: parent.width
-    anchors { left: parent.left; top: userInfoBox.bottom }
+    anchors { left: parent.left; top: cookedFlickBox.bottom }
     color: "#ffcccc"
     TextInput {
       id: textEnter

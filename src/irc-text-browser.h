@@ -17,6 +17,7 @@ public:
   IrcTextBrowser (QGraphicsItem * parent=0);
 
   Q_INVOKABLE void setHtml (const QString & html);
+  Q_INVOKABLE void setWidth (qreal wid);
 
 private slots:
 

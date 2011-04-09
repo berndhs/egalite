@@ -441,7 +441,7 @@ IrcAbstractChannel::UserSend ()
     QString data = userData.toString();
     qDebug () << "   user data " << data;
     if (data.trimmed().length() > 0) {
-      QMetaObject::invokeMethod (qmlItem, "writeUserData");
+      QMetaObject::invokeMethod (qmlItem, "clearUserData");
       emit Outgoing (chanName, data);
       history.append (data);
       history.removeDuplicates ();
