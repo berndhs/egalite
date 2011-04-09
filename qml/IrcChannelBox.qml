@@ -23,6 +23,7 @@
 
 
 import QtQuick 1.0
+import net.sf.egalite 1.0
 
 Rectangle {
   id: channelBox
@@ -40,6 +41,7 @@ Rectangle {
   signal userSend ()
   signal userUp ()
   signal userDown ()
+  signal activatedLink (string link)
 
   function selectUser (user) {
     console.log ("selected user " + user)
@@ -49,10 +51,12 @@ Rectangle {
     channelBox.destroy()
   }
   function setCookedLog (theText) {
-    cookedLogBox.text = theText
+    //cookedLogBox.text = theText
+    cookedLogBox.setHtml (theText)
     cookedFlickBox.alignBottom ()
   }
   function userData () { return textEnter.text }
+  function writeUserData (theText) { textEnter.text = theText }
   function clearUserData () { textEnter.text = "" }
 
   function setModel (theModel) { userList.model = theModel }
@@ -68,7 +72,7 @@ Rectangle {
     anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }
     color: "#eeaaaa"
     z: parent.z+1
-    MouseArea {
+    MouseArea {      //text : "Chat Hstory"
       anchors.fill: parent
       onClicked: {
         console.log ("clicked channel name")
@@ -82,6 +86,7 @@ Rectangle {
   }
   Flickable {
     id: cookedFlickBox
+    objectName: "CookedFlickBox"
     anchors { top: channelBoxLabelRect.bottom; left: parent.left; leftMargin: 2 }
     width: parent.width-2
     contentWidth: Math.max(parent.width,cookedLogBox.width)
@@ -95,12 +100,16 @@ Rectangle {
     interactive: true
     height: channelBox.height - (channelBoxLabel.height + rawLogBox.height 
            + userInfoBox.height + textEnterBox.height)
-    Text {
+    IrcTextBrowser {
       id: cookedLogBox
-      anchors {top: parent.top; left: parent.left }
-      width: parent.width
-      text : "Chat Hstory"
-      onLinkActivated: { console.log (" cooked link activated " + link) }
+      //anchors {top: parent.top; left: parent.left }
+      z: 1
+      //width: parent.width
+      //text : "Chat Hstory"
+      onActivatedLink: { 
+        console.log (" ^^^^ cooked link activated " + link) 
+        channelBox.activatedLink (link)
+      }
     }
   }
   TextEdit {
@@ -122,7 +131,7 @@ Rectangle {
     TextInput {
       id: textEnter
       anchors.fill: parent
-      text: "User Input to Send"
+      text: ""
       Keys.onEnterPressed: channelBox.userSend ()
       Keys.onReturnPressed: channelBox.userSend ()
       Keys.onUpPressed: channelBox.userUp ()

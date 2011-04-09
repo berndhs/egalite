@@ -27,6 +27,7 @@
 #include <QMetaObject>
 #include <QDeclarativeItem>
 #include "irc-abstract-channel.h"
+#include "irc-text-browser.h"
 
 namespace egalite
 {
@@ -53,6 +54,15 @@ QmlIrcChannelGroup::Start ()
     QMessageBox::critical (this, "Fatal", "QML Load Failure");
     return;
   }
+  QDeclarativeEngine * engine = ui.qmlChannelView->engine ();
+  if (engine == 0) {
+    QMessageBox::critical (this, "Fatal", "No QML Engine");
+    return;
+  }
+  int handle = qmlRegisterType<IrcTextBrowser>
+              ("net.sf.egalite",1,0,"IrcTextBrowser");
+  qDebug () << " ----------------------- "
+             "QmlIrcChannelGroup registered type as " << handle;
   connect (qmlRoot, SIGNAL (selectedChannel (QString)),
            this, SLOT (ClickedChannel (QString)));
   connect (qmlRoot, SIGNAL (changedHeadHeight (int)),

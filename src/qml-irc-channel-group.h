@@ -26,6 +26,7 @@
 #include <QWidget>
 #include <QGraphicsObject>
 #include <QDeclarativeItem>
+#include <QDeclarativeEngine>
 #include <QStringList>
 #include <QList>
 

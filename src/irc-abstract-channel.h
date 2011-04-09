@@ -88,6 +88,7 @@ private slots:
 
   void Link (const QUrl & url);
   void ClickedUser (const QString & userName);
+  void ActivatedCookedLink (const QString & link);
   void HideMe ();
   void HideGroup ();
   void HideAll ();

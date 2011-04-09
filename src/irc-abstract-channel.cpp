@@ -75,6 +75,8 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
   connect (qmlItem, SIGNAL (userSend ()), this, SLOT (UserSend()));
   connect (qmlItem, SIGNAL (userUp()), this, SLOT (UserUp()));
   connect (qmlItem, SIGNAL (userDown()), this, SLOT (UserDown ()));
+  connect (qmlItem, SIGNAL (activatedLink(const QString &)),
+           this, SLOT (ActivatedCookedLink(const QString &)));
 }
  
 void
@@ -278,6 +280,27 @@ IrcAbstractChannel::Link (const QUrl & url)
 }
 
 void
+IrcAbstractChannel::ActivatedCookedLink (const QString & link)
+{
+  QUrl url (link);
+  if (url.scheme () == "ircsender") {
+    if (qmlItem) {
+      QVariant msgVar;
+      QMetaObject::invokeMethod (qmlItem, "userData",
+         Q_RETURN_ARG (QVariant, msgVar));
+      QString msg (msgVar.toString());
+qDebug () << " IrcAbstractChannel :: old userData " << msg;
+      msg.append (url.userName());
+      msg.append (": ");
+      QMetaObject::invokeMethod (qmlItem, "writeUserData",
+         Q_ARG (QVariant, msg));
+    }
+  } else {
+    QDesktopServices::openUrl (url);
+  }
+}
+
+void
 IrcAbstractChannel::AppendSmall (QString & log, const QString & line)
 {
   log.append (QString ("<span style=\"font-size: small\">%1</span><br>\n")
@@ -387,7 +410,7 @@ IrcAbstractChannel::eventFilter (QObject * obj, QEvent * evt)
   return QObject::eventFilter (obj, evt);
 }
 
-bool
+bool     
 IrcAbstractChannel::event (QEvent *evt)
 {
   QEvent::Type  tipo = evt->type();
@@ -418,7 +441,7 @@ IrcAbstractChannel::UserSend ()
     QString data = userData.toString();
     qDebug () << "   user data " << data;
     if (data.trimmed().length() > 0) {
-      QMetaObject::invokeMethod (qmlItem, "clearUserData");
+      QMetaObject::invokeMethod (qmlItem, "writeUserData");
       emit Outgoing (chanName, data);
       history.append (data);
       history.removeDuplicates ();
