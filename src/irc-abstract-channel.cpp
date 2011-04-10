@@ -238,9 +238,9 @@ IrcAbstractChannel::SetTopic (const QString & newTopic)
   QString cooked = LinkMangle::Anchorize (topic, 
                          LinkMangle::HttpExp(),
                          LinkMangle::HttpAnchor);
-  #if 0
-  ui.chanTopic->setHtml (cooked);
-  #endif
+  if (qmlItem) {
+    qmlItem->setProperty ("channelTopic", cooked);
+  }
 }
 
 void

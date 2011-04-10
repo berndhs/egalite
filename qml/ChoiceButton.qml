@@ -6,7 +6,11 @@ Rectangle {
   signal pressAndHold ()
   property alias labelText : label.text
   property alias labelHeight: label.height
+  property alias labelWidth: label.width
   property real commonMargin: 4
+
+  signal labelChanged (string text)
+
   width: 100
   height: 100
   radius: 5
@@ -28,5 +32,6 @@ Rectangle {
     width: parent.width
     anchors.centerIn: parent 
     horizontalAlignment: Text.AlignHCenter
+    onTextChanged: { botton.labelChanged (label.text) }
  }
 }

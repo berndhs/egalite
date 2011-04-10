@@ -30,13 +30,14 @@ Rectangle {
   property real labelHeight:32
   property real inputHeight: 28
   property real userNameHeight: 20
-  property real countWidth: 0.3 * width
+  property real countWidth: 0.25 * width
   property real rollDelay: 200
   property real parentHeightReserve: 0
   property real parentWidthReserve: 0
   property alias userListModel: userList.model
   property alias boxLabel: channelBoxLabel.text
   property alias userListCounter: userListCount.text
+  property alias channelTopic: topicBoxContent.text
 
   signal userSend ()
   signal userUp ()
@@ -70,19 +71,48 @@ Rectangle {
     id: channelBoxLabelRect
     height: childrenRect.height
     width: childrenRect.width
-    anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }
-    color: "#eeaaaa"
+    anchors { top: parent.top; left: parent.left }
+    color: "#ff99aa"
     z: parent.z+1
     MouseArea { 
       anchors.fill: parent
-      onClicked: {
-        console.log ("clicked channel name")
-        cookedFlickBox.alignBottom()
-      }
+      onClicked: cookedFlickBox.alignBottom()
+      onPressAndHold: topicBox.toggleHeight()
     }
     Text {
       id: channelBoxLabel
       text: " "
+    }
+  }
+  Rectangle {
+    id: topicBox
+    property real maxHeight: channelBoxLabelRect.height
+    property bool bigHeight: false
+    clip: true
+    color: Qt.lighter (cookedFlickBox.color)
+    z: cookedFlickBox.z + 1
+    anchors { left: channelBoxLabelRect.right; top: parent.top }
+    width: parent.width - channelBoxLabelRect.width - countWidth
+    height: Math.min (maxHeight, childrenRect.height)
+    function toggleHeight () {
+      bigHeight = !bigHeight
+      if (bigHeight)  setBigHeight ()
+      else            setSmallHeight ()
+    }
+    function setBigHeight () {
+      maxHeight = channelBox.height - channelBoxLabel.height - textEnterBox.height 
+    }
+    function setSmallHeight () {
+      maxHeight = channelBoxLabelRect.height
+    }
+    Text {
+      id: topicBoxContent
+      width: topicBox.width
+      wrapMode: Text.Wrap
+      text: qsTr ("no topic set")
+      onTextChanged: {
+        topicBox.setSmallHeight ()
+      }
     }
   }
   Flickable {
@@ -119,7 +149,7 @@ Rectangle {
     height:inputHeight
     width: parent.width
     anchors { left: parent.left; top: cookedFlickBox.bottom }
-    color: "#ffcccc"
+    color: "#ddffee"
     TextInput {
       id: textEnter
       anchors.fill: parent
@@ -129,20 +159,29 @@ Rectangle {
       Keys.onUpPressed: channelBox.userUp ()
       Keys.onDownPressed: channelBox.userDown ()
     }
+    ChoiceButton {
+      id: sendButton
+      labelText: qsTr ("Send")
+      width: labelWidth
+      height: inputHeight
+      anchors { top: parent.top; right: parent.right }
+      onLabelChanged: { width = labelWidth }
+      onClicked: { channelBox.userSend () }
+    }
   }
   Rectangle {
     id: userListBox
     color: "transparent"
     anchors { top: channelBox.top; right: channelBox.right }
-    height: channelBox.height
+    height: channelBox.height - textEnterBox.height
     width: countWidth
     property bool shortView: true
     Rectangle {
       id: userListCountRect
       height: childrenRect.height
       width: parent.width
-      color: "#0099ee"
-      opacity: 0.7
+      color: "#00aaff"
+      opacity: 0.6666
       Text {
         id: userListCount
         horizontalAlignment: Text.AlignHCenter
