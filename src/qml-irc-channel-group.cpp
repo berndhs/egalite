@@ -52,7 +52,7 @@ void
 QmlIrcChannelGroup::Start ()
 {
   ui.qmlChannelView->setSource (
-         QUrl::fromLocalFile("qml/IrcChannelGroup.qml"));
+         QUrl("qrc:///qml/IrcChannelGroup.qml"));
 
   qmlRoot = ui.qmlChannelView->rootObject();
   if (qmlRoot == 0) {
