@@ -77,7 +77,7 @@ Rectangle {
 
   Rectangle {
     id: channelBoxLabelRect
-    height: childrenRect.height + 4
+    height: childrenRect.height + 3
     width: childrenRect.width
     anchors { top: parent.top; left: parent.left }
     color: "#ff99aa"
@@ -88,6 +88,7 @@ Rectangle {
       onPressAndHold: topicBox.toggleHeight()
     }
     Text {
+      anchors { leftMargin: 2; rightMargin: 2; verticalCenter: parent.verticalCenter }
       id: channelBoxLabel
       text: " "
     }
