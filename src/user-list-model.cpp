@@ -1,5 +1,5 @@
+#include "user-list-model.h"
 
-#include "irc-float.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -22,60 +22,18 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include <QCloseEvent>
+
+#include <QHash>
 
 namespace egalite
 {
 
-IrcFloat::IrcFloat (QWidget *parent)
-  :QDialog (parent),
-   chanBox (0)
+UserListModel::UserListModel (QObject *parent)
+  :QStringListModel (parent)
 {
-  ui.setupUi (this);
-}
-
-void
-IrcFloat::Hide ()
-{
-  hide ();
-}
-
-void
-IrcFloat::Show ()
-{
-  show ();
-  raise ();
-}
-
-void
-IrcFloat::AddChannel (IrcAbstractChannel *chan)
-{
-  if (chanBox != 0) {
-    return;
-  }
-  chanBox = chan;
-  //ui.mainLayout->addWidget (chanBox, 0,0,1,1);
-  setWindowTitle (chan->Name());
-  connect (chanBox, SIGNAL (HideMe()), this, SLOT (Hide()));
-  //chan->show ();
-}
-
-void
-IrcFloat::RemoveChannel (IrcAbstractChannel *chan)
-{
-  if (chanBox == chan) {
-    disconnect (chanBox, 0, this, 0);
-    chanBox = 0;
-  }
-}
-
-void
-IrcFloat::closeEvent (QCloseEvent *event)
-{
-  if (chanBox) {
-    chanBox->Part ();
-  }
-  QDialog::closeEvent (event);
+  QHash<int, QByteArray> roles;
+  roles[Qt::DisplayRole] = "userName";
+  setRoleNames(roles);
 }
 
 } // namespace

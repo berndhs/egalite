@@ -31,7 +31,8 @@ message ("translations in $$TRANS_DIR/")
 CODEFORTR = UTF-8
 
 message ("generating MAKEFILE as $$MAKEFILE")
-QT += core gui network xml xmlpatterns sql webkit 
+QT += core gui network xml xmlpatterns sql webkit declarative
+
 
 DEFINES += DELIBERATE_QTM1=$$QT_MAJOR_VERSION
 DEFINES += DELIBERATE_QTM2=$$QT_MINOR_VERSION
@@ -97,6 +98,12 @@ win32 {
 }
 message ("using extra libs $$LIBS")
 
+audio {
+        message ("---width audio")
+	QT += multimedia
+}
+message ("QT variable is $$QT")
+
 build_x86 {
   QMAKE_LFLAGS += "-z noexecstack"
 }
@@ -131,8 +138,7 @@ FORMS = \
 	ui/server-account.ui \
 	ui/count-down.ui \
 	ui/cert-list.ui \
-        ui/irc-channel-group.ui \
-        ui/irc-channel-box.ui \
+        ui/irc-qml-channel-group.ui \
         ui/irc-control.ui \
         ui/irc-float.ui \
         ui/irc-account.ui \
@@ -140,9 +146,8 @@ FORMS = \
         ui/edit-simple.ui \
 
 
-
-
-SOURCES = src/main.cpp \
+SOURCES = \
+        src/main.cpp \
 	src/dchat.cpp \
 	src/cmdoptions.cpp \
 	src/delib-debug.cpp \
@@ -169,19 +174,26 @@ SOURCES = src/main.cpp \
 	src/direct-message.cpp \
 	src/direct-parser.cpp \
 	src/cert-list-edit.cpp \
-        src/irc-channel-group.cpp \
-        src/irc-channel-box.cpp \
+        src/qml-irc-channel-group.cpp \
+        src/irc-abstract-channel.cpp \
         src/irc-float.cpp \
         src/irc-control.cpp \
         src/irc-socket.cpp \
         src/irc-ctcp.cpp \
         src/irc-sock-static.cpp \
         src/irc-nick-edit.cpp \
+        src/irc-text-browser.cpp \
         src/enter-string.cpp \
         src/edit-simple.cpp \
+        src/user-list-model.cpp \
+
+audio {
+	SOURCES += src/audio-message.cpp
+}
 
 
-HEADERS = \
+
+HEADERS += \
 	src/dchat.h \
 	src/cmdoptions.h \
 	src/delib-debug.h \
@@ -210,7 +222,8 @@ HEADERS = \
 	src/direct-message.h \
 	src/direct-parser.h \
 	src/cert-list-edit.h \
-        src/irc-channel-box.h \
+        src/qml-irc-channel-group.h \
+        src/irc-abstract-channel.h \
         src/irc-control.h \
         src/irc-socket.h \
         src/irc-ctcp.h \
@@ -218,15 +231,13 @@ HEADERS = \
         src/irc-channel-group.h \
         src/irc-float.h \
         src/irc-nick-edit.h \
+        src/irc-text-browser.h \
         src/enter-string.h \
         src/edit-simple.h \
-
+        src/user-list-model.h \
 
 audio {
-	QT += phonon
-	SOURCES += src/audio-message.cpp
 	HEADERS += src/audio-message.h
 }
-
 
 

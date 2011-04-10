@@ -3,6 +3,10 @@
   <file alias="dchatlogo.png">images/e6.png</file>
   <file alias="treeback.png">images/pale.png</file>
 </qresource>
+<qresource prefix="/qml">
+  <file alias="IrcChannelBox.qml">qml/IrcChannelBox.qml</file>
+  <file alias="IrcChanneGroup.qml">qml/IrcChannelGroup.qml</file>
+</qresource>
 <qresource prefix="/schemas">
   <file alias="identities.sql">schemafiles/identities.sql</file>
   <file alias="uniqueident.sql">schemafiles/uniqueident.sql</file>

@@ -1,5 +1,6 @@
-#ifndef IRC_CHANNEL_GROUP_H
-#define ITC_CHANNEL_GROUP_H
+#ifndef EGALITE_USER_LIST_MODEL_H
+#define EGALITE_USER_LIST_MODEL_H
+
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -21,54 +22,23 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-channel-group.h"
-#include <QIcon>
-#include <QSize>
-#include <QPoint>
 
-class QCloseEvent;
+
+#include <QStringListModel>
 
 namespace egalite
 {
 
-class IrcChannelBox;
-
-class IrcChannelGroup : public QDialog
+class UserListModel : public QStringListModel 
 {
 Q_OBJECT
-
 public:
-
-  IrcChannelGroup (QWidget *parent=0);
-
-  void AddChannel (IrcChannelBox * chan);
-  void RemoveChannel (IrcChannelBox * chan);
-  void MarkActive (IrcChannelBox * chan, bool active);
-  bool HaveChannel (IrcChannelBox * chan);
-  void ShowChannel (IrcChannelBox * chan);
- 
-  void Close ();
-
-public slots:
-
-  void Show ();
-  void Hide ();
-
-protected:
-
-  void closeEvent (QCloseEvent *event);
-
-private:
-
-  Ui_IrcChannelGroup    ui;
-  QIcon                 activeIcon;
-  QIcon                 quietIcon;
-  QSize                 oldSize;
-  QPoint                oldPos;
-  bool                  hidSelf;
+  
+  UserListModel (QObject *parent);
 
 };
 
 } // namespace
+
 
 #endif

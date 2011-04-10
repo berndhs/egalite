@@ -4,7 +4,7 @@
 /****************************************************************
  * This file is distributed under the following license:
  *
- * Copyright (C) 2010, Bernd Stramm
+ * Copyright (C) 2011, Bernd Stramm
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,34 +21,36 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-channel-box.h"
 #include <QList>
 #include <QRegExp>
+#include <QObject>
+#include <QUrl>
+#include <QString>
+#include <QStringList>
+#include <QDeclarativeItem>
+#include <QRectF>
 
-class QMenuBar;
-class QMenu;
-class QAction;
-class QFocusEvent;
-class QShowEvent;
-class QEvent;
-class QUrl;
-class QListWidgetItem;
-class QTreeWidgetItem;
+#include "user-list-model.h"
+
 
 namespace egalite
 {
 
-class IrcChannelBox : public QWidget
+class IrcAbstractChannel : public QObject
 {
 Q_OBJECT
 
 public:
 
-  IrcChannelBox (const QString & name, 
+  IrcAbstractChannel (const QString & name, 
                  const QString & sockName,
-                 QWidget *parent=0);
+                 QObject *parent=0);
+
+  ~IrcAbstractChannel ();
 
   void Close ();
+
+  UserListModel * userNamesModel ();
 
   void SetTopic (const QString & newTopic);
   void SetHost (const QString & hostName);
@@ -62,9 +64,19 @@ public:
   QString Topic () { return topic; }
   QString Name ()  { return chanName; }
   QString Sock () { return sockName; }
+  QDeclarativeItem * QmlItem () { return qmlItem; }
+
+  void SetQmlItem (QDeclarativeItem * item);
 
   void StartWatching (const QRegExp & watch);
   void StopWatching  (const QRegExp & watch);
+
+  bool Topmost ();
+  void SetTopmost (bool top);
+  void HeadHeightChanged (int newHeight);
+  bool IsActive ();
+  void SetActive (bool a);
+  QRectF cookedBoundingRect () const;
 
 public slots:
 
@@ -78,16 +90,17 @@ public slots:
 
 private slots:
 
-  void TypingFinished ();
   void Link (const QUrl & url);
-  void ClickedUser (QListWidgetItem * item);
-  void Menu ();
+  void ClickedUser (const QString & userName);
+  void ActivatedCookedLink (const QString & link);
   void HideMe ();
   void HideGroup ();
   void HideAll ();
   void CopyClip ();
   void Whois ();
-  void UserInfoDetail (QTreeWidgetItem *, int);
+  void UserSend ();
+  void UserUp ();
+  void UserDown ();
 
 protected:
 
@@ -100,34 +113,24 @@ signals:
   void Outgoing (QString channel, QString message);
   void OutRaw (QString sockName, QString data);
   void WantWhois (QString channel, QString otherUser, bool want);
-  void Active (IrcChannelBox * box);
-  void InUse (IrcChannelBox * box);
-  void WantFloat (IrcChannelBox * box);
-  void WantDock (IrcChannelBox * box);
+  void Active (IrcAbstractChannel * box);
+  void InUse (IrcAbstractChannel * box);
+  void WantFloat (IrcAbstractChannel * box);
+  void WantDock (IrcAbstractChannel * box);
   void HideAllChannels ();
   void HideDock ();
-  void HideChannel (IrcChannelBox * box);
+  void HideChannel (IrcAbstractChannel * box);
   void WatchAlert (QString pattern, QString line);
 
 private:
 
-  void   SetupMenus ();
   void   Connect ();
-  void   BalanceWidths ();
-  void   AppendSmall (QTextBrowser* log, const QString & line);
+  void   AppendSmall (QString & log, const QString & line);
+  void   UpdateCooked ();
   void   CheckWatch (const QString & data);
-  bool   DoHistory (QLineEdit * edit, 
-                    QStringList & hist,
-                    QEvent      * evt,
-                    int         & index,
-                    QString     & bottom);
 
   static bool Less (const QString & left, const QString & right);
 
-  Ui_IrcChannelBox    ui;
-  QMenu              *chanMenu;
-  QMenu              *userMenu;
-  QMenu              *infoMenu;
   QString             chanName;
   QString             sockName;
   QString             partMsg;
@@ -135,12 +138,17 @@ private:
   QStringList         oldNames;
   QString             queryUser;
   QString             clipSave;
+  QString             cookedLog;
 
   QList <QRegExp>     watchList;
 
   QStringList         history;
   QString             historyBottom;
   int                 historyIndex;
+  UserListModel       namesModel;
+  QDeclarativeItem   *qmlItem;
+  bool                topmost;
+  bool                active;
 
 };
 

@@ -32,7 +32,7 @@ or whatever you specified as prefix in the configure command.
 You need:
 
 g++ (that's gcc/c++)
-Qt4.6 devel or later
+Qt4.7.1 devel or later
   - this includes qmake and lrelease
 QCA2-devel
 QCA-ossl  (don't need devel of this)

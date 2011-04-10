@@ -26,13 +26,13 @@
 #include "version.h"
 #include "helpview.h"
 #include "edit-simple.h"
-#include "irc-channel-box.h"
+#include "irc-abstract-channel.h"
 #include "irc-socket.h"
 #include "irc-sock-static.h"
 #include "irc-ctcp.h"
 #include <QSize>
 #include "cert-store.h"
-#include "irc-channel-group.h"
+#include "qml-irc-channel-group.h"
 #include "enter-string.h"
 #include <QDebug>
 #include <QMessageBox>
@@ -57,7 +57,8 @@ IrcControl::IrcControl (QWidget *parent)
    hidSelf (false)
 {
   mainUi.setupUi (this);
-  dockedChannels = new IrcChannelGroup (parentWidget ());
+  dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
+  dockedChannels->Start ();
   dockedChannels->hide ();
   ConnectGui ();
   commandXform ["MSG"] = IrcSockStatic::TransformPRIVMSG;
@@ -609,7 +610,7 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
   if (sock == 0) {
     return;
   }
-  IrcChannelBox * newchan  = new IrcChannelBox (chanName, sock->Name(), this);
+  IrcAbstractChannel * newchan  = new IrcAbstractChannel (chanName, sock->Name(), this);
   channels [chanName] = newchan;
   dockedChannels->AddChannel (newchan);
   dockedChannels->show ();
@@ -620,20 +621,20 @@ IrcControl::AddChannel (IrcSocket * sock, const QString & chanName)
            this, SLOT (Outgoing (QString, QString)));
   connect (newchan, SIGNAL (OutRaw (QString, QString)),
            this, SLOT (SendRaw (QString, QString )));
-  connect (newchan, SIGNAL (Active (IrcChannelBox *)),
-           this, SLOT (ChanActive (IrcChannelBox *)));
-  connect (newchan, SIGNAL (InUse (IrcChannelBox *)),
-           this, SLOT (ChanInUse (IrcChannelBox *)));
-  connect (newchan, SIGNAL (WantFloat (IrcChannelBox *)),
-           this, SLOT (ChanWantsFloat (IrcChannelBox *)));
-  connect (newchan, SIGNAL (WantDock (IrcChannelBox *)),
-           this, SLOT (ChanWantsDock (IrcChannelBox *)));
+  connect (newchan, SIGNAL (Active (IrcAbstractChannel *)),
+           this, SLOT (ChanActive (IrcAbstractChannel *)));
+  connect (newchan, SIGNAL (InUse (IrcAbstractChannel *)),
+           this, SLOT (ChanInUse (IrcAbstractChannel *)));
+  connect (newchan, SIGNAL (WantFloat (IrcAbstractChannel *)),
+           this, SLOT (ChanWantsFloat (IrcAbstractChannel *)));
+  connect (newchan, SIGNAL (WantDock (IrcAbstractChannel *)),
+           this, SLOT (ChanWantsDock (IrcAbstractChannel *)));
   connect (newchan, SIGNAL (HideAllChannels ()),
            this, SLOT (HideAll ()));
   connect (newchan, SIGNAL (HideDock ()),
            this, SLOT (HideGroup ()));
-  connect (newchan, SIGNAL (HideChannel (IrcChannelBox *)),
-           this, SLOT (HideChannel (IrcChannelBox *)));
+  connect (newchan, SIGNAL (HideChannel (IrcAbstractChannel *)),
+           this, SLOT (HideChannel (IrcAbstractChannel *)));
   connect (newchan, SIGNAL (WantWhois (QString, QString, bool)),
            this, SLOT (WantsWhois (QString, QString, bool)));
   connect (newchan, SIGNAL (WatchAlert (QString, QString)),
@@ -648,8 +649,9 @@ IrcControl::DropChannel (IrcSocket * sock, const QString & chanName)
   if (!channels.contains (chanName)) {
     return;
   }
-  IrcChannelBox * chanBox = channels [chanName];
+  IrcAbstractChannel * chanBox = channels [chanName];
   disconnect (chanBox, 0,0,0);
+  qDebug () << " dropping channel " << chanName << chanBox->Name();
   if (dockedChannels->HaveChannel (chanBox)) {
     dockedChannels->RemoveChannel (chanBox);
   }
@@ -690,7 +692,7 @@ IrcControl::WhoisData (const QString & thisUser,
   if (whoisWait.contains (otherUser)) {
     QString chan = whoisWait[otherUser];
     if (channels.contains (chan)) {
-      IrcChannelBox * box = channels[chan];
+      IrcAbstractChannel * box = channels[chan];
       box->WhoisData (otherUser, numeric, data);
     }
   }
@@ -702,15 +704,15 @@ IrcControl::ChannelClicked (QListWidgetItem *item)
   if (item) {
     QString chanName = item->text ();
     qDebug () << " clicked on channel " << chanName;
-    IrcChannelBox * chanBox = channels [chanName];
+    IrcAbstractChannel * chanBox = channels [chanName];
     qDebug () << "       is in box " << chanBox;
     ShowChannel (chanBox);
-    chanBox->raise ();
+    //chanBox->raise ();
   }
 }
 
 void
-IrcControl::ShowChannel (IrcChannelBox * chanBox)
+IrcControl::ShowChannel (IrcAbstractChannel * chanBox)
 {
   if (dockedChannels->HaveChannel (chanBox)) {
     dockedChannels->ShowChannel (chanBox);
@@ -720,7 +722,7 @@ IrcControl::ShowChannel (IrcChannelBox * chanBox)
 }
 
 void
-IrcControl::HideChannel (IrcChannelBox * chanBox)
+IrcControl::HideChannel (IrcAbstractChannel * chanBox)
 {
   if (floatingChannels.contains (chanBox)) {
     floatingChannels [chanBox]->Hide();
@@ -755,7 +757,7 @@ IrcControl::PartAll (const QString & sockName)
   ChannelMapType::iterator cit;
   for (cit=channels.begin(); cit != channels.end(); cit++) {
     if (*cit) {
-      IrcChannelBox * chan = *cit;
+      IrcAbstractChannel * chan = *cit;
       if (chan->Sock() == sockName) {
         chan->Part ();
       }
@@ -773,7 +775,7 @@ IrcControl::UserQuit (IrcSocket * sock,
   ChannelMapType::iterator cit;
   for (cit=channels.begin(); cit != channels.end(); cit++) {
     if (*cit) {
-      IrcChannelBox * chan = *cit;
+      IrcAbstractChannel * chan = *cit;
       if (chan->Sock() == sockName) {
         chan->DropName (user, quitMsg);
       }
@@ -782,19 +784,19 @@ IrcControl::UserQuit (IrcSocket * sock,
 }
 
 void
-IrcControl::ChanActive (IrcChannelBox *chan)
+IrcControl::ChanActive (IrcAbstractChannel *chan)
 {
   dockedChannels->MarkActive (chan, true);
 }
 
 void
-IrcControl::ChanInUse (IrcChannelBox *chan)
+IrcControl::ChanInUse (IrcAbstractChannel *chan)
 {
   dockedChannels->MarkActive (chan, false);
 }
 
 void
-IrcControl::ChanWantsFloat (IrcChannelBox *chan)
+IrcControl::ChanWantsFloat (IrcAbstractChannel *chan)
 {
   if (dockedChannels->HaveChannel (chan)) {
     dockedChannels->RemoveChannel (chan);
@@ -808,7 +810,7 @@ IrcControl::ChanWantsFloat (IrcChannelBox *chan)
 }
 
 void
-IrcControl::ChanWantsDock (IrcChannelBox *chan)
+IrcControl::ChanWantsDock (IrcAbstractChannel *chan)
 {
   if (floatingChannels.contains (chan)) {
     IrcFloat * oldFloat = floatingChannels [chan];
@@ -999,7 +1001,7 @@ IrcControl::AddNames (const QString & chanName, const QString & names)
   if (!channels.contains (chanName)) {
     return;
   }
-  IrcChannelBox * chan = channels [chanName];
+  IrcAbstractChannel * chan = channels [chanName];
   chan->AddNames (names);
 }
 
@@ -1009,7 +1011,7 @@ IrcControl::AddName (const QString & chanName, const QString & name)
   if (!channels.contains (chanName)) {
     return;
   }
-  IrcChannelBox * chan = channels [chanName];
+  IrcAbstractChannel * chan = channels [chanName];
   chan->AddName (name);
 }
 
@@ -1022,7 +1024,7 @@ IrcControl::DropName (IrcSocket * sock,
   if (!channels.contains (chanName)) {
     return;
   }
-  IrcChannelBox * chan = channels [chanName];
+  IrcAbstractChannel * chan = channels [chanName];
   chan->DropName (name, msg);
 }
 
@@ -1033,7 +1035,7 @@ IrcControl::SetTopic (IrcSocket * sock,
   if (!channels.contains (chanName)) {
     return;
   }
-  IrcChannelBox * chan = channels [chanName];
+  IrcAbstractChannel * chan = channels [chanName];
   chan->SetTopic (topic);
 }
 

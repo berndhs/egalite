@@ -23,10 +23,6 @@
 #include "audio-message.h"
 #include <QDesktopServices>
 #include <QDir>
-#if DO_AUDIO
-#include <QAudioInput>
-#include <QAudioOutput>
-#endif
 #include <QTimer>
 #include <QUuid>
 #include <QDebug>

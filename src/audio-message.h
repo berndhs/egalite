@@ -24,9 +24,12 @@
 
 #include <QObject>
 #if DO_AUDIO
+#include <QtMultimedia/QtMultimedia>
+#if 0
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QAudioFormat>
+#endif
 #endif
 #include <QFile>
 #include <QString>
