@@ -17,6 +17,23 @@ IrcTextBrowser::IrcTextBrowser (QGraphicsItem *prnt)
   DebugCheck ();
 }
 
+QRectF
+IrcTextBrowser::boundingRect () const
+{
+  return QGraphicsTextItem::boundingRect ();
+}
+
+void
+IrcTextBrowser::noFunc ()
+{
+}
+
+qreal
+IrcTextBrowser::getHeight () const
+{
+  return boundingRect().height();
+}
+
 void
 IrcTextBrowser::DebugCheck ()
 {

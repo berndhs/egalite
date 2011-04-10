@@ -35,12 +35,17 @@ namespace egalite
 QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
   :QWidget (parent),
    qmlRoot (0),
-   chanLinkPrefix ("chanlink://channel_")
+   chanLinkPrefix ("chanlink://channel_"),
+   debugTimer (this)
 {
   ui.setupUi (this);
   activeIcon = QIcon (":/ircicons/active.png");
   quietIcon = QIcon (":/ircicons/inactive.png");
   move (250,250);
+  connect (&debugTimer, SIGNAL (timeout()),
+           this, SLOT (DebugCheck()));
+  debugTimer.start (30*1000);
+  QTimer::singleShot (10000, this, SLOT (DebugCheck()));
 }
 
 void
@@ -214,6 +219,18 @@ QmlIrcChannelGroup::closeEvent (QCloseEvent *event)
 {
   Hide ();
   event->ignore ();
+}
+
+void
+QmlIrcChannelGroup::DebugCheck ()
+{
+  qDebug () << "QmlIrcChannelGroup :: DebugCheck ";
+  int nc = channelList.count();
+  for (int i=0; i<nc; i++) {
+    IrcAbstractChannel * chan = channelList.at(i);
+    qDebug () << " channel " << chan->Name() << " bounds "
+              << chan->cookedBoundingRect ();
+  }
 }
 
 } // namespace

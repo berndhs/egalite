@@ -29,6 +29,7 @@
 #include <QDeclarativeEngine>
 #include <QStringList>
 #include <QList>
+#include <QTimer>
 
 class QCloseEvent;
 
@@ -64,6 +65,7 @@ private slots:
 
   void ClickedChannel (QString link);
   void HeadHeightChanged (int newHeight);
+  void DebugCheck ();
 
 protected:
 
@@ -82,6 +84,7 @@ private:
   QGraphicsObject        *qmlRoot;
   QList <IrcAbstractChannel*>  channelList;
   QString                 chanLinkPrefix;
+  QTimer                  debugTimer;
 
 };
 

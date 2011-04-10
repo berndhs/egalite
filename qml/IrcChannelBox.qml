@@ -51,15 +51,16 @@ Rectangle {
     channelBox.destroy()
   }
   function setCookedLog (theText) {
-    //cookedLogBox.text = theText
     cookedLogBox.setHtml (theText)
     cookedFlickBox.alignBottom ()
+    console.log ("  After update text height " + cookedLogBox.height)
   }
   function userData () { return textEnter.text }
   function writeUserData (theText) { textEnter.text = theText }
   function clearUserData () { textEnter.text = "" }
 
   function setModel (theModel) { userList.model = theModel }
+  function cookedBoundingRect () { return cookedLogBox.boundingRect () }
 
   height: parent.height - parentHeightReserve
   width: parent.width - parentWidthReserve
@@ -89,22 +90,25 @@ Rectangle {
     objectName: "CookedFlickBox"
     anchors { top: channelBoxLabelRect.bottom; left: parent.left; leftMargin: 2 }
     width: parent.width-2
+    interactive: true
+    height: channelBox.height - channelBoxLabel.height - textEnterBox.height
+    clip: true
     contentWidth: Math.max(parent.width,cookedLogBox.width)
     contentHeight: Math.max(parent.height,cookedLogBox.height)
+    boundsBehavior: Flickable.DragAndOvershootBounds
 
     function alignBottom () {
       if (flicking) return   // not while moving
       contentY = Math.max (0, cookedLogBox.height - cookedFlickBox.height - 2)
       console.log ("cooked box contentY set to " + contentY)
     }
-    interactive: true
-    height: channelBox.height - channelBoxLabel.height - textEnterBox.height
     IrcTextBrowser {
       id: cookedLogBox
       onActivatedLink: { 
         channelBox.activatedLink (link)
       }
     }
+
     onWidthChanged: cookedLogBox.setWidth (width)
     Component.onCompleted: {
       cookedLogBox.setWidth (cookedFlickBox.width)

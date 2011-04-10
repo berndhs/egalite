@@ -79,6 +79,18 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
   connect (qmlItem, SIGNAL (activatedLink(const QString &)),
            this, SLOT (ActivatedCookedLink(const QString &)));
 }
+
+QRectF
+IrcAbstractChannel::cookedBoundingRect () const
+{
+  if (qmlItem) {
+    QVariant rectVar;
+    QMetaObject::invokeMethod (qmlItem, "cookedBoundingRect",
+             Q_RETURN_ARG (QVariant, rectVar));
+    QRectF br = rectVar.toRectF();
+    return br;
+  }
+}
  
 void
 IrcAbstractChannel::SetTopmost (bool top)

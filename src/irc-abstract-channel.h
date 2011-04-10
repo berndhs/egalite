@@ -28,6 +28,7 @@
 #include <QString>
 #include <QStringList>
 #include <QDeclarativeItem>
+#include <QRectF>
 
 #include "user-list-model.h"
 
@@ -75,6 +76,7 @@ public:
   void HeadHeightChanged (int newHeight);
   bool IsActive ();
   void SetActive (bool a);
+  QRectF cookedBoundingRect () const;
 
 public slots:
 
