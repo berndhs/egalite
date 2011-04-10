@@ -106,6 +106,7 @@ Rectangle {
     anchors { left: channelBoxLabelRect.right; top: parent.top }
     width: parent.width - channelBoxLabelRect.width - countWidth
     height: maxHeight
+    Behavior on height  { PropertyAnimation { duration: rollDelay } }
     function toggleHeight () {
       bigHeight = !bigHeight
       if (bigHeight)  setBig ()
@@ -154,7 +155,7 @@ Rectangle {
     anchors { top: channelBoxLabelRect.bottom; left: parent.left; leftMargin: 2 }
     width: parent.width-2
     interactive: true
-    height: channelBox.height - channelBoxLabel.height - textEnterBox.height
+    height: channelBox.height - channelBoxLabelRect.height - textEnterBox.height
     clip: true
     contentWidth: Math.max(parent.width,cookedLogBox.width)
     contentHeight: Math.max(parent.height,cookedLogBox.height)
@@ -197,8 +198,8 @@ Rectangle {
       id: sendButton
       labelText: qsTr ("Send")
       width: labelWidth
-      height: inputHeight
-      anchors { top: parent.top; right: parent.right }
+      height: inputHeight -4
+      anchors { verticalCenter: parent.verticalCenter; right: parent.right }
       onLabelChanged: { width = labelWidth }
       onClicked: { channelBox.userSend () }
     }
