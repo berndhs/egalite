@@ -272,7 +272,8 @@ IrcSockStatic::ReceiveNumeric (IrcControl * context, IrcSocket *sock,
                         const QString & rest)
 {
   context->LogRaw (QString ("numeric %1  %2 %3").arg(first).arg(num).arg(rest));
-  if (num == "311" || num == "312" || num == "313" || num == "319") {
+  if (num == "311" || num == "312" || num == "313" 
+      || num == "319" || num == "401") {
     QString theRest (rest);
     QString thisUser, otherUser;
     QRegExp wordRx ("(\\S+)");

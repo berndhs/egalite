@@ -81,6 +81,7 @@ Rectangle {
     width: childrenRect.width
     anchors { top: parent.top; left: parent.left }
     color: "#ff99aa"
+    radius: 4
     z: parent.z+1
     MouseArea { 
       anchors.fill: parent

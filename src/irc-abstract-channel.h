@@ -97,7 +97,7 @@ private slots:
   void HideGroup ();
   void HideAll ();
   void CopyClip ();
-  void Whois ();
+  void Whois (const QString & queryUser);
   void UserSend ();
   void UserUp ();
   void UserDown ();
@@ -140,7 +140,6 @@ private:
   QString             partMsg;
   QString             topic;
   QStringList         oldNames;
-  QString             queryUser;
   QString             clipSave;
   QString             cookedLog;
 

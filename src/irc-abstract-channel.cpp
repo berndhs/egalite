@@ -366,20 +366,14 @@ IrcAbstractChannel::ClickedUser (const QString & userName)
 }
 
 void
-IrcAbstractChannel::Whois ()
+IrcAbstractChannel::Whois (const QString & queryUser)
 {
-#if 0
   QStringList head;
   head << tr ("Whois info on");
   head << queryUser;
-  ui.userinfoWidget->clear ();
-  QTreeWidgetItem * item = new QTreeWidgetItem (head);
-  ui.userinfoWidget->addTopLevelItem (item);
-  ui.userinfoWidget->show ();
   QString query ("WHOIS %1");
   emit WantWhois (chanName, queryUser, true);
   emit OutRaw (sockName, query.arg (queryUser));
-#endif
 }
 
 void
@@ -387,7 +381,6 @@ IrcAbstractChannel::WhoisData (const QString &otherUser,
                           const QString &numeric,
                           const QString &data)
 {
-#if 0
   QStringList newinfo;
   QString theData (data.trimmed());
   if (numeric == "318") {
@@ -404,11 +397,13 @@ IrcAbstractChannel::WhoisData (const QString &otherUser,
       theData.remove (0,1);
     }
     newinfo << tr("Channels") << theData;
+  } else if (numeric == "401") {
+    newinfo << tr("Don't know") << theData;
   }
-  QTreeWidgetItem * item = new QTreeWidgetItem (newinfo);
-  ui.userinfoWidget->addTopLevelItem (item);
-  ui.rawLog->append (QString ("WHOIS %1 %2").arg (otherUser).arg (data));
-#endif
+  cookedLog.append (QString ("WHOIS %1 %2<br>\n")
+                    .arg (otherUser)
+                    .arg (data));
+  UpdateCooked ();
 }
 
 void
@@ -466,6 +461,7 @@ void
 IrcAbstractChannel::UserSend ()
 {
   qDebug () << " User sending " ;
+  bool sendout (true);
   if (qmlItem) {
     QVariant userData;
     QMetaObject::invokeMethod (qmlItem, "userData",
@@ -477,8 +473,14 @@ IrcAbstractChannel::UserSend ()
       if (data == "/part") {
         data.append (" ");
         data.append (chanName);
+      } else if (data.startsWith ("/whois")) {
+        data.remove (0, 6);
+        Whois (data.trimmed());
+        sendout = false;
       }
-      emit Outgoing (chanName, data);
+      if (sendout) {
+        emit Outgoing (chanName, data);
+      }
       history.append (data);
       history.removeDuplicates ();
       historyIndex = history.size();
