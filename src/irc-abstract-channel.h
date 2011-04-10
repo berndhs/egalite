@@ -128,6 +128,10 @@ private:
   void   AppendSmall (QString & log, const QString & line);
   void   UpdateCooked ();
   void   CheckWatch (const QString & data);
+  void   DoHistory (Qt::Key       key,
+                    QStringList & hist,
+                    int         & index,
+                    QString     & bottom);
 
   static bool Less (const QString & left, const QString & right);
 

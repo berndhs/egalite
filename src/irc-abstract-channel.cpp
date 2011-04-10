@@ -486,12 +486,58 @@ void
 IrcAbstractChannel::UserUp ()
 {
   qDebug () << " User Up arrow ";
+  DoHistory (Qt::Key_Up, history, historyIndex, historyBottom);
 }
 
 void
 IrcAbstractChannel::UserDown ()
 {
   qDebug () << " User Down arrow ";
+  DoHistory (Qt::Key_Down, history, historyIndex, historyBottom);
 }
+
+void
+IrcAbstractChannel::DoHistory (
+                       Qt::Key       key,
+                       QStringList & hist,
+                       int         & index,
+                       QString     & bottom)
+{
+  if (qmlItem == 0) {
+    return;
+  }
+  if (key == Qt::Key_Up) {
+    if (hist.size() == 0) {
+      return ;
+    }
+    if (index >= hist.size()) { // at bottom
+      QVariant bottomVar;
+      QMetaObject::invokeMethod (qmlItem, "userData",
+          Q_RETURN_ARG (QVariant, bottomVar));
+      bottom = bottomVar.toString();
+    } 
+    index--;
+    if (index < 0) {
+      index = -1;
+    } else {
+      QMetaObject::invokeMethod (qmlItem, "writeUserData",
+         Q_ARG (QVariant, hist.at(historyIndex)));
+    }
+  } else if (key == Qt::Key_Down) {
+    if (hist.size() == 0) {
+      return;
+    }
+    index++;
+    if (index >= hist.size()) {
+      index = hist.size();
+      QMetaObject::invokeMethod (qmlItem, "writeUserData",
+         Q_ARG (QVariant, bottom));
+    } else {
+      QMetaObject::invokeMethod (qmlItem, "writeUserData",
+         Q_ARG (QVariant, hist.at(index)));
+    }
+  }
+}
+
 
 } // namespace
