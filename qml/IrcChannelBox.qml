@@ -106,7 +106,8 @@ Rectangle {
     anchors { left: channelBoxLabelRect.right; top: parent.top }
     width: parent.width - channelBoxLabelRect.width - countWidth
     height: maxHeight
-    Behavior on height  { PropertyAnimation { duration: rollDelay } }
+    Behavior on height  { PropertyAnimation { duration: 1.5*rollDelay } }
+    Behavior on color { PropertyAnimation { duration: 1.5*rollDelay } }
     function toggleHeight () {
       bigHeight = !bigHeight
       if (bigHeight)  setBig ()
@@ -114,13 +115,11 @@ Rectangle {
     }
     function setBig () {
       maxHeight = topicBoxContent.height
-      border.color = "blue"
-      border.width = 1
+      color = Qt.lighter ("#f3f6f6", 1.9)
     }
     function setSmall () {
       maxHeight = channelBoxLabelRect.height
-      border.color = "transparent"
-      border.width = 0
+      color = "#f3f6f6"
     }
     function setName (newName) {
       topicBoxContent.name = newName
