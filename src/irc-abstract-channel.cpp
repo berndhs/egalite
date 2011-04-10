@@ -474,6 +474,10 @@ IrcAbstractChannel::UserSend ()
     qDebug () << "   user data " << data;
     if (data.trimmed().length() > 0) {
       QMetaObject::invokeMethod (qmlItem, "clearUserData");
+      if (data == "/part") {
+        data.append (" ");
+        data.append (chanName);
+      }
       emit Outgoing (chanName, data);
       history.append (data);
       history.removeDuplicates ();
