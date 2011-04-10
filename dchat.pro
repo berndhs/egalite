@@ -147,7 +147,8 @@ FORMS = \
         ui/edit-simple.ui \
 
 
-SOURCES = src/main.cpp \
+SOURCES = \
+        src/main.cpp \
 	src/dchat.cpp \
 	src/cmdoptions.cpp \
 	src/delib-debug.cpp \

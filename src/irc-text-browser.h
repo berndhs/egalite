@@ -4,7 +4,6 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsItem>
 #include <QRectF>
-#include <QTimer>
 
 namespace egalite
 {
@@ -17,7 +16,9 @@ public:
 
   IrcTextBrowser (QGraphicsItem * parent=0);
 
-  Q_PROPERTY(qreal height READ getHeight)
+  Q_PROPERTY(qreal height READ getHeight) 
+  Q_PROPERTY(qreal width READ textWidth WRITE setTextWidth)
+  Q_PROPERTY(QString name READ getName WRITE setName) 
 
   Q_INVOKABLE void noFunc ();
 
@@ -25,6 +26,8 @@ public:
   Q_INVOKABLE void setWidth (qreal wid);
   Q_INVOKABLE QRectF boundingRect () const;
   Q_INVOKABLE qreal getHeight () const;
+  Q_INVOKABLE QString getName () const;
+  Q_INVOKABLE void setName (const QString & name);
 
 private slots:
 

@@ -27,6 +27,7 @@ import net.sf.egalite 1.0
 
 Rectangle {
   id: channelBox
+  property string channelName: qsTr ("no channel")
   property real labelHeight:32
   property real inputHeight: 28
   property real userNameHeight: 20
@@ -37,7 +38,7 @@ Rectangle {
   property alias userListModel: userList.model
   property alias boxLabel: channelBoxLabel.text
   property alias userListCounter: userListCount.text
-  property alias channelTopic: topicBoxContent.text
+  property alias channelTopic: topicBox.topicText
 
   signal userSend ()
   signal userUp ()
@@ -63,13 +64,20 @@ Rectangle {
   function setModel (theModel) { userList.model = theModel }
   function cookedBoundingRect () { return cookedLogBox.boundingRect () }
 
+  objectName: "ChannelBox_" + channelName
   height: parent.height - parentHeightReserve
   width: parent.width - parentWidthReserve
   anchors { topMargin: parentHeightReserve }
   color: "#f3f6f6"
+
+  onChannelNameChanged: { 
+    objectName = "ChannelBox_" + channelName 
+    topicBox.setName (channelName)
+  }
+
   Rectangle {
     id: channelBoxLabelRect
-    height: childrenRect.height
+    height: childrenRect.height + 4
     width: childrenRect.width
     anchors { top: parent.top; left: parent.left }
     color: "#ff99aa"
@@ -88,31 +96,55 @@ Rectangle {
     id: topicBox
     property real maxHeight: channelBoxLabelRect.height
     property bool bigHeight: false
+    property string topicText: qsTr ("no topic set")
     clip: true
-    color: Qt.lighter (cookedFlickBox.color)
+    color: "#f3f6f6"
+    border.color: "transparent"
+    border.width: 0
     z: cookedFlickBox.z + 1
     anchors { left: channelBoxLabelRect.right; top: parent.top }
     width: parent.width - channelBoxLabelRect.width - countWidth
-    height: Math.min (maxHeight, childrenRect.height)
+    height: maxHeight
     function toggleHeight () {
       bigHeight = !bigHeight
-      if (bigHeight)  setBigHeight ()
-      else            setSmallHeight ()
+      if (bigHeight)  setBig ()
+      else            setSmall ()
     }
-    function setBigHeight () {
-      maxHeight = channelBox.height - channelBoxLabel.height - textEnterBox.height 
+    function setBig () {
+      maxHeight = topicBoxContent.height
+      border.color = "blue"
+      border.width = 1
     }
-    function setSmallHeight () {
+    function setSmall () {
       maxHeight = channelBoxLabelRect.height
+      border.color = "transparent"
+      border.width = 0
     }
-    Text {
-      id: topicBoxContent
-      width: topicBox.width
-      wrapMode: Text.Wrap
-      text: qsTr ("no topic set")
-      onTextChanged: {
-        topicBox.setSmallHeight ()
+    function setName (newName) {
+      topicBoxContent.name = newName
+    }
+    Item {
+      anchors { top: parent.top; left: parent.left}
+      height: 64 //Math.min (32, childrenRect.height)
+      width: parent.width
+      IrcTextBrowser {
+        id: topicBoxContent
+        name: "Topic_" + channelBox.channelName
+        onActivatedLink: {
+          channelBox.activatedLink (link)
+        }
       }
+    }
+    onWidthChanged: topicBoxContent.setWidth (width)
+    onTopicTextChanged: {
+      console.log (" topic changed for " + channelBox.objectName + " to " + topicBox.topicText)
+      topicBox.setSmall ()
+      topicBoxContent.setHtml (topicBox.topicText)
+    }
+    Component.onCompleted: {
+      topicBoxContent.setWidth (topicBox.width) 
+      topicBoxContent.setHtml (topicBox.topicText)
+      console.log ("Topic box loaded for " + channelBox.objectName)
     }
   }
   Flickable {
@@ -134,6 +166,7 @@ Rectangle {
     }
     IrcTextBrowser {
       id: cookedLogBox
+      name: "Cooked_" + channelBox.channelName
       onActivatedLink: { 
         channelBox.activatedLink (link)
       }

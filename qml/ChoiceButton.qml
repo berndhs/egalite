@@ -32,6 +32,6 @@ Rectangle {
     width: parent.width
     anchors.centerIn: parent 
     horizontalAlignment: Text.AlignHCenter
-    onTextChanged: { botton.labelChanged (label.text) }
+    onTextChanged: { button.labelChanged (label.text) }
  }
 }

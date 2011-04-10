@@ -73,11 +73,15 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
     disconnect (qmlItem, 0,0,0);
   }
   qmlItem = item;
+  if (qmlItem == 0) {
+    return;
+  }
   connect (qmlItem, SIGNAL (userSend ()), this, SLOT (UserSend()));
   connect (qmlItem, SIGNAL (userUp()), this, SLOT (UserUp()));
   connect (qmlItem, SIGNAL (userDown()), this, SLOT (UserDown ()));
   connect (qmlItem, SIGNAL (activatedLink(const QString &)),
            this, SLOT (ActivatedCookedLink(const QString &)));
+  qmlItem->setProperty ("channelName", chanName);
 }
 
 QRectF
