@@ -161,6 +161,7 @@ QmlIrcChannelGroup::ClickedChannel (QString link)
     QString name (link);
     name.remove (0,chanLinkPrefix.length());
     SetTopmostChannel (name);
+    SetChannelList ();
   }
 }
 

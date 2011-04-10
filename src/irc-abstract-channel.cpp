@@ -90,6 +90,7 @@ IrcAbstractChannel::cookedBoundingRect () const
     QRectF br = rectVar.toRectF();
     return br;
   }
+  return QRectF ();
 }
  
 void
@@ -98,6 +99,9 @@ IrcAbstractChannel::SetTopmost (bool top)
   if (qmlItem) {
     topmost = top;
     qmlItem->setProperty ("z", top ? 1 : -1);
+    if (topmost) {
+      active = false;
+    }
   }
 }
 
