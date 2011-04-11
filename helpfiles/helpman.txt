@@ -1,21 +1,24 @@
 Egalite Manual
 ==============
 Bernd Stramm <bernd.stramm@gmail.com>
-v0.1.2, August 2010
+v0.5.1, April 2011
 
 *Egalite* is a instant messenger program.
 
-It provides server-based chat and presence for XMPP compatible servers, 
+It provides <<XMPP,server-based chat>> and presence for XMPP compatible servers, 
 such as jabber and google talk, and many others.
 
-*Egalite* also provides direct chat over SSL sockets without server interaction.
+*Egalite* also provides <<Direct,direct chat>> over SSL sockets without server interaction.
 
-== Server (Xmpp) Chat ==
+Finally, *Egalite* provides simple <<IRC,IRC>>.
+
+== [[XMPP]] Server (Xmpp) Chat ==
 
 For server chat, the people you chat with are identified by their user name 
-on a server, and the server name. For example, alice.smith@gmail.com or bobjones@jabber.org.
+on a server, and the server name. 
+For example, alice.smith@gmail.com or bobjones@jabber.org.
 
-== Direct Chat ==
+== [[Direct]] Direct Chat ==
 
 === Definitions ===
 
@@ -99,8 +102,7 @@ and the internet for your local availability.
 Egalite can listen to, as well as connect to, IPv6 and IPv4 addresses. With
 separate listeners, some can listen on IPv4 while others listen on IPv5.
 
-The only mix that does not work is different types of addresses on the same
-connection - both ends must be of the same address type.
+Of course both ends of any particular connection have to use the same protocol.
 
 
 === Certificates ===
@@ -121,6 +123,44 @@ These addresses are stored as *direct contacts*.
 
 You can specify the address as an IP numberical address (IPv4 or IPv6), or as 
 a host name for the DNS service your computer (or device) uses.
+
+== [[IRC]] IRC ==
+
+*Egalite* allows connecting to multiple channels on multiple IRC servers at the
+same time.
+
+=== Channel List ===
+
+At the top of the (docked) IRC channel display is a list of channels which you 
+are connected to. Click on a channel name to raise the history display for that channel
+to the top, and to send input to that channel.
+
+Channels with activity (someone send a message to the channel) are highlighted
+in the list.
+
+=== Channel Label ===
+
+The Channel Label acts as a multi-function button:
+
+- *Click* to reset the history display to show the most current item at the bottom
+- *Double-Click* to stop/start the drag/flickable behaviour of the history
+- *Press-and-Hold* to expand/contract the topic text
+
+=== Channel History ===
+
+The channel history display usually scrolls, and you can drag the content
+and flick it (version 0.5 and later). 
+
+To select and copy text from teh history, it can be helpful to stop the
+drag/flickable behaviour by *Double Clicking* on the channel name label. 
+To re-enable the behaviour double click again.
+
+=== Channel Topic ===
+
+Some channels keep the topic text short and to the point, while other channels do
+not. To expand the topic text, *Press-and-Hold* the channel title box.
+
+
 
 == Configuration ==
 
