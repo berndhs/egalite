@@ -5,7 +5,7 @@ CHANGELOG=${NAME}.changes
 VERSION=`grep "ProgramVersion::VersionNumber" src/version.cpp \
         | awk '{print $3;}' \
         | sed s/[\(\"\;\)]//g`
-PACKDIR=${HOME}/packaging/dchat-qml
+PACKDIR=${HOME}/packaging/dchat
 
 makearchive.sh ${NAME}-${VERSION} master
 cp ${NAME}-${VERSION}.tar.gz ${PACKDIR}
