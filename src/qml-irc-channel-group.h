@@ -83,8 +83,10 @@ private:
   QIcon                   quietIcon;
   QGraphicsObject        *qmlRoot;
   QList <IrcAbstractChannel*>  channelList;
-  QString                 chanLinkPrefix;
   QTimer                  debugTimer;
+  QString                 chanLinkPrefix;
+  QString                 channelMaskActive;
+  QString                 channelMaskIdle;
 
 };
 

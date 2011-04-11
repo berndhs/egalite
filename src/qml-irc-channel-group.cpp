@@ -35,8 +35,18 @@ namespace egalite
 QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
   :QWidget (parent),
    qmlRoot (0),
-   chanLinkPrefix ("chanlink://channel_"),
-   debugTimer (this)
+   debugTimer (this),
+   chanLinkPrefix 
+     ("chanlink://channel_"),
+   channelMaskActive 
+     ("["
+         "<span "
+           "style=\"color: red\; font-weight: bold\">"
+           " ! "
+         "</span>"
+       "%1] "),
+   channelMaskIdle 
+     ("[%1] ")
 {
   ui.setupUi (this);
   activeIcon = QIcon (":/ircicons/active.png");
@@ -74,6 +84,7 @@ QmlIrcChannelGroup::Start ()
            this, SLOT (HeadHeightChanged (int)));
 }
 
+
 void
 QmlIrcChannelGroup::SetChannelList ()
 {
@@ -84,8 +95,8 @@ QmlIrcChannelGroup::SetChannelList ()
        IrcAbstractChannel * chan = channelList.at(i);
        if (chan) {
          chanAnchList.append (
-             (chan->IsActive() ? QString ("[<b> ! </b>%1] ") 
-                               : QString ("[%1] "))
+             (chan->IsActive() ? channelMaskActive 
+                               : channelMaskIdle)
                .arg(ChannelAnchor (chan->Name()))
              );
        }

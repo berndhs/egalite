@@ -35,6 +35,8 @@ Rectangle {
   property real rollDelay: 200
   property real parentHeightReserve: 0
   property real parentWidthReserve: 0
+  property string backgroundImage: "qrc:///palee6.png"
+  property bool   useBackgroundImage: true
   property alias userListModel: userList.model
   property alias boxLabel: channelBoxLabel.text
   property alias userListCounter: userListCount.text
@@ -78,7 +80,8 @@ Rectangle {
   Image {
     anchors.fill: parent
     fillMode: Image.Tile
-    source: "qrc:///palee6.png"
+    source: backgroundImage
+    visible: useBackgroundImage
   }
   Rectangle {
     id: channelBoxLabelRect

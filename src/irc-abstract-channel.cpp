@@ -471,8 +471,8 @@ IrcAbstractChannel::UserSend ()
     if (data.trimmed().length() > 0) {
       QMetaObject::invokeMethod (qmlItem, "clearUserData");
       if (data == "/part") {
-        data.append (" ");
-        data.append (chanName);
+        Part ();
+        sendout = false;
       } else if (data.startsWith ("/whois")) {
         data.remove (0, 6);
         Whois (data.trimmed());
