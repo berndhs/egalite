@@ -84,7 +84,8 @@ QmlIrcChannelGroup::SetChannelList ()
        IrcAbstractChannel * chan = channelList.at(i);
        if (chan) {
          chanAnchList.append (
-             (chan->IsActive() ? QString ("%1<b>-!</b> ") : QString ("%1 "))
+             (chan->IsActive() ? QString ("[<b> ! </b>%1] ") 
+                               : QString ("[%1] "))
                .arg(ChannelAnchor (chan->Name()))
              );
        }

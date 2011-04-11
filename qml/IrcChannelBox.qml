@@ -231,8 +231,10 @@ Rectangle {
           userListBox.shortView = !userListBox.shortView
           if (userListBox.shortView) {
             userListDataRect.yScale = 0
+            userListDataRect.color = channelBox.color
           } else {
             userListDataRect.yScale = 1
+            userListDataRect.color = Qt.lighter(channelBox.color, 2.0)
           }
         }
       }
@@ -262,9 +264,11 @@ Rectangle {
       property alias xScale: rollupScale.xScale
       height: userListBox.height - userListCountRect.height
       width: parent.width
-      color: Qt.lighter(channelBox.color)
+      color: channelBox.color
       opacity: 0.7
       anchors {top: userListCountRect.bottom; right: parent.right}
+
+      Behavior on color { PropertyAnimation { duration: rollDelay } }
       transform: Scale {
         id: rollupScale
         xScale: 1
@@ -276,6 +280,7 @@ Rectangle {
           NumberAnimation { duration: rollDelay }
         }
       }
+
       ListView {
         id: userList
         anchors.fill: parent
