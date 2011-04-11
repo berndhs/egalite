@@ -7,7 +7,7 @@ VERSION=`grep "ProgramVersion::VersionNumber" src/version.cpp \
         | sed s/[\(\"\;\)]//g`
 PACKDIR=${HOME}/packaging/dchat-qml
 
-makearchive.sh ${NAME}-${VERSION} qml
+makearchive.sh ${NAME}-${VERSION} master
 cp ${NAME}-${VERSION}.tar.gz ${PACKDIR}
 cp ${CHANGELOG} ${PACKDIR}
 echo ${NAME} > ${PACKDIR}/pack-name
