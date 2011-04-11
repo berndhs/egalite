@@ -75,6 +75,11 @@ Rectangle {
     topicBox.setName (channelName)
   }
 
+  Image {
+    anchors.fill: parent
+    fillMode: Image.Tile
+    source: "qrc:///palee6.png"
+  }
   Rectangle {
     id: channelBoxLabelRect
     height: childrenRect.height + 3

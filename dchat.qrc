@@ -2,6 +2,7 @@
 <qresource>
   <file alias="dchatlogo.png">images/e6.png</file>
   <file alias="treeback.png">images/pale.png</file>
+  <file alias="palee6.png">images/pale.png</file>
 </qresource>
 <qresource>
   <file>qml/IrcChannelBox.qml</file>
