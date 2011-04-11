@@ -226,10 +226,10 @@ qDebug () << " cooked message " << cooked;
   QDateTime now = QDateTime::currentDateTime ();
   QString smalldate ("<span style=\"font-size:small\">"
                      "%1</span> %2");
+  cookedLog.append ("<br>\n");
   cookedLog.append (smalldate
                           .arg (now.toString ("hh:mm:ss"))
                           .arg (cooked));
-  cookedLog.append ("<br>\n");
   UpdateCooked ();
   CheckWatch (raw.length() > 0 ? raw : message);
   emit Active (this);
