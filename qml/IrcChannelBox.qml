@@ -56,7 +56,9 @@ Rectangle {
   }
   function setCookedLog (theText) {
     cookedLogBox.setHtml (theText)
-    cookedFlickBox.alignBottom ()
+    if (cookedFlickBox.interactive) {
+      cookedFlickBox.alignBottom ()
+    }
     console.log ("  After update text height " + cookedLogBox.height)
   }
   function userData () { return textEnter.text }
@@ -94,6 +96,7 @@ Rectangle {
     MouseArea { 
       anchors.fill: parent
       onClicked: cookedFlickBox.alignBottom()
+      onDoubleClicked: { cookedFlickBox.interactive = !cookedFlickBox.interactive }
       onPressAndHold: topicBox.toggleHeight()
     }
     Text {
@@ -165,8 +168,8 @@ Rectangle {
     interactive: true
     height: channelBox.height - channelBoxLabelRect.height - textEnterBox.height
     clip: true
-    contentWidth: Math.max(parent.width,cookedLogBox.width)
-    contentHeight: Math.max(parent.height,cookedLogBox.height)
+    contentWidth: cookedLogBox.width
+    contentHeight: cookedLogBox.height
     boundsBehavior: Flickable.DragAndOvershootBounds
 
     function alignBottom () {

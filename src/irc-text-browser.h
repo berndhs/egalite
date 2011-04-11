@@ -39,7 +39,7 @@ public:
 
   IrcTextBrowser (QGraphicsItem * parent=0);
 
-  Q_PROPERTY(qreal height READ getHeight) 
+  Q_PROPERTY(qreal height READ getHeight NOTIFY heightChanged) 
   Q_PROPERTY(qreal width READ textWidth WRITE setTextWidth)
   Q_PROPERTY(QString name READ getName WRITE setName) 
 
@@ -59,6 +59,7 @@ private slots:
 signals:
 
   void activatedLink (const QString & link);
+  void heightChanged (qreal height);
 
 private:
 

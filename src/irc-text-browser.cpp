@@ -92,6 +92,7 @@ IrcTextBrowser::setWidth (qreal wid)
   setTextWidth (wid);
   qDebug () << " IrcTextBrowser " << objectName() << " set Width " << wid 
             << " is now " << textWidth();
+  emit heightChanged (getHeight());
 }
 
 void
@@ -100,6 +101,7 @@ IrcTextBrowser::setHtml (const QString & html)
   qDebug () << "IrcTextBrowser " << objectName() << " set html " << html;
   QGraphicsTextItem::setHtml (html);
   qDebug () << "           textWidth " << textWidth();
+  emit heightChanged (getHeight());
 }
 
 void
