@@ -12,11 +12,15 @@ such as jabber and google talk, and many others.
 
 Finally, *Egalite* provides simple <<IRC,IRC>>.
 
+There is an IRC channel where you can talk about *Egalite*, named _#egalite_ on
+the server _chat.freenode.net_.
+
 == [[XMPP]] Server (Xmpp) Chat ==
 
 For server chat, the people you chat with are identified by their user name 
 on a server, and the server name. 
 For example, alice.smith@gmail.com or bobjones@jabber.org.
+To manage these accounts, open the *Identities* menu and select *Server Accounts*.
 
 == [[Direct]] Direct Chat ==
 
@@ -128,6 +132,11 @@ a host name for the DNS service your computer (or device) uses.
 
 *Egalite* allows connecting to multiple channels on multiple IRC servers at the
 same time.
+
+=== Nicks ===
+
+IRC identities are called "Nicks". You can manage them in *Egalite* by selecting
+the *Identities* menu and then *IRC Nicks*.
 
 === Channel List ===
 

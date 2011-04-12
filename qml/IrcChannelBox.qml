@@ -128,10 +128,14 @@ Rectangle {
     function setBig () {
       maxHeight = topicBoxContent.height
       color = Qt.lighter ("#f3f6f6", 1.9)
+      border.color = "#c0c0c0"
+      border.width = 1
     }
     function setSmall () {
       maxHeight = channelBoxLabelRect.height
       color = "#f3f6f6"
+      border.color = "transparent"
+      border.width = 0
     }
     function setName (newName) {
       topicBoxContent.name = newName

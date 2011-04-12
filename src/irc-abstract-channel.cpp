@@ -210,6 +210,7 @@ IrcAbstractChannel::Dock ()
 void
 IrcAbstractChannel::Part ()
 {
+qDebug () << " -----------> PART parts " << chanName << partMsg;
   emit Outgoing (chanName, QString ("/part %1 :%2")
                                     .arg (chanName)
                                     .arg (partMsg));
@@ -335,7 +336,7 @@ IrcAbstractChannel::ActivatedCookedLink (const QString & link)
 void
 IrcAbstractChannel::AppendSmall (QString & log, const QString & line)
 {
-  log.append (QString ("<span style=\"font-size: small\">%1</span><br>\n")
+  log.append (QString ("<br>\n<span style=\"font-size: small\">%1</span>")
                        .arg (line));
 }
 

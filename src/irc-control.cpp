@@ -849,7 +849,7 @@ IrcControl::Outgoing (QString chan, QString msg)
     QString cooked (trim);
     TransformSend (sock, chan, cooked);
     sock->Send (cooked);
-qDebug () << " handed to socket: " << cooked;
+qDebug () << " ==========>618 handed to socket: " << cooked;
     trim.prepend (QString (":%1!%1@localhost ").arg (sock->Nick()));
     ReceiveLine (sock, trim.toUtf8());
   } else {
