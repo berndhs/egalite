@@ -1,5 +1,4 @@
 
-
 /****************************************************************
  * This file is distributed under the following license:
  *
@@ -21,3 +20,14 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+import QtQuick 1.0
+
+Rectangle {
+  id: ircControlBox
+  objectName: "IrcControlBox"
+  color: "yellow"
+  
+  Component.onCompleted: {
+    console.log ("loaded IrcControlBox")
+  }
+}

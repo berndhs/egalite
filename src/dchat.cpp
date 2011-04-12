@@ -66,6 +66,7 @@ DChatMain::DChatMain (QWidget *parent)
    serverAccountEdit (this),
    certListEdit (this),
    ircControl (0),
+   ircQmlControl (0),
    publicPort (29999),
    defaultPort (29999),
    passdial (0),
@@ -80,6 +81,7 @@ DChatMain::DChatMain (QWidget *parent)
   ui.setupUi (this);
   ui.contactView->setModel (&contactListModel);
   ircControl = new IrcControl (this);
+  ircQmlControl = new IrcQmlControl (this);
   SetupToolbar ();
   CreateSystemTrayStuff ();
   Connect ();
@@ -113,6 +115,8 @@ DChatMain::SetupToolbar ()
 
   ircMenu = new QMenu (this);
   ircMenu->addAction (tr("Show Irc Control"), ircControl, SLOT (Show()));
+  ircMenu->addAction (tr("Show Irc Qml Control"), 
+                        ircQmlControl, SLOT (Show()));
   ircMenu->addAction (tr("Show Irc Channels"), ircControl, SLOT (ShowAll()));
   ircMenu->addAction (tr("Hide Irc Control"), ircControl, SLOT (Hide()));
   ircMenu->addAction (tr("Hide Irc Channels"), ircControl, SLOT (HideAll()));
@@ -456,6 +460,7 @@ void
 DChatMain::RunIrc ()
 {
   ircControl->Show();
+  ircQmlControl->Show();
 }
 
 void

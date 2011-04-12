@@ -1,5 +1,5 @@
-#ifndef IRC_CONTROL_H
-#define IRC_CONTROL_H
+#ifndef EGALITE_IRC_QML_CONTROL_H
+#define EGALITE_IRC_QML_CONTROL_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -45,13 +45,13 @@ namespace egalite
 class IrcAbstractChannel;
 class QmlIrcChannelGroup;
 
-class IrcControl : public QDialog
+class IrcQmlControl : public QDialog
 {
 Q_OBJECT
 
 public:
 
-  IrcControl (QWidget *parent=0);
+  IrcQmlControl (QWidget *parent=0);
 
   int   OpenCount ();
   bool  IsRunning () { return isRunning; }
@@ -142,13 +142,13 @@ private:
           FloatingMapType;
   typedef QMap <QString, IrcSocket *>
           SocketMapType;
-  typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, const QString &,
+  typedef QMap <QString, void (*) (IrcQmlControl*, IrcSocket *, const QString &,
                            const QString &, const QString &)>
           ReceiveMapType;
-  typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, QString &, 
+  typedef QMap <QString, void (*) (IrcQmlControl*, IrcSocket *, QString &, 
                                    QString &, QString &, QString &)>  
           XformMapType;
-  typedef QMap <QString, void (*) (IrcControl*, IrcSocket *, const QString &,
+  typedef QMap <QString, void (*) (IrcQmlControl*, IrcSocket *, const QString &,
                            const QString &, const QString &)>
           CtcpMapType;
 
@@ -199,7 +199,7 @@ private:
 
 
   bool                initDone;
-  Ui_IrcControl       mainUi;
+  Ui_IrcQmlControl    mainUi;
   bool                isRunning;
 
   QmlIrcChannelGroup    *dockedChannels;

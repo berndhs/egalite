@@ -140,6 +140,7 @@ FORMS = \
 	ui/cert-list.ui \
         ui/irc-qml-channel-group.ui \
         ui/irc-control.ui \
+        ui/irc-qml-control.ui \
         ui/irc-float.ui \
         ui/irc-account.ui \
         ui/enter-string.ui \
@@ -178,9 +179,11 @@ SOURCES = \
         src/irc-abstract-channel.cpp \
         src/irc-float.cpp \
         src/irc-control.cpp \
+        src/irc-qml-control.cpp \
         src/irc-socket.cpp \
         src/irc-ctcp.cpp \
         src/irc-sock-static.cpp \
+        src/irc-qml-sock-static.cpp \
         src/irc-nick-edit.cpp \
         src/irc-text-browser.cpp \
         src/enter-string.cpp \
@@ -225,9 +228,11 @@ HEADERS += \
         src/qml-irc-channel-group.h \
         src/irc-abstract-channel.h \
         src/irc-control.h \
+        src/irc-qml-control.h \
         src/irc-socket.h \
         src/irc-ctcp.h \
         src/irc-sock-static.h \
+        src/irc-qml-sock-static.h \
         src/irc-channel-group.h \
         src/irc-float.h \
         src/irc-nick-edit.h \
