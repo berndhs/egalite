@@ -20,7 +20,11 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
-    <widget class="QDeclarativeView" name="qmlVIew"/>
+    <widget class="QDeclarativeView" name="qmlView">
+     <property name="resizeMode">
+      <enum>QDeclarativeView::SizeRootObjectToView</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -92,7 +92,8 @@ CertStore::CertStore ()
                 << "ircignore"
                 << "uniqueircignore"
                 << "ircmessages"
-                << "uniqueircmsgs";
+                << "uniqueircmsgs"
+                << "ircchannelservers";
 }
 
 void
@@ -1191,6 +1192,86 @@ CertStore::GetIrcMessages(const QString & nick,
     return true;
   }
   return false;
+}
+
+QStringList
+CertStore::IrcServers (const QString & channel)
+{
+  QStringList servers;
+  QString cmdPat ("select server from ircchannelservers "
+                  " where channel == \"%1\"");
+  QSqlQuery query (certDB);
+  bool ok = query.exec (cmdPat.arg (channel));
+  while (ok && query.next ()) {
+    QString s (query.value(0).toString());
+    if (s.length() > 0) {
+      servers << s;
+    }
+  }
+  return servers;
+}
+
+QStringList
+CertStore::IrcChannels (const QString & server)
+{
+  QStringList channels;
+  QString cmdPat ("select channel from ircchannelservers "
+                  " where server == \"%1\"");
+  QSqlQuery query (certDB);
+  bool ok = query.exec (cmdPat.arg (server));
+  while (ok && query.next ()) {
+    QString c (query.value(0).toString());
+    if (c.length() > 0) {
+      channels << c;
+    }
+  }
+  return channels;
+}
+
+void
+CertStore::SaveChannelList (const QString & server,
+                            const QStringList & channels)
+{
+  if (server.length() < 1) {
+    return;
+  }
+  QSqlQuery query (certDB);
+  QString cmd ("insert or replace into ircchannelservers "
+               " (channel, server) "
+               " values (?,?) ");
+  int nc = channels.count ();
+  for (int i=0; i<nc; i++) {
+    QString c (channels.at(i));
+    if (c.length() > 0) {
+      query.prepare (cmd);
+      query.bindValue (0,QVariant (c));
+      query.bindValue (1,QVariant (server));
+      query.exec ();
+    }
+  }
+}
+
+void
+CertStore::SaveServerList (const QString & chan,
+                            const QStringList & servers)
+{
+  if (chan.length() < 1) {
+    return;
+  }
+  QSqlQuery query (certDB);
+  QString cmd ("insert or replace into ircchannelservers "
+               " (channel, server) "
+               " values (?,?) ");
+  int ns = servers.count ();
+  for (int i=0; i<ns; i++) {
+    QString s (servers.at(i));
+    if (s.length() > 0) {
+      query.prepare (cmd);
+      query.bindValue (0,QVariant (s));
+      query.bindValue (1,QVariant (chan));
+      query.exec ();
+    }
+  }
 }
 
 } // namespace

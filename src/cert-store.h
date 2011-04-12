@@ -100,6 +100,8 @@ public:
   QStringList IrcNicks ();
   QStringList IrcChannels ();
   QStringList IrcIgnores ();
+  QStringList IrcServers (const QString & channel);
+  QStringList IrcChannels (const QString & server);
   bool        GetIrcIdent (const QString & nick, 
                                  QString & realname, 
                                  QString & pass);
@@ -108,6 +110,10 @@ public:
                                     QString & quitMsg);
   void        SaveIrcServer (const QString & server);
   void        SaveIrcChannel (const QString & chan);
+  void        SaveServerList (const QString & chan,
+                              const QStringList & servers);
+  void        SaveChannelList (const QString & server,
+                               const QStringList & channels);
   void        SaveIrcNick (const QString & nick,
                            const QString & realname = QString(), 
                            const QString & pass = QString());
@@ -119,6 +125,8 @@ public:
   bool        RemoveIrcNick (const QString & nick);
   bool        RemoveIrcChannel (const QString & chan);
   bool        RemoveIrcIgnore (const QString & name);
+  bool        RemoveIrcChannelServers (const QString & chan);
+  bool        RemoveIrcServerChannels (const QString & server);
 
 public slots:
 

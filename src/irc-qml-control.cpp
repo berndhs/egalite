@@ -21,28 +21,25 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include <QApplication>
 #include "deliberate.h"
 #include "version.h"
 #include "helpview.h"
 #include "edit-simple.h"
 #include "irc-abstract-channel.h"
 #include "irc-socket.h"
-#include "irc-sock-static.h"
+#include "irc-qml-sock-static.h"
 #include "irc-ctcp.h"
 #include <QSize>
 #include "cert-store.h"
 #include "qml-irc-channel-group.h"
 #include "enter-string.h"
 #include <QDebug>
-#include <QMessageBox>
 #include <QTimer>
-#include <QCursor>
 #include <QHostAddress>
 #include <QTimer>
 #include <QFont>
 #include <QFile>
-#include <QListWidgetItem>
+#include <QMessageBox>
 
 using namespace deliberate;
 
@@ -52,11 +49,12 @@ namespace egalite
 IrcQmlControl::IrcQmlControl (QWidget *parent)
   :QDialog (parent),
    initDone (false),
+   qmlRoot (0),
    isRunning (false),
    isConnected (false),
    hidSelf (false)
 {
-  mainUi.setupUi (this);
+  ui.setupUi (this);
   dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
   dockedChannels->Start ();
   dockedChannels->hide ();
@@ -157,6 +155,14 @@ IrcQmlControl::Run ()
     dockedChannels->resize (groupBoxSize);
   }
 
+  ui.qmlView->setSource (
+         QUrl("qrc:///qml/IrcControl.qml"));
+
+  qmlRoot = ui.qmlView->rootObject();
+  if (qmlRoot == 0) {
+    QMessageBox::critical (this, "Fatal", "QML Load Failure");
+    return false;
+  }
   LoadLists ();
   show ();
 
@@ -170,20 +176,26 @@ IrcQmlControl::LoadLists ()
   QStringList  servers = CertStore::IF().IrcServers ();
   noNameServer = tr("--- New Server ---");
   servers.append (noNameServer);
+  #if 0
   mainUi.serverCombo->clear ();
   mainUi.serverCombo->insertItems (0,servers);
+  #endif
 
   QStringList  nicks = CertStore::IF().IrcNicks ();
   noNameNick = tr ("--- New Nick ---");
   nicks.append (noNameNick);
+  #if 0
   mainUi.nickCombo->clear ();
   mainUi.nickCombo->insertItems (0,nicks);
+  #endif
 
   QStringList  chans = CertStore::IF().IrcChannels ();
   noNameChannel = tr("--- New Channel ---");
   chans.append (noNameChannel);
+  #if 0
   mainUi.chanCombo->clear ();
   mainUi.chanCombo->insertItems (0,chans);
+  #endif
 
   ignoreSources = CertStore::IF().IrcIgnores ();
 }
@@ -191,6 +203,7 @@ IrcQmlControl::LoadLists ()
 void
 IrcQmlControl::ConnectGui ()
 {
+  #if 0
   connect (mainUi.connectButton, SIGNAL (clicked()),
            this, SLOT (TryConnect ()));
   connect (mainUi.joinButton, SIGNAL (clicked()),
@@ -209,6 +222,7 @@ IrcQmlControl::ConnectGui ()
            this, SLOT (ChannelClicked (QListWidgetItem *)));
   connect (mainUi.serverTable, SIGNAL (itemClicked (QTableWidgetItem *)),
            this, SLOT (ServerClicked (QTableWidgetItem *)));
+  #endif
 }
 
 void
@@ -256,7 +270,7 @@ IrcQmlControl::Exiting ()
 void
 IrcQmlControl::TryConnect ()
 {
-  QString host = mainUi.serverCombo->currentText();
+  QString host; // = mainUi.serverCombo->currentText();
   if (host == noNameServer) {
     EnterString  enter (this);
     bool picked = enter.Choose (tr("IRC Server"), tr("Server:"));
@@ -280,14 +294,14 @@ qDebug () << " try connect to " << host;
            this, SLOT (ReceiveLine (IrcSocket *, QByteArray)));
   connect (socket, SIGNAL (ChangedHostName (IrcSocket*, QString)),
            this, SLOT (ChangedHostName (IrcSocket*, QString)));
-  quint16 port = mainUi.portBox->value ();
+  quint16 port = 6667; // mainUi.portBox->value ();
   socket->connectToHost (host, port);
 }
 
 void
 IrcQmlControl::TryJoin ()
 {
-  QString chan = mainUi.chanCombo->currentText ();
+  QString chan ; //= mainUi.chanCombo->currentText ();
   if (chan == noNameChannel) {
     EnterString enter (this);
     bool picked = enter.Choose (tr("IRC Channel"), tr("Channel:"));
@@ -295,16 +309,17 @@ IrcQmlControl::TryJoin ()
       chan = enter.Value ();
       if (enter.Save()) {
         CertStore::IF().SaveIrcChannel (chan);
-        mainUi.chanCombo->clear ();
+       // mainUi.chanCombo->clear ();
         QStringList knownChans = CertStore::IF().IrcChannels ();
         knownChans.append (noNameChannel);
-        mainUi.chanCombo->addItems (knownChans);
+qDebug () << " Kknown channel " << noNameChannel;
+       // mainUi.chanCombo->addItems (knownChans);
       }
     } else {
       return;
     }
   }
-  IrcSocket * sock = CurrentSock (mainUi.serverTable);
+  IrcSocket * sock = 0; //CurrentSock (mainUi.serverTable);
   if (sock == 0) {
     return;
   }
@@ -314,8 +329,8 @@ IrcQmlControl::TryJoin ()
 void
 IrcQmlControl::TryPart ()
 {
-  QString chan = mainUi.chanCombo->currentText ();
-  IrcSocket * sock = CurrentSock (mainUi.serverTable);
+  QString chan = 0; //mainUi.chanCombo->currentText ();
+  IrcSocket * sock = 0; //CurrentSock (mainUi.serverTable);
   if (sock) {
     sock->Send (QString ("PART %1").arg (chan));
   }
@@ -382,18 +397,19 @@ qDebug () << "       from " << sock->Name();
       sock->Send (QString ("PONG :%1").arg(retName));
     }
   }
-  mainUi.logDisplay->append (QString (line));\
+  qDebug () << " Received line " << line;
+  //mainUi.logDisplay->append (QString (line));
 }
 
 void
 IrcQmlControl::Send ()
 {
-  int row = mainUi.serverTable->currentRow ();
-  QTableWidgetItem * item = FindType (mainUi.serverTable, row, int (Cell_Addr));
+  int row = 0; //mainUi.serverTable->currentRow ();
+  QTableWidgetItem * item = 0; //FindType (mainUi.serverTable, row, int (Cell_Addr));
   if (item) {
     QString sname = item->data (int(Data_ConnName)).toString();
     if (sockets.contains (sname)) {
-      QString text = mainUi.sendEdit->text ();
+      QString text ; //= mainUi.sendEdit->text ();
       IrcSocket * sock = sockets [sname];
       TransformSend (sock, "", text);
       sock->Send (text);
@@ -426,9 +442,9 @@ IrcQmlControl::TransformSend (IrcSocket * sock, const QString & chan,
 void
 IrcQmlControl::ConnectionReady (IrcSocket * sock)
 {
-  mainUi.logDisplay->append ("Connection Ready");
-  mainUi.logDisplay->append (QString ("peer address %1")
-                 .arg (sock->peerAddress().toString()));
+ // mainUi.logDisplay->append ("Connection Ready");
+  //mainUi.logDisplay->append (QString ("peer address %1")
+  //               .arg (sock->peerAddress().toString()));
   qDebug () << " connection ready " << sock->peerAddress().toString();
   AddConnect (sock);
   emit StatusChange ();
@@ -437,22 +453,22 @@ IrcQmlControl::ConnectionReady (IrcSocket * sock)
 void
 IrcQmlControl::AddConnect (IrcSocket *sock)
 {
-  int nrows = mainUi.serverTable->rowCount();
+  int nrows = 0; //mainUi.serverTable->rowCount();
   QTableWidgetItem * item = 
           new QTableWidgetItem (sock->HostName(), int(Cell_Name));
   int row (nrows);
-  mainUi.serverTable->setRowCount (nrows+1);
-  mainUi.serverTable->setItem (row, 1, item);
+  //mainUi.serverTable->setRowCount (nrows+1);
+  //mainUi.serverTable->setItem (row, 1, item);
   item = new QTableWidgetItem (sock->peerAddress().toString(),
                                int (Cell_Addr));
   item->setData (Data_ConnName, sock->Name());
-  mainUi.serverTable->setItem (row, 2, item);
+  //mainUi.serverTable->setItem (row, 2, item);
   item = new QTableWidgetItem (QString::number (sock->peerPort()),
                                int (Cell_Port));
-  mainUi.serverTable->setItem (row, 3, item);
+  //mainUi.serverTable->setItem (row, 3, item);
   item = new QTableWidgetItem (tr("Disconnect"), int (Cell_Action));
-  mainUi.serverTable->setItem (row, 0, item);
-  mainUi.serverTable->selectRow (row);
+  //mainUi.serverTable->setItem (row, 0, item);
+  //mainUi.serverTable->selectRow (row);
 }
 
 void
@@ -463,8 +479,8 @@ qDebug () << " have new host name " << name << " for " << sock;
     return;
   }
   QString sname = sock->Name();
-  int row = FindRow (mainUi.serverTable, sname);
-  QTableWidgetItem * item = FindType (mainUi.serverTable, row, int(Cell_Name));
+  int row = 0; //FindRow (mainUi.serverTable, sname);
+  QTableWidgetItem * item = 0; //FindType (mainUi.serverTable, row, int(Cell_Name));
   if (item) {
     item->setText (name);
   }
@@ -515,8 +531,8 @@ void
 IrcQmlControl::ConnectionGone (IrcSocket * sock)
 {
   qDebug () << " disconnect seen for " << sock;
-  mainUi.logDisplay->append (QString ("!!! disconnected from %1")
-                 .arg (sock->peerAddress().toString()));
+ // mainUi.logDisplay->append (QString ("!!! disconnected from %1")
+  //               .arg (sock->peerAddress().toString()));
   RemoveConnect (sock);
   sockets.remove (sock->Name());
   sock->deleteLater ();
@@ -527,16 +543,16 @@ void
 IrcQmlControl::RemoveConnect (IrcSocket * sock)
 {
   int row, col;
-  int nrows = mainUi.serverTable->rowCount ();
-  int ncols = mainUi.serverTable->columnCount ();
+  int nrows = 0;//mainUi.serverTable->rowCount ();
+  int ncols = 0;//mainUi.serverTable->columnCount ();
   QString sname = sock->Name();
   QTableWidgetItem *item;  
   bool looking (true);
   for (row=0; looking && row< nrows; row++) {
     for (col=0; looking && col< ncols; col++) {
-      item = FindType (mainUi.serverTable, row, int (Cell_Addr));
+      item = 0;// FindType (mainUi.serverTable, row, int (Cell_Addr));
       if (item && item->data (int(Data_ConnName)).toString() == sname) {
-        mainUi.serverTable->removeRow (row);
+        //mainUi.serverTable->removeRow (row);
         looking = false;
       }
     }
@@ -547,11 +563,11 @@ IrcQmlControl::RemoveConnect (IrcSocket * sock)
 void
 IrcQmlControl::NickLogin ()
 {
-  IrcSocket * sock = CurrentSock (mainUi.serverTable);
+  IrcSocket * sock = 0; //= CurrentSock (mainUi.serverTable);
   if (sock == 0) {
     return;
   }
-  QString nick = mainUi.nickCombo->currentText();
+  QString nick;//= mainUi.nickCombo->currentText();
   if (nick == noNameNick) {
     EnterString  enter (this);
     bool picked = enter.Choose (tr("IRC Nick"), tr("Nick:"), true);
@@ -639,7 +655,7 @@ IrcQmlControl::AddChannel (IrcSocket * sock, const QString & chanName)
            this, SLOT (WantsWhois (QString, QString, bool)));
   connect (newchan, SIGNAL (WatchAlert (QString, QString)),
            this, SLOT (SeenWatchAlert (QString, QString)));
-  mainUi.chanList->addItem (chanName);
+  //mainUi.chanList->addItem (chanName);
 }
 
 void
@@ -663,11 +679,11 @@ IrcQmlControl::DropChannel (IrcSocket * sock, const QString & chanName)
   }
   channels.remove (chanName);
   chanBox->deleteLater ();
-  int nc = mainUi.chanList->count();
+  int nc =0; // mainUi.chanList->count();
   for (int c=nc-1; c>=0; c--) {
-    QListWidgetItem *item = mainUi.chanList->item (c);
+    QListWidgetItem *item = 0; //mainUi.chanList->item (c);
     if (item && item->text() == chanName) {
-      mainUi.chanList->takeItem (c);
+     // mainUi.chanList->takeItem (c);
       delete item;
     }
   }
@@ -707,7 +723,6 @@ IrcQmlControl::ChannelClicked (QListWidgetItem *item)
     IrcAbstractChannel * chanBox = channels [chanName];
     qDebug () << "       is in box " << chanBox;
     ShowChannel (chanBox);
-    //chanBox->raise ();
   }
 }
 
@@ -737,9 +752,9 @@ IrcQmlControl::ServerClicked (QTableWidgetItem *item)
               << " row " << item->row()
               << " " << item->text ();
     if (item->text () == tr("Disconnect")) {
-      QTableWidgetItem * aitem = FindType (mainUi.serverTable, 
-                                           item->row(), 
-                                           int (Cell_Addr));
+      QTableWidgetItem * aitem =0; // FindType (mainUi.serverTable, 
+                                  //         item->row(), 
+                                  //         int (Cell_Addr));
       if (aitem) {
         QString sname = aitem->data (int (Data_ConnName)).toString();
         if (sockets.contains (sname)) {
@@ -904,10 +919,12 @@ IrcQmlControl::InUserMsg (IrcSocket * sock,
     IncomingRaw (sock, from, QString ("<a href=\"ircsender://%1@egalite\">%1</a>: %2").
                                 arg(from).arg(themsg));
   }
+#if 0
   mainUi.logDisplay->append (QString ("Message from %1 to %2 says %3")
                              .arg (from)
                              .arg (to)
                              .arg (msg));
+#endif
 }
 
 void
@@ -992,7 +1009,8 @@ qDebug () << " Ctcp USER " << msg;
 void
 IrcQmlControl::LogRaw (const QString & raw)
 {
-  mainUi.logDisplay->append (raw);
+// mainUi.logDisplay->append (raw);
+  qDebug () << "IrcQmlControl :: LogRaw " << raw;
 }
 
 void

@@ -233,7 +233,6 @@ HEADERS += \
         src/irc-ctcp.h \
         src/irc-sock-static.h \
         src/irc-qml-sock-static.h \
-        src/irc-channel-group.h \
         src/irc-float.h \
         src/irc-nick-edit.h \
         src/irc-text-browser.h \

@@ -21,7 +21,6 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include <QMainWindow>
 #include "ui_irc-control.h"
 #include "ui_irc-qml-control.h"
 #include "config-edit.h"
@@ -34,6 +33,7 @@
 #include <QList>
 #include <QSize>
 #include <QPoint>
+#include <QGraphicsObject>
 
 using namespace deliberate;
 
@@ -199,7 +199,8 @@ private:
 
 
   bool                initDone;
-  Ui_IrcQmlControl    mainUi;
+  Ui_IrcQmlControl    ui;
+  QGraphicsObject    *qmlRoot;
   bool                isRunning;
 
   QmlIrcChannelGroup    *dockedChannels;
@@ -225,7 +226,7 @@ private:
 
   QMap <QString, QString>  whoisWait;
 
-  friend class IrcSockStatic;
+  friend class IrcQmlSockStatic;
   friend class IrcCtcp;
 
 };

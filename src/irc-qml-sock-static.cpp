@@ -134,8 +134,10 @@ qDebug () << "user " << user << " sock user "
       }
     } else {
       context->AddName (chan, user);
+#if 0
       context->mainUi.logDisplay->append (QString ("user %1 JOINs %2")
                                     .arg (user) . arg (chan));
+#endif
     }
   }
 }
@@ -177,10 +179,12 @@ qDebug () << "user " << user << " currentUser "
       context->DropChannel (sock, chan);
     } else {
       context->DropName (sock, chan, user, rest.mid (pos+len,-1));
+#if 0
       context->mainUi.logDisplay->append 
                              (QString ("user %1 PARTs %2 saying %3")
                                .arg (user) . arg (chan)
                                .arg (rest.mid (pos+len,-1)));
+#endif
     }
   }
 }

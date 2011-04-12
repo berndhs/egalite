@@ -29,6 +29,7 @@ namespace egalite
 
 class IrcSocket;
 class IrcControl;
+class IrcQmlControl;
 
 class IrcCtcp 
 {
@@ -36,12 +37,21 @@ class IrcCtcp
 private:
 
   friend class IrcControl;
+  friend class IrcQmlControl;
 
   static void ReceiveVERSION (IrcControl * context, IrcSocket * sock,
                               const QString & from,
                               const QString & to,
                               const QString & msg);
   static void ReceiveACTION (IrcControl * context, IrcSocket * sock,
+                              const QString & from,
+                              const QString & to,
+                              const QString & msg);
+  static void ReceiveVERSION (IrcQmlControl * context, IrcSocket * sock,
+                              const QString & from,
+                              const QString & to,
+                              const QString & msg);
+  static void ReceiveACTION (IrcQmlControl * context, IrcSocket * sock,
                               const QString & from,
                               const QString & to,
                               const QString & msg);

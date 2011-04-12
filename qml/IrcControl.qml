@@ -26,6 +26,12 @@ Rectangle {
   id: ircControlBox
   objectName: "IrcControlBox"
   color: "yellow"
+
+  Text {
+    id: placeHolder
+    anchors.centerIn: parent
+    text: "IrcControlBox"
+  }
   
   Component.onCompleted: {
     console.log ("loaded IrcControlBox")
