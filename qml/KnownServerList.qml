@@ -29,73 +29,87 @@ ListView {
 
   property real nameWidth: 250
   property real portWidth:  100
-  property real rowWidth: 350
+  property real buttonWidth: 100
+  property real rowWidth: portWidth + nameWidth + buttonWidth
   property real rowHeight: 32
 
-  property string nameColor: "#ff0000"
-  property string portColor: "#ff7700"
-
   signal selectServer (string name, int port)
+  signal connectServer (string name, int port)
 
   Component {
     id: landscapeDelegate 
-    Rectangle {
+    Row {
       width: knownServerList.rowWidth; height: knownServerList.rowHeight
-      color: "yellow"
-      border.color: "black"
-      Column {
-        id: serverNameCol
-        Rectangle {
-          id: nameBox
-          width: knownServerList.nameWidth
+      Rectangle {
+        id: connectButtonCol
+        width: knownServerList.buttonWidth
+        color: "transparent"
+        ChoiceButton {
+          id: connectButton
           height: knownServerList.rowHeight
-          color: knownServerList.nameColor
-          MouseArea {
-            anchors.fill: parent
-            onClicked: knownServerList.selectServer (sname, sport)
-          }
-          Text {
-            anchors.fill: parent
-            text: sname
+          width: parent.width * 0.6666
+          anchors { left: parent.left; horizontalCenter: parent.horizontalCenter }
+          radius: 0.5*height
+          labelText: qsTr ("Connect")
+          onClicked: {
+            knownServerList.connectServer (sname, sport)
           }
         }
+       }
+      
+      Rectangle {
+        id: serverNameCol
+        anchors  {left: connectButtonCol.right }
+        width: knownServerList.nameWidth
+        height: knownServerList.rowHeight
+        color: "transparent"
+        MouseArea {
+          anchors.fill: parent
+          onClicked: {
+            knownServerList.currentIndex = index
+            console.log ("setting currentindex to " + index)
+            knownServerList.selectServer (sname, sport)
+          }
+        }
+        Text {
+          anchors { 
+            left: parent.left; leftMargin: 3 ; 
+            verticalCenter: parent.verticalCenter 
+          }
+          text: sname
+        }
       }
-      Column {
+      Rectangle {
         id: serverPortCol
-        anchors.left : serverNameCol.right
-        Rectangle {
-          id: portBoknownServerListx
-          width: knownServerList.portWidth
-          height: knownServerList.rowHeight
-          color: knownServerList.portColor
-          MouseArea {
-            anchors.fill: parent
-            onClicked: knownServerList.selectServer (sname, sport)
+        anchors { 
+          left : serverNameCol.right
+        }
+        width: knownServerList.portWidth
+        height: knownServerList.rowHeight
+        color: "transparent"
+        MouseArea {
+          anchors.fill: parent
+          onClicked: {
+            knownServerList.currentIndex = index
+            knownServerList.selectServer (sname, sport)
           }
-          TextInput {
-            anchors.fill: parent
-            text: sport
+        }
+        TextInput {
+          anchors { 
+            left: parent.left
+            verticalCenter: parent.verticalCenter  
           }
+          horizontalAlignment: TextInput.AlignRight
+          text: sport
         }
       }
     }
     
   }
 
-  Component {
-    id: landscapeHighlight
-    Rectangle {
-      width: knownServerList.rowWidth
-      height: knownServerList.rowHeight 
-      radius: 4
-      color: Qt.lighter (knownServerList.nameColor)
-    }
-  }
-
-
+ 
   delegate: landscapeDelegate
-  highlight: landscapeHighlight
-
+  highlight: Rectangle { color: "#7777ff" } 
   Component.onCompleted: console.log ("Done loading KnownServerList")
 
 }

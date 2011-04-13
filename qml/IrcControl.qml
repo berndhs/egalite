@@ -27,8 +27,9 @@ Rectangle {
   objectName: "IrcControlBox"
 
   property alias activeServerModel: activeServerList.model
-
-  color: "yellow"
+  property string baseColor: "yellow"
+  property real rollDelay: 175
+  color: baseColor
 
   signal hideMe ()
 
@@ -42,14 +43,39 @@ Rectangle {
       ircControlBox.hideMe ();300
     }
   }
-  KnownServerList {
-    id: knownServerList
-    model: cppKnownServerModel
-    height: 3*rowHeight; 
-    rowWidth: 500
-    width: rowWidth
-    clip: true
-    onSelectServer: console.log ("picked server " + name + " port " + port)
+  Rectangle {
+    width: childrenRect.width; height: childrenRect.height
+    color: knownButton.visible ? "transparent " : "green"
+    ChoiceButton {
+      id: knownButton
+      height: 32
+      width: knownServerList.nameWidth
+      radius: 0.5 * height
+      color: Qt.darker (baseColor)
+      labelText: qsTr (" - Show Known Servers - ")
+      visible: true
+      onClicked: {
+        visible = false
+        knownServerList.show ()
+      }
+    }
+    KnownServerList {
+      id: knownServerList
+      visible: !knownButton.visible
+      model: cppKnownServerModel
+      height: (visible ? 3*rowHeight : 0)
+      width: (visible ? rowWidth : 0)
+      nameWidth: 300
+      portWidth: 90
+      clip: true
+      Behavior on height { PropertyAnimation { duration: rollDelay  } }
+      Behavior on width { PropertyAnimation { duration: rollDelay  } }
+      onSelectServer: console.log ("picked server " + name + " port " + port)
+      onConnectServer: {
+        console.log ("connect server " + name + " port " + port )
+        knownButton.visible = true
+      }
+    }
   }
 
   ListView {
