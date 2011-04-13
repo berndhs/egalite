@@ -186,6 +186,7 @@ SOURCES = \
         src/irc-qml-sock-static.cpp \
         src/irc-nick-edit.cpp \
         src/irc-text-browser.cpp \
+        src/irc-known-server-model.cpp \
         src/enter-string.cpp \
         src/edit-simple.cpp \
         src/user-list-model.cpp \
@@ -236,6 +237,7 @@ HEADERS += \
         src/irc-float.h \
         src/irc-nick-edit.h \
         src/irc-text-browser.h \
+        src/irc-known-server-model.h \
         src/enter-string.h \
         src/edit-simple.h \
         src/user-list-model.h \

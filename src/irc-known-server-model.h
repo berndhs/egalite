@@ -1,4 +1,5 @@
-
+#ifndef EGALITE_IRC_KNOWN_SERVER_MODEL_H
+#define EGALITE_IRC_KNOWN_SERVER_MODEL_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -22,42 +23,53 @@
  ****************************************************************/
 
 
-import QtQuick 1.0
+#include <QAbstractListModel>
+#include <QString>
+#include <QList>
 
-Rectangle {
-  id: button
-  signal clicked ()
-  signal pressAndHold ()
-  signal pressed ()
-  property alias labelText : label.text
-  property alias labelHeight: label.height
-  property alias labelWidth: label.width
-  property real commonMargin: 4
+namespace egalite
+{
 
-  signal labelChanged (string text)
+class KnownServerModel : public QAbstractListModel
+{
+Q_OBJECT
+public:
 
-  width: 100
-  height: 100
-  radius: 5
-  color: "#d3d3d3"
-  anchors { 
-    topMargin: commonMargin; bottomMargin: commonMargin; 
-    leftMargin: commonMargin; rightMargin: commonMargin
-  }
-  MouseArea {
-    anchors.fill: parent
-    onClicked: { parent.clicked () }
-    onPressAndHold: { parent.pressAndHold () }
-    onPressed: { parent.pressed () }
-  }
-  Text { 
-    id: label
-    text: "Button"
-    z: parent.z
-    wrapMode:Text.Wrap
-    width: parent.width
-    anchors.centerIn: parent 
-    horizontalAlignment: Text.AlignHCenter
-    onTextChanged: { button.labelChanged (label.text) }
- }
-}
+  /** \brief stuff invokable from QML */
+
+  int rowCount (const QModelIndex & index = QModelIndex()) const;
+  QVariant data (const QModelIndex & index, 
+                  int role = Qt::DisplayRole) const;
+
+  /** \brief the rest */
+
+  KnownServerModel (QObject *parent=0);
+
+  void clear ();
+
+  void addServer (const QString & name, int port);
+
+private:
+
+  enum DataRoles {
+    Role_Name = Qt::UserRole+1,
+    Role_Port = Qt::UserRole+2
+  };
+
+  struct ServerStruct {
+    QString  name;
+    int      port;
+    ServerStruct ();
+    ServerStruct (const QString & n, int p);
+    ServerStruct (const ServerStruct & other);
+  };
+
+  typedef QList<ServerStruct>   ServerListType;
+
+  ServerListType   servers;
+
+};
+
+} // namespace
+
+#endif

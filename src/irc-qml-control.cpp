@@ -3,7 +3,7 @@
 /****************************************************************
  * This file is distributed under the following license:
  *
- * Copyright (C) 2010, Bernd Stramm
+ * Copyright (C) 2011, Bernd Stramm
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -40,6 +40,7 @@
 #include <QFont>
 #include <QFile>
 #include <QMessageBox>
+#include <QDeclarativeContext>
 
 using namespace deliberate;
 
@@ -52,13 +53,13 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
    qmlRoot (0),
    isRunning (false),
    isConnected (false),
-   hidSelf (false)
+   hidSelf (false),
+   knownServers (this)
 {
   ui.setupUi (this);
   dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
   dockedChannels->Start ();
   dockedChannels->hide ();
-  ConnectGui ();
   commandXform ["MSG"] = IrcQmlSockStatic::TransformPRIVMSG;
   commandXform ["ME"] = IrcQmlSockStatic::TransformME;
   commandXform ["JOIN"] = IrcQmlSockStatic::TransformJOIN;
@@ -98,6 +99,7 @@ IrcQmlControl::Show ()
 void
 IrcQmlControl::Hide ()
 {
+qDebug () << " IrcQmlControl::Hide ()";
   oldSize = size ();
   oldPos = pos();
   hidSelf = true;
@@ -155,6 +157,12 @@ IrcQmlControl::Run ()
     dockedChannels->resize (groupBoxSize);
   }
 
+  QDeclarativeContext * context = ui.qmlView->rootContext ();
+  if (context == 0) {
+    QMessageBox::critical (this, "Fatal", "QML Context Missing");
+    return false;
+  }
+  context->setContextProperty ("cppKnownServerModel", &knownServers);
   ui.qmlView->setSource (
          QUrl("qrc:///qml/IrcControl.qml"));
 
@@ -163,6 +171,7 @@ IrcQmlControl::Run ()
     QMessageBox::critical (this, "Fatal", "QML Load Failure");
     return false;
   }
+  ConnectGui ();
   LoadLists ();
   show ();
 
@@ -176,18 +185,14 @@ IrcQmlControl::LoadLists ()
   QStringList  servers = CertStore::IF().IrcServers ();
   noNameServer = tr("--- New Server ---");
   servers.append (noNameServer);
-  #if 0
-  mainUi.serverCombo->clear ();
-  mainUi.serverCombo->insertItems (0,servers);
-  #endif
+  int ns = servers.count();
+  for (int i=0; i< ns; i++) {
+    knownServers.addServer (servers.at(i), 6667);
+  }
 
   QStringList  nicks = CertStore::IF().IrcNicks ();
   noNameNick = tr ("--- New Nick ---");
   nicks.append (noNameNick);
-  #if 0
-  mainUi.nickCombo->clear ();
-  mainUi.nickCombo->insertItems (0,nicks);
-  #endif
 
   QStringList  chans = CertStore::IF().IrcChannels ();
   noNameChannel = tr("--- New Channel ---");
@@ -203,6 +208,7 @@ IrcQmlControl::LoadLists ()
 void
 IrcQmlControl::ConnectGui ()
 {
+  connect (qmlRoot, SIGNAL (hideMe()), this, SLOT (Hide()));
   #if 0
   connect (mainUi.connectButton, SIGNAL (clicked()),
            this, SLOT (TryConnect ()));

@@ -25,7 +25,37 @@ import QtQuick 1.0
 Rectangle {
   id: ircControlBox
   objectName: "IrcControlBox"
+
+  property alias activeServerModel: activeServerList.model
+
   color: "yellow"
+
+  signal hideMe ()
+
+  ChoiceButton {
+    anchors {top: parent.top; right: parent.right }
+    labelText: qsTr ("Hide")
+    height: 32
+    width: 80
+    onClicked: {
+      console.log ("Hide Button clicked")
+      ircControlBox.hideMe ();300
+    }
+  }
+  KnownServerList {
+    id: knownServerList
+    model: cppKnownServerModel
+    height: 3*rowHeight; 
+    rowWidth: 500
+    width: rowWidth
+    clip: true
+    onSelectServer: console.log ("picked server " + name + " port " + port)
+  }
+
+  ListView {
+    id: activeServerList
+  }
+    
 
   Text {
     id: placeHolder

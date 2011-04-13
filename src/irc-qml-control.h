@@ -4,7 +4,7 @@
 /****************************************************************
  * This file is distributed under the following license:
  *
- * Copyright (C) 2010, Bernd Stramm
+ * Copyright (C) 2011, Bernd Stramm
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
 #include "helpview.h"
 #include "irc-float.h"
 #include "irc-socket.h"
+#include "irc-known-server-model.h"
 #include <QFile>
 #include <QStringList>
 #include <QMap>
@@ -225,6 +226,8 @@ private:
   QList <QString>     ignoreSources;
 
   QMap <QString, QString>  whoisWait;
+
+  KnownServerModel    knownServers;
 
   friend class IrcQmlSockStatic;
   friend class IrcCtcp;
