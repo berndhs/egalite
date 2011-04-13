@@ -444,7 +444,7 @@ qDebug () << "Receive Count == " << rcvCount << " mode " << chatMode;
   QString msgtext = (isLocal ? localLine : remoteLine)
                            .arg (now.toString (dateMask))
                            .arg (from)
-                           .arg (body)
+                           .arg (HtmlMangle::Sanitize(body))
                             ;
   QString cookedText = HtmlMangle::Anchorize (msgtext,
                                    HtmlMangle::HttpExp (),
