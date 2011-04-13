@@ -87,20 +87,41 @@ ListView {
         width: knownServerList.portWidth
         height: knownServerList.rowHeight
         color: "transparent"
+        property string portBuffer: sport
         MouseArea {
           anchors.fill: parent
           onClicked: {
             knownServerList.currentIndex = index
-            knownServerList.selectServer (sname, sport)
+            knownServerList.model.setPort (index, theInput.text)
+            knownServerList.selectServer (sname, serverPortCol.portBuffer)
           }
         }
         TextInput {
+          id: theInput
           anchors { 
             left: parent.left
             verticalCenter: parent.verticalCenter  
           }
           horizontalAlignment: TextInput.AlignRight
           text: sport
+          validator: IntValidator { bottom: 1; top: 65535 }
+          onActiveFocusChanged: {
+            if (activeFocus) {
+              serverPortCol.color = "#ffdddd"
+              knownServerList.currentIndex = index
+            } else {
+              serverPortCol.color = "transparent"
+            }
+          }
+          Keys.onEnterPressed: {
+            console.log ("try to set port " + theInput.text )
+            knownServerList.model.setPort (index, theInput.text)
+            focus = false
+          }
+          Keys.onReturnPressed: {
+            knownServerList.model.setPort (index, theInput.text)
+            focus = false
+          }
         }
       }
     }
@@ -109,7 +130,7 @@ ListView {
 
  
   delegate: landscapeDelegate
-  highlight: Rectangle { color: "#7777ff" } 
+  highlight: Rectangle { color: "#77bbff" } 
   Component.onCompleted: console.log ("Done loading KnownServerList")
 
 }

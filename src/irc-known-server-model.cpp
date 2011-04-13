@@ -85,6 +85,22 @@ qDebug () << " KnownServerModel::addServer " << name << port;
   endInsertRows ();
 }
 
+void
+KnownServerModel::setPort (int row, const QString & port)
+{
+  int iport = port.toInt();
+  int nr = servers.count();
+  if (row < 0 || row >= nr) {
+    return;
+  }
+  int oldport = servers.at(row).port;
+  if (iport != oldport) {
+    servers[row].port = iport;
+    QModelIndex changedIndex = createIndex (row, 0);
+    emit dataChanged (changedIndex, changedIndex);
+  }
+}
+
 KnownServerModel::ServerStruct::ServerStruct ()
   :name (""),
    port (0)

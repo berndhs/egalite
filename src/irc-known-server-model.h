@@ -41,6 +41,8 @@ public:
   QVariant data (const QModelIndex & index, 
                   int role = Qt::DisplayRole) const;
 
+  Q_INVOKABLE void setPort (int row, const QString & port);
+
   /** \brief the rest */
 
   KnownServerModel (QObject *parent=0);

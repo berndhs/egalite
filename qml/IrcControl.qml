@@ -44,19 +44,29 @@ Rectangle {
     }
   }
   Rectangle {
+    id: knownButtonRect
     width: childrenRect.width; height: childrenRect.height
     color: knownButton.visible ? "transparent " : "green"
+    border.color: "#c0c0c0"
+    border.width: knownServerList.visible ? 1 : 0
+    property string showString: qsTr (" --- Show Known Servers --- ")
+    property string noShowString: qsTr (" Hide List ")
     ChoiceButton {
       id: knownButton
       height: 32
       width: knownServerList.nameWidth
       radius: 0.5 * height
-      color: Qt.darker (baseColor)
-      labelText: qsTr (" - Show Known Servers - ")
+      property string lightColor: "#aaffaa"
+      property string darkColor: "#ffaaff"
+      property bool seeList: knownServerList.visible
+      color: seeList ? lightColor : darkColor
+      labelText: knownServerList.visible 
+                      ? knownButtonRect.noShowString 
+                      : knownButtonRect.showString
       visible: true
+      Behavior on color { PropertyAnimation { duration: rollDelay } }
       onClicked: {
-        visible = false
-        knownServerList.show ()
+        knownServerList.visible = !knownServerList.visible
       }
     }
     KnownServerList {
@@ -65,6 +75,7 @@ Rectangle {
       model: cppKnownServerModel
       height: (visible ? 3*rowHeight : 0)
       width: (visible ? rowWidth : 0)
+      anchors {top : knownButton.bottom; left: knownButton.left }
       nameWidth: 300
       portWidth: 90
       clip: true
@@ -73,7 +84,7 @@ Rectangle {
       onSelectServer: console.log ("picked server " + name + " port " + port)
       onConnectServer: {
         console.log ("connect server " + name + " port " + port )
-        knownButton.visible = true
+        visible = false
       }
     }
   }
