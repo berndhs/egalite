@@ -20,7 +20,7 @@
 #include <QLabel>
 #include <QSslSocket>
 #include <QDebug>
-#include "link-mangle.h"
+#include "html-mangle.h"
 #include <iostream>
 
 /****************************************************************
@@ -446,9 +446,9 @@ qDebug () << "Receive Count == " << rcvCount << " mode " << chatMode;
                            .arg (from)
                            .arg (body)
                             ;
-  QString cookedText = LinkMangle::Anchorize (msgtext,
-                                   LinkMangle::HttpExp (),
-                                   LinkMangle::HttpAnchor);
+  QString cookedText = HtmlMangle::Anchorize (msgtext,
+                                   HtmlMangle::HttpExp (),
+                                   HtmlMangle::HtmlAnchor);
   ui.textHistory->append (cookedText);
   emit Activity (this);
 }

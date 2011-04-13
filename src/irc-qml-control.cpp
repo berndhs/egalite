@@ -29,7 +29,7 @@
 #include "irc-socket.h"
 #include "irc-qml-sock-static.h"
 #include "irc-ctcp.h"
-#include "link-mangle.h"
+#include "html-mangle.h"
 #include <QSize>
 #include "cert-store.h"
 #include "qml-irc-channel-group.h"
@@ -901,7 +901,7 @@ IrcQmlControl::InChanMsg (IrcSocket * sock,
     } else {
       channels [chan]->Incoming (QString ("<a href=\"ircsender://%1@egalite\">%1</a>: %2")
                                  .arg(from)
-                                 .arg(LinkMangle::Sanitize(themsg)),
+                                 .arg(HtmlMangle::Sanitize(themsg)),
                                  themsg);
     }
   }
@@ -978,7 +978,7 @@ qDebug () << " Ctcp CHAN " << msg;
   channels [chan]->Incoming (QString 
                      ("<a href=\"ircsender://%1\">%1</a>:"
                       "<span style=\"font-size:small\">CTCPc</span> %2").
-                                  arg(from).arg(LinkMangle::Sanitize(msg)),
+                                  arg(from).arg(HtmlMangle::Sanitize(msg)),
                       msg);
 }
 
@@ -1009,7 +1009,7 @@ qDebug () << " Ctcp USER " << msg;
     channels [from]->Incoming (QString 
                       ("<a href=\"ircsender://%1\">%1</a>:"
                       "<span style=\"font-size:small\">CTCPu</span> %2")
-                          .arg(from).arg(LinkMangle::Sanitize(msg)),
+                          .arg(from).arg(HtmlMangle::Sanitize(msg)),
                       msg);
   }
 }

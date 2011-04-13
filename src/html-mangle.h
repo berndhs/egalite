@@ -1,5 +1,5 @@
-#ifndef LINK_MANGLE_H
-#define LINK_MANGLE_H
+#ifndef EGALITE_HTML_MANGLE_H
+#define EGALITE_HTML_MANGLE_H
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -38,7 +38,7 @@ namespace egalite {
   *
   */
 
-class LinkMangle {
+class HtmlMangle {
 
 public:
 
@@ -55,7 +55,7 @@ static QString Anchorize (const QString &text, QRegExp regular,
                          void (*anchorFunc)(QString&, QString));
 
 /** insert a string (ref) into an html anchor pattern */
-static void HttpAnchor (QString & anchor /** the result */ ,
+static void HtmlAnchor (QString & anchor /** the result */ ,
                         QString  ref     /** the text to decorate */
                        );
 

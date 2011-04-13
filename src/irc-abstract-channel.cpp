@@ -39,7 +39,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QRegExp>
-#include "link-mangle.h"
+#include "html-mangle.h"
 
 namespace egalite
 {
@@ -221,9 +221,9 @@ void
 IrcAbstractChannel::Incoming (const QString & message,
                          const QString & raw)
 {
-  QString cooked = LinkMangle::Anchorize (message, 
-                         LinkMangle::HttpExp(),
-                         LinkMangle::HttpAnchor);
+  QString cooked = HtmlMangle::Anchorize (message, 
+                         HtmlMangle::HttpExp(),
+                         HtmlMangle::HtmlAnchor);
 qDebug () << " cooked message " << cooked;
   QDateTime now = QDateTime::currentDateTime ();
   QString smalldate ("<span style=\"font-size:small\">"
@@ -241,9 +241,9 @@ void
 IrcAbstractChannel::SetTopic (const QString & newTopic)
 {
   topic = newTopic;
-  QString cooked = LinkMangle::Anchorize (topic, 
-                         LinkMangle::HttpExp(),
-                         LinkMangle::HttpAnchor);
+  QString cooked = HtmlMangle::Anchorize (topic, 
+                         HtmlMangle::HttpExp(),
+                         HtmlMangle::HtmlAnchor);
   if (qmlItem) {
     qmlItem->setProperty ("channelTopic", cooked);
   }

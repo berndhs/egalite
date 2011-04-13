@@ -1,5 +1,5 @@
 
-#include "link-mangle.h"
+#include "html-mangle.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -28,7 +28,7 @@
 namespace egalite {
 
 QString
-LinkMangle::Anchorize (const QString &text, QRegExp regular, 
+HtmlMangle::Anchorize (const QString &text, QRegExp regular, 
                          void (*anchorFunc)(QString&, QString))
 {
   int where;
@@ -51,19 +51,19 @@ LinkMangle::Anchorize (const QString &text, QRegExp regular,
 }
 
 void
-LinkMangle::HttpAnchor (QString & anchor, QString ref)
+HtmlMangle::HtmlAnchor (QString & anchor, QString ref)
 {
   anchor =  QString("<a href=\"%1\">%1</a>").arg(ref);
 }
 
 QRegExp
-LinkMangle::HttpExp ()
+HtmlMangle::HttpExp ()
 {
   return QRegExp ("(https?://)(\\S*)");
 }
 
 QString 
-LinkMangle::Sanitize (const QString & text)
+HtmlMangle::Sanitize (const QString & text)
 {
   QRegExp rAmp("&(?!amp;)");
   QString rLess ("<");
@@ -77,7 +77,7 @@ LinkMangle::Sanitize (const QString & text)
 
 #if 0
 void
-LinkMangle::TwitAtAnchor (QString & anchor, QString ref)
+HtmlMangle::TwitAtAnchor (QString & anchor, QString ref)
 {
   static QRegExp punctuation ("[`~!@#$%^&*()_-+={[}}|\\:;\"'<,>.?/]+");
   if (ref.length() == 1) {
@@ -93,7 +93,7 @@ LinkMangle::TwitAtAnchor (QString & anchor, QString ref)
 }
 
 void
-LinkMangle::TwitHashAnchor (QString & anchor, QString ref)
+HtmlMangle::TwitHashAnchor (QString & anchor, QString ref)
 {
   if (ref.length() == 1) {
     anchor = ref;

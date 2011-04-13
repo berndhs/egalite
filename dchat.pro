@@ -164,7 +164,7 @@ SOURCES = \
         src/chat-box.cpp \
         src/chat-content.cpp \
         src/helpview.cpp \
-        src/link-mangle.cpp \
+        src/html-mangle.cpp \
         src/subscription-change.cpp \
         src/simple-pass.cpp \
         src/contact-list-model.cpp \
@@ -215,7 +215,7 @@ HEADERS += \
         src/chat-content.h \
         src/server-contact.h \
         src/helpview.h \
-        src/link-mangle.h \
+        src/html-mangle.h \
         src/subscription-change.h \
         src/simple-pass.h \
         src/contact-list-model.h \
