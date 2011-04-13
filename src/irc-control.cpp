@@ -30,6 +30,7 @@
 #include "irc-socket.h"
 #include "irc-sock-static.h"
 #include "irc-ctcp.h"
+#include "link-mangle.h"
 #include <QSize>
 #include "cert-store.h"
 #include "qml-irc-channel-group.h"
@@ -877,8 +878,9 @@ IrcControl::InChanMsg (IrcSocket * sock,
     if (themsg.startsWith (QChar (1))) {
       IncomingCtcpChan (sock, from, chan, themsg);
     } else {
-      channels [chan]->Incoming (QString ("<a href=\"ircsender://%1@egalite\">%1</a>: %2").
-                                  arg(from).arg(themsg),
+      channels [chan]->Incoming (QString ("<a href=\"ircsender://%1@egalite\">%1</a>: %2")
+                                 .arg(from)
+                                 .arg(LinkMangle::Sanitize(themsg)),
                                  themsg);
     }
   }
@@ -953,7 +955,7 @@ qDebug () << " Ctcp CHAN " << msg;
   channels [chan]->Incoming (QString 
                      ("<a href=\"ircsender://%1\">%1</a>:"
                       "<span style=\"font-size:small\">CTCPc</span> %2").
-                                  arg(from).arg(msg),
+                                  arg(from).arg(LinkMangle::Sanitize(msg)),
                       msg);
 }
 
@@ -984,7 +986,7 @@ qDebug () << " Ctcp USER " << msg;
     channels [from]->Incoming (QString 
                       ("<a href=\"ircsender://%1\">%1</a>:"
                       "<span style=\"font-size:small\">CTCPu</span> %2").
-                                  arg(from).arg(msg),
+                                  arg(from).arg(LinkMangle::Sanitize(msg)),
                       msg);
   }
 }

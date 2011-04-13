@@ -58,6 +58,8 @@ static QString Anchorize (const QString &text, QRegExp regular,
 static void HttpAnchor (QString & anchor /** the result */ ,
                         QString  ref     /** the text to decorate */
                        );
+
+static QString Sanitize (const QString & text);
 #if 0
 static void TwitAtAnchor (QString & anchor , QString  ref);
 static void TwitHashAnchor (QString & anchor, QString ref);

@@ -62,6 +62,19 @@ LinkMangle::HttpExp ()
   return QRegExp ("(https?://)(\\S*)");
 }
 
+QString 
+LinkMangle::Sanitize (const QString & text)
+{
+  QRegExp rAmp("&(?!amp;)");
+  QString rLess ("<");
+  QString rGtr (">");
+  QString sanitized (text);
+  sanitized.replace (rAmp,"&amp;")
+           .replace (rLess,"&lt;")
+           .replace (rGtr,"&gt;");
+  return sanitized;
+}
+
 #if 0
 void
 LinkMangle::TwitAtAnchor (QString & anchor, QString ref)

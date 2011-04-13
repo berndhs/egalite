@@ -38,6 +38,7 @@
 #include <QTreeWidgetItem>
 #include <QApplication>
 #include <QClipboard>
+#include <QRegExp>
 #include "link-mangle.h"
 
 namespace egalite
