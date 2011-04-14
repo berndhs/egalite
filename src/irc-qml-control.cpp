@@ -505,6 +505,9 @@ IrcQmlControl::ConnectionGone (IrcSocket * sock)
   qDebug () << " disconnect seen from " << sock;
   activeServers.removeServer (sock);
   sockets.remove (sock->Name());
+  if (selectedServer == sock) {
+    selectedServer = 0;
+  }
   sock->deleteLater ();
   emit StatusChange ();
 }
