@@ -27,8 +27,10 @@ Rectangle {
   objectName: "IrcControlBox"
 
   property alias activeServerModel: activeServerList.model
-  property string baseColor: "yellow"
+  property string baseColor: "#ef0e0"
   property real rollDelay: 175
+  property real topHeight: knownListRect.height + activeListBox.height
+  property real restHeight: height - topHeight
   color: baseColor
 
   signal hideMe ()
@@ -42,30 +44,30 @@ Rectangle {
   ChoiceButton {
     anchors {top: parent.top; right: parent.right }
     labelText: qsTr ("Hide")
-    height: 32
+    height: 30
     width: 80
     onClicked: {
       console.log ("Hide Button clicked")
-      ircControlBox.hideMe ();300
+      ircControlBox.hideMe ()
     }
   }
   Rectangle {
     id: knownListRect
     width: childrenRect.width; height: childrenRect.height
-    color: knownButton.visible ? "transparent " : "green"
+    color: "transparent"
     border.color: "#c0c0c0"
     border.width: knownServerList.visible ? 1 : 0
     property string showString: qsTr (" --- Show Known Servers --- ")
-    property string noShowString: qsTr (" Hide List ")
+    property string noShowString: qsTr (" Hide Known Servers ")
     ChoiceButton {
       id: knownButton
       height: 32
       width: knownServerList.nameWidth
       radius: 0.5 * height
-      property string lightColor: "#aaffaa"
-      property string darkColor: "#ffaaff"
+      property string showColor: "#aaffaa"
+      property string hideColor: "#d3d3d3"
       property bool seeList: knownServerList.visible
-      color: seeList ? lightColor : darkColor
+      color: seeList ? hideColor : showColor
       labelText: knownServerList.visible 
                       ? knownListRect.noShowString 
                       : knownListRect.showString
@@ -101,10 +103,22 @@ Rectangle {
     anchors { top: knownListRect.bottom; left: parent.left; leftMargin: 2 }
     width: ircControlBox.width - 4
     height: childrenRect.height
-    color: "blue"
+    color: "transparent"
+    border.color: "#c0c0c0"; border.width: 1
+    Rectangle {
+      id: activeListHead
+      height: childrenRect.height
+      width: parent.width
+      color: "#d0ffd0"
+      Text {
+        width: parent.width
+        horizontalAlignment: Text.AlignHCenter
+        text: qsTr ("Active Servers")
+      }
+    }
     ActiveServerList {
       id: activeServerList
-      anchors { left: parent.left; top: parent.top }
+      anchors { left: parent.left; top:activeListHead.bottom }
       nameWidth: 200
       addressWidth: 150
       height: 3.5*rowHeight
@@ -128,130 +142,139 @@ Rectangle {
     }
   }
 
-  Rectangle {
-    id: channelListBox
-    color: "transparent"
-    border.color: "red"
-    border.width: 1
-    width: parent.width * 0.4
-    height: 4 * 32
-    anchors { top: activeListBox.bottom; left: parent.left }
-    Rectangle {
-      id: channelHeader
-      height: childrenRect.height
-      width: parent.width
-      color: "#d0d0ff"
-      Text {
-        horizontalAlignment: Text.AlignHCenter
-        text: qsTr ("Channel Names")
-      }
-    }
-    ListView {
-      Component {
-        id: channelDelegate
-        Rectangle {
-          id: channelDelegateBox 
-          width: channelListBox.width
-          height: 32
-          color: "transparent"
-          MouseArea {
-            anchors.fill: parent
-            onClicked: { 
-              channelList.currentIndex = index; 
-              ircControlBox.selectChannel (name) 
-            }
-          }
-          Text {
-            width: channelListBox,width; text: name
-          }
-        }
-      }
-      id: channelList
-      width: parent.width
-      height: 3 * 32
-      clip: true
-      anchors { top: channelHeader.bottom; left: channelListBox.left }
-      model: cppChannelListModel
-      highlight: Rectangle { color: "#ffcccc" }
-      delegate: channelDelegate
-    }
-  }
-
-  Column {
-    id: middleButtons
+  Flow {
+    id: bottomFlow
+    spacing: 6
+    width: ircControlBox.width 
+    property real subListWidth: width * 0.4
+    property real middleButtonWidth: width - 2*subListWidth - 2*spacing
+                    
     anchors { 
-      left: channelListBox.right; 
-      top: channelListBox.top 
+      top: activeListBox.bottom; 
+      horizontalCenter: parent.horizontalCenter 
+      leftMargin: 4
+      rightMargin: 4
     }
-    ChoiceButton {
-      id: joinButton 
-      labelText: qsTr ("<-- Join")
-      radius: 8
-      height: 64
-      onClicked: {
-        ircControlBox.join ()
-      }
-    }
-    ChoiceButton {
-      id: loginButton 
-      labelText: qsTr ("Login -->")
-      radius: 8
-      height: 64
-      onClicked: {
-        ircControlBox.login ()
-      }
-    }
-  }
-    
-  Rectangle {
-    id: nickListBox
-    color: "transparent"
-    border.color: "blue"
-    border.width: 1
-    width: parent.width * 0.4
-    height: 4 * 32
-    anchors { top: activeListBox.bottom; left: middleButtons.right }
     Rectangle {
-      id: nickHeader
-      height: childrenRect.height
-      width: parent.width
-      color: "#d0ffd0"
-      Text {
-        horizontalAlignment: Text.AlignHCenter
-        text: qsTr ("Nick Names")
-      }
-    }
-    ListView {
-      Component {
-        id: nickDelegate
-        Rectangle {
-          id: nickDelegateBox 
-          width: nickListBox.width
-          height: 32
-          color: "transparent"
-          MouseArea {
-            height: 32
-            anchors.fill: parent
-            onClicked:  { 
-              nickList.currentIndex = index; 
-              ircControlBox.selectNick (name) 
-            }
-          }
-          Text {
-            width: nickListBox.width
-            text: name
-          }
+      id: channelListBox
+      color: "transparent"
+      width: bottomFlow.subListWidth
+      height: restHeight
+      Rectangle {
+        id: channelHeader
+        height: childrenRect.height
+        width: parent.width
+        color: "#d0d0ff"
+        Text {
+          width: parent.width
+          horizontalAlignment: Text.AlignHCenter
+          text: qsTr ("Channel Names")
         }
       }
-      id: nickList
-      width: parent.width
-      height: 3 * 32
-      clip: true
-      anchors { top: nickHeader.bottom; left: nickListBox.left }
-      model: cppNickListModel
-      delegate: nickDelegate
-      highlight: Rectangle { color: "#eeccff" }
+      ListView {
+        Component {
+          id: channelDelegate
+          Rectangle {
+            id: channelDelegateBox 
+            width: channelListBox.width
+            height: 32
+            color: "transparent"
+            MouseArea {
+              anchors.fill: parent
+              onClicked: { 
+                channelList.currentIndex = index; 
+                ircControlBox.selectChannel (name) 
+              }
+            }
+            Text {
+              width: channelListBox,width; text: name
+            }
+          }
+        }
+        id: channelList
+        width: parent.width
+        height: parent.height - channelHeader.height
+        clip: true
+        anchors { top: channelHeader.bottom; left: channelListBox.left }
+        model: cppChannelListModel
+        highlight: Rectangle { color: "#ffcccc" }
+        delegate: channelDelegate
+      }
     }
+
+    Column {
+      id: middleButtons
+      spacing: 2
+      ChoiceButton {
+        id: joinButton 
+        labelText: qsTr ("<-- Join")
+        radius: 8
+        height: 48
+        width: middleButtonWidth
+        onClicked: {
+          ircControlBox.join ()
+        }
+      }
+      ChoiceButton {
+        id: loginButton 
+        labelText: qsTr ("Login -->")
+        radius: 8
+        height: 48
+        width: middleButtonWidth
+        onClicked: {
+          ircControlBox.login ()
+        }
+      }
+    }
+    
+    Rectangle {
+      id: nickListBox
+      color: "transparent"
+      width: bottomFlow.subListWidth
+      height: restHeight
+      Rectangle {
+        id: nickHeader
+        height: childrenRect.height
+        width: parent.width
+        color: "#d0ffd0"
+        Text {
+          width: parent.width
+          horizontalAlignment: Text.AlignHCenter
+          text: qsTr ("Nick Names")
+        }
+      }
+      ListView {
+        Component {
+          id: nickDelegate
+          Rectangle {
+            id: nickDelegateBox 
+            width: nickListBox.width
+            height: 32
+            color: "transparent"
+            MouseArea {
+              height: 32
+              anchors.fill: parent
+              onClicked:  { 
+                nickList.currentIndex = index; 
+                ircControlBox.selectNick (name) 
+              }
+            }
+            Text {
+              width: nickListBox.width
+              text: name
+            }
+          }
+        }
+        id: nickList
+        width: parent.width
+        height: parent.height - nickHeader.height
+        clip: true
+        anchors { top: nickHeader.bottom; left: nickListBox.left }
+        model: cppNickListModel
+        delegate: nickDelegate
+        highlight: Rectangle { color: "#eeccff" }
+      }
+    } 
   }
     
   Component.onCompleted: {

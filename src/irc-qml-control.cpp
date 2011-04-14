@@ -204,15 +204,17 @@ IrcQmlControl::LoadLists ()
   }
 
   QStringList  nicks = CertStore::IF().IrcNicks ();
-  noNameNick = tr ("--- New Nick ---");
+  noNameNick = tr (" --- New Nick --- ");
   nicks.append (noNameNick);
+  nicks.sort ();
   nickModel.setStringList (nicks);
  
   qDebug () << " ------------ Nicks " << nicks;
 
   QStringList  chans = CertStore::IF().IrcChannels ();
-  noNameChannel = tr("--- New Channel ---");
+  noNameChannel = tr("# --- New Channel ---");
   chans.append (noNameChannel);
+  chans.sort ();
   channelModel.setStringList (chans);
 
   qDebug () << " ---------------- Channels " << chans;
