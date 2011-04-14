@@ -117,6 +117,12 @@ Rectangle {
       onSelectedServer: {
         ircControlBox.selectActiveServer (index)
       }
+      Connections {
+        target: cppActiveServerModel
+        onNewServer: {
+          activeServerList.currenIndex = row
+        }
+      }
     }
   }
 
@@ -128,11 +134,15 @@ Rectangle {
     width: parent.width * 0.4
     height: 4 * 32
     anchors { top: activeListBox.bottom; left: parent.left }
-    Text {
+    Rectangle {
       id: channelHeader
-      height: 32
+      height: childrenRect.height
       width: parent.width
-      text: qsTr ("Channel Names")
+      color: "#d0d0ff"
+      Text {
+        horizontalAlignment: Text.AlignHCenter
+        text: qsTr ("Channel Names")
+      }
     }
     ListView {
       Component {
@@ -199,11 +209,15 @@ Rectangle {
     width: parent.width * 0.4
     height: 4 * 32
     anchors { top: activeListBox.bottom; left: middleButtons.right }
-    Text {
+    Rectangle {
       id: nickHeader
-      height: 32
+      height: childrenRect.height
       width: parent.width
-      text: qsTr ("Nick Names")
+      color: "#d0ffd0"
+      Text {
+        horizontalAlignment: Text.AlignHCenter
+        text: qsTr ("Nick Names")
+      }
     }
     ListView {
       Component {

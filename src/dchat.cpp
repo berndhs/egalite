@@ -101,6 +101,9 @@ DChatMain::DChatMain (QWidget *parent)
   connect (ircControl, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
   connect (ircControl, SIGNAL (WatchAlert (QString)),
             this, SLOT (ShowTrayMessage (QString)));
+  connect (ircQmlControl, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
+  connect (ircQmlControl, SIGNAL (WatchAlert (QString)),
+            this, SLOT (ShowTrayMessage (QString)));
   xclientMap.clear ();
   trayIcon->show ();
   oldPos = pos();
@@ -180,7 +183,8 @@ DChatMain::StatusUpdate ()
   actionDirectStatus->setText (directMsg);
   QString xmppMsg = tr("%1 Xmpp").arg (xclientMap.size());
   actionXmppStatus->setText (xmppMsg);
-  QString ircMsg = tr ("%1 IRC").arg (ircControl->OpenCount());
+  int nIrc = ircControl->OpenCount () + ircQmlControl->OpenCount();
+  QString ircMsg = tr ("%1 IRC").arg (nIrc);
   actionIrcStatus->setText (ircMsg);
   if (trayIcon) {
     QString trayMsg = "Egalite\n" + directMsg + "\n" + xmppMsg + "\n" + ircMsg;

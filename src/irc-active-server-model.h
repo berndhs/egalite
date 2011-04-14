@@ -75,6 +75,7 @@ public:
 signals:
 
   void wantDisconnect (IrcSocket * sock);
+  void newServer (int row);
 
 private:
 

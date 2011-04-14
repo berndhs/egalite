@@ -131,6 +131,7 @@ qDebug () << " ActiveServerModel::addServer " << baseName << port;
   beginInsertRows (QModelIndex(), nr, nr);
   servers << ServerStruct (sock, baseName, realName, address, port);
   endInsertRows ();
+  emit newServer (nr);
 }
 
 int
