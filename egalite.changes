@@ -1,3 +1,6 @@
+* Fri Apr 15 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.4-1
+- reformat active server list and highlighting
+
 * Thu Apr 14 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.3-1
 - connected the main IRC/QML functions, only need to add Raw Log
 
