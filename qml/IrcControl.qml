@@ -109,6 +109,7 @@ Rectangle {
       nameWidth: 200
       addressWidth: 150
       height: 2.5*rowHeight
+      width: activeListBox.width
       model: cppActiveServerModel
       onDisconnectServer: {
         console.log ("disconnect from " + index)
@@ -119,8 +120,9 @@ Rectangle {
       }
       Connections {
         target: cppActiveServerModel
-        onNewServer: {
-          activeServerList.currenIndex = row
+        onSelectRow: {
+          console.log (" Select Row " + row)
+          activeServerList.currentIndex = row
         }
       }
     }

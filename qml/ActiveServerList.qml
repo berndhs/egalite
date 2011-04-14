@@ -40,35 +40,41 @@ ListView {
   Component {
     id: landscapeDelegate 
     Row {
-      width: activeServerList.rowWidth; height: activeServerList.rowHeight
+      id: serverRow
+      width: activeServerList.width
+      height: activeServerList.rowHeight
+      spacing: 4
+      anchors.left: parent.left
       Rectangle {
         id: connectButtonCol
         width: activeServerList.buttonWidth
+        height: activeServerList.rowHeight
         color: "transparent"
         ChoiceButton {
           id: connectButton
           height: activeServerList.rowHeight
           width: parent.width * 0.6666
-          anchors { left: parent.left; horizontalCenter: parent.horizontalCenter }
+          anchors { horizontalCenter: connectButtonCol.horizontalCenter }
           radius: 0.5*height
           labelText: qsTr ("Leave")
           onClicked: {
             activeServerList.disconnectServer (index)
           }
         }
-       }
+      }
       
       Rectangle {
         id: baseNameCol
-        anchors  {left: connectButtonCol.right }
-        width: activeServerList.nameWidth
+        width: childrenRect.width //activeServerList.nameWidth
         height: activeServerList.rowHeight
         color: "transparent"
         MouseArea {
           anchors.fill: parent
           onPressed: {
+console.log (" press BASE name " + index );
             activeServerList.currentIndex = index;
             activeServerList.selectedServer (index);
+console.log ("    current index " + activeServerList.currentIndex )
           }
         }
         Text {
@@ -81,8 +87,7 @@ ListView {
       }      
       Rectangle {
         id: realNameCol
-        anchors  {left: baseNameCol.right }
-        width: activeServerList.nameWidth
+        width: childrenRect.width //activeServerList.nameWidth
         height: activeServerList.rowHeight
         color: "transparent"
         MouseArea {
@@ -102,10 +107,10 @@ ListView {
       }
       Rectangle {
         id: addressCol
-        anchors  {left: realNameCol.right }
-        width: activeServerList.addressWidth
+        width: childrenRect.width //activeServerList.addressWidth
         height: activeServerList.rowHeight
         color: "transparent"
+        border.color: "green"
         MouseArea {
           anchors.fill: parent
           onPressed: {
@@ -123,12 +128,10 @@ ListView {
       }
       Rectangle {
         id: portCol
-        anchors { 
-          left : addressCol.right
-        }
         width: activeServerList.portWidth
         height: activeServerList.rowHeight
         color: "transparent"
+        border.color: "white"
         MouseArea {
           anchors.fill: parent
           onPressed: {
@@ -150,9 +153,10 @@ ListView {
     
   }
 
- 
   delegate: landscapeDelegate
-  highlight: Rectangle { color: "#77ddff" } 
+  highlight: Rectangle {
+    color: (activeServerList.currentIndex < 0 ? "transparent" : "#77ddff")
+  }
   Component.onCompleted: console.log ("Done loading ActiveServerList")
 
 }

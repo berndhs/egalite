@@ -57,6 +57,12 @@ ActiveServerModel::rowCount (const QModelIndex & parent) const
 }
 
 void
+ActiveServerModel::selectNone ()
+{
+  emit selectRow (-1);
+}
+
+void
 ActiveServerModel::disconnectServer (int row)
 {
   int ns = servers.count();
@@ -81,7 +87,6 @@ ActiveServerModel::removeServer (IrcSocket * sock)
 QVariant
 ActiveServerModel::data (const QModelIndex & index, int role) const
 {
-qDebug () << " ActiveServerModel data " << index << " role " << role;
   if (!index.isValid()) {
     return QVariant ();
   }
@@ -115,7 +120,6 @@ qDebug () << " ActiveServerModel data " << index << " role " << role;
   default:
     break;
   }
-  qDebug () << "           return " << retVar;
   return retVar;
 }
 
@@ -126,12 +130,11 @@ ActiveServerModel::addServer (IrcSocket *sock,
                   const QHostAddress & address,
                     int port)
 {
-qDebug () << " ActiveServerModel::addServer " << baseName << port;
   int nr = rowCount();
   beginInsertRows (QModelIndex(), nr, nr);
   servers << ServerStruct (sock, baseName, realName, address, port);
   endInsertRows ();
-  emit newServer (nr);
+  emit selectRow (nr);
 }
 
 int
