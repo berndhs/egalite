@@ -1,3 +1,6 @@
+* Thu Apr 14 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.3-1
+- connected the main IRC/QML functions, only need to add Raw Log
+
 * Wed Apr 13 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.2-1
 - imropve html mangling in XMPP; add some test code for more QML
 
