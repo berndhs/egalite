@@ -2,7 +2,7 @@
 # dchat 
 #
 #//
-#//  Copyright (C) 2010 - Bernd H Stramm 
+#//  Copyright (C) 2010,2011 - Bernd H Stramm 
 #//
 #// This program is distributed under the terms of 
 #// the GNU General Public License version 3 
