@@ -125,17 +125,6 @@ signals:
 
 private:
 
-  enum CellType {
-       Cell_None = 0,
-       Cell_Action = 1,
-       Cell_Name = 2,
-       Cell_Addr = 3,
-       Cell_Port = 4
-       };
-  enum DataType {
-       Data_ConnName = Qt::UserRole+1
-       };
-
   typedef QMap <QString, IrcAbstractChannel *>   
           ChannelMapType;
   typedef QMap <IrcAbstractChannel*, IrcFloat*>    
@@ -155,7 +144,6 @@ private:
   void ConnectGui ();
   void LoadLists ();
   void AddConnect (IrcSocket * sock);
-  void RemoveConnect (IrcSocket * sock);
   void TransformSend (IrcSocket * sock, const QString & chan, QString & data);
 
   void AddChannel (IrcSocket * sock, const QString & chanName);

@@ -95,15 +95,15 @@ Rectangle {
     id: activeListBox
     anchors { top: knownListRect.bottom; left: parent.left; leftMargin: 2 }
     width: ircControlBox.width - 4
-    height: 200
+    height: childrenRect.height
     color: "blue"
     border.color: "black"
     ActiveServerList {
       id: activeServerList
       anchors { left: parent.left; top: parent.top }
       nameWidth: 200
-      addressWidth: 172
-      height: 200
+      addressWidth: 150
+      height: 2.5*rowHeight
       model: cppActiveServerModel
       onDisconnectServer: {
         console.log ("disconnect from " + index)

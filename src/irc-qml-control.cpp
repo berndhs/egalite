@@ -318,8 +318,13 @@ void
 IrcQmlControl::DisconnectServer (IrcSocket * sock)
 {
   qDebug () << "IrcQmlCOntrol:: DisconnectServer " << sock;
+  qDebug () << "     sname " << sock->Name();
+  PartAll (sock->Name());
+  if (sockets.contains (sock->Name())) {
+    sockets.remove (sock->Name());
+  }
   if (sock) {
-    sock->disconnect ();
+    sock->DisconnectLater (3000);
   }
 }
 
@@ -442,9 +447,6 @@ IrcQmlControl::TransformSend (IrcSocket * sock, const QString & chan,
 void
 IrcQmlControl::ConnectionReady (IrcSocket * sock)
 {
- // mainUi.logDisplay->append ("Connection Ready");
-  //mainUi.logDisplay->append (QString ("peer address %1")
-  //               .arg (sock->peerAddress().toString()));
   qDebug () << " connection ready " << sock->peerAddress().toString();
   AddConnect (sock);
   emit StatusChange ();
@@ -468,7 +470,7 @@ qDebug () << " have new host name " << name << " for " << sock;
     return;
   }
   activeServers.setRealName (sock, name);
-  QString sname = activeServers.realName (sock);
+  QString sname = sock->Name();
   ChannelMapType::iterator cit;
   for (cit=channels.begin(); cit!=channels.end(); cit++) {
     if (*cit) {
@@ -482,33 +484,11 @@ qDebug () << " have new host name " << name << " for " << sock;
 void
 IrcQmlControl::ConnectionGone (IrcSocket * sock)
 {
-  qDebug () << " disconnect seen for " << sock;
- // mainUi.logDisplay->append (QString ("!!! disconnected from %1")
-  //               .arg (sock->peerAddress().toString()));
-  RemoveConnect (sock);
+  qDebug () << " disconnect seen from " << sock;
+  activeServers.removeServer (sock);
   sockets.remove (sock->Name());
   sock->deleteLater ();
   emit StatusChange ();
-}
-
-void
-IrcQmlControl::RemoveConnect (IrcSocket * sock)
-{
-  int row, col;
-  int nrows = 0;//mainUi.serverTable->rowCount ();
-  int ncols = 0;//mainUi.serverTable->columnCount ();
-  QString sname = sock->Name();
-  QTableWidgetItem *item;  
-  bool looking (true);
-  for (row=0; looking && row< nrows; row++) {
-    for (col=0; looking && col< ncols; col++) {
-      item = 0;// FindType (mainUi.serverTable, row, int (Cell_Addr));
-      if (item && item->data (int(Data_ConnName)).toString() == sname) {
-        //mainUi.serverTable->removeRow (row);
-        looking = false;
-      }
-    }
-  }
 }
 
 
