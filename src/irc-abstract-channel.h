@@ -30,7 +30,7 @@
 #include <QDeclarativeItem>
 #include <QRectF>
 
-#include "user-list-model.h"
+#include "name-list-model.h"
 
 
 namespace egalite
@@ -50,7 +50,7 @@ public:
 
   void Close ();
 
-  UserListModel * userNamesModel ();
+  NameListModel * userNamesModel ();
 
   void SetTopic (const QString & newTopic);
   void SetHost (const QString & hostName);
@@ -148,7 +148,7 @@ private:
   QStringList         history;
   QString             historyBottom;
   int                 historyIndex;
-  UserListModel       namesModel;
+  NameListModel       namesModel;
   QDeclarativeItem   *qmlItem;
   bool                topmost;
   bool                active;

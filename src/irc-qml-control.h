@@ -104,7 +104,6 @@ private slots:
   void ConnectionReady (IrcSocket * sock);
   void ConnectionGone (IrcSocket * sock);
   void ReceiveLine (IrcSocket * sock, QByteArray line);
-  void NickLogin ();
   void ChangedHostName (IrcSocket * sock, QString name);
   void ChanActive (IrcAbstractChannel * chan);
   void ChanInUse (IrcAbstractChannel * chan);
@@ -114,6 +113,12 @@ private slots:
   void ShowChannel (IrcAbstractChannel * chanBox);
   void Send ();
   void WantsWhois (QString chan, QString otherUser, bool wantsit);
+
+  void SetActiveServer (int row);
+  void SetCurrentChannel (const QString & chan);
+  void SetCurrentNick (const QString & nick);
+  void Join ();
+  void Login ();
 
   void Outgoing (QString chan, QString msg);
   void SeenWatchAlert (QString chanName, QString data);
@@ -144,6 +149,7 @@ private:
   void ConnectGui ();
   void LoadLists ();
   void AddConnect (IrcSocket * sock);
+  void NickLogin (const QString & nick, IrcSocket *sock);
   void TransformSend (IrcSocket * sock, const QString & chan, QString & data);
 
   void AddChannel (IrcSocket * sock, const QString & chanName);
@@ -214,6 +220,12 @@ private:
 
   KnownServerModel    knownServers;
   ActiveServerModel   activeServers;
+  NameListModel       channelModel;
+  NameListModel       nickModel;
+
+  IrcSocket          *selectedServer;
+  QString             selectedChannel;
+  QString             selectedNick;
 
   friend class IrcQmlSockStatic;
   friend class IrcCtcp;

@@ -55,7 +55,11 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
    isRunning (false),
    isConnected (false),
    hidSelf (false),
-   knownServers (this)
+   knownServers (this),
+   activeServers (this),
+   channelModel (this),
+   nickModel (this),
+   selectedServer (0)
 {
   ui.setupUi (this);
   dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
@@ -170,6 +174,8 @@ IrcQmlControl::Run ()
   }
   context->setContextProperty ("cppKnownServerModel", &knownServers);
   context->setContextProperty ("cppActiveServerModel", &activeServers);
+  context->setContextProperty ("cppChannelListModel",&channelModel);
+  context->setContextProperty ("cppNickListModel",&nickModel);
   ui.qmlView->setSource (
          QUrl("qrc:///qml/IrcControl.qml"));
 
@@ -200,14 +206,16 @@ IrcQmlControl::LoadLists ()
   QStringList  nicks = CertStore::IF().IrcNicks ();
   noNameNick = tr ("--- New Nick ---");
   nicks.append (noNameNick);
+  nickModel.setStringList (nicks);
+ 
+  qDebug () << " ------------ Nicks " << nicks;
 
   QStringList  chans = CertStore::IF().IrcChannels ();
   noNameChannel = tr("--- New Channel ---");
   chans.append (noNameChannel);
-  #if 0
-  mainUi.chanCombo->clear ();
-  mainUi.chanCombo->insertItems (0,chans);
-  #endif
+  channelModel.setStringList (chans);
+
+  qDebug () << " ---------------- Channels " << chans;
 
   ignoreSources = CertStore::IF().IrcIgnores ();
 }
@@ -218,6 +226,16 @@ IrcQmlControl::ConnectGui ()
   connect (qmlRoot, SIGNAL (hideMe()), this, SLOT (Hide()));
   connect (qmlRoot, SIGNAL (tryConnect(const QString &, int)),
            this, SLOT (TryConnect (const QString &, int)));
+  connect (qmlRoot, SIGNAL (selectActiveServer (int)),
+           this, SLOT (SetActiveServer (int)));
+  connect (qmlRoot, SIGNAL (selectChannel (const QString &)),
+           this, SLOT (SetCurrentChannel (const QString &)));
+  connect (qmlRoot, SIGNAL (selectNick (const QString & )),
+           this, SLOT (SetCurrentNick (const QString & )));
+  connect (qmlRoot, SIGNAL (join ()),
+           this, SLOT (Join ()));
+  connect (qmlRoot, SIGNAL (login()),
+           this, SLOT (Login ()));
   #if 0
   connect (mainUi.connectButton, SIGNAL (clicked()),
            this, SLOT (TryConnect ()));
@@ -493,37 +511,36 @@ IrcQmlControl::ConnectionGone (IrcSocket * sock)
 
 
 void
-IrcQmlControl::NickLogin ()
+IrcQmlControl::NickLogin (const QString & nick, IrcSocket *sock)
 {
-  IrcSocket * sock = 0; //= CurrentSock (mainUi.serverTable);
   if (sock == 0) {
     return;
   }
-  QString nick;//= mainUi.nickCombo->currentText();
-  if (nick == noNameNick) {
+  QString useNick (nick);
+  if (useNick == noNameNick) {
     EnterString  enter (this);
     bool picked = enter.Choose (tr("IRC Nick"), tr("Nick:"), true);
     if (picked) {
-      nick = enter.Value ();
+      useNick = enter.Value ();
     } else {
       return; 
     }
   }
   QString pass;
   QString real;
-  bool  havePass = CertStore::IF().GetIrcIdent (nick, real, pass);
+  bool  havePass = CertStore::IF().GetIrcIdent (useNick, real, pass);
   if (real.length() == 0) {
-    real = nick;
+    real = useNick;
   }
   if (havePass) {
     sock->Send (QString ("PASS :%1").arg(pass));
   }
-  sock->Send (QString ("USER %1 0 * :%2").arg (nick).arg(real));
-  sock->Send (QString ("NICK %1").arg (nick));
-  sock->SetNick (nick);
+  sock->Send (QString ("USER %1 0 * :%2").arg (useNick).arg(real));
+  sock->Send (QString ("NICK %1").arg (useNick));
+  sock->SetNick (useNick);
   QString part;
   QString quit;
-  bool haveMsgs = CertStore::IF().GetIrcMessages (nick, part, quit);
+  bool haveMsgs = CertStore::IF().GetIrcMessages (useNick, part, quit);
   if (haveMsgs) { 
     sock->SetPartMsg (part);
     sock->SetQuitMsg (quit);
@@ -1013,6 +1030,40 @@ QStringList
 IrcQmlControl::LoadIgnores ()
 {
   return CertStore::IF().IrcIgnores ();
+}
+
+void
+IrcQmlControl::SetActiveServer (int row)
+{
+  selectedServer = activeServers.socket (row);
+}
+
+void
+IrcQmlControl::SetCurrentChannel (const QString & chan)
+{
+  selectedChannel = chan;
+}
+
+void
+IrcQmlControl::SetCurrentNick (const QString & nick)
+{
+  selectedNick = nick;
+}
+
+void
+IrcQmlControl::Join ()
+{
+  qDebug () << "IrcQmlControl::Join " << selectedChannel << selectedServer;
+  if (selectedServer) {
+    selectedServer->Send (QString ("JOIN %1").arg(selectedChannel));
+  }
+}
+
+void
+IrcQmlControl::Login ()
+{
+  qDebug () << " IrcQmlControl Login " << selectedNick << selectedServer;
+  NickLogin (selectedNick, selectedServer);
 }
 
 } // namespace

@@ -264,7 +264,7 @@ Rectangle {
             id: userNameRect
             width: userListBox.width; height: userListBox.height
             color: "transparent"
-            Text { width: userListBox.width; text: userName }
+            Text { width: userListBox.width; text: name }
             MouseArea {
               anchors.fill: parent
               onClicked : selectUser (userName)

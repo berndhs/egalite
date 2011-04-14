@@ -35,6 +35,7 @@ ListView {
   property real rowHeight: 32
 
   signal disconnectServer (int index)
+  signal selectedServer (int index)
 
   Component {
     id: landscapeDelegate 
@@ -63,6 +64,13 @@ ListView {
         width: activeServerList.nameWidth
         height: activeServerList.rowHeight
         color: "transparent"
+        MouseArea {
+          anchors.fill: parent
+          onPressed: {
+            activeServerList.currentIndex = index;
+            activeServerList.selectedServer (index);
+          }
+        }
         Text {
           anchors { 
             left: parent.left; leftMargin: 3 ; 
@@ -77,6 +85,13 @@ ListView {
         width: activeServerList.nameWidth
         height: activeServerList.rowHeight
         color: "transparent"
+        MouseArea {
+          anchors.fill: parent
+          onPressed: {
+            activeServerList.currentIndex = index;
+            activeServerList.selectedServer (index);
+          }
+        }
         Text {
           anchors { 
             left: parent.left; leftMargin: 3 ; 
@@ -91,6 +106,13 @@ ListView {
         width: activeServerList.addressWidth
         height: activeServerList.rowHeight
         color: "transparent"
+        MouseArea {
+          anchors.fill: parent
+          onPressed: {
+            activeServerList.currentIndex = index;
+            activeServerList.selectedServer (index);
+          }
+        }
         Text {
           anchors { 
             left: parent.left; leftMargin: 3 ; 
@@ -107,6 +129,13 @@ ListView {
         width: activeServerList.portWidth
         height: activeServerList.rowHeight
         color: "transparent"
+        MouseArea {
+          anchors.fill: parent
+          onPressed: {
+            activeServerList.currentIndex = index;
+            activeServerList.selectedServer (index);
+          }
+        }
         Text {
           id: thePortText
           anchors { 
@@ -123,7 +152,7 @@ ListView {
 
  
   delegate: landscapeDelegate
-  highlight: Rectangle { color: "#77bbff" } 
+  highlight: Rectangle { color: "#77ddff" } 
   Component.onCompleted: console.log ("Done loading ActiveServerList")
 
 }

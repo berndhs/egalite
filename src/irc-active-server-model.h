@@ -70,6 +70,8 @@ public:
   QHostAddress  address (const IrcSocket *sock) const;
   int           port (const IrcSocket *sock) const;
 
+  IrcSocket    *socket (int row);
+
 signals:
 
   void wantDisconnect (IrcSocket * sock);

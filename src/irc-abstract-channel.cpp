@@ -137,7 +137,7 @@ IrcAbstractChannel::SetActive (bool a)
   active = a;
 }
 
-UserListModel *
+NameListModel *
 IrcAbstractChannel::userNamesModel ()
 {
   return & namesModel;

@@ -1,5 +1,4 @@
-#ifndef EGALITE_USER_LIST_MODEL_H
-#define EGALITE_USER_LIST_MODEL_H
+#include "name-list-model.h"
 
 
 /****************************************************************
@@ -24,21 +23,17 @@
  ****************************************************************/
 
 
-#include <QStringListModel>
+#include <QHash>
 
 namespace egalite
 {
 
-class UserListModel : public QStringListModel 
+NameListModel::NameListModel (QObject *parent)
+  :QStringListModel (parent)
 {
-Q_OBJECT
-public:
-  
-  UserListModel (QObject *parent);
-
-};
+  QHash<int, QByteArray> roles;
+  roles[Qt::DisplayRole] = "name";
+  setRoleNames(roles);
+}
 
 } // namespace
-
-
-#endif

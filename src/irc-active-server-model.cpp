@@ -229,6 +229,18 @@ ActiveServerModel::realName (const IrcSocket *sock) const
   return servers.at(row).realName;
 }
 
+IrcSocket *
+ActiveServerModel::socket (int row)
+{
+  if (row < 0) {
+    return 0;
+  }
+  if (row >= servers.count()) {
+    return 0;
+  }
+  return servers.at(row).socket;
+}
+
 QHostAddress
 ActiveServerModel::address (const IrcSocket *sock) const
 {

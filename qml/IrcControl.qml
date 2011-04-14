@@ -33,6 +33,11 @@ Rectangle {
 
   signal hideMe ()
   signal tryConnect (string host, int port)
+  signal selectActiveServer (int index)
+  signal selectChannel (string name)
+  signal selectNick (string name)
+  signal join ()
+  signal login ();
 
   ChoiceButton {
     anchors {top: parent.top; right: parent.right }
@@ -109,6 +114,127 @@ Rectangle {
         console.log ("disconnect from " + index)
         model.disconnectServer (index)
       }
+      onSelectedServer: {
+        ircControlBox.selectActiveServer (index)
+      }
+    }
+  }
+
+  Rectangle {
+    id: channelListBox
+    color: "transparent"
+    border.color: "red"
+    border.width: 1
+    width: parent.width * 0.4
+    height: 4 * 32
+    anchors { top: activeListBox.bottom; left: parent.left }
+    Text {
+      id: channelHeader
+      height: 32
+      width: parent.width
+      text: qsTr ("Channel Names")
+    }
+    ListView {
+      Component {
+        id: channelDelegate
+        Rectangle {
+          id: channelDelegateBox 
+          width: channelListBox.width
+          height: 32
+          color: "transparent"
+          MouseArea {
+            anchors.fill: parent
+            onClicked: { 
+              channelList.currentIndex = index; 
+              ircControlBox.selectChannel (name) 
+            }
+          }
+          Text {
+            width: channelListBox,width; text: name
+          }
+        }
+      }
+      id: channelList
+      width: parent.width
+      height: 3 * 32
+      clip: true
+      anchors { top: channelHeader.bottom; left: channelListBox.left }
+      model: cppChannelListModel
+      highlight: Rectangle { color: "#ffcccc" }
+      delegate: channelDelegate
+    }
+  }
+
+  Column {
+    id: middleButtons
+    anchors { 
+      left: channelListBox.right; 
+      top: channelListBox.top 
+    }
+    ChoiceButton {
+      id: joinButton 
+      labelText: qsTr ("<-- Join")
+      radius: 8
+      height: 64
+      onClicked: {
+        ircControlBox.join ()
+      }
+    }
+    ChoiceButton {
+      id: loginButton 
+      labelText: qsTr ("Login -->")
+      radius: 8
+      height: 64
+      onClicked: {
+        ircControlBox.login ()
+      }
+    }
+  }
+    
+  Rectangle {
+    id: nickListBox
+    color: "transparent"
+    border.color: "blue"
+    border.width: 1
+    width: parent.width * 0.4
+    height: 4 * 32
+    anchors { top: activeListBox.bottom; left: middleButtons.right }
+    Text {
+      id: nickHeader
+      height: 32
+      width: parent.width
+      text: qsTr ("Nick Names")
+    }
+    ListView {
+      Component {
+        id: nickDelegate
+        Rectangle {
+          id: nickDelegateBox 
+          width: nickListBox.width
+          height: 32
+          color: "transparent"
+          MouseArea {
+            height: 32
+            anchors.fill: parent
+            onClicked:  { 
+              nickList.currentIndex = index; 
+              ircControlBox.selectNick (name) 
+            }
+          }
+          Text {
+            width: nickListBox.width
+            text: name
+          }
+        }
+      }
+      id: nickList
+      width: parent.width
+      height: 3 * 32
+      clip: true
+      anchors { top: nickHeader.bottom; left: nickListBox.left }
+      model: cppNickListModel
+      delegate: nickDelegate
+      highlight: Rectangle { color: "#eeccff" }
     }
   }
     
