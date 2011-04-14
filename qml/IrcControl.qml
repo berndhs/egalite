@@ -32,6 +32,7 @@ Rectangle {
   color: baseColor
 
   signal hideMe ()
+  signal tryConnect (string host, int port)
 
   ChoiceButton {
     anchors {top: parent.top; right: parent.right }
@@ -44,7 +45,7 @@ Rectangle {
     }
   }
   Rectangle {
-    id: knownButtonRect
+    id: knownListRect
     width: childrenRect.width; height: childrenRect.height
     color: knownButton.visible ? "transparent " : "green"
     border.color: "#c0c0c0"
@@ -61,8 +62,8 @@ Rectangle {
       property bool seeList: knownServerList.visible
       color: seeList ? lightColor : darkColor
       labelText: knownServerList.visible 
-                      ? knownButtonRect.noShowString 
-                      : knownButtonRect.showString
+                      ? knownListRect.noShowString 
+                      : knownListRect.showString
       visible: true
       Behavior on color { PropertyAnimation { duration: rollDelay } }
       onClicked: {
@@ -85,21 +86,32 @@ Rectangle {
       onConnectServer: {
         console.log ("connect server " + name + " port " + port )
         visible = false
+        ircControlBox.tryConnect (name, port)
       }
     }
   }
 
-  ListView {
-    id: activeServerList
+  Rectangle {
+    id: activeListBox
+    anchors { top: knownListRect.bottom; left: parent.left; leftMargin: 2 }
+    width: ircControlBox.width - 4
+    height: 200
+    color: "blue"
+    border.color: "black"
+    ActiveServerList {
+      id: activeServerList
+      anchors { left: parent.left; top: parent.top }
+      nameWidth: 200
+      addressWidth: 172
+      height: 200
+      model: cppActiveServerModel
+      onDisconnectServer: {
+        console.log ("disconnect from " + index)
+        model.disconnectServer (index)
+      }
+    }
   }
     
-
-  Text {
-    id: placeHolder
-    anchors.centerIn: parent
-    text: "IrcControlBox"
-  }
-  
   Component.onCompleted: {
     console.log ("loaded IrcControlBox")
   }

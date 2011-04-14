@@ -28,6 +28,7 @@
 #include "irc-float.h"
 #include "irc-socket.h"
 #include "irc-known-server-model.h"
+#include "irc-active-server-model.h"
 #include <QFile>
 #include <QStringList>
 #include <QMap>
@@ -96,9 +97,9 @@ private slots:
 
   void Exit ();
   void Exiting ();
-  void TryConnect ();
+  void TryConnect (const QString & host, int port);
   void TryDisconnect ();
-  void TryJoin ();
+  void DisconnectServer (IrcSocket * sock);
   void TryPart ();
   void ConnectionReady (IrcSocket * sock);
   void ConnectionGone (IrcSocket * sock);
@@ -111,8 +112,6 @@ private slots:
   void ChanWantsFloat (IrcAbstractChannel * chan);
   void HideChannel (IrcAbstractChannel * chanBox);
   void ShowChannel (IrcAbstractChannel * chanBox);
-  void ChannelClicked (QListWidgetItem * item);
-  void ServerClicked (QTableWidgetItem * item);
   void Send ();
   void WantsWhois (QString chan, QString otherUser, bool wantsit);
 
@@ -158,9 +157,7 @@ private:
   void AddConnect (IrcSocket * sock);
   void RemoveConnect (IrcSocket * sock);
   void TransformSend (IrcSocket * sock, const QString & chan, QString & data);
-  IrcSocket * CurrentSock (QTableWidget * table);
-  QTableWidgetItem* FindType (QTableWidget * table, int row, int type);
-  int  FindRow (QTableWidget * table, const QString & sname);
+
   void AddChannel (IrcSocket * sock, const QString & chanName);
   void DropChannel (IrcSocket * sock, 
                     const QString & chanName);
@@ -228,6 +225,7 @@ private:
   QMap <QString, QString>  whoisWait;
 
   KnownServerModel    knownServers;
+  ActiveServerModel   activeServers;
 
   friend class IrcQmlSockStatic;
   friend class IrcCtcp;

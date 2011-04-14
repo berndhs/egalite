@@ -11,6 +11,7 @@
   <file>qml/ChoiceButton.qml</file>
   <file>qml/DropMenu.qml</file>
   <file>qml/KnownServerList.qml</file>
+  <file>qml/ActiveServerList.qml</file>
 </qresource>
 <qresource prefix="/schemas">
   <file alias="identities.sql">schemafiles/identities.sql</file>
