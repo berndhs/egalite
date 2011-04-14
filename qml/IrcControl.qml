@@ -102,13 +102,13 @@ Rectangle {
     width: ircControlBox.width - 4
     height: childrenRect.height
     color: "blue"
-    border.color: "black"
     ActiveServerList {
       id: activeServerList
       anchors { left: parent.left; top: parent.top }
       nameWidth: 200
       addressWidth: 150
-      height: 2.5*rowHeight
+      height: 3.5*rowHeight
+      clip: true
       width: activeListBox.width
       model: cppActiveServerModel
       onDisconnectServer: {

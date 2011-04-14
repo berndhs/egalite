@@ -100,7 +100,6 @@ IrcSocket::DidConnect ()
 {
   hostName = peerAddress().toString();
   emit connected (this);
-  emit ChangedHostName (this, hostName);
   scriptTimer->start (1000);
   pingTimer->start (2*60*1000);
 }

@@ -55,7 +55,8 @@ public:
                   const QString & baseName, 
                   const QString & realName,
                   const QHostAddress & address,
-                    int port);
+                    int port,
+                   bool readSet = false);
 
   int findServer (const IrcSocket *sock) const;
   void removeServer (IrcSocket * sock);
@@ -87,7 +88,8 @@ private:
     Role_RealName = Qt::UserRole+2,
     Role_Address = Qt::UserRole+3,
     Role_Port = Qt::UserRole+4,
-    Role_State = Qt::UserRole+5
+    Role_State = Qt::UserRole+5,
+    Role_HaveRealName = Qt::UserRole+6
   };
 
   struct ServerStruct {
@@ -96,13 +98,16 @@ private:
     QString       realName;
     QHostAddress  address;
     int           port;
+    bool          realSet;
     ServerStruct ();
     ServerStruct (IrcSocket * sck,
                   const QString & bn,
                   const QString & rn,
                   const QHostAddress & ad, 
-                  int p);
+                  int pm,
+                  bool haveReal = false);
     ServerStruct (const ServerStruct & other);
+    void setReal (const QString &rn);
   };
 
   typedef QList<ServerStruct>   ServerListType;

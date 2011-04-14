@@ -39,10 +39,10 @@ ListView {
 
   Component {
     id: landscapeDelegate 
-    Row {
+    Flow {
       id: serverRow
       width: activeServerList.width
-      height: activeServerList.rowHeight
+      height: childrenRect.height //activeServerList.rowHeight
       spacing: 4
       anchors.left: parent.left
       Rectangle {
@@ -82,35 +82,14 @@ console.log ("    current index " + activeServerList.currentIndex )
             left: parent.left; leftMargin: 3 ; 
             verticalCenter: parent.verticalCenter 
           }
-          text: basename
+          text: haverealname ? realname : basename
         }
       }      
-      Rectangle {
-        id: realNameCol
-        width: childrenRect.width //activeServerList.nameWidth
-        height: activeServerList.rowHeight
-        color: "transparent"
-        MouseArea {
-          anchors.fill: parent
-          onPressed: {
-            activeServerList.currentIndex = index;
-            activeServerList.selectedServer (index);
-          }
-        }
-        Text {
-          anchors { 
-            left: parent.left; leftMargin: 3 ; 
-            verticalCenter: parent.verticalCenter 
-          }
-          text: realname
-        }
-      }
       Rectangle {
         id: addressCol
         width: childrenRect.width //activeServerList.addressWidth
         height: activeServerList.rowHeight
         color: "transparent"
-        border.color: "green"
         MouseArea {
           anchors.fill: parent
           onPressed: {
@@ -131,7 +110,6 @@ console.log ("    current index " + activeServerList.currentIndex )
         width: activeServerList.portWidth
         height: activeServerList.rowHeight
         color: "transparent"
-        border.color: "white"
         MouseArea {
           anchors.fill: parent
           onPressed: {

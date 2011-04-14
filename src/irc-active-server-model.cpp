@@ -38,6 +38,7 @@ ActiveServerModel::ActiveServerModel (QObject *parent)
   roles[Role_Address] = "address";
   roles[Role_Port] = "port";
   roles[Role_State] = "connectstate";
+  roles[Role_HaveRealName] = "haverealname";
   setRoleNames (roles);
 }
 
@@ -117,6 +118,9 @@ ActiveServerModel::data (const QModelIndex & index, int role) const
       retVar = QString ("??");
     }
     break;
+  case Role_HaveRealName:
+    retVar = servers.at(row).realSet;
+    break;
   default:
     break;
   }
@@ -128,11 +132,12 @@ ActiveServerModel::addServer (IrcSocket *sock,
                   const QString & baseName, 
                   const QString & realName,
                   const QHostAddress & address,
-                    int port)
+                    int port,
+                   bool realSet)
 {
   int nr = rowCount();
   beginInsertRows (QModelIndex(), nr, nr);
-  servers << ServerStruct (sock, baseName, realName, address, port);
+  servers << ServerStruct (sock, baseName, realName, address, port, realSet);
   endInsertRows ();
   emit selectRow (nr);
 }
@@ -185,7 +190,7 @@ ActiveServerModel::setRealName (const IrcSocket *sock, const QString & name)
   if (row < 0) {
     return;
   }
-  servers[row].realName = name;
+  servers[row].setReal (name);
   QModelIndex changedIndex = createIndex (row, 0);
   emit dataChanged (changedIndex, changedIndex);
 }
@@ -260,7 +265,8 @@ ActiveServerModel::ServerStruct::ServerStruct ()
    baseName (""),
    realName (""),
    address (QHostAddress()),
-   port (0)
+   port (0),
+   realSet (false)
 {
 }
 
@@ -268,12 +274,14 @@ ActiveServerModel::ServerStruct::ServerStruct (IrcSocket * sck,
                   const QString & bn,
                   const QString & rn,
                   const QHostAddress & ad, 
-                  int p)
+                  int p,
+                  bool haveReal)
   :socket (sck),
    baseName(bn),
    realName (rn),
    address (ad),
-   port (p)
+   port (p),
+   realSet (haveReal)
 {
 }
 
@@ -282,8 +290,16 @@ ActiveServerModel::ServerStruct::ServerStruct (
   :socket (other.socket),
    baseName (other.baseName),
    realName (other.realName),
-   port (other.port)
+   port (other.port),
+   realSet (other.realSet)
 {
+}
+
+void
+ActiveServerModel::ServerStruct::setReal (const QString & rn)
+{
+  realName = rn;
+  realSet = true;
 }
 
 
