@@ -117,12 +117,11 @@ DChatMain::SetupToolbar ()
   actionIrcStatus = ui.toolBar->addAction (tr("IRC"));
 
   ircMenu = new QMenu (this);
-  ircMenu->addAction (tr("Show Irc Control"), ircControl, SLOT (Show()));
-  ircMenu->addAction (tr("Show Irc Qml Control"), 
+  ircMenu->addAction (tr("Show Irc Control"), 
                         ircQmlControl, SLOT (Show()));
-  ircMenu->addAction (tr("Show Irc Channels"), ircControl, SLOT (ShowAll()));
-  ircMenu->addAction (tr("Hide Irc Control"), ircControl, SLOT (Hide()));
-  ircMenu->addAction (tr("Hide Irc Channels"), ircControl, SLOT (HideAll()));
+  ircMenu->addAction (tr("Show Irc Channels"), ircQmlControl, SLOT (ShowAll()));
+  ircMenu->addAction (tr("Hide Irc Control"), ircQmlControl, SLOT (Hide()));
+  ircMenu->addAction (tr("Hide Irc Channels"), ircQmlControl, SLOT (HideAll()));
 
 
   directMenu = new QMenu (this);
@@ -1089,9 +1088,9 @@ DChatMain::CreateSystemTrayStuff ()
   trayMenu = new QMenu(this);
   trayMenu->addAction (tr("Show %1").arg (QString::fromUtf8("Egalite")),
                        this, SLOT (Show()));
-  trayMenu->addAction (tr("Show IRC Control"), ircControl, SLOT (Show()));
-  trayMenu->addAction (tr("Show IRC Dock"), ircControl, SLOT (ShowGroup()));
-  trayMenu->addAction (tr("Show IRC Floats"), ircControl, SLOT (ShowFloats()));
+  trayMenu->addAction (tr("Show IRC Control"), ircQmlControl, SLOT (Show()));
+  trayMenu->addAction (tr("Show IRC Dock"), ircQmlControl, SLOT (ShowGroup()));
+  trayMenu->addAction (tr("Show IRC Floats"), ircQmlControl, SLOT (ShowFloats()));
   trayMenu->addAction (tr ("Hide %1").arg (QString::fromUtf8("Egalite")),
                        this, SLOT (hide()));
   trayMenu->addAction (tr ("Quit %1").arg (QString::fromUtf8("Egalite")),

@@ -27,30 +27,25 @@ import QtQuick 1.0
 Rectangle {
   id: dropMenu
   property real itemHeight: 32
-  property real itemWidth: width
-  property real floatHeight: childrenRect.height
-  property real floatWidth: childrenRect.width
-  property real rollDelay: 125
-  property real initialYScale: 0
-
+  property real itemWidth: 100
+  property real rollDelay: 175
+  property bool isShown: true
 
   function hide () {
-    rollupScale.yScale = 0
+    isShown = false
   }
   function show () {
-    rollupScale.yScale = 1
-    console.log ("show menu at z = " + z )
-  }
-  transform: Scale {
-    id: rollupScale
-    xScale: 1
-    yScale: initialYScale
-    Behavior  on yScale {
-      NumberAnimation { duration: rollDelay }
-    }
+    isShown = true
   }
 
+  Behavior on scale { NumberAnimation { duration: rollDelay }}
+
   width: itemWidth
-  height: 200
+  height: childrenRect.height
+  scale: isShown ? 1 : 0
   color: "green"
+  MouseArea {
+    anchors.fill: parent
+    onExited: parent.hide ()
+  }
 }

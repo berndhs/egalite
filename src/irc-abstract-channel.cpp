@@ -82,6 +82,7 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
   connect (qmlItem, SIGNAL (userDown()), this, SLOT (UserDown ()));
   connect (qmlItem, SIGNAL (activatedLink(const QString &)),
            this, SLOT (ActivatedCookedLink(const QString &)));
+  connect (qmlItem, SIGNAL (wantPart()), this, SLOT (Part()));
   qmlItem->setProperty ("channelName", chanName);
 }
 
@@ -224,9 +225,13 @@ void
 IrcAbstractChannel::Part ()
 {
 qDebug () << " -----------> PART parts " << chanName << partMsg;
-  emit Outgoing (chanName, QString ("/part %1 :%2")
+  if (raw) {
+    emit WantClose (this);
+  } else {
+    emit Outgoing (chanName, QString ("/part %1 :%2")
                                     .arg (chanName)
                                     .arg (partMsg));
+  }
 }
 
 void

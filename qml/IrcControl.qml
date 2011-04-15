@@ -203,6 +203,7 @@ Rectangle {
         clip: true
         anchors { top: channelHeader.bottom; left: channelListBox.left }
         model: cppChannelListModel
+        highlightMoveSpeed: 2000
         highlight: Rectangle { color: "#ffcccc" }
         delegate: channelDelegate
       }

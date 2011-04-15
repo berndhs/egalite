@@ -46,6 +46,7 @@ Rectangle {
   signal userUp ()
   signal userDown ()
   signal activatedLink (string link)
+  signal wantPart ()
 
   function selectUser (user) {
     console.log ("selected user " + user)
@@ -95,7 +96,13 @@ Rectangle {
     z: parent.z+1
     MouseArea { 
       anchors.fill: parent
-      onClicked: cookedFlickBox.alignBottom()
+      onClicked: {
+        if (channelMenu.isShown) {
+          channelMenu.hide ()
+        } else {
+          channelMenu.show ()
+        }
+      }
       onDoubleClicked: { cookedFlickBox.interactive = !cookedFlickBox.interactive }
       onPressAndHold: topicBox.toggleHeight()
     }
@@ -103,6 +110,36 @@ Rectangle {
       anchors { leftMargin: 2; rightMargin: 2; verticalCenter: parent.verticalCenter }
       id: channelBoxLabel
       text: " "
+    }
+  }
+  DropMenu {
+    id: channelMenu
+    color: "transparent"
+    itemWidth: childrenRect.width
+    itemHeight: 36
+    property real buttonRadius: 0.4 * itemHeight
+    z: parent.z + 1
+    isShown: false
+    rollDelay: 75
+    anchors { 
+      top: channelBoxLabelRect.bottom; 
+      left: channelBoxLabelRect.horizontalCenter 
+    }
+    ChoiceButton {
+      id: partButton
+      height: parent.itemHeight
+      radius: buttonRadius
+      anchors {top: parent.top; horizontalCenter: parent.horizontalCenter }
+      labelText: qsTr (" Leave Channel ")
+      onClicked: { channelBox.wantPart (); channelMenu.hide () }
+    }
+    ChoiceButton {
+      id: tpoicButton
+      height: parent.itemHeight
+      radius: buttonRadius
+      anchors {top: partButton.bottom; horizontalCenter: parent.horizontalCenter }
+      labelText: qsTr (" Big Topic ")
+      onClicked: { topicBox.toggleHeight(); channelMenu.hide () }
     }
   }
   Rectangle {
