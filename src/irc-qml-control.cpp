@@ -615,6 +615,8 @@ IrcQmlControl::AddChannel (IrcSocket * sock,
            this, SLOT (HideChannel (IrcAbstractChannel *)));
   connect (newchan, SIGNAL (WantWhois (QString, QString, bool)),
            this, SLOT (WantsWhois (QString, QString, bool)));
+  connect (newchan, SIGNAL (ShowControl()),
+           this, SLOT (Show()));
   //mainUi.chanList->addItem (chanName);
 }
 

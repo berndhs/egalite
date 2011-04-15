@@ -83,6 +83,7 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
   connect (qmlItem, SIGNAL (activatedLink(const QString &)),
            this, SLOT (ActivatedCookedLink(const QString &)));
   connect (qmlItem, SIGNAL (wantPart()), this, SLOT (Part()));
+  connect (qmlItem, SIGNAL (showControl()), this, SIGNAL (ShowControl()));
   qmlItem->setProperty ("channelName", chanName);
 }
 

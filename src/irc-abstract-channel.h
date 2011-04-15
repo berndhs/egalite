@@ -124,6 +124,7 @@ signals:
   void HideDock ();
   void HideChannel (IrcAbstractChannel * box);
   void WatchAlert (QString pattern, QString line);
+  void ShowControl ();
 
 private:
 
