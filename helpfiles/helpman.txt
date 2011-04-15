@@ -151,7 +151,7 @@ in the list.
 
 The Channel Label acts as a multi-function button:
 
-- *Click* to reset the history display to show the most current item at the bottom
+- *Click* to open or close a context menu
 - *Double-Click* to stop/start the drag/flickable behaviour of the history
 - *Press-and-Hold* to expand/contract the topic text
 

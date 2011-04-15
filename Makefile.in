@@ -32,6 +32,9 @@ distclean: $(MAKEFILE) FORCE
 	$(MAKE) -f $(MAKEFILE) distclean
 	rm -f $(MAKEFILE)
 	rm -f $(TOP_MAKEFILE)
+
+manual:
+	asciidoc helpfiles/helpman.txt
 	
 debug: $(MAKEFILE) FORCE
 	$(MAKE) -f $(MAKEFILE) debug
