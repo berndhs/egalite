@@ -51,6 +51,9 @@ Rectangle {
       ircControlBox.hideMe ()
     }
   }
+
+/** Known Server List */
+
   Rectangle {
     id: knownListRect
     width: childrenRect.width; height: childrenRect.height
@@ -98,6 +101,8 @@ Rectangle {
     }
   }
 
+/**    Active Server List  */
+
   Rectangle {
     id: activeListBox
     anchors { top: knownListRect.bottom; left: parent.left; leftMargin: 2 }
@@ -136,30 +141,31 @@ Rectangle {
         target: cppActiveServerModel
         onSelectRow: {
           console.log (" Select Row " + row)
-          activeServerList.currentIndex = row
+          activeServerList.selectRow (row)
         }
       }
     }
   }
 
-  Flow {
+/** Bottom Section with channel list, nick list, join button, login button */
+
+  Rectangle {
     id: bottomFlow
-    spacing: 6
     width: ircControlBox.width 
+    property real space : 4
     property real subListWidth: width * 0.4
-    property real middleButtonWidth: width - 2*subListWidth - 2*spacing
+    property real middleButtonWidth: width - 2*subListWidth - 2*space
                     
     anchors { 
       top: activeListBox.bottom; 
-      horizontalCenter: parent.horizontalCenter 
-      leftMargin: 4
-      rightMargin: 4
+      horizontalCenter:ircControlBox.horizontalCenter 
     }
     Rectangle {
       id: channelListBox
       color: "transparent"
       width: bottomFlow.subListWidth
       height: restHeight
+      anchors { left: bottomFlow.left; top: parent.top }
       Rectangle {
         id: channelHeader
         height: childrenRect.height
@@ -204,7 +210,8 @@ Rectangle {
 
     Column {
       id: middleButtons
-      spacing: 2
+      anchors { horizontalCenter: bottomFlow.horizontalCenter }
+      spacing: 6
       ChoiceButton {
         id: joinButton 
         labelText: qsTr ("<-- Join")
@@ -232,6 +239,7 @@ Rectangle {
       color: "transparent"
       width: bottomFlow.subListWidth
       height: restHeight
+      anchors { right: bottomFlow.right; leftMargin: space }
       Rectangle {
         id: nickHeader
         height: childrenRect.height

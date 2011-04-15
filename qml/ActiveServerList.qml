@@ -37,6 +37,11 @@ ListView {
   signal disconnectServer (int index)
   signal selectedServer (int index)
 
+  function selectRow (row) {
+    currentIndex = row
+    selectedServer (row)
+  }
+
   Component {
     id: landscapeDelegate 
     Flow {
@@ -71,10 +76,8 @@ ListView {
         MouseArea {
           anchors.fill: parent
           onPressed: {
-console.log (" press BASE name " + index );
             activeServerList.currentIndex = index;
             activeServerList.selectedServer (index);
-console.log ("    current index " + activeServerList.currentIndex )
           }
         }
         Text {

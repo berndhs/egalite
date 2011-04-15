@@ -238,26 +238,6 @@ IrcQmlControl::ConnectGui ()
            this, SLOT (Join ()));
   connect (qmlRoot, SIGNAL (login()),
            this, SLOT (Login ()));
-  #if 0
-  connect (mainUi.connectButton, SIGNAL (clicked()),
-           this, SLOT (TryConnect ()));
-  connect (mainUi.joinButton, SIGNAL (clicked()),
-           this, SLOT (TryJoin ()));
-  connect (mainUi.sendButton, SIGNAL (clicked()),
-           this, SLOT (Send ()));
-  connect (mainUi.partButton, SIGNAL (clicked()),
-           this, SLOT (TryPart ()));
-  connect (mainUi.sendEdit, SIGNAL (returnPressed()),
-           this, SLOT (Send ()));
-  connect (mainUi.loginButton, SIGNAL (clicked()),
-           this, SLOT (NickLogin ()));
-  connect (mainUi.hideButton, SIGNAL (clicked ()),
-           this, SLOT (hide ()));
-  connect (mainUi.chanList, SIGNAL (itemClicked (QListWidgetItem *)),
-           this, SLOT (ChannelClicked (QListWidgetItem *)));
-  connect (mainUi.serverTable, SIGNAL (itemClicked (QTableWidgetItem *)),
-           this, SLOT (ServerClicked (QTableWidgetItem *)));
-  #endif
 }
 
 void
