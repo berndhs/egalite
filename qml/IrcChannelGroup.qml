@@ -34,6 +34,7 @@ Rectangle {
 
   signal selectedChannel (string link)
   signal changedHeadHeight (int newHeight)
+  signal hideMe ()
 
   function addChannel () {
     console.log ("  channelGroup add ")
@@ -80,9 +81,17 @@ Rectangle {
     id: emptyBox
     width: 200; height: 100
     anchors.centerIn: parent
+    color: "#ffffcc"
+    MouseArea {
+      anchors.fill: parent
+      onPressed: {
+        channelGroup.hideMe ()
+      }
+    }
     Text {
       anchors.centerIn: parent
-      text: qsTr ("No Channels")
+      horizontalAlignment: Text.AlignHCenter
+      text: qsTr ("No Channels\n\n( Close )")
     }
   }
   Component.onCompleted: {

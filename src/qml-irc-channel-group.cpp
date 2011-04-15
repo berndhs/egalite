@@ -82,6 +82,8 @@ QmlIrcChannelGroup::Start ()
            this, SLOT (ClickedChannel (QString)));
   connect (qmlRoot, SIGNAL (changedHeadHeight (int)),
            this, SLOT (HeadHeightChanged (int)));
+  connect (qmlRoot, SIGNAL (hideMe()),
+           this, SLOT (Hide ()));
 }
 
 
