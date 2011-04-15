@@ -485,7 +485,7 @@ IrcAbstractChannel::UserSend ()
     if (data.trimmed().length() > 0) {
       QMetaObject::invokeMethod (qmlItem, "clearUserData");
       if (raw) {
-        emit OutRaw (sockName, data);
+        AlmostRaw (data);
       } else if (data == "/part") {
         Part ();
         sendout = false;
@@ -502,6 +502,27 @@ IrcAbstractChannel::UserSend ()
       historyIndex = history.size();
     }
   }
+}
+
+void
+IrcAbstractChannel::AlmostRaw (const QString & data)
+{
+  QString prepared (data);
+  if (prepared == QString ("/part")) {
+    emit WantClose (this);
+    return;
+  }
+  if (prepared.startsWith("/msg")) {
+    prepared.remove (0,4);
+    prepared.prepend ("PRIVMSG");
+  } else if (prepared.startsWith ("/part")) {
+    prepared.remove (0,5);
+    prepared.prepend ("PART");
+  } else if (prepared.startsWith ("/whois")) {
+    prepared.remove (0,6);
+    prepared.prepend ("WHOIS");
+  }
+  emit OutRaw (sockName, prepared);
 }
 
 void

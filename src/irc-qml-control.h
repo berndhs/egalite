@@ -109,6 +109,7 @@ private slots:
   void ChanInUse (IrcAbstractChannel * chan);
   void ChanWantsDock (IrcAbstractChannel * chan);
   void ChanWantsFloat (IrcAbstractChannel * chan);
+  void ChanWantsClose (IrcAbstractChannel * chan);
   void HideChannel (IrcAbstractChannel * chanBox);
   void ShowChannel (IrcAbstractChannel * chanBox);
   void Send ();

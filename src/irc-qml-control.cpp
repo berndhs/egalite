@@ -502,8 +502,25 @@ void
 IrcQmlControl::ConnectionGone (IrcSocket * sock)
 {
   qDebug () << " disconnect seen from " << sock;
+  if (sock == 0) {
+    return;
+  }
   activeServers.removeServer (sock);
+  QString sockName (sock->Name());
   sockets.remove (sock->Name());
+
+  ChannelMapType::iterator cit;
+  for (cit=channels.begin(); cit != channels.end(); cit++) {
+    if (*cit) {
+      IrcAbstractChannel * chan = *cit;
+qDebug () << " Check Disconnect chan " << chan->Sock() << chan->Name()
+          << " at key " << cit.key();
+      if (chan->Sock() == sockName) {
+        DropChannel (sock, chan->Name());
+      }
+    }
+  }
+
   if (selectedServer == sock) {
     activeServers.selectNone ();
     selectedServer = 0;
@@ -561,12 +578,8 @@ IrcQmlControl::AddChannel (IrcSocket * sock,
   if (sock == 0) {
     return;
   }
-  QString cookedName(chanName);
-  if (isRaw) {
-    cookedName = tr("raw-%1").arg(chanName);
-  }
   IrcAbstractChannel * newchan  = 
-        new IrcAbstractChannel (cookedName, sock->Name(), this);
+        new IrcAbstractChannel (chanName, sock->Name(), this);
   channels [chanName] = newchan;
   dockedChannels->AddChannel (newchan);
   dockedChannels->show ();
@@ -586,6 +599,8 @@ IrcQmlControl::AddChannel (IrcSocket * sock,
            this, SLOT (ChanWantsFloat (IrcAbstractChannel *)));
   connect (newchan, SIGNAL (WantDock (IrcAbstractChannel *)),
            this, SLOT (ChanWantsDock (IrcAbstractChannel *)));
+  connect (newchan, SIGNAL (WantClose (IrcAbstractChannel *)),
+           this, SLOT (ChanWantsClose (IrcAbstractChannel *)));
   connect (newchan, SIGNAL (HideAllChannels ()),
            this, SLOT (HideAll ()));
   connect (newchan, SIGNAL (HideDock ()),
@@ -604,6 +619,7 @@ IrcQmlControl::DropChannel (IrcSocket * sock, const QString & chanName)
 {
   Q_UNUSED (sock)
   if (!channels.contains (chanName)) {
+qDebug () << " DropChannel doesn't have " << chanName;
     return;
   }
   IrcAbstractChannel * chanBox = channels [chanName];
@@ -620,14 +636,6 @@ IrcQmlControl::DropChannel (IrcSocket * sock, const QString & chanName)
   }
   channels.remove (chanName);
   chanBox->deleteLater ();
-  int nc =0; // mainUi.chanList->count();
-  for (int c=nc-1; c>=0; c--) {
-    QListWidgetItem *item = 0; //mainUi.chanList->item (c);
-    if (item && item->text() == chanName) {
-      // mainUi.chanList->takeItem (c);
-      delete item;
-    }
-  }
 }
 
 void
@@ -743,6 +751,19 @@ IrcQmlControl::ChanWantsDock (IrcAbstractChannel *chan)
   if (!dockedChannels->HaveChannel (chan)) {
     dockedChannels->AddChannel (chan);
     dockedChannels->show ();
+  }
+}
+
+void
+IrcQmlControl::ChanWantsClose (IrcAbstractChannel *chan)
+{
+  if (chan) {
+    if (sockets.contains (chan->Sock())) {
+      IrcSocket * sock = sockets[chan->Sock()];
+      if (sock) {
+        DropChannel (sock, chan->Name());
+      }
+    }
   }
 }
 

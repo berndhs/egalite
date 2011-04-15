@@ -119,6 +119,7 @@ signals:
   void InUse (IrcAbstractChannel * box);
   void WantFloat (IrcAbstractChannel * box);
   void WantDock (IrcAbstractChannel * box);
+  void WantClose (IrcAbstractChannel * box);
   void HideAllChannels ();
   void HideDock ();
   void HideChannel (IrcAbstractChannel * box);
@@ -134,6 +135,7 @@ private:
                     QStringList & hist,
                     int         & index,
                     QString     & bottom);
+  void   AlmostRaw (const QString & data);
 
   static bool Less (const QString & left, const QString & right);
 
