@@ -152,7 +152,9 @@ private:
   void NickLogin (const QString & nick, IrcSocket *sock);
   void TransformSend (IrcSocket * sock, const QString & chan, QString & data);
 
-  void AddChannel (IrcSocket * sock, const QString & chanName);
+  void AddChannel (IrcSocket * sock, 
+                   const QString & chanName, 
+                   bool isRaw=false);
   void DropChannel (IrcSocket * sock, 
                     const QString & chanName);
   void PartAll (const QString & sockName);
@@ -179,6 +181,8 @@ private:
                   const QString & numeric,
                   const QString & data);
 
+  void ReceiveRaw (IrcSocket *sock, const QByteArray & line);
+
   static void SaveServer (const QString & name);
   static void SaveChannel (const QString & name);
   static void SaveIgnore (const QString & name);
@@ -203,6 +207,8 @@ private:
   QString             noNameServer;
   QString             noNameNick;
   QString             noNameChannel;
+  QString             rawServer;
+  QString             rawHeader;
   QSize               oldSize;
   QPoint              oldPos;
   bool                hidSelf;

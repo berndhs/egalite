@@ -56,6 +56,8 @@ public:
   void SetHost (const QString & hostName);
   void SetPartMsg (const QString & part)
                { partMsg = part; }
+  void SetRaw (bool isRaw);
+  bool Raw ();
 
   void AddNames (const QString & names);
   void AddName (const QString & name);
@@ -152,6 +154,7 @@ private:
   QDeclarativeItem   *qmlItem;
   bool                topmost;
   bool                active;
+  bool                raw;
 
 };
 

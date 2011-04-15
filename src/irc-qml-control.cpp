@@ -17,7 +17,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
@@ -85,7 +85,7 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
 
   connect (&activeServers, SIGNAL (wantDisconnect (IrcSocket*)),
            this, SLOT (DisconnectServer (IrcSocket*)));
-qDebug () << " IrcQmlControl allocated and initialized";
+  qDebug () << " IrcQmlControl allocated and initialized";
 }
 
 void
@@ -107,7 +107,7 @@ IrcQmlControl::Show ()
 void
 IrcQmlControl::Hide ()
 {
-qDebug () << " IrcQmlControl::Hide ()";
+  qDebug () << " IrcQmlControl::Hide ()";
   oldSize = size ();
   oldPos = pos();
   hidSelf = true;
@@ -163,7 +163,7 @@ IrcQmlControl::Run ()
     resize (newsize);
     QSize  groupBoxSize = dockedChannels->size();
     groupBoxSize = Settings().value ("sizes/channelgroup", groupBoxSize)
-                             .toSize();
+                   .toSize();
     dockedChannels->resize (groupBoxSize);
   }
 
@@ -177,7 +177,7 @@ IrcQmlControl::Run ()
   context->setContextProperty ("cppChannelListModel",&channelModel);
   context->setContextProperty ("cppNickListModel",&nickModel);
   ui.qmlView->setSource (
-         QUrl("qrc:///qml/IrcControl.qml"));
+    QUrl("qrc:///qml/IrcControl.qml"));
 
   qmlRoot = ui.qmlView->rootObject();
   if (qmlRoot == 0) {
@@ -208,12 +208,14 @@ IrcQmlControl::LoadLists ()
   nicks.append (noNameNick);
   nicks.sort ();
   nickModel.setStringList (nicks);
- 
+
   qDebug () << " ------------ Nicks " << nicks;
 
   QStringList  chans = CertStore::IF().IrcChannels ();
   noNameChannel = tr("# --- New Channel ---");
+  rawServer = tr("# --- Raw Server ---");
   chans.append (noNameChannel);
+  chans.append (rawServer);
   chans.sort ();
   channelModel.setStringList (chans);
 
@@ -298,7 +300,7 @@ IrcQmlControl::TryConnect (const QString & host, int port)
       return;
     }
   }
-qDebug () << " try connect to " << baseHost;
+  qDebug () << " try connect to " << baseHost;
   IrcSocket *socket = new IrcSocket (this);
   sockets [socket->Name()] = socket;
   activeServers.addServer (socket, baseHost, QString (""),
@@ -355,7 +357,7 @@ IrcQmlControl::TryDisconnect ()
   SocketMapType::iterator  sit;
   for (sit = sockets.begin (); sit != sockets.end(); sit++) {
     if (*sit) {
-     (*sit)->Disconnect ();
+      (*sit)->Disconnect ();
     }
   }
 }
@@ -364,8 +366,8 @@ void
 IrcQmlControl::ReceiveLine (IrcSocket * sock, QByteArray line)
 {
   QString data (QString::fromUtf8(line.data()));
-qDebug () << " received Line " << data;
-qDebug () << "       from " << sock->Name();
+  qDebug () << " received Line " << data;
+  qDebug () << "       from " << sock->Name();
   if (data.startsWith(QChar (':'))) {
     QRegExp wordRx ("(\\S+)");
     QString first, cmd, rest;
@@ -394,14 +396,29 @@ qDebug () << "       from " << sock->Name();
     } else {
       IrcQmlSockStatic::ReceiveDefault (this, sock, first, cmd, rest);
     }
+    ReceiveRaw (sock, line);
   } else {
     if (data.startsWith ("PING")) {
       QString retName = data.split (QRegExp("(\\s+)")).at(1);
       sock->Send (QString ("PONG :%1").arg(retName));
     }
+    ReceiveRaw (sock, line);
   }
   qDebug () << " Received line " << line;
   //mainUi.logDisplay->append (QString (line));
+}
+
+void
+IrcQmlControl::ReceiveRaw (IrcSocket * sock, const QByteArray & line)
+{
+  qDebug () << " IrcQmlControl::ReceiveRaw " << sock
+            << sock->HostName() << line;
+  ChannelMapType::iterator cit;
+  for (cit=channels.begin(); cit != channels.end(); cit++) {
+    if (cit.value()->Raw() && cit.value()->Sock() == sock->Name()) {
+      cit.value()->Incoming (QString (line), QString (line));
+    }
+  }
 }
 
 void
@@ -423,9 +440,9 @@ IrcQmlControl::Send ()
 }
 
 void
-IrcQmlControl::TransformSend (IrcSocket * sock, const QString & chan, 
-                           QString & data)
-{ 
+IrcQmlControl::TransformSend (IrcSocket * sock, const QString & chan,
+                              QString & data)
+{
   if (data.startsWith(QChar ('/'))) {
     QRegExp wordRx ("(\\S+)");
     int pos = wordRx.indexIn (data, 1);
@@ -465,7 +482,7 @@ IrcQmlControl::AddConnect (IrcSocket *sock)
 void
 IrcQmlControl::ChangedHostName (IrcSocket * sock, QString name)
 {
-qDebug () << " have new host name " << name << " for " << sock;
+  qDebug () << " have new host name " << name << " for " << sock;
   if (sock == 0) {
     return;
   }
@@ -509,7 +526,7 @@ IrcQmlControl::NickLogin (const QString & nick, IrcSocket *sock)
     if (picked) {
       useNick = enter.Value ();
     } else {
-      return; 
+      return;
     }
   }
   QString pass;
@@ -527,14 +544,16 @@ IrcQmlControl::NickLogin (const QString & nick, IrcSocket *sock)
   QString part;
   QString quit;
   bool haveMsgs = CertStore::IF().GetIrcMessages (useNick, part, quit);
-  if (haveMsgs) { 
+  if (haveMsgs) {
     sock->SetPartMsg (part);
     sock->SetQuitMsg (quit);
   }
 }
 
 void
-IrcQmlControl::AddChannel (IrcSocket * sock, const QString & chanName)
+IrcQmlControl::AddChannel (IrcSocket * sock, 
+                           const QString & chanName, 
+                           bool isRaw)
 {
   if (channels.contains (chanName)) {
     return;
@@ -542,12 +561,18 @@ IrcQmlControl::AddChannel (IrcSocket * sock, const QString & chanName)
   if (sock == 0) {
     return;
   }
-  IrcAbstractChannel * newchan  = new IrcAbstractChannel (chanName, sock->Name(), this);
+  QString cookedName(chanName);
+  if (isRaw) {
+    cookedName = tr("raw-%1").arg(chanName);
+  }
+  IrcAbstractChannel * newchan  = 
+        new IrcAbstractChannel (cookedName, sock->Name(), this);
   channels [chanName] = newchan;
   dockedChannels->AddChannel (newchan);
   dockedChannels->show ();
   newchan->SetHost (sock->HostName());
   newchan->SetPartMsg (sock->PartMsg ());
+  newchan->SetRaw (isRaw);
   newchan->StartWatching (QRegExp (QString ("\\b%1\\b").arg(sock->Nick())));
   connect (newchan, SIGNAL (Outgoing (QString, QString)),
            this, SLOT (Outgoing (QString, QString)));
@@ -599,7 +624,7 @@ IrcQmlControl::DropChannel (IrcSocket * sock, const QString & chanName)
   for (int c=nc-1; c>=0; c--) {
     QListWidgetItem *item = 0; //mainUi.chanList->item (c);
     if (item && item->text() == chanName) {
-     // mainUi.chanList->takeItem (c);
+      // mainUi.chanList->takeItem (c);
       delete item;
     }
   }
@@ -617,9 +642,9 @@ IrcQmlControl::WantsWhois (QString channel, QString otherUser, bool wantsit)
 
 void
 IrcQmlControl::WhoisData (const QString & thisUser,
-                  const QString & otherUser,
-                  const QString & numeric,
-                  const QString & data)
+                          const QString & otherUser,
+                          const QString & numeric,
+                          const QString & data)
 {
   if (whoisWait.contains (otherUser)) {
     QString chan = whoisWait[otherUser];
@@ -637,7 +662,7 @@ IrcQmlControl::ShowChannel (IrcAbstractChannel * chanBox)
     dockedChannels->ShowChannel (chanBox);
   } else if (floatingChannels.contains (chanBox)) {
     floatingChannels [chanBox]->Show ();
-  } 
+  }
 }
 
 void
@@ -664,8 +689,8 @@ IrcQmlControl::PartAll (const QString & sockName)
 
 void
 IrcQmlControl::UserQuit (IrcSocket * sock,
-                      const QString & user,
-                      const QString & msg)
+                         const QString & user,
+                         const QString & msg)
 {
   QString sockName = sock->Name();
   QString quitMsg = QString (tr("QUIT ") + msg);
@@ -742,11 +767,11 @@ IrcQmlControl::Outgoing (QString chan, QString msg)
     return;
   }
   IrcSocket * sock = sockets [sname];
-  if (trim.startsWith (QChar ('/')) ){
+  if (trim.startsWith (QChar ('/')) ) {
     QString cooked (trim);
     TransformSend (sock, chan, cooked);
     sock->Send (cooked);
-qDebug () << " ==========> handed to socket: " << cooked;
+    qDebug () << " ==========> handed to socket: " << cooked;
     trim.prepend (QString (":%1!%1@localhost ").arg (sock->Nick()));
     ReceiveLine (sock, trim.toUtf8());
   } else {
@@ -759,9 +784,9 @@ qDebug () << " ==========> handed to socket: " << cooked;
 
 void
 IrcQmlControl::InChanMsg (IrcSocket * sock,
-                    const QString & chan, 
-                    const QString & from, 
-                    const QString & msg)
+                          const QString & chan,
+                          const QString & from,
+                          const QString & msg)
 {
   if (ignoreSources.contains (from)) {
     return;
@@ -784,10 +809,10 @@ IrcQmlControl::InChanMsg (IrcSocket * sock,
 
 
 void
-IrcQmlControl::InUserMsg (IrcSocket * sock, 
-                    const QString & from, 
-                    const QString & to, 
-                    const QString & msg)
+IrcQmlControl::InUserMsg (IrcSocket * sock,
+                          const QString & from,
+                          const QString & to,
+                          const QString & msg)
 {
   if (ignoreSources.contains (from)) {
     return;
@@ -800,7 +825,7 @@ IrcQmlControl::InUserMsg (IrcSocket * sock,
     IncomingCtcpUser (sock, from, to, themsg);
   } else {
     IncomingRaw (sock, from, QString ("<a href=\"ircsender://%1@egalite\">%1</a>: %2").
-                                arg(from).arg(themsg));
+                 arg(from).arg(themsg));
   }
 #if 0
   mainUi.logDisplay->append (QString ("Message from %1 to %2 says %3")
@@ -811,9 +836,9 @@ IrcQmlControl::InUserMsg (IrcSocket * sock,
 }
 
 void
-IrcQmlControl::IncomingRaw (IrcSocket * sock, 
-                         const QString & from, 
-                         const QString & msg)
+IrcQmlControl::IncomingRaw (IrcSocket * sock,
+                            const QString & from,
+                            const QString & msg)
 {
   if (!channels.contains (from)) {
     AddChannel (sock, from);
@@ -830,17 +855,17 @@ IrcQmlControl::SendRaw (QString sockName, QString data)
 }
 
 void
-IrcQmlControl::IncomingCtcpChan (IrcSocket * sock, 
-                    const QString & from, 
-                    const QString & chan, 
-                    const QString & msg)
+IrcQmlControl::IncomingCtcpChan (IrcSocket * sock,
+                                 const QString & from,
+                                 const QString & chan,
+                                 const QString & msg)
 {
   QString themsg (msg);
   themsg.chop (1);
   themsg.remove (0,1);
   QRegExp cmdRx ("(\\S+)");
   int pos, len;
-qDebug () << " Ctcp CHAN " << msg;
+  qDebug () << " Ctcp CHAN " << msg;
   pos = cmdRx.indexIn (themsg, 0);
   if (pos >=0 ) {
     len = cmdRx.matchedLength ();
@@ -850,20 +875,19 @@ qDebug () << " Ctcp CHAN " << msg;
       return;
     }
   }
-  channels [chan]->Incoming (QString 
-                     ("<a href=\"ircsender://%1\">%1</a>:"
-                      "<span style=\"font-size:small\">CTCPc</span> %2").
-                                  arg(from).arg(HtmlMangle::Sanitize(msg)),
-                      msg);
+  channels [chan]->Incoming (QString
+                             ("<a href=\"ircsender://%1\">%1</a>:"
+                              "<span style=\"font-size:small\">CTCPc</span> %2").
+                             arg(from).arg(HtmlMangle::Sanitize(msg)),
+                             msg);
 }
 
 
-
 void
-IrcQmlControl::IncomingCtcpUser (IrcSocket * sock, 
-                    const QString & from, 
-                    const QString & to, 
-                    const QString & msg)
+IrcQmlControl::IncomingCtcpUser (IrcSocket * sock,
+                                 const QString & from,
+                                 const QString & to,
+                                 const QString & msg)
 {
   QString themsg (msg);
   themsg.chop (1);
@@ -871,7 +895,7 @@ IrcQmlControl::IncomingCtcpUser (IrcSocket * sock,
   QRegExp cmdRx ("(\\S+)");
   int pos, len;
   pos = cmdRx.indexIn (themsg, 0);
-qDebug () << " Ctcp USER " << msg;
+  qDebug () << " Ctcp USER " << msg;
   if (pos >=0 ) {
     len = cmdRx.matchedLength ();
     QString cmd = themsg.mid (pos,len);
@@ -881,11 +905,11 @@ qDebug () << " Ctcp USER " << msg;
     }
   }
   if (channels.contains (from)) {
-    channels [from]->Incoming (QString 
-                      ("<a href=\"ircsender://%1\">%1</a>:"
-                      "<span style=\"font-size:small\">CTCPu</span> %2")
-                          .arg(from).arg(HtmlMangle::Sanitize(msg)),
-                      msg);
+    channels [from]->Incoming (QString
+                               ("<a href=\"ircsender://%1\">%1</a>:"
+                                "<span style=\"font-size:small\">CTCPu</span> %2")
+                               .arg(from).arg(HtmlMangle::Sanitize(msg)),
+                               msg);
   }
 }
 
@@ -918,9 +942,9 @@ IrcQmlControl::AddName (const QString & chanName, const QString & name)
 
 void
 IrcQmlControl::DropName (IrcSocket * sock,
-                      const QString & chanName, 
-                      const QString & name,
-                      const QString & msg)
+                         const QString & chanName,
+                         const QString & name,
+                         const QString & msg)
 {
   if (!channels.contains (chanName)) {
     return;
@@ -931,7 +955,7 @@ IrcQmlControl::DropName (IrcSocket * sock,
 
 void
 IrcQmlControl::SetTopic (IrcSocket * sock,
-                      const QString & chanName, const QString & topic)
+                         const QString & chanName, const QString & topic)
 {
   if (!channels.contains (chanName)) {
     return;
@@ -1041,7 +1065,27 @@ IrcQmlControl::Join ()
 {
   qDebug () << "IrcQmlControl::Join " << selectedChannel << selectedServer;
   if (selectedServer) {
-    selectedServer->Send (QString ("JOIN %1").arg(selectedChannel));
+    if (selectedChannel == rawServer) {
+      qDebug () << "IrcQmlControl:: Join " << selectedServer->HostName();
+      AddChannel (selectedServer, selectedServer->HostName(), true);
+    } else {
+      if (selectedChannel == noNameChannel) {
+        EnterString enter (this);
+        bool picked = enter.Choose (tr("IRC Channel"), tr("Channel:"));
+        if (picked) {
+          selectedChannel = enter.Value ();
+          if (enter.Save()) {
+            CertStore::IF().SaveIrcChannel (selectedChannel);
+            QStringList knownChans = CertStore::IF().IrcChannels ();
+            knownChans.append (selectedChannel);
+            channelModel.setStringList (knownChans);
+          }
+        } else {
+          return;
+        }
+      }
+      selectedServer->Send (QString ("JOIN %1").arg(selectedChannel));
+    }
   }
 }
 

@@ -85,6 +85,18 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
   qmlItem->setProperty ("channelName", chanName);
 }
 
+void
+IrcAbstractChannel::SetRaw (bool isRaw)
+{
+  raw = isRaw;
+}
+
+bool
+IrcAbstractChannel::Raw ()
+{
+  return raw;
+}
+
 QRectF
 IrcAbstractChannel::cookedBoundingRect () const
 {
@@ -219,7 +231,7 @@ qDebug () << " -----------> PART parts " << chanName << partMsg;
 
 void
 IrcAbstractChannel::Incoming (const QString & message,
-                         const QString & raw)
+                         const QString & rawMessage)
 {
   QString cooked = HtmlMangle::Anchorize (message, 
                          HtmlMangle::HttpExp(),
@@ -233,7 +245,7 @@ qDebug () << " cooked message " << cooked;
                           .arg (now.toString ("hh:mm:ss"))
                           .arg (cooked));
   UpdateCooked ();
-  CheckWatch (raw.length() > 0 ? raw : message);
+  CheckWatch (rawMessage.length() > 0 ? rawMessage : message);
   emit Active (this);
 }
 
@@ -472,7 +484,9 @@ IrcAbstractChannel::UserSend ()
     qDebug () << "   user data " << data;
     if (data.trimmed().length() > 0) {
       QMetaObject::invokeMethod (qmlItem, "clearUserData");
-      if (data == "/part") {
+      if (raw) {
+        emit OutRaw (sockName, data);
+      } else if (data == "/part") {
         Part ();
         sendout = false;
       } else if (data.startsWith ("/whois")) {
