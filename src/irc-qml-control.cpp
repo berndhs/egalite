@@ -198,6 +198,7 @@ IrcQmlControl::LoadLists ()
   QStringList  servers = CertStore::IF().IrcServers ();
   noNameServer = tr("--- New Server ---");
   servers.append (noNameServer);
+  knownServers.clear ();
   int ns = servers.count();
   for (int i=0; i< ns; i++) {
     knownServers.addServer (servers.at(i), 6667);
@@ -586,7 +587,12 @@ IrcQmlControl::AddChannel (IrcSocket * sock,
   newchan->SetHost (sock->HostName());
   newchan->SetPartMsg (sock->PartMsg ());
   newchan->SetRaw (isRaw);
-  newchan->StartWatching (QRegExp (QString ("\\b%1\\b").arg(sock->Nick())));
+  if (!isRaw) {
+    newchan->StartWatching 
+      (QRegExp (QString ("\\b%1\\b").arg(sock->Nick())));
+    connect (newchan, SIGNAL (WatchAlert (QString, QString)),
+           this, SLOT (SeenWatchAlert (QString, QString)));
+  }
   connect (newchan, SIGNAL (Outgoing (QString, QString)),
            this, SLOT (Outgoing (QString, QString)));
   connect (newchan, SIGNAL (OutRaw (QString, QString)),
@@ -609,8 +615,6 @@ IrcQmlControl::AddChannel (IrcSocket * sock,
            this, SLOT (HideChannel (IrcAbstractChannel *)));
   connect (newchan, SIGNAL (WantWhois (QString, QString, bool)),
            this, SLOT (WantsWhois (QString, QString, bool)));
-  connect (newchan, SIGNAL (WatchAlert (QString, QString)),
-           this, SLOT (SeenWatchAlert (QString, QString)));
   //mainUi.chanList->addItem (chanName);
 }
 
