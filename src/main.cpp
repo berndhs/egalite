@@ -58,7 +58,10 @@ main (int argc, char* argv[])
   settings.setValue ("program",pv.MyName());
 
 
-  QStringList  configMessages;
+  QStringList  configMessages;  
+  configMessages.append (QObject::tr("Build with Qt %1").arg(QT_VERSION_STR));
+  configMessages.append (QObject::tr("Running with Qt %1").arg(qVersion()));
+
   QCA::scanForPlugins ();
   // We need to ensure that we have certificate handling support
   if ( !QCA::isSupported( "cert" ) ) {
