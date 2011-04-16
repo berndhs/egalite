@@ -39,7 +39,7 @@ public:
 
   /** \brief stuff invokable from QML */
 
-  int rowCount (const QModelIndex & index = QModelIndex()) const;
+  Q_INVOKABLE int rowCount (const QModelIndex & index = QModelIndex()) const;
   QVariant data (const QModelIndex & index, 
                   int role = Qt::DisplayRole) const;
 
@@ -79,6 +79,7 @@ signals:
 
   void wantDisconnect (IrcSocket * sock);
   void selectRow (int row);
+  void contentChange ();
 
 private:
 

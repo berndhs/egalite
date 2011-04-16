@@ -27,7 +27,7 @@ Rectangle {
   objectName: "IrcControlBox"
 
   property alias activeServerModel: activeServerList.model
-  property string baseColor: "#ef0e0"
+  property string baseColor: "#f7fbe0"
   property real rollDelay: 175
   property real topHeight: knownListRect.height + activeListBox.height
   property real restHeight: height - topHeight
@@ -126,10 +126,17 @@ Rectangle {
       anchors { left: parent.left; top:activeListHead.bottom }
       nameWidth: 200
       addressWidth: 150
-      height: 3.5*rowHeight
+      height: 0.5 * rowHeight
       clip: true
       width: activeListBox.width
       model: cppActiveServerModel
+      function resetHeight () {
+        console.log ("  Active Server List reset height ")
+        console.log ("                items : " + cppActiveServerModel.rowCount());
+        var showRows = Math.min (3.5, Math.max (cppActiveServerModel.rowCount(), 1))
+        console.log ("           show rows  : " + showRows)
+        height = rowHeight * showRows
+      }
       onDisconnectServer: {
         console.log ("disconnect from " + index)
         model.disconnectServer (index)
@@ -143,7 +150,12 @@ Rectangle {
           console.log (" Select Row " + row)
           activeServerList.selectRow (row)
         }
+        onContentChange: {
+          console.log (" Active Server List data change ")
+          activeServerList.resetHeight ()
+        }
       }
+      Component.onCompleted: resetHeight ()
     }
   }
 

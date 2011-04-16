@@ -48,6 +48,7 @@ ActiveServerModel::clear ()
   beginResetModel ();
   servers.clear ();
   endResetModel ();
+  emit contentChange ();
 }
 
 int
@@ -83,6 +84,7 @@ ActiveServerModel::removeServer (IrcSocket * sock)
   beginRemoveRows (QModelIndex (), row, row);
   servers.removeAt (row);
   endRemoveRows ();
+  emit contentChange ();
 }
 
 QVariant
@@ -140,6 +142,7 @@ ActiveServerModel::addServer (IrcSocket *sock,
   servers << ServerStruct (sock, baseName, realName, address, port, realSet);
   endInsertRows ();
   emit selectRow (nr);
+  emit contentChange ();
 }
 
 int
