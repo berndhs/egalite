@@ -44,6 +44,7 @@ KnownServerModel::clear ()
   beginResetModel ();
   servers.clear ();
   endResetModel ();
+  emit contentChange ();
 }
 
 int
@@ -83,6 +84,7 @@ qDebug () << " KnownServerModel::addServer " << name << port;
   beginInsertRows (QModelIndex(), nr, nr);
   servers << ServerStruct (name, port);
   endInsertRows ();
+  emit contentChange ();
 }
 
 void

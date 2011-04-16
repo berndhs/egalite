@@ -84,7 +84,8 @@ Rectangle {
       id: knownServerList
       visible: !knownButton.visible
       model: cppKnownServerModel
-      height: (visible ? 3*rowHeight : 0)
+      property real numRowsToShow: 3.5
+      height: (visible ? numRowsToShow*rowHeight : 0)
       width: (visible ? rowWidth : 0)
       anchors {top : knownButton.bottom; left: knownButton.left }
       nameWidth: 300
@@ -97,6 +98,12 @@ Rectangle {
         console.log ("connect server " + name + " port " + port )
         visible = false
         ircControlBox.tryConnect (name, port)
+      }
+      Connections {
+        target: cppKnownServerModel
+        onContentChange: {
+          numRowsToShow = Math.min (3.5, Math.min (1,cppKnownServerModel.rowCount()))
+        }
       }
     }
   }

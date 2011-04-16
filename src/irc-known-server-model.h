@@ -37,7 +37,7 @@ public:
 
   /** \brief stuff invokable from QML */
 
-  int rowCount (const QModelIndex & index = QModelIndex()) const;
+  Q_INVOKABLE int rowCount (const QModelIndex & index = QModelIndex()) const;
   QVariant data (const QModelIndex & index, 
                   int role = Qt::DisplayRole) const;
 
@@ -50,6 +50,10 @@ public:
   void clear ();
 
   void addServer (const QString & name, int port);
+
+signals:
+
+  void contentChange ();
 
 private:
 
