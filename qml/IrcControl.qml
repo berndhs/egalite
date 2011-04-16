@@ -138,10 +138,7 @@ Rectangle {
       width: activeListBox.width
       model: cppActiveServerModel
       function resetHeight () {
-        console.log ("  Active Server List reset height ")
-        console.log ("                items : " + cppActiveServerModel.rowCount());
         var showRows = Math.min (3.5, Math.max (cppActiveServerModel.rowCount(), 1))
-        console.log ("           show rows  : " + showRows)
         height = rowHeight * showRows
       }
       onDisconnectServer: {

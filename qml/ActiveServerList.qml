@@ -87,10 +87,10 @@ ListView {
           }
           text: haverealname ? realname : basename
         }
-      }      
+      }    
       Rectangle {
-        id: addressCol
-        width: childrenRect.width //activeServerList.addressWidth
+        id: trafficCountCol
+        width: childrenRect.width
         height: activeServerList.rowHeight
         color: "transparent"
         MouseArea {
@@ -105,7 +105,29 @@ ListView {
             left: parent.left; leftMargin: 3 ; 
             verticalCenter: parent.verticalCenter 
           }
-          text: address
+          text:  "<span style=\"font-size:small\">" 
+                 + qsTr(" in:") + bytesin + qsTr (" out:") + bytesout +  " "
+                 + "</span>"
+        }
+      }  
+      Rectangle {
+        id: addressCol
+        width: childrenRect.width //activeServerList.addressWidth
+        height: activeServerList.rowHeight
+        color: "transparent"
+        MouseArea {
+          anchors.fill: parent
+          onPressed: {
+            activeServerList.currentIndex = index;
+            activeServerList.selectedServer (index);
+          }
+        }
+        Text {
+          anchors { 
+            left: parent.left; leftMargin: 3 
+            verticalCenter: parent.verticalCenter 
+          }
+          text: "<span style=\"font-size:small\">" + address + "</span>"
         }
       }
       Rectangle {
@@ -127,7 +149,7 @@ ListView {
             verticalCenter: parent.verticalCenter  
           }
           horizontalAlignment: TextInput.AlignRight
-          text: port
+          text:  "<span style=\"font-size:small\">" + port + "</span>"
         }
       }
     }

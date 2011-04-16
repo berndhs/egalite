@@ -39,6 +39,8 @@ ActiveServerModel::ActiveServerModel (QObject *parent)
   roles[Role_Port] = "port";
   roles[Role_State] = "connectstate";
   roles[Role_HaveRealName] = "haverealname";
+  roles[Role_BytesIn] = "bytesin";
+  roles[Role_BytesOut] = "bytesout";
   setRoleNames (roles);
 }
 
@@ -83,6 +85,11 @@ ActiveServerModel::removeServer (IrcSocket * sock)
   }
   beginRemoveRows (QModelIndex (), row, row);
   servers.removeAt (row);
+  inCounter.removeAt (row);
+  outCounter.removeAt (row);
+  if (sock) {
+    disconnect (sock, SIGNAL (IOActivity()), this, SLOT (UpdateCounts()));
+  }
   endRemoveRows ();
   emit contentChange ();
 }
@@ -99,6 +106,10 @@ ActiveServerModel::data (const QModelIndex & index, int role) const
     return QVariant ();
   }
   QVariant retVar;
+  IrcSocket * sock (0);
+  if (servers.at(row).socket) {
+    sock = servers.at(row).socket;
+  }
   switch (role) {
   case Qt::DisplayRole:
   case Role_BaseName:
@@ -114,14 +125,16 @@ ActiveServerModel::data (const QModelIndex & index, int role) const
     retVar = QString::number (servers.at(row).port);
     break;
   case Role_State:
-    if (servers.at(row).socket) {
-      retVar = QString::number (servers.at(row).socket->state());
-    } else {
-      retVar = QString ("??");
-    }
+    retVar = (sock ? QString::number (sock->state()) : QString ("??"));
     break;
   case Role_HaveRealName:
     retVar = servers.at(row).realSet;
+    break;
+  case Role_BytesIn:
+    retVar = (sock ? sock->BytesIn() : 0);
+    break;
+  case Role_BytesOut:
+    retVar = (sock ? sock->BytesOut() : 0);
     break;
   default:
     break;
@@ -140,9 +153,40 @@ ActiveServerModel::addServer (IrcSocket *sock,
   int nr = rowCount();
   beginInsertRows (QModelIndex(), nr, nr);
   servers << ServerStruct (sock, baseName, realName, address, port, realSet);
+  qint64 bytesIn (0);
+  qint64 bytesOut (0);
+  if (sock) {
+    bytesIn = sock->BytesIn();
+    bytesOut = sock->BytesOut();
+    connect (sock, SIGNAL (IOActivity()), this, SLOT (UpdateCounts()));
+  }
+  inCounter << bytesIn;
+  outCounter << bytesOut;
   endInsertRows ();
   emit selectRow (nr);
   emit contentChange ();
+}
+
+void
+ActiveServerModel::UpdateCounts ()
+{
+  int nc=servers.count();
+  for (int i=0; i<nc; i++) {
+    IrcSocket * sock (0);
+    sock = servers.at(i).socket;
+    if (sock) {
+      qint64 oldIn = inCounter.at(i);
+      qint64 oldOut = inCounter.at(i);
+      qint64 newIn = sock->BytesIn ();
+      qint64 newOut = sock->BytesOut ();
+      if (newIn != oldIn || newOut != oldOut) {
+        inCounter[i] = newIn;
+        outCounter[i] = newOut;
+        QModelIndex changedIndex = createIndex (i, 0);
+        emit dataChanged (changedIndex, changedIndex);
+      }
+    }
+  }
 }
 
 int

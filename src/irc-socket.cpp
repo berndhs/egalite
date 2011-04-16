@@ -34,7 +34,9 @@ int IrcSocket::sockCount (0);
 
 IrcSocket::IrcSocket (QObject *parent)
   :QTcpSocket (parent),
-   needPing (true)
+   needPing (true),
+   numBytesIn (0),
+   numBytesOut (0)
 {
   sockCount++;
   setObjectName (QString("IrcSocket-%1").arg(sockCount));
@@ -53,7 +55,28 @@ IrcSocket::IrcSocket (QObject *parent)
            this, SLOT (DidDisconnect ()));
   connect (this, SIGNAL (readyRead ()),
            this, SLOT (Receive ()));
+  connect (this, SIGNAL (bytesWritten (qint64)),
+           this, SLOT (CountBytesOut (qint64)));
 qDebug () << " IrcSocket " << objectName();
+}
+
+void
+IrcSocket::CountBytesOut (qint64 bytes)
+{
+  numBytesOut += bytes;
+  emit IOActivity ();
+}
+
+qint64 
+IrcSocket::BytesIn ()
+{
+  return numBytesIn;
+}
+
+qint64
+IrcSocket::BytesOut ()
+{
+  return numBytesOut;
 }
 
 void
@@ -115,6 +138,7 @@ IrcSocket::Receive ()
 {
   QByteArray bytes = readAll ();
 qDebug () << " got " << bytes.size() << " bytes " << bytes;
+  numBytesIn += bytes.size();
   QByteArray last2 = lineData.right(2);
   if (last2.size () < 2) {
     last2.prepend ("??");
@@ -135,6 +159,7 @@ qDebug () << " got " << bytes.size() << " bytes " << bytes;
       lineData.clear ();
     }
   }
+  emit IOActivity ();
 }
 
 void

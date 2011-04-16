@@ -56,6 +56,8 @@ public:
 
   void    Send (QString data);
   void    SendData (const QString & data);
+  qint64  BytesIn ();
+  qint64  BytesOut ();
 
 public slots:
 
@@ -70,6 +72,7 @@ private slots:
   void SendScriptHead ();
   void SendPing ();
   void SockError (QAbstractSocket::SocketError err);
+  void CountBytesOut (qint64 bytes);
 
 signals:
 
@@ -77,6 +80,7 @@ signals:
   void disconnected (IrcSocket * sock);
   void ChangedHostName (IrcSocket *, QString newName);
   void ReceivedLine (IrcSocket *, QByteArray line);
+  void IOActivity ();
 
 private:
 
@@ -91,6 +95,8 @@ private:
   QTimer          *pingTimer;
   QTimer          *scriptTimer;
   bool             needPing;
+  qint64           numBytesIn;
+  qint64           numBytesOut;
 
   static int sockCount;
 

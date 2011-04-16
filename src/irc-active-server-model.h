@@ -75,6 +75,10 @@ public:
 
   IrcSocket    *socket (int row);
 
+private slots:
+
+  void UpdateCounts ();
+
 signals:
 
   void wantDisconnect (IrcSocket * sock);
@@ -90,7 +94,9 @@ private:
     Role_Address = Qt::UserRole+3,
     Role_Port = Qt::UserRole+4,
     Role_State = Qt::UserRole+5,
-    Role_HaveRealName = Qt::UserRole+6
+    Role_HaveRealName = Qt::UserRole+6,
+    Role_BytesIn = Qt::UserRole+7,
+    Role_BytesOut = Qt::UserRole+8
   };
 
   struct ServerStruct {
@@ -114,6 +120,8 @@ private:
   typedef QList<ServerStruct>   ServerListType;
 
   ServerListType   servers;
+  QList<qint64>    inCounter;
+  QList<qint64>    outCounter;
 
 };
 
