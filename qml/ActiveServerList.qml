@@ -31,7 +31,6 @@ ListView {
   property real addressWidth: 150
   property real portWidth:  72
   property real buttonWidth: 100
-  property real rowWidth: portWidth + 2.0*nameWidth + addressWidth + buttonWidth
   property real rowHeight: 32
 
   signal disconnectServer (int index)
@@ -132,7 +131,7 @@ ListView {
       }
       Rectangle {
         id: portCol
-        width: activeServerList.portWidth
+        width: childrenRect.width
         height: activeServerList.rowHeight
         color: "transparent"
         MouseArea {
