@@ -21,7 +21,6 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-control.h"
 #include "ui_irc-qml-control.h"
 #include "config-edit.h"
 #include "helpview.h"
@@ -47,7 +46,7 @@ namespace egalite
 class IrcAbstractChannel;
 class QmlIrcChannelGroup;
 
-class IrcQmlControl : public QDialog
+class IrcQmlControl : public QWidget
 {
 Q_OBJECT
 

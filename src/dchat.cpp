@@ -65,7 +65,6 @@ DChatMain::DChatMain (QWidget *parent)
    subscriptionDialog (this),
    serverAccountEdit (this),
    certListEdit (this),
-   ircControl (0),
    ircQmlControl (0),
    publicPort (29999),
    defaultPort (29999),
@@ -80,8 +79,7 @@ DChatMain::DChatMain (QWidget *parent)
 {
   ui.setupUi (this);
   ui.contactView->setModel (&contactListModel);
-  ircControl = new IrcControl (this);
-  ircQmlControl = new IrcQmlControl (this);
+  ircQmlControl = new IrcQmlControl (0);
   SetupToolbar ();
   CreateSystemTrayStuff ();
   Connect ();
@@ -98,9 +96,6 @@ DChatMain::DChatMain (QWidget *parent)
   connect (statusTimer, SIGNAL (timeout()), this, SLOT (StatusUpdate()));
   statusTimer->start (30*1000);
   QTimer::singleShot (1500, this, SLOT (StatusUpdate ()));
-  connect (ircControl, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
-  connect (ircControl, SIGNAL (WatchAlert (QString)),
-            this, SLOT (ShowTrayMessage (QString)));
   connect (ircQmlControl, SIGNAL (StatusChange()), this, SLOT (StatusUpdate()));
   connect (ircQmlControl, SIGNAL (WatchAlert (QString)),
             this, SLOT (ShowTrayMessage (QString)));
@@ -182,7 +177,7 @@ DChatMain::StatusUpdate ()
   actionDirectStatus->setText (directMsg);
   QString xmppMsg = tr("%1 Xmpp").arg (xclientMap.size());
   actionXmppStatus->setText (xmppMsg);
-  int nIrc = ircControl->OpenCount () + ircQmlControl->OpenCount();
+  int nIrc = ircQmlControl->OpenCount();
   QString ircMsg = tr ("%1 IRC").arg (nIrc);
   actionIrcStatus->setText (ircMsg);
   if (trayIcon) {
@@ -395,11 +390,11 @@ DChatMain::Connect ()
   connect (ui.actionConnectIRC, SIGNAL (triggered ()),
            this, SLOT (RunIrc ()));
   connect (ui.actionIRCServers, SIGNAL (triggered ()),
-           ircControl, SLOT (EditServers()));
+           ircQmlControl, SLOT (EditServers()));
   connect (ui.actionIRCChannels, SIGNAL (triggered ()),
-           ircControl, SLOT (EditChannels ()));
+           ircQmlControl, SLOT (EditChannels ()));
   connect (ui.actionIRCIgnores, SIGNAL (triggered ()),
-           ircControl, SLOT (EditIgnores ()));
+           ircQmlControl, SLOT (EditIgnores ()));
   connect (&contactListModel, SIGNAL (StartServerChat (QString, QString)),
            this, SLOT (StartServerChat (QString, QString)));
   connect (&contactListModel, SIGNAL (NewAccountIndex (QModelIndex)),
@@ -462,7 +457,6 @@ DChatMain::Login ()
 void
 DChatMain::RunIrc ()
 {
-  ircControl->Show();
   ircQmlControl->Show();
 }
 

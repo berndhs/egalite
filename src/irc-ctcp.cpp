@@ -24,41 +24,11 @@
 
 #include <QString>
 #include "irc-socket.h"
-#include "irc-control.h"
 #include "irc-qml-control.h"
 #include "version.h"
 
 namespace egalite
 {
-
-void
-IrcCtcp::ReceiveACTION(IrcControl * context, IrcSocket * sock,
-                              const QString & from,
-                              const QString & dest,
-                              const QString & msg)
-{
-  context->IncomingRaw (sock, dest, QString ("%1 %2")
-                   .arg (from)
-                   .arg (msg));
-}
-
-void
-IrcCtcp::ReceiveVERSION (IrcControl * context, IrcSocket * sock,
-                              const QString & from,
-                              const QString & dest,
-                              const QString & msg)
-{
-  Q_UNUSED (dest)
-  QString reply ("\001VERSION %1:%2:%3\001");
-  QString remsg = QString ("PRIVMSG %1 :%2")
-                     .arg (from)
-                     .arg (reply.arg (deliberate::ProgramVersion::MyName())
-                                .arg (deliberate::ProgramVersion::Number())
-                                .arg ("Anywhere")
-                           );
-  qDebug () << " version reply " << remsg;
-  sock->SendData (remsg);
-}
 
 void
 IrcCtcp::ReceiveACTION(IrcQmlControl * context, IrcSocket * sock,

@@ -49,7 +49,7 @@ namespace egalite
 {
 
 IrcQmlControl::IrcQmlControl (QWidget *parent)
-  :QDialog (parent),
+  :QWidget (parent),
    initDone (false),
    qmlRoot (0),
    isRunning (false),
@@ -102,6 +102,7 @@ IrcQmlControl::Show ()
     hidSelf = false;
   }
   show ();
+  raise ();
 }
 
 void
@@ -296,6 +297,7 @@ IrcQmlControl::TryConnect (const QString & host, int port)
       baseHost = enter.Value ();
       if (enter.Save()) {
         CertStore::IF().SaveIrcServer (baseHost);
+        LoadLists ();
       }
     } else {
       return;

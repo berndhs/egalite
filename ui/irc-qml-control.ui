@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author>Bernd Stramm</author>
  <class>IrcQmlControl</class>
- <widget class="QDialog" name="IrcQmlControl">
+ <widget class="QWidget" name="IrcQmlControl">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
-    <height>388</height>
+    <width>600</width>
+    <height>400</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>IRC</string>
@@ -18,9 +23,15 @@
    <iconset resource="../dchat.qrc">
     <normaloff>:/dchatlogo.png</normaloff>:/dchatlogo.png</iconset>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QDeclarativeView" name="qmlView">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="resizeMode">
       <enum>QDeclarativeView::SizeRootObjectToView</enum>
      </property>
@@ -28,7 +39,6 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="1" margin="1"/>
  <customwidgets>
   <customwidget>
    <class>QDeclarativeView</class>
