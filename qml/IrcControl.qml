@@ -112,11 +112,10 @@ Rectangle {
 
   Rectangle {
     id: activeListBox
-    anchors { top: knownListRect.bottom; left: parent.left; leftMargin: 2 }
-    width: ircControlBox.width - 4
+    anchors { top: knownListRect.bottom; left: parent.left }
+    width: ircControlBox.width
     height: childrenRect.height
     color: "transparent"
-    border.color: "#c0c0c0"; border.width: 1
     Rectangle {
       id: activeListHead
       height: childrenRect.height
