@@ -1,7 +1,7 @@
 Egalite Manual
 ==============
 Bernd Stramm <bernd.stramm@gmail.com>
-v0.5.1, April 2011
+v0.5.7, April 2011
 
 *Egalite* is a instant messenger program.
 
@@ -159,9 +159,8 @@ The Channel Label acts as a multi-function button:
 The channel history display usually scrolls, and you can drag the content
 and flick it (version 0.5 and later). 
 
-To select and copy text from teh history, it can be helpful to stop the
-drag/flickable behaviour by *Double Clicking* on the channel name label. 
-To re-enable the behaviour double click again.
+To select and copy text from the history, it can be helpful to stop the
+drag/flickable behaviour selecting *Stop Scroll* from the context menu.
 
 === Channel Topic ===
 
