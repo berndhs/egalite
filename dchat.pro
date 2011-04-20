@@ -19,6 +19,8 @@ TARGET = bin/egalite
 unix {
   CONFIG += debug
   CONFIG += crypto
+  CONFIG += link_pkgconfig
+  PKGCONFIG += qca2
 }
 win32 {
   CONFIG += debug_and_release
