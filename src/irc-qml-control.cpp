@@ -181,8 +181,8 @@ IrcQmlControl::Run ()
   context->setContextProperty ("cppActiveServerModel", &activeServers);
   context->setContextProperty ("cppChannelListModel",&channelModel);
   context->setContextProperty ("cppNickListModel",&nickModel);
-  QUrl qmlSource (QUrl::fromLocalFile ("qml/IrcControl.qml"));
-  //QUrl qmlSource (QUrl(QString::fromAscii("qrc:///qml/IrcControl.qml")));
+  //QUrl qmlSource (QUrl::fromLocalFile ("qml/IrcControl.qml"));
+  QUrl qmlSource (QUrl(QString::fromAscii("qrc:///qml/IrcControl.qml")));
 
   qDebug () << " load qml from " << qmlSource;
   ui.qmlView->setSource (qmlSource);
