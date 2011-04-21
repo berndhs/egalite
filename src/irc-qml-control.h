@@ -122,6 +122,8 @@ private slots:
 
   void Outgoing (QString chan, QString msg);
   void SeenWatchAlert (QString chanName, QString data);
+  
+  void ViewStatusChange (QDeclarativeView::Status status);
 
 signals:
 

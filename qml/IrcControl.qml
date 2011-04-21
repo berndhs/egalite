@@ -35,6 +35,12 @@ Rectangle {
   property real middleButtonWidth: 90
 
   color: baseColor
+  visible: false
+
+  function makeVisible () { 
+    console.log ("make visible " + objectName)
+    visible = true 
+  }
 
   signal hideMe ()
   signal tryConnect (string host, int port)
@@ -71,44 +77,70 @@ Rectangle {
       radius: 0.5 * height
       property string showColor: "#aaffaa"
       property string hideColor: "#d3d3d3"
-      property bool seeList: knownServerList.visible
-      color: seeList ? hideColor : showColor
-      labelText: seeList  
-                      ? knownListRect.noShowString 
-                      : knownListRect.showString
+      property alias seeList: knownServerList.normalSize
+      color:  seeList ? hideColor : showColor
+
+      labelText: qsTr (" --- Show Known Servers --- ")
+
       visible: true
-      Behavior on color { PropertyAnimation { duration: rollDelay } }
+     // Behavior on color { PropertyAnimation { duration: rollDelay } }
       onClicked: {
+        console.log ("-------------- know list button clicked")
+        console.log ("    see list is " + seeList)
         knownServerList.toggleVisible ();
+      }
+      function adjust () {
+        if (seeList) {
+          labelText = knownListRect.noShowString
+          color = hideColor
+        } else {
+          labelText = knownListRect.showString
+          color = showColor
+        }
+        console.log ("    new text " + labelText)
       }
     }
       
     KnownServerList {
       id: knownServerList
-      visible: false
+      visible: true
+      property bool normalSize: false
       //model: cppKnownServerModel
       property bool modelEnabled: false
       property real numRowsToShow: 3.5
-      height: (visible ? numRowsToShow*rowHeight : 0)
-      width: (visible ? rowWidth : 0)
+      height: 0
+      width: 0
       anchors {top : knownButton.bottom; left: knownButton.left }
       nameWidth: 300
       portWidth: 90
       clip: true
       function toggleVisible () {
-        var visi = visible;
-        if (visi) adjustRows ()
-        visible = ! visi;
+        var visi = normalSize;
+        console.log (" knownServerList change visi from " + visi)
+        normalSize = ! visi
+        adjustRows ()
+        knownButton.adjust ()
       }
       function adjustRows () {
+        console.log (" knownServerList adjust rows " + knownServerList.modelEnabled)
         if (knownServerList.modelEnabled) {
           var nr = cppKnownServerModel.numberOfRows
           console.log (" known server model now has " + nr)
           if (nr > 3) {
-            knownServerList.numRowsToShow = 3.5
+            numRowsToShow = 3.5
           } else {
-            knownServerList.numRowsToShow = Math.min (1, nr)
+            numRowsToShow = Math.min (1, nr)
           }
+          if (normalSize) {
+            height = numRowsToShow * rowHeight
+            width = rowWidth
+          } else {
+            height = 0
+            width = 0
+          }
+          console.log ("  num to show " + knownServerList.numRowsToShow)
+          console.log ("  new height " + height)
+          console.log ("  new width  " + width)
         }
       }
       Behavior on height { PropertyAnimation { duration: rollDelay  } }
@@ -116,15 +148,17 @@ Rectangle {
       onSelectServer: console.log ("picked server " + name + " port " + port)
       onConnectServer: {
         console.log ("connect server " + name + " port " + port )
-        visible = false
+        normalSize = false
+        adjustRows ()
+        knownButton.adjust ()
         ircControlBox.tryConnect (name, port)
       }
       Connections {
         target: cppKnownServerModel
-        onContentChange: adjustRows ()
+        onContentChange: knownServerList.adjustRows ()
       }
-      Component.onCompleted: {
-        console.log ("loaded KnownServerList into IrcContrl")
+      onDoneLoading: {
+        console.log ("  done loaded KnownServerList into IrcContrl")
         console.log (" cpp model is " + cppKnownServerModel)
         model = cppKnownServerModel
         knownServerList.modelEnabled = true
@@ -183,7 +217,10 @@ Rectangle {
           activeServerList.resetHeight ()
         }
       }
-      Component.onCompleted: resetHeight ()
+      Component.onCompleted: {
+        resetHeight ()
+        console.log ("have active server list, height is " + activeServerList.height )
+      }
     }
   }
 
@@ -244,7 +281,7 @@ Rectangle {
         anchors { top: channelHeader.bottom; left: channelListBox.left }
         model: cppChannelListModel
         highlightMoveSpeed: 2000
-        highlight: Rectangle { color: "#ffcccc" }
+        highlight: Rectangle { color: "#ffcccc"}
         delegate: channelDelegate
       }
     }

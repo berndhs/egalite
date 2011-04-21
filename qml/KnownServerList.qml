@@ -35,6 +35,7 @@ ListView {
 
   signal selectServer (string name, int port)
   signal connectServer (string name, int port)
+  signal doneLoading ()
 
   Component {
     id: smallDelegate 
@@ -46,7 +47,6 @@ ListView {
       }
     }
   }
-
 
   Component {
     id: landscapeDelegate 
@@ -138,9 +138,10 @@ ListView {
     }
   }
 
-  delegate: landscapeDelegate
+  delegate:landscapeDelegate
   highlight: Rectangle { color: "#77bbff" } 
   Component.onCompleted: {
     console.log ("Done loading KnownServerList")
+    knownServerList.doneLoading ()
   }
 }

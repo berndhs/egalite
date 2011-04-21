@@ -24,6 +24,7 @@ ICON_DIR = /usr/share/pixmaps
 
 all: $(MAKEFILE) translations
 	$(MAKE) -f $(MAKEFILE) all
+	ls -ltr bin/*
 
 clean: $(MAKEFILE) FORCE
 	$(MAKE) -f $(MAKEFILE) clean

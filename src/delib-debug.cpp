@@ -36,6 +36,7 @@ void UseMyOwnMessageHandler ()
 void MyOwnMessageOutput (QtMsgType type, const char* msg)
 {
 #if DELIBERATE_DEBUG
+  cout << " Message type " << type << " \"" << msg << "\"" << endl;
   switch (type) {
   case QtDebugMsg:
     if (staticLog) {
@@ -97,14 +98,16 @@ void MyOwnMessageOutput (QtMsgType type, const char* msg)
 void
 StartDebugLog (bool gui)
 {
-  if (staticLog == 0) {
+  if (staticLog == 0 && gui) {
     staticLog = new DebugLog ;
   }
-  staticLog->StartLogging ();
-  staticLog->UseGui (gui);
-  if (gui) {
-    staticLog->move (QPoint (0,0));
-    staticLog->show ();
+  if (staticLog) {
+    staticLog->StartLogging ();
+    staticLog->UseGui (gui);
+    if (gui) {
+      staticLog->move (QPoint (0,0));
+      staticLog->show ();
+    }
   }
 }
 

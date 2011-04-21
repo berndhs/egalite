@@ -86,6 +86,8 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
 
   connect (&activeServers, SIGNAL (wantDisconnect (IrcSocket*)),
            this, SLOT (DisconnectServer (IrcSocket*)));
+  connect (ui.qmlView, SIGNAL (statusChanged (DeclarativeView::Status)),
+           this, SLOT (ViewStatusChange (QDeclarativeView::Status)));
   qDebug () << " IrcQmlControl allocated and initialized";
 }
 
@@ -158,8 +160,9 @@ IrcQmlControl::HideFloats ()
 bool
 IrcQmlControl::Run ()
 {
+  LoadLists ();
   if (!isRunning) {
-    qDebug () << " Start IrcQmlControl";
+    qDebug () << __PRETTY_FUNCTION__ << " Start IrcQmlControl";
     QSize defaultSize = size();
     QSize newsize = Settings().value ("sizes/ircsock", defaultSize).toSize();
     resize (newsize);
@@ -178,20 +181,33 @@ IrcQmlControl::Run ()
   context->setContextProperty ("cppActiveServerModel", &activeServers);
   context->setContextProperty ("cppChannelListModel",&channelModel);
   context->setContextProperty ("cppNickListModel",&nickModel);
-  ui.qmlView->setSource (
-    QUrl("qrc:///qml/IrcControl.qml"));
+  QUrl qmlSource (QUrl::fromLocalFile ("qml/IrcControl.qml"));
+  //QUrl qmlSource (QUrl(QString::fromAscii("qrc:///qml/IrcControl.qml")));
 
+  qDebug () << " load qml from " << qmlSource;
+  ui.qmlView->setSource (qmlSource);
+  qDebug () << "     back from load " << ui.qmlView->status ();
   qmlRoot = ui.qmlView->rootObject();
   if (qmlRoot == 0) {
     QMessageBox::critical (this, "Fatal", "QML Load Failure");
     return false;
   }
   ConnectGui ();
-  LoadLists ();
   show ();
+  ViewStatusChange (ui.qmlView->status());
 
   isRunning = true;
   return true;
+}
+
+void
+IrcQmlControl::ViewStatusChange ( QDeclarativeView::Status status)
+{
+  qDebug () << __PRETTY_FUNCTION__ << " status change " << status;
+  qDebug () << "                 " << qmlRoot;
+  if (status == QDeclarativeView::Ready && qmlRoot) {
+    QMetaObject::invokeMethod (qmlRoot, "makeVisible");
+  }
 }
 
 void
@@ -212,7 +228,6 @@ IrcQmlControl::LoadLists ()
   nicks.sort ();
   nickModel.setStringList (nicks);
 
-  qDebug () << " ------------ Nicks " << nicks;
 
   QStringList  chans = CertStore::IF().IrcChannels ();
   noNameChannel = tr("# --- New Channel ---");
@@ -221,8 +236,6 @@ IrcQmlControl::LoadLists ()
   chans.append (rawServer);
   chans.sort ();
   channelModel.setStringList (chans);
-
-  qDebug () << " ---------------- Channels " << chans;
 
   ignoreSources = CertStore::IF().IrcIgnores ();
 }
