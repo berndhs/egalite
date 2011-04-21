@@ -15,9 +15,8 @@
 
 TEMPLATE = app
 MAKEFILE = MakeDChat
-TARGET = bin/egalite
 unix {
-  CONFIG += debug
+  CONFIG += debug_and_release
   CONFIG += crypto
   CONFIG += link_pkgconfig
   PKGCONFIG += qca2
@@ -25,6 +24,12 @@ unix {
 win32 {
   CONFIG += debug_and_release
   CONFIG += link_prl
+}
+CONFIG(debug,debug|release) {
+  TARGET = bin/egalite_d
+}
+CONFIG(release,debug|release) {
+  TARGET = bin/egalite
 }
 TRANS_DIR = translate
 TRANSLATIONS += $$TRANS_DIR/egalite_fr.ts $$TRANS_DIR/egalite_de.ts

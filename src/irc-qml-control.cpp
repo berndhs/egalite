@@ -55,13 +55,14 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
    isRunning (false),
    isConnected (false),
    hidSelf (false),
-   knownServers (this),
+   knownServers (0),
    activeServers (this),
    channelModel (this),
    nickModel (this),
    selectedServer (0)
 {
   ui.setupUi (this);
+  knownServers = new KnownServerModel (this);
   dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
   dockedChannels->Start ();
   dockedChannels->hide ();
@@ -173,7 +174,7 @@ IrcQmlControl::Run ()
     QMessageBox::critical (this, "Fatal", "QML Context Missing");
     return false;
   }
-  context->setContextProperty ("cppKnownServerModel", &knownServers);
+  context->setContextProperty ("cppKnownServerModel", knownServers);
   context->setContextProperty ("cppActiveServerModel", &activeServers);
   context->setContextProperty ("cppChannelListModel",&channelModel);
   context->setContextProperty ("cppNickListModel",&nickModel);
@@ -199,10 +200,10 @@ IrcQmlControl::LoadLists ()
   QStringList  servers = CertStore::IF().IrcServers ();
   noNameServer = tr("--- New Server ---");
   servers.append (noNameServer);
-  knownServers.clear ();
+  knownServers->clear ();
   int ns = servers.count();
   for (int i=0; i< ns; i++) {
-    knownServers.addServer (servers.at(i), 6667);
+    knownServers->addServer (servers.at(i), 6667);
   }
 
   QStringList  nicks = CertStore::IF().IrcNicks ();

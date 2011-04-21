@@ -224,7 +224,7 @@ private:
 
   QMap <QString, QString>  whoisWait;
 
-  KnownServerModel    knownServers;
+  KnownServerModel    *knownServers;
   ActiveServerModel   activeServers;
   NameListModel       channelModel;
   NameListModel       nickModel;

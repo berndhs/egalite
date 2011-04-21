@@ -43,7 +43,6 @@
 int
 main (int argc, char* argv[])
 {
-    std::cout << "hello" << std::endl;
   QCoreApplication::setApplicationName ("egalite");
   QCoreApplication::setOrganizationName ("BerndStramm");
   QCoreApplication::setOrganizationDomain ("bernd-stramm.com");

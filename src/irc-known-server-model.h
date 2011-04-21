@@ -37,11 +37,15 @@ public:
 
   /** \brief stuff invokable from QML */
 
+  Q_PROPERTY(int numberOfRows READ numRows) 
+  Q_INVOKABLE int zero () const;
+  Q_INVOKABLE int  numRows () const ;
   Q_INVOKABLE int rowCount (const QModelIndex & index = QModelIndex()) const;
   QVariant data (const QModelIndex & index, 
                   int role = Qt::DisplayRole) const;
 
   Q_INVOKABLE void setPort (int row, const QString & port);
+  Q_INVOKABLE void setEnabled (bool able);
 
   /** \brief the rest */
 
@@ -73,6 +77,7 @@ private:
   typedef QList<ServerStruct>   ServerListType;
 
   ServerListType   servers;
+  bool             isAble;
 
 };
 

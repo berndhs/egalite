@@ -30,12 +30,23 @@ namespace egalite
 {
 
 KnownServerModel::KnownServerModel (QObject *parent)
-  :QAbstractListModel (parent)
+  :QAbstractListModel (parent),
+   isAble (false)
 {
   QHash<int, QByteArray>  roles;
   roles[Role_Name] = "sname";
   roles[Role_Port] = "sport";
   setRoleNames (roles);
+  setObjectName ("KnownServerModel");
+}
+
+void
+KnownServerModel::setEnabled (bool able)
+{
+  isAble = able;
+  if (isAble) {
+    emit contentChange ();
+  }
 }
 
 void
@@ -51,6 +62,19 @@ int
 KnownServerModel::rowCount (const QModelIndex & parent) const
 {
   Q_UNUSED (parent)
+  qDebug () << __PRETTY_FUNCTION__ << servers.count();
+  return servers.count ();
+}
+
+int
+KnownServerModel::zero () const
+{
+  return 0;
+} 
+int
+KnownServerModel::numRows () const
+{
+qDebug () << __PRETTY_FUNCTION__ << servers.count();
   return servers.count ();
 }
 
@@ -84,7 +108,9 @@ qDebug () << " KnownServerModel::addServer " << name << port;
   beginInsertRows (QModelIndex(), nr, nr);
   servers << ServerStruct (name, port);
   endInsertRows ();
-  emit contentChange ();
+  if (isAble) {
+    emit contentChange ();
+  }
 }
 
 void

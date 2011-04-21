@@ -28,9 +28,12 @@ Rectangle {
 
   property alias activeServerModel: activeServerList.model
   property string baseColor: "#f7fbe0"
-  property real rollDelay: 175
+  property real rollDelay: 200
+
   property real topHeight: knownListRect.height + activeListBox.height
   property real restHeight: height - topHeight
+  property real middleButtonWidth: 90
+
   color: baseColor
 
   signal hideMe ()
@@ -58,32 +61,33 @@ Rectangle {
     id: knownListRect
     width: childrenRect.width; height: childrenRect.height
     color: "transparent"
-    border.color: "#c0c0c0"
-    border.width: knownServerList.visible ? 1 : 0
     property string showString: qsTr (" --- Show Known Servers --- ")
     property string noShowString: qsTr (" Hide Known Servers ")
     ChoiceButton {
       id: knownButton
       height: 32
       width: knownServerList.nameWidth
+      anchors { left: parent.left; top: parent.top }
       radius: 0.5 * height
       property string showColor: "#aaffaa"
       property string hideColor: "#d3d3d3"
       property bool seeList: knownServerList.visible
       color: seeList ? hideColor : showColor
-      labelText: knownServerList.visible 
+      labelText: seeList  
                       ? knownListRect.noShowString 
                       : knownListRect.showString
       visible: true
       Behavior on color { PropertyAnimation { duration: rollDelay } }
       onClicked: {
-        knownServerList.visible = !knownServerList.visible
+        knownServerList.toggleVisible ();
       }
     }
+      
     KnownServerList {
       id: knownServerList
-      visible: !knownButton.visible
-      model: cppKnownServerModel
+      visible: false
+      //model: cppKnownServerModel
+      property bool modelEnabled: false
       property real numRowsToShow: 3.5
       height: (visible ? numRowsToShow*rowHeight : 0)
       width: (visible ? rowWidth : 0)
@@ -91,6 +95,22 @@ Rectangle {
       nameWidth: 300
       portWidth: 90
       clip: true
+      function toggleVisible () {
+        var visi = visible;
+        if (visi) adjustRows ()
+        visible = ! visi;
+      }
+      function adjustRows () {
+        if (knownServerList.modelEnabled) {
+          var nr = cppKnownServerModel.numberOfRows
+          console.log (" known server model now has " + nr)
+          if (nr > 3) {
+            knownServerList.numRowsToShow = 3.5
+          } else {
+            knownServerList.numRowsToShow = Math.min (1, nr)
+          }
+        }
+      }
       Behavior on height { PropertyAnimation { duration: rollDelay  } }
       Behavior on width { PropertyAnimation { duration: rollDelay  } }
       onSelectServer: console.log ("picked server " + name + " port " + port)
@@ -101,9 +121,14 @@ Rectangle {
       }
       Connections {
         target: cppKnownServerModel
-        onContentChange: {
-          numRowsToShow = Math.min (3.5, Math.min (1,cppKnownServerModel.rowCount()))
-        }
+        onContentChange: adjustRows ()
+      }
+      Component.onCompleted: {
+        console.log ("loaded KnownServerList into IrcContrl")
+        console.log (" cpp model is " + cppKnownServerModel)
+        model = cppKnownServerModel
+        knownServerList.modelEnabled = true
+        cppKnownServerModel.setEnabled (true)
       }
     }
   }
@@ -255,7 +280,7 @@ Rectangle {
       color: "transparent"
       width: bottomFlow.subListWidth
       height: restHeight
-      anchors { right: bottomFlow.right; leftMargin: space }
+      anchors { right: bottomFlow.right; leftMargin: 2 }
       Rectangle {
         id: nickHeader
         height: childrenRect.height
@@ -301,6 +326,7 @@ Rectangle {
     } 
   }
     
+
   Component.onCompleted: {
     console.log ("loaded IrcControlBox")
   }

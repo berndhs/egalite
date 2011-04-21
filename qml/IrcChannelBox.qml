@@ -27,6 +27,7 @@ import net.sf.egalite 1.0
 
 Rectangle {
   id: channelBox
+
   property string channelName: qsTr ("no channel")
   property real labelHeight:32
   property real inputHeight: 28
@@ -87,10 +88,11 @@ Rectangle {
     source: backgroundImage
     visible: useBackgroundImage
   }
+
   Rectangle {
     id: channelBoxLabelRect
-    height: childrenRect.height + 3
-    width: childrenRect.width
+    height: channelBoxLabel.height + 3
+    width: channelBoxLabel.width + 6
     anchors { top: parent.top; left: parent.left }
     color: "#ff99aa"
     radius: 4
@@ -112,6 +114,7 @@ Rectangle {
       text: " "
     }
   }
+
   DropMenu {
     id: channelMenu
     color: "transparent"
@@ -252,6 +255,7 @@ Rectangle {
       cookedLogBox.setWidth (cookedFlickBox.width)
     }
   }
+
   Rectangle {
     id: textEnterBox
     height:inputHeight
@@ -277,6 +281,7 @@ Rectangle {
       onClicked: { channelBox.userSend () }
     }
   }
+
   Rectangle {
     id: userListBox
     color: "transparent"
@@ -361,6 +366,8 @@ Rectangle {
         delegate: horizontalDelegate
       }
     }
-  } 
+  }
+
   Component.onCompleted: console.log ("Loaded ChannelBox.qml")
 }
+

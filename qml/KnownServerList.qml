@@ -37,29 +37,43 @@ ListView {
   signal connectServer (string name, int port)
 
   Component {
+    id: smallDelegate 
+    Rectangle {
+      width: 300
+      height: 28
+      Text {
+        text: "small delegate"
+      }
+    }
+  }
+
+
+  Component {
     id: landscapeDelegate 
     Row {
       width: knownServerList.rowWidth; height: knownServerList.rowHeight
+      anchors { left: parent.left }
       Rectangle {
         id: connectButtonCol
+        anchors { leftMargin: 4 }
         width: knownServerList.buttonWidth
+        height: knownServerList.rowHeight
         color: "transparent"
         ChoiceButton {
           id: connectButton
           height: knownServerList.rowHeight
           width: parent.width * 0.6666
-          anchors { left: parent.left; horizontalCenter: parent.horizontalCenter }
           radius: 0.5*height
-          labelText: qsTr ("Connect")
+          labelText: qsTr ("Connect ")
           onClicked: {
+            console.log ("clicked on connect button")
             knownServerList.connectServer (sname, sport)
           }
         }
-       }
-      
+       }   
       Rectangle {
         id: serverNameCol
-        anchors  {left: connectButtonCol.right }
+        anchors { leftMargin: 50 }
         width: knownServerList.nameWidth
         height: knownServerList.rowHeight
         color: "transparent"
@@ -81,9 +95,6 @@ ListView {
       }
       Rectangle {
         id: serverPortCol
-        anchors { 
-          left : serverNameCol.right
-        }
         width: knownServerList.portWidth
         height: knownServerList.rowHeight
         color: "transparent"
@@ -125,12 +136,11 @@ ListView {
         }
       }
     }
-    
   }
 
- 
   delegate: landscapeDelegate
   highlight: Rectangle { color: "#77bbff" } 
-  Component.onCompleted: console.log ("Done loading KnownServerList")
-
+  Component.onCompleted: {
+    console.log ("Done loading KnownServerList")
+  }
 }
