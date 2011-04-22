@@ -21,6 +21,7 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
+/** \brief This is the box around a single IRC channel */
 
 import QtQuick 1.0
 import net.sf.egalite 1.0

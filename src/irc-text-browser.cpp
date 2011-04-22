@@ -49,18 +49,45 @@ IrcTextBrowser::boundingRect () const
   return QGraphicsTextItem::boundingRect ();
 }
 
-void
-IrcTextBrowser::noFunc ()
+int
+IrcTextBrowser::zero ()
 {
+  return 0;
+}
+
+void
+IrcTextBrowser::adjustSize ()
+{
+  QGraphicsTextItem::adjustSize ();
+}
+
+bool
+IrcTextBrowser::event (QEvent *evt)
+{
+  qDebug () << __PRETTY_FUNCTION__ << evt->type() << evt;
+  int t = evt->type ();
+  if (t == QEvent::GraphicsSceneResize) {
+    qDebug () << __PRETTY_FUNCTION__ << "          graphics resize ";
+  } else if (t == QEvent::Resize) {
+    qDebug () << __PRETTY_FUNCTION__ << "  plain resize ";
+  }
+  QGraphicsTextItem::event (evt);
 }
 
 qreal
 IrcTextBrowser::getHeight () const
 {
-  qDebug () << " asking " << objectName() << " for height ";
-  qDebug () << "    answer " << boundingRect().height() 
-            << " because of " << boundingRect();
-  return boundingRect().height();
+  qreal h = boundingRect().height();
+  qDebug () << __PRETTY_FUNCTION__ << h;
+  return h;
+}
+
+qreal
+IrcTextBrowser::getWidth () const
+{
+  qreal w = boundingRect().width();
+  qDebug () << __PRETTY_FUNCTION__ << w;
+  return w;
 }
 
 QString
@@ -78,8 +105,8 @@ IrcTextBrowser::setName (const QString & name)
 void
 IrcTextBrowser::DebugCheck ()
 {
-  qDebug () << " -=---------------  IrcTextBrowser DebugCheck  "
-            ;
+  qDebug () << " -=--------------- " << __PRETTY_FUNCTION__ ;
+            
   qDebug () << "                    I am            " << this;
   qDebug () << "                    name            " << objectName();
   qDebug () << "                    parent          " << parent();
@@ -93,6 +120,7 @@ IrcTextBrowser::setWidth (qreal wid)
   qDebug () << " IrcTextBrowser " << objectName() << " set Width " << wid 
             << " is now " << textWidth();
   emit heightChanged (getHeight());
+  emit widthChanged (getWidth());
 }
 
 void

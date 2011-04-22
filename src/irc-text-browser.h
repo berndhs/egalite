@@ -27,6 +27,7 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsItem>
 #include <QRectF>
+#include <QEvent>
 
 namespace egalite
 {
@@ -40,17 +41,19 @@ public:
   IrcTextBrowser (QGraphicsItem * parent=0);
 
   Q_PROPERTY(qreal height READ getHeight NOTIFY heightChanged) 
-  Q_PROPERTY(qreal width READ textWidth WRITE setTextWidth)
+  Q_PROPERTY(qreal width READ getWidth WRITE widthChanged)
   Q_PROPERTY(QString name READ getName WRITE setName) 
 
-  Q_INVOKABLE void noFunc ();
+  Q_INVOKABLE int zero ();
 
   Q_INVOKABLE void setHtml (const QString & html);
   Q_INVOKABLE void setWidth (qreal wid);
   Q_INVOKABLE QRectF boundingRect () const;
   Q_INVOKABLE qreal getHeight () const;
+  Q_INVOKABLE qreal getWidth () const;
   Q_INVOKABLE QString getName () const;
   Q_INVOKABLE void setName (const QString & name);
+  Q_INVOKABLE void adjustSize ();
 
 private slots:
 
@@ -60,6 +63,11 @@ signals:
 
   void activatedLink (const QString & link);
   void heightChanged (qreal height);
+  void widthChanged (qreal width);
+
+protected:
+
+  bool event (QEvent *evt);
 
 private:
 
