@@ -85,6 +85,7 @@ Rectangle {
     MouseArea {
       anchors.fill: parent
       onPressed: {
+       console.log (" clicked empty box to hide channel group")
         channelGroup.hideMe ()
       }
     }

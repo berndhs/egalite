@@ -33,7 +33,7 @@ namespace egalite
 {
 
 QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
-  :QWidget (parent),
+  :QmlView (parent),
    qmlRoot (0),
    debugTimer (this),
    chanLinkPrefix 
@@ -41,17 +41,16 @@ QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
    channelMaskActive 
      ("["
          "<span "
-           "style=\"color: red\; font-weight: bold\">"
+           "style=\"color: red\"; font-weight: bold\">"
            " ! "
          "</span>"
        "%1] "),
    channelMaskIdle 
      ("[%1] ")
 {
-  ui.setupUi (this);
+  //ui.setupUi (this);
   activeIcon = QIcon (":/ircicons/active.png");
   quietIcon = QIcon (":/ircicons/inactive.png");
-  move (250,250);
   connect (&debugTimer, SIGNAL (timeout()),
            this, SLOT (DebugCheck()));
   debugTimer.start (30*1000);
@@ -61,17 +60,16 @@ QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
 void
 QmlIrcChannelGroup::Start ()
 {
-  ui.qmlChannelView->setSource (
-         QUrl("qrc:///qml/IrcChannelGroup.qml"));
+  setSource (QUrl("qrc:///qml/IrcChannelGroup.qml"));
 
-  qmlRoot = ui.qmlChannelView->rootObject();
+  qmlRoot = rootObject();
   if (qmlRoot == 0) {
-    QMessageBox::critical (this, "Fatal", "QML Load Failure");
+    QMessageBox::critical (0, "Fatal", "QML Load Failure");
     return;
   }
-  QDeclarativeEngine * engine = ui.qmlChannelView->engine ();
+  QDeclarativeEngine * engine = QmlView::engine ();
   if (engine == 0) {
-    QMessageBox::critical (this, "Fatal", "No QML Engine");
+    QMessageBox::critical (0, "Fatal", "No QML Engine");
     return;
   }
   int handle = qmlRegisterType<IrcTextBrowser>
@@ -83,7 +81,7 @@ QmlIrcChannelGroup::Start ()
   connect (qmlRoot, SIGNAL (changedHeadHeight (int)),
            this, SLOT (HeadHeightChanged (int)));
   connect (qmlRoot, SIGNAL (hideMe()),
-           this, SLOT (Hide ()));
+           this, SLOT (hide ()));
 }
 
 
@@ -212,9 +210,9 @@ QmlIrcChannelGroup::Close ()
 }
 
 void
-QmlIrcChannelGroup::Show ()
+QmlIrcChannelGroup::show ()
 {
-  show ();
+  QmlView::show ();
 }
 
 void
@@ -224,15 +222,15 @@ QmlIrcChannelGroup::ShowChannel (IrcAbstractChannel *chan)
 
 
 void
-QmlIrcChannelGroup::Hide ()
+QmlIrcChannelGroup::hide ()
 {
-  hide ();
+  QmlView::hide ();
 }
 
 void
 QmlIrcChannelGroup::closeEvent (QCloseEvent *event)
 {
-  Hide ();
+  hide ();
   event->ignore ();
 }
 

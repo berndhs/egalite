@@ -21,7 +21,9 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-qml-channel-group.h"
+
+#include "qml-view.h"
+
 #include <QIcon>
 #include <QWidget>
 #include <QGraphicsObject>
@@ -38,7 +40,7 @@ namespace egalite
 
 class IrcAbstractChannel;
 
-class QmlIrcChannelGroup : public QWidget
+class QmlIrcChannelGroup : public QmlView
 {
 Q_OBJECT
 
@@ -58,8 +60,8 @@ public:
 
 public slots:
 
-  void Show ();
-  void Hide ();
+  void show ();
+  void hide ();
 
 private slots:
 
@@ -78,7 +80,6 @@ private:
   void     SetTopmostChannel (IrcAbstractChannel * topChan);
   void     SetTopmostChannel (const QString & topName);
 
-  Ui_IrcQmlChannelGroup   ui;
   QIcon                   activeIcon;
   QIcon                   quietIcon;
   QGraphicsObject        *qmlRoot;

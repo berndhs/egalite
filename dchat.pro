@@ -145,7 +145,6 @@ FORMS = \
 	ui/server-account.ui \
 	ui/count-down.ui \
 	ui/cert-list.ui \
-        ui/irc-qml-channel-group.ui \
         ui/irc-qml-control.ui \
         ui/irc-float.ui \
         ui/irc-account.ui \
@@ -195,6 +194,7 @@ SOURCES = \
         src/enter-string.cpp \
         src/edit-simple.cpp \
         src/name-list-model.cpp \
+        src/qml-view.cpp \
 
 audio {
 	SOURCES += src/audio-message.cpp
@@ -245,6 +245,7 @@ HEADERS += \
         src/enter-string.h \
         src/edit-simple.h \
         src/name-list-model.h \
+        src/qml-view.h \
 
 audio {
 	HEADERS += src/audio-message.h

@@ -125,7 +125,7 @@ IrcQmlControl::ShowGroup ()
     Run ();
   }
   if (dockedChannels) {
-    dockedChannels->Show ();
+    dockedChannels->show ();
   }
 }
 
@@ -133,7 +133,7 @@ void
 IrcQmlControl::HideGroup ()
 {
   if (dockedChannels) {
-    dockedChannels->Hide ();
+    dockedChannels->hide ();
   }
 }
 
