@@ -1,3 +1,6 @@
+* Thu Apr 21 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.8-4
+- updates to get things to run with Gnome3/Fedora15
+
 * Sat Apr 16 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.6-1
 - update IRC server list displays
 - remove some duplicated transition code
