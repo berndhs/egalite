@@ -70,7 +70,7 @@ IrcTextBrowser::event (QEvent *evt)
   } else if (t == QEvent::Resize) {
     qDebug () << __PRETTY_FUNCTION__ << "  plain resize ";
   }
-  QGraphicsTextItem::event (evt);
+  return QGraphicsTextItem::event (evt);
 }
 
 qreal
