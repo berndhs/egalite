@@ -22,13 +22,14 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include "qml-view.h"
+//#include "qml-view.h"
 
 #include <QIcon>
 #include <QWidget>
 #include <QGraphicsObject>
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
+#include <QDeclarativeView>
 #include <QStringList>
 #include <QList>
 #include <QTimer>
@@ -40,7 +41,7 @@ namespace egalite
 
 class IrcAbstractChannel;
 
-class QmlIrcChannelGroup : public QmlView
+class QmlIrcChannelGroup : public QDeclarativeView
 {
 Q_OBJECT
 
@@ -72,6 +73,7 @@ private slots:
 protected:
 
   void closeEvent (QCloseEvent *event);
+  void resizeEvent (QResizeEvent * event); 
 
 private:
 

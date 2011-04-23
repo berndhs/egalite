@@ -270,6 +270,7 @@ Rectangle {
               }
             }
             Text {
+              id: channelNameText
               width: channelListBox,width; text: name
             }
           }
@@ -281,7 +282,7 @@ Rectangle {
         anchors { top: channelHeader.bottom; left: channelListBox.left }
         model: cppChannelListModel
         highlightMoveSpeed: 2000
-        highlight: Rectangle { color: "#ffcccc"}
+        highlight: Rectangle { color: "#ffccee"}
         delegate: channelDelegate
       }
     }

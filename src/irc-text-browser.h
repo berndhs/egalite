@@ -47,7 +47,7 @@ public:
   Q_INVOKABLE int zero ();
 
   Q_INVOKABLE void setHtml (const QString & html);
-  Q_INVOKABLE void setWidth (qreal wid);
+  Q_INVOKABLE void setTextWidth (qreal wid);
   Q_INVOKABLE QRectF boundingRect () const;
   Q_INVOKABLE qreal getHeight () const;
   Q_INVOKABLE qreal getWidth () const;
@@ -70,8 +70,6 @@ protected:
   bool event (QEvent *evt);
 
 private:
-
-  void DebugCheck ();
 
 };
 

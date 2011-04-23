@@ -119,7 +119,7 @@ Rectangle {
   DropMenu {
     id: channelMenu
     color: "transparent"
-    itemWidth: childrenRect.width
+    itemWidth: 150
     itemHeight: 32
     property real buttonRadius: 0.4 * itemHeight
     z: parent.z + 1
@@ -133,7 +133,8 @@ Rectangle {
     ChoiceButton {
       id: stopButton
       height: parent.itemHeight
-      radius: buttonRadius
+      width: parent.itemWidth
+      radius: channelMenu.buttonRadius
       anchors {top: parent.top; horizontalCenter: parent.horizontalCenter }
       labelText: cookedFlickBox.interactive ? 
                     qsTr (" Stop Scroll ") : qsTr (" Start Scroll ")
@@ -145,15 +146,17 @@ Rectangle {
     ChoiceButton {
       id: partButton
       height: parent.itemHeight
-      radius: buttonRadius
+      width: parent.itemWidth
+      radius: channelMenu.buttonRadius
       anchors {top: stopButton.bottom; horizontalCenter: parent.horizontalCenter }
-      labelText: qsTr (" Leave Channel ")
+      labelText: qsTr ("  Leave Channel  ")
       onClicked: { channelBox.wantPart (); channelMenu.hide () }
     }
     ChoiceButton {
       id: topicButton
       height: parent.itemHeight
-      radius: buttonRadius
+      width: parent.itemWidth
+      radius: channelMenu.buttonRadius
       anchors {top: partButton.bottom; horizontalCenter: parent.horizontalCenter }
       labelText: qsTr (" Big Topic ")
       onClicked: { topicBox.toggleHeight(); channelMenu.hide () }
@@ -161,7 +164,8 @@ Rectangle {
     ChoiceButton {
       id: showControlButton
       height: parent.itemHeight
-      radius: buttonRadius
+      width: parent.itemWidth
+      radius: channelMenu.buttonRadius
       anchors { top: topicButton.bottom; horizontalCenter: parent.horizontalCenter }
       labelText: qsTr ("Show Control")
       onClicked: { channelBox.showControl (); channelMenu.hide () }
@@ -214,14 +218,14 @@ Rectangle {
         }
       }
     }
-    onWidthChanged: topicBoxContent.setWidth (width)
+    onWidthChanged: topicBoxContent.setTextWidth (width)
     onTopicTextChanged: {
       console.log (" topic changed for " + channelBox.objectName + " to " + topicBox.topicText)
       topicBox.setSmall ()
       topicBoxContent.setHtml (topicBox.topicText)
     }
     Component.onCompleted: {
-      topicBoxContent.setWidth (topicBox.width) 
+      topicBoxContent.setTextWidth (topicBox.width) 
       topicBoxContent.setHtml (topicBox.topicText)
       console.log ("Topic box loaded for " + channelBox.objectName)
     }
@@ -234,10 +238,9 @@ Rectangle {
     interactive: true
     height: channelBox.height - channelBoxLabelRect.height - textEnterBox.height
     clip: true
-    contentWidth: cookedLogBox.width
-    contentHeight: cookedLogBox.height
+    contentWidth: width
+    contentHeight: 0 
     boundsBehavior: Flickable.DragAndOvershootBounds
-
     function alignBottom () {
       if (flicking) return   // not while moving
       contentY = Math.max (0, cookedLogBox.height - cookedFlickBox.height - 2)
@@ -249,11 +252,17 @@ Rectangle {
       onActivatedLink: { 
         channelBox.activatedLink (link)
       }
+      onHeightChanged: {
+        cookedFlickBox.contentHeight= height
+      }
+      onWidthChanged: {
+        cookedFlickBox.contentWidth = width
+      }
     }
 
-    onWidthChanged: cookedLogBox.setWidth (width)
+    onWidthChanged: cookedLogBox.setTextWidth (width)
     Component.onCompleted: {
-      cookedLogBox.setWidth (cookedFlickBox.width)
+      cookedLogBox.setTextWidth (cookedFlickBox.width)
     }
   }
 

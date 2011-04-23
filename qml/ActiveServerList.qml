@@ -43,7 +43,7 @@ ListView {
 
   Component {
     id: landscapeDelegate 
-    Flow {
+    Row {
       id: serverRow
       width: activeServerList.width
       height: childrenRect.height //activeServerList.rowHeight
@@ -69,7 +69,7 @@ ListView {
       
       Rectangle {
         id: baseNameCol
-        width: childrenRect.width //activeServerList.nameWidth
+        width: nameText.width 
         height: activeServerList.rowHeight
         color: "transparent"
         MouseArea {
@@ -80,6 +80,7 @@ ListView {
           }
         }
         Text {
+          id: nameText
           anchors { 
             left: parent.left; leftMargin: 3 ; 
             verticalCenter: parent.verticalCenter 
@@ -89,7 +90,7 @@ ListView {
       }    
       Rectangle {
         id: trafficCountCol
-        width: childrenRect.width
+        width: countText.width
         height: activeServerList.rowHeight
         color: "transparent"
         MouseArea {
@@ -100,6 +101,7 @@ ListView {
           }
         }
         Text {
+          id: countText
           anchors { 
             left: parent.left; leftMargin: 3 ; 
             verticalCenter: parent.verticalCenter 
@@ -111,7 +113,7 @@ ListView {
       }  
       Rectangle {
         id: addressCol
-        width: childrenRect.width //activeServerList.addressWidth
+        width: addressText.width //activeServerList.addressWidth
         height: activeServerList.rowHeight
         color: "transparent"
         MouseArea {
@@ -122,6 +124,7 @@ ListView {
           }
         }
         Text {
+          id: addressText
           anchors { 
             left: parent.left; leftMargin: 3 
             verticalCenter: parent.verticalCenter 
@@ -131,7 +134,7 @@ ListView {
       }
       Rectangle {
         id: portCol
-        width: childrenRect.width
+        width: thePortText.width
         height: activeServerList.rowHeight
         color: "transparent"
         MouseArea {

@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include <QMetaObject>
 #include <QDeclarativeItem>
+#include <QRectF>
 #include "irc-abstract-channel.h"
 #include "irc-text-browser.h"
 
@@ -33,7 +34,7 @@ namespace egalite
 {
 
 QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
-  :QmlView (parent),
+  :QDeclarativeView (parent),
    qmlRoot (0),
    debugTimer (this),
    chanLinkPrefix 
@@ -60,6 +61,8 @@ QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
 void
 QmlIrcChannelGroup::Start ()
 {
+  int handle = qmlRegisterType<IrcTextBrowser>
+              ("net.sf.egalite",1,0,"IrcTextBrowser");
   setSource (QUrl("qrc:///qml/IrcChannelGroup.qml"));
 
   qmlRoot = rootObject();
@@ -67,13 +70,12 @@ QmlIrcChannelGroup::Start ()
     QMessageBox::critical (0, "Fatal", "QML Load Failure");
     return;
   }
-  QDeclarativeEngine * engine = QmlView::engine ();
-  if (engine == 0) {
-    QMessageBox::critical (0, "Fatal", "No QML Engine");
-    return;
-  }
-  int handle = qmlRegisterType<IrcTextBrowser>
-              ("net.sf.egalite",1,0,"IrcTextBrowser");
+  QRectF scene = sceneRect ();
+  qreal width = scene.width();
+  qreal height = scene.height();
+  qDebug () << __PRETTY_FUNCTION__ << " new size w " << width << " h " << height;
+  qmlRoot->setProperty ("width", width);
+  qmlRoot->setProperty ("height", height);
   qDebug () << " ----------------------- "
              "QmlIrcChannelGroup registered type as " << handle;
   connect (qmlRoot, SIGNAL (selectedChannel (QString)),
@@ -212,7 +214,7 @@ QmlIrcChannelGroup::Close ()
 void
 QmlIrcChannelGroup::show ()
 {
-  QmlView::show ();
+  QDeclarativeView::show ();
 }
 
 void
@@ -224,7 +226,7 @@ QmlIrcChannelGroup::ShowChannel (IrcAbstractChannel *chan)
 void
 QmlIrcChannelGroup::hide ()
 {
-  QmlView::hide ();
+  QDeclarativeView::hide ();
 }
 
 void
@@ -232,6 +234,20 @@ QmlIrcChannelGroup::closeEvent (QCloseEvent *event)
 {
   hide ();
   event->ignore ();
+}
+
+void
+QmlIrcChannelGroup::resizeEvent (QResizeEvent *event)
+{
+  if (event && qmlRoot) {
+    QSize size = event->size();
+    qreal width = size.width();
+    qreal height = size.height();
+    qDebug () << __PRETTY_FUNCTION__ << " new size w " << width << " h " << height;
+    qmlRoot->setProperty ("width", width);
+    qmlRoot->setProperty ("height", height);
+  }
+  QDeclarativeView::resizeEvent (event);
 }
 
 void

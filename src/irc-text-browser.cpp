@@ -39,8 +39,7 @@ IrcTextBrowser::IrcTextBrowser (QGraphicsItem *prnt)
   setObjectName ("IrcTextBrowser_");
   connect (this, SIGNAL (linkActivated(const QString &)),
            this, SLOT (doActivateLink(const QString &)));
-  DebugCheck ();
-  QTimer::singleShot (2000, this, SLOT (DebugCheck()));
+  qDebug () << __PRETTY_FUNCTION__ << this << " parent " << prnt;
 }
 
 QRectF
@@ -102,22 +101,12 @@ IrcTextBrowser::setName (const QString & name)
   setObjectName (QString ("IrcTextBrowser_") + name);
 }
 
-void
-IrcTextBrowser::DebugCheck ()
-{
-  qDebug () << " -=--------------- " << __PRETTY_FUNCTION__ ;
-            
-  qDebug () << "                    I am            " << this;
-  qDebug () << "                    name            " << objectName();
-  qDebug () << "                    parent          " << parent();
-  qDebug () << "                    parentItem      " << parentItem();
-}
 
 void
-IrcTextBrowser::setWidth (qreal wid)
+IrcTextBrowser::setTextWidth (qreal wid)
 {
-  setTextWidth (wid);
-  qDebug () << " IrcTextBrowser " << objectName() << " set Width " << wid 
+  QGraphicsTextItem::setTextWidth (wid);
+  qDebug () << __PRETTY_FUNCTION__ << objectName() << " set Width " << wid 
             << " is now " << textWidth();
   emit heightChanged (getHeight());
   emit widthChanged (getWidth());
@@ -126,7 +115,7 @@ IrcTextBrowser::setWidth (qreal wid)
 void
 IrcTextBrowser::setHtml (const QString & html)
 {
-  qDebug () << "IrcTextBrowser " << objectName() << " set html " << html;
+  qDebug () << __PRETTY_FUNCTION__ << objectName() << " set html " << html;
   QGraphicsTextItem::setHtml (html);
   qDebug () << "           textWidth " << textWidth();
   emit heightChanged (getHeight());
@@ -135,8 +124,7 @@ IrcTextBrowser::setHtml (const QString & html)
 void
 IrcTextBrowser::doActivateLink (const QString & link)
 {
-  qDebug () << "IrcTextBrowser  " << objectName() << " link activated, re-emit " << link;
-  DebugCheck ();
+  qDebug () << __PRETTY_FUNCTION__ << objectName() << " link activated, re-emit " << link;
   emit activatedLink (link);
 }
 

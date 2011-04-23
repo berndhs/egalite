@@ -13,7 +13,6 @@ QmlView::QmlView (QWidget *parent)
 void
 QmlView::resizeEvent (QResizeEvent *event)
 {
-  qDebug () << __PRETTY_FUNCTION__ << " resize event " << event;
   QDeclarativeView::resizeEvent (event);
 }
 
