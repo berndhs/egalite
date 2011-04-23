@@ -267,6 +267,7 @@ Rectangle {
               onClicked: { 
                 channelList.currentIndex = index; 
                 ircControlBox.selectChannel (name) 
+                console.log (" channel box width " + parent.width + " name " + name)
               }
             }
             Text {
@@ -282,7 +283,7 @@ Rectangle {
         anchors { top: channelHeader.bottom; left: channelListBox.left }
         model: cppChannelListModel
         highlightMoveSpeed: 2000
-        highlight: Rectangle { color: "#ffccee"}
+        highlight: Rectangle { color: "#ffccee"; width:channelListBox.width}
         delegate: channelDelegate
       }
     }
@@ -359,7 +360,7 @@ Rectangle {
         anchors { top: nickHeader.bottom; left: nickListBox.left }
         model: cppNickListModel
         delegate: nickDelegate
-        highlight: Rectangle { color: "#eeccff" }
+        highlight: Rectangle { color: "#eeccff"; width:nickListBox.width }
       }
     } 
   }
