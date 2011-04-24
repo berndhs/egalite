@@ -62,7 +62,6 @@ int
 KnownServerModel::rowCount (const QModelIndex & parent) const
 {
   Q_UNUSED (parent)
-  qDebug () << __PRETTY_FUNCTION__ << servers.count();
   return servers.count ();
 }
 
@@ -74,7 +73,6 @@ KnownServerModel::zero () const
 int
 KnownServerModel::numRows () const
 {
-qDebug () << __PRETTY_FUNCTION__ << servers.count();
   return servers.count ();
 }
 

@@ -53,6 +53,7 @@ public:
   NameListModel * userNamesModel ();
 
   void SetTopic (const QString & newTopic);
+  void RefreshTopic ();
   void SetHost (const QString & hostName);
   void SetPartMsg (const QString & part)
                { partMsg = part; }
@@ -61,6 +62,7 @@ public:
 
   void AddNames (const QString & names);
   void AddName (const QString & name);
+  void RefreshNames ();
   void DropName (const QString & name, const QString & msg = QString());
 
   QString Topic () { return topic; }

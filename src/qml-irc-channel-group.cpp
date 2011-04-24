@@ -111,6 +111,9 @@ QmlIrcChannelGroup::SetChannelList ()
 void
 QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
 {
+  if (newchan == 0) {
+    return;
+  }
   QVariant chanObjVar;
   QMetaObject::invokeMethod (qmlRoot, "addChannel",
               Qt::DirectConnection,
@@ -126,6 +129,9 @@ QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
     SetTopmostChannel (newchan);
     SetChannelList ();
   }
+  newchan->UpdateCooked ();
+  newchan->RefreshNames();
+  newchan->RefreshTopic();
 }
 
 QString
@@ -138,6 +144,7 @@ QmlIrcChannelGroup::ChannelAnchor (const QString & name)
 void
 QmlIrcChannelGroup::RemoveChannel (IrcAbstractChannel * chan)
 {
+  qDebug () << __PRETTY_FUNCTION__ << chan;
   if (chan) {
     channelList.removeAll (chan);
     if (chan->Topmost() && !channelList.isEmpty()) {

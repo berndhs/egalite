@@ -63,13 +63,6 @@ IrcTextBrowser::adjustSize ()
 bool
 IrcTextBrowser::event (QEvent *evt)
 {
-  qDebug () << __PRETTY_FUNCTION__ << evt->type() << evt;
-  int t = evt->type ();
-  if (t == QEvent::GraphicsSceneResize) {
-    qDebug () << __PRETTY_FUNCTION__ << "          graphics resize ";
-  } else if (t == QEvent::Resize) {
-    qDebug () << __PRETTY_FUNCTION__ << "  plain resize ";
-  }
   return QGraphicsTextItem::event (evt);
 }
 
@@ -77,7 +70,6 @@ qreal
 IrcTextBrowser::getHeight () const
 {
   qreal h = boundingRect().height();
-  qDebug () << __PRETTY_FUNCTION__ << h;
   return h;
 }
 
@@ -85,7 +77,6 @@ qreal
 IrcTextBrowser::getWidth () const
 {
   qreal w = boundingRect().width();
-  qDebug () << __PRETTY_FUNCTION__ << w;
   return w;
 }
 
@@ -106,8 +97,6 @@ void
 IrcTextBrowser::setTextWidth (qreal wid)
 {
   QGraphicsTextItem::setTextWidth (wid);
-  qDebug () << __PRETTY_FUNCTION__ << objectName() << " set Width " << wid 
-            << " is now " << textWidth();
   emit heightChanged (getHeight());
   emit widthChanged (getWidth());
 }
@@ -115,16 +104,13 @@ IrcTextBrowser::setTextWidth (qreal wid)
 void
 IrcTextBrowser::setHtml (const QString & html)
 {
-  qDebug () << __PRETTY_FUNCTION__ << objectName() << " set html " << html;
   QGraphicsTextItem::setHtml (html);
-  qDebug () << "           textWidth " << textWidth();
   emit heightChanged (getHeight());
 }
 
 void
 IrcTextBrowser::doActivateLink (const QString & link)
 {
-  qDebug () << __PRETTY_FUNCTION__ << objectName() << " link activated, re-emit " << link;
   emit activatedLink (link);
 }
 

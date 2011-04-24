@@ -38,7 +38,7 @@ IrcFloat::IrcFloat (QWidget *parent)
    qmlRoot (0),
    qmlChannel (0)
 {
-  int handle = qmlRegisterType<IrcTextBrowser>
+  qmlRegisterType<IrcTextBrowser>
               ("net.sf.egalite",1,0,"IrcTextBrowser");
   setSource (QUrl ("qrc:///qml/IrcFloatBox.qml"));
   qmlRoot = rootObject ();
@@ -77,15 +77,17 @@ IrcFloat::AddChannel (IrcAbstractChannel *chan)
     return;
   }
   chanBox = chan;
-  setWindowTitle (chan->Name());
   connect (chanBox, SIGNAL (HideMe()), this, SLOT (Hide()));
   chanBox->SetQmlItem (qmlChannel);
   qmlChannel->setProperty ("boxLabel", chan->Name());
   QObject * model = qobject_cast<QObject*>(chan->userNamesModel());
   QMetaObject::invokeMethod (qmlChannel, "setModel",
       Q_ARG (QVariant, qVariantFromValue (model)));
+  setWindowTitle (tr ("IRC channel %1").arg(chan->Name()));
   chan->SetTopmost (true);
   chan->UpdateCooked ();
+  chan->RefreshNames ();
+  chan->RefreshTopic ();
 }
 
 void

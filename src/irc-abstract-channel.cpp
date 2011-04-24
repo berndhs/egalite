@@ -72,7 +72,7 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
 {
   if (qmlItem) {
     disconnect (qmlItem, 0,0,0);
-    QMetaObject::invokeMethod (qmlItem, "destroy");
+    QMetaObject::invokeMethod (qmlItem, "deallocateSelf");
   }
   qmlItem = item;
   if (qmlItem == 0) {
@@ -267,6 +267,12 @@ void
 IrcAbstractChannel::SetTopic (const QString & newTopic)
 {
   topic = newTopic;
+  RefreshTopic ();
+}
+
+void
+IrcAbstractChannel::RefreshTopic ()
+{
   QString cooked = HtmlMangle::Anchorize (topic, 
                          HtmlMangle::HttpExp(),
                          HtmlMangle::HtmlAnchor);
@@ -278,15 +284,11 @@ IrcAbstractChannel::SetTopic (const QString & newTopic)
 void
 IrcAbstractChannel::AddNames (const QString & names)
 {
-  QStringList newNames = names.split (QRegExp ("(\\s+)"));
-qDebug () << " IrcAbstractChannel :: AddNames " << newNames;
-  oldNames.append (newNames);
-  oldNames.removeDuplicates ();
-  qSort (oldNames.begin(), oldNames.end(), IrcAbstractChannel::Less);
-  namesModel.setStringList (oldNames);
-  if (qmlItem) {
-    qmlItem->setProperty ("userListCounter",
-      tr("%1 Users").arg (oldNames.size()));
+  qDebug () << __PRETTY_FUNCTION__ << names;
+  if (names.trimmed().length() > 0) {
+    QStringList newNames = names.split (QRegExp ("(\\s+)"));
+    oldNames.append (newNames);
+    RefreshNames ();
   }
 }
 
@@ -297,15 +299,24 @@ qDebug () << " IrcAbstractChannel :: AddName " << name;
   if (oldNames.contains (name)) {
     return;
   }
-  oldNames.append (name);
+  if (name.length() > 0) {
+    oldNames.append (name);
+    RefreshNames ();
+  }
+  AppendSmall (cookedLog, tr(" Enter: -&gt; %1").arg(name));
+  UpdateCooked ();
+}
+
+void
+IrcAbstractChannel::RefreshNames ()
+{
+  oldNames.removeDuplicates ();
   qSort (oldNames.begin(), oldNames.end(), IrcAbstractChannel::Less);
   namesModel.setStringList (oldNames);
   if (qmlItem) {
     qmlItem->setProperty ("userListCounter",
       tr("%1 Users").arg (oldNames.size()));
   }
-  AppendSmall (cookedLog, tr(" Enter: -&gt; %1").arg(name));
-  UpdateCooked ();
 }
 
 void

@@ -752,6 +752,7 @@ IrcQmlControl::ChanInUse (IrcAbstractChannel *chan)
 void
 IrcQmlControl::ChanWantsFloat (IrcAbstractChannel *chan)
 {
+  qDebug () << __PRETTY_FUNCTION__ << chan;
   if (dockedChannels->HaveChannel (chan)) {
     dockedChannels->RemoveChannel (chan);
   }
@@ -766,6 +767,7 @@ IrcQmlControl::ChanWantsFloat (IrcAbstractChannel *chan)
 void
 IrcQmlControl::ChanWantsDock (IrcAbstractChannel *chan)
 {
+  qDebug () << __PRETTY_FUNCTION__ << chan;
   if (floatingChannels.contains (chan)) {
     IrcFloat * oldFloat = floatingChannels [chan];
     oldFloat->RemoveChannel (chan);
