@@ -72,6 +72,7 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
 {
   if (qmlItem) {
     disconnect (qmlItem, 0,0,0);
+    QMetaObject::invokeMethod (qmlItem, "destroy");
   }
   qmlItem = item;
   if (qmlItem == 0) {

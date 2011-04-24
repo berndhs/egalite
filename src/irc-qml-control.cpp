@@ -756,7 +756,7 @@ IrcQmlControl::ChanWantsFloat (IrcAbstractChannel *chan)
     dockedChannels->RemoveChannel (chan);
   }
   if (!floatingChannels.contains (chan)) {
-    IrcFloat * newFloat = new IrcFloat (this);
+    IrcFloat * newFloat = new IrcFloat (0);
     floatingChannels [chan] = newFloat;
     newFloat->AddChannel (chan);
     newFloat->show ();
