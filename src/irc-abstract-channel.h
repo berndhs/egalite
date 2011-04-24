@@ -79,6 +79,7 @@ public:
   bool IsActive ();
   void SetActive (bool a);
   QRectF cookedBoundingRect () const;
+  void   UpdateCooked ();
 
 public slots:
 
@@ -96,6 +97,7 @@ private slots:
   void ClickedUser (const QString & userName);
   void ActivatedCookedLink (const QString & link);
   void HideMe ();
+  void ToggleFloat ();
   void HideGroup ();
   void HideAll ();
   void CopyClip ();
@@ -119,6 +121,7 @@ signals:
   void InUse (IrcAbstractChannel * box);
   void WantFloat (IrcAbstractChannel * box);
   void WantDock (IrcAbstractChannel * box);
+  void ToggleFloat (IrcAbstractChannel * box);
   void WantClose (IrcAbstractChannel * box);
   void HideAllChannels ();
   void HideDock ();
@@ -130,7 +133,6 @@ private:
 
   void   Connect ();
   void   AppendSmall (QString & log, const QString & line);
-  void   UpdateCooked ();
   void   CheckWatch (const QString & data);
   void   DoHistory (Qt::Key       key,
                     QStringList & hist,

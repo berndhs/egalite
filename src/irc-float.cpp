@@ -23,15 +23,38 @@
  ****************************************************************/
 
 #include <QCloseEvent>
+#include "irc-text-browser.h"
+#include <QRectF>
+#include <QMetaObject>
+#include <QMessageBox>
+#include <QDebug>
 
 namespace egalite
 {
 
 IrcFloat::IrcFloat (QWidget *parent)
-  :QDialog (parent),
-   chanBox (0)
+  :QDeclarativeView (parent),
+   chanBox (0),
+   qmlRoot (0),
+   qmlChannel (0)
 {
-  ui.setupUi (this);
+  int handle = qmlRegisterType<IrcTextBrowser>
+              ("net.sf.egalite",1,0,"IrcTextBrowser");
+  setSource (QUrl ("qrc:///qml/IrcFloatBox.qml"));
+  qmlRoot = rootObject ();
+  if (!qmlRoot) {
+    QMessageBox::critical (this, "Fatal", "QML Float Root Missing");
+    abort ();
+  }
+  QRectF scene = sceneRect ();
+  qreal width = scene.width();
+  qreal height = scene.height();
+  qDebug () << __PRETTY_FUNCTION__ << " new size w " << width << " h " << height;
+  qmlRoot->setProperty ("width", width);
+  qmlRoot->setProperty ("height", height);
+  QString chanName = qmlRoot->property ("floatName").toString();
+  qmlChannel = qmlRoot->findChild<QDeclarativeItem*>(chanName);
+  qDebug () << "   qmlChannel " <<   qmlChannel;
 }
 
 void
@@ -50,14 +73,19 @@ IrcFloat::Show ()
 void
 IrcFloat::AddChannel (IrcAbstractChannel *chan)
 {
-  if (chanBox != 0) {
+  if (chanBox != 0 || chan == 0) {
     return;
   }
   chanBox = chan;
-  //ui.mainLayout->addWidget (chanBox, 0,0,1,1);
   setWindowTitle (chan->Name());
   connect (chanBox, SIGNAL (HideMe()), this, SLOT (Hide()));
-  //chan->show ();
+  chanBox->SetQmlItem (qmlChannel);
+  qmlChannel->setProperty ("boxLabel", chan->Name());
+  QObject * model = qobject_cast<QObject*>(chan->userNamesModel());
+  QMetaObject::invokeMethod (qmlChannel, "setModel",
+      Q_ARG (QVariant, qVariantFromValue (model)));
+  chan->SetTopmost (true);
+  chan->UpdateCooked ();
 }
 
 void
@@ -75,7 +103,7 @@ IrcFloat::closeEvent (QCloseEvent *event)
   if (chanBox) {
     chanBox->Part ();
   }
-  QDialog::closeEvent (event);
+  QDeclarativeView::closeEvent (event);
 }
 
 } // namespace

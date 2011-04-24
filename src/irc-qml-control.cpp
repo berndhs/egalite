@@ -629,6 +629,8 @@ IrcQmlControl::AddChannel (IrcSocket * sock,
            this, SLOT (HideGroup ()));
   connect (newchan, SIGNAL (HideChannel (IrcAbstractChannel *)),
            this, SLOT (HideChannel (IrcAbstractChannel *)));
+  connect (newchan, SIGNAL (ToggleFloat (IrcAbstractChannel *)),
+           this, SLOT (WantsFloatToggle (IrcAbstractChannel *)));
   connect (newchan, SIGNAL (WantWhois (QString, QString, bool)),
            this, SLOT (WantsWhois (QString, QString, bool)));
   connect (newchan, SIGNAL (ShowControl()),
@@ -773,6 +775,16 @@ IrcQmlControl::ChanWantsDock (IrcAbstractChannel *chan)
   if (!dockedChannels->HaveChannel (chan)) {
     dockedChannels->AddChannel (chan);
     dockedChannels->show ();
+  }
+}
+
+void
+IrcQmlControl::WantsFloatToggle (IrcAbstractChannel *chan)
+{
+  if (floatingChannels.contains (chan)) {
+    ChanWantsDock (chan);
+  } else if (dockedChannels->HaveChannel (chan)) {
+    ChanWantsFloat (chan);
   }
 }
 

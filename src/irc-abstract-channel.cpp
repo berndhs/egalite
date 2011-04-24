@@ -84,7 +84,14 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
            this, SLOT (ActivatedCookedLink(const QString &)));
   connect (qmlItem, SIGNAL (wantPart()), this, SLOT (Part()));
   connect (qmlItem, SIGNAL (showControl()), this, SIGNAL (ShowControl()));
+  connect (qmlItem, SIGNAL (toggleFloat()), this, SLOT (ToggleFloat ()));
   qmlItem->setProperty ("channelName", chanName);
+}
+
+void
+IrcAbstractChannel::ToggleFloat ()
+{
+  emit ToggleFloat (this);
 }
 
 void
@@ -117,7 +124,7 @@ IrcAbstractChannel::SetTopmost (bool top)
 {
   if (qmlItem) {
     topmost = top;
-    qmlItem->setProperty ("z", top ? 1 : -1);
+    qmlItem->setProperty ("topmost", top);
     if (topmost) {
       active = false;
     }

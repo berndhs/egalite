@@ -30,6 +30,7 @@ Rectangle {
   id: channelBox
 
   property string channelName: qsTr ("no channel")
+  property bool topmost: true
   property real labelHeight:32
   property real inputHeight: 28
   property real userNameHeight: 20
@@ -43,6 +44,14 @@ Rectangle {
   property alias boxLabel: channelBoxLabel.text
   property alias userListCounter: userListCount.text
   property alias channelTopic: topicBox.topicText
+  property real channelBoxWidth: parent.width - parentWidthReserve
+  property real channelBoxHeight: parent.height - parentHeightReserve
+
+  objectName: "ChannelBox_" + channelName
+  height: channelBoxHeight
+  width: channelBoxWidth
+  anchors { topMargin: parentHeightReserve }
+  color: "#f3f6f6"
 
   signal userSend ()
   signal userUp ()
@@ -50,6 +59,7 @@ Rectangle {
   signal activatedLink (string link)
   signal wantPart ()
   signal showControl ()
+  signal toggleFloat ()
 
   function selectUser (user) {
     console.log ("selected user " + user)
@@ -72,15 +82,12 @@ Rectangle {
   function setModel (theModel) { userList.model = theModel }
   function cookedBoundingRect () { return cookedLogBox.boundingRect () }
 
-  objectName: "ChannelBox_" + channelName
-  height: parent.height - parentHeightReserve
-  width: parent.width - parentWidthReserve
-  anchors { topMargin: parentHeightReserve }
-  color: "#f3f6f6"
-
   onChannelNameChanged: { 
     objectName = "ChannelBox_" + channelName 
     topicBox.setName (channelName)
+  }
+  onTopmostChanged: {
+    visible = topmost
   }
 
   Image {
@@ -162,11 +169,20 @@ Rectangle {
       onClicked: { topicBox.toggleHeight(); channelMenu.hide () }
     }
     ChoiceButton {
-      id: showControlButton
+      id: floatButton 
       height: parent.itemHeight
       width: parent.itemWidth
       radius: channelMenu.buttonRadius
       anchors { top: topicButton.bottom; horizontalCenter: parent.horizontalCenter }
+      labelText: qsTr ("Float/Dock")
+      onClicked: { channelBox.toggleFloat (); channelMenu.hide () }
+    }
+    ChoiceButton {
+      id: showControlButton
+      height: parent.itemHeight
+      width: parent.itemWidth
+      radius: channelMenu.buttonRadius
+      anchors { top: floatButton.bottom; horizontalCenter: parent.horizontalCenter }
       labelText: qsTr ("Show Control")
       onClicked: { channelBox.showControl (); channelMenu.hide () }
     }

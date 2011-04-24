@@ -21,7 +21,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-float.h"
+
+#include <QDeclarativeView>
 #include "irc-abstract-channel.h"
 
 class QCloseEvent;
@@ -29,7 +30,7 @@ class QCloseEvent;
 namespace egalite
 {
 
-class IrcFloat : public QDialog
+class IrcFloat : public QDeclarativeView
 {
 Q_OBJECT
 
@@ -50,8 +51,9 @@ protected:
 
 private:
 
-  Ui_IrcFloat         ui;
   IrcAbstractChannel      *chanBox;
+  QGraphicsObject         *qmlRoot;
+  QDeclarativeItem        *qmlChannel;
 
 };
 
