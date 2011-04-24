@@ -107,5 +107,18 @@ IrcFloat::closeEvent (QCloseEvent *event)
   }
   QDeclarativeView::closeEvent (event);
 }
+void
+IrcFloat::resizeEvent (QResizeEvent *event)
+{
+  if (event && qmlRoot) {
+    QSize size = event->size();
+    qreal width = size.width();
+    qreal height = size.height();
+    qDebug () << __PRETTY_FUNCTION__ << " new size w " << width << " h " << height;
+    qmlRoot->setProperty ("width", width);
+    qmlRoot->setProperty ("height", height);
+  }
+  //QDeclarativeView::resizeEvent (event);
+}
 
 } // namespace

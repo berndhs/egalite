@@ -24,6 +24,8 @@
 
 #include <QDeclarativeView>
 #include "irc-abstract-channel.h"
+#include <QResizeEvent>
+#include <QCloseEvent>
 
 class QCloseEvent;
 
@@ -48,6 +50,7 @@ public slots:
 protected:
 
   void closeEvent (QCloseEvent * event);
+  void resizeEvent (QResizeEvent * event);
 
 private:
 
