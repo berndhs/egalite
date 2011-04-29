@@ -49,7 +49,7 @@ QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
    channelMaskIdle 
      ("[%1] ")
 {
-  //ui.setupUi (this);
+  setWindowTitle (tr ("%1 IRC Channels").arg(QString::fromUtf8("Égalité!")));
   activeIcon = QIcon (":/ircicons/active.png");
   quietIcon = QIcon (":/ircicons/inactive.png");
   connect (&debugTimer, SIGNAL (timeout()),

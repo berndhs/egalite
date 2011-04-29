@@ -62,6 +62,8 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
    selectedServer (0)
 {
   ui.setupUi (this);
+  setWindowTitle (tr ("%1 IRC Control")
+               .arg(QString::fromUtf8("Égalité!")));
   knownServers = new KnownServerModel (this);
   dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
   dockedChannels->Start ();

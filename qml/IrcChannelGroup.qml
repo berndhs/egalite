@@ -28,8 +28,8 @@ import QtQuick 1.0
 Rectangle {
   id: channelGroup
   property real channelTopMargin: 24
-  height: 300
-  width: 300
+  height: 400
+  width: 600
   color: "#f0f0f3"
 
   signal selectedChannel (string link)
