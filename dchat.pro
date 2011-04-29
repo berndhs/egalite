@@ -145,8 +145,6 @@ FORMS = \
 	ui/server-account.ui \
 	ui/count-down.ui \
 	ui/cert-list.ui \
-        ui/irc-qml-control.ui \
-        ui/irc-float.ui \
         ui/irc-account.ui \
         ui/enter-string.ui \
         ui/edit-simple.ui \
