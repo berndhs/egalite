@@ -105,7 +105,6 @@ IrcAbstractChannel::ToggleFloat ()
 void
 IrcAbstractChannel::ToggleLog ()
 {
-qDebug () << __PRETTY_FUNCTION__ << logging;
   if (logging) {
     logFile.close ();
     if (qmlItem) {
@@ -116,7 +115,6 @@ qDebug () << __PRETTY_FUNCTION__ << logging;
     QString filename = QFileDialog::getSaveFileName (0, 
                tr("Log file for %1").arg(Name()),
                QString ("./") + Name() + tr ("-log.html"));
-qDebug () << " ToggleLog " << filename;
     if (!filename.isEmpty()) {
       logFile.setFileName (filename);
       logFile.open (QFile::WriteOnly);
