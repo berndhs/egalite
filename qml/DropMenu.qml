@@ -43,8 +43,4 @@ Column {
   width: itemWidth
   height: childrenRect.height
   scale: isShown ? 1 : 0
-  MouseArea {
-    anchors.fill: parent
-    onExited: parent.hide ()
-  }
 }
