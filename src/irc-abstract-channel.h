@@ -29,6 +29,7 @@
 #include <QStringList>
 #include <QDeclarativeItem>
 #include <QRectF>
+#include <QFile>
 
 #include "name-list-model.h"
 
@@ -100,6 +101,7 @@ private slots:
   void ActivatedCookedLink (const QString & link);
   void HideMe ();
   void ToggleFloat ();
+  void ToggleLog ();
   void HideGroup ();
   void HideAll ();
   void CopyClip ();
@@ -162,6 +164,8 @@ private:
   bool                topmost;
   bool                active;
   bool                raw;
+  bool                logging;
+  QFile               logFile;
 
 };
 

@@ -31,6 +31,7 @@
 #include <QEvent>
 #include <QUrl>
 #include <QDesktopServices>
+#include <QFileDialog>
 #include <QListWidgetItem>
 #include <QDateTime>
 #include <QtAlgorithms>
@@ -54,7 +55,8 @@ IrcAbstractChannel::IrcAbstractChannel (const QString & name,
    namesModel (this),
    qmlItem (0),
    topmost (false),
-   active (false)
+   active (false),
+   logging (false)
 {
   Connect ();
   SetTopic (tr("Channel %1").arg (chanName));
@@ -64,6 +66,10 @@ IrcAbstractChannel::~IrcAbstractChannel ()
 {
   if (qmlItem) {
     QMetaObject::invokeMethod (qmlItem, "deallocateSelf");
+  }
+  if (logging) {
+    logFile.close();
+    logging = false;
   }
 }
 
@@ -86,6 +92,7 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
   connect (qmlItem, SIGNAL (wantPart()), this, SLOT (Part()));
   connect (qmlItem, SIGNAL (showControl()), this, SIGNAL (ShowControl()));
   connect (qmlItem, SIGNAL (toggleFloat()), this, SLOT (ToggleFloat ()));
+  connect (qmlItem, SIGNAL (toggleLog()), this, SLOT (ToggleLog ()));
   qmlItem->setProperty ("channelName", chanName);
 }
 
@@ -93,6 +100,32 @@ void
 IrcAbstractChannel::ToggleFloat ()
 {
   emit ToggleFloat (this);
+}
+
+void
+IrcAbstractChannel::ToggleLog ()
+{
+qDebug () << __PRETTY_FUNCTION__ << logging;
+  if (logging) {
+    logFile.close ();
+    if (qmlItem) {
+      qmlItem->setProperty ("logging", false);
+    }
+    logging = false;
+  } else {
+    QString filename = QFileDialog::getSaveFileName (0, 
+               tr("Log file for %1").arg(Name()),
+               QString ("./") + Name() + tr ("-log.html"));
+qDebug () << " ToggleLog " << filename;
+    if (!filename.isEmpty()) {
+      logFile.setFileName (filename);
+      logFile.open (QFile::WriteOnly);
+      logging = true;
+      if (qmlItem) {
+        qmlItem->setProperty ("logging", true);
+      }
+    }
+  }
 }
 
 void
@@ -216,6 +249,10 @@ IrcAbstractChannel::CheckWatch (const QString & data)
 void
 IrcAbstractChannel::Close ()
 {
+  if (logging) {
+    logFile.close ();
+    logging = false;
+  }
 }
 
 void
@@ -254,11 +291,17 @@ qDebug () << " cooked message " << cooked;
   QDateTime now = QDateTime::currentDateTime ();
   QString smalldate ("<span style=\"font-size:small\">"
                      "%1</span> %2");
-  cookedLog.append ("<br>\n");
-  cookedLog.append (smalldate
+  QString cookedLine;
+  cookedLine.append ("<br>\n");
+  cookedLine.append (smalldate
                           .arg (now.toString ("hh:mm:ss"))
                           .arg (cooked));
+  cookedLog.append (cookedLine);
   UpdateCooked ();
+  if (logging) {
+    logFile.write (cookedLine.toUtf8());
+    logFile.flush ();
+  }
   CheckWatch (rawMessage.length() > 0 ? rawMessage : message);
   emit Active (this);
 }

@@ -46,6 +46,7 @@ Rectangle {
   property alias channelTopic: topicBox.topicText
   property real channelBoxWidth: parent.width - parentWidthReserve
   property real channelBoxHeight: parent.height - parentHeightReserve
+  property bool logging: false
 
   objectName: "ChannelBox_" + channelName
   height: channelBoxHeight
@@ -136,7 +137,7 @@ Rectangle {
     itemHeight: 32
     property real buttonRadius: 0.4 * itemHeight
     z: parent.z + 1
-    isShown: true
+    isShown: false
     rollDelay: 75
     spacing: 2
     ChoiceButton {
@@ -180,7 +181,7 @@ Rectangle {
       height: parent.itemHeight
       width: parent.itemWidth
       radius: channelMenu.buttonRadius
-      labelText: qsTr ("Log Channel")
+      labelText: channelBox.logging ? qsTr ("Stop Logging") : qsTr("Log Channel")
       onClicked: { channelBox.toggleLog (); channelMenu.hide () }
     }
  
