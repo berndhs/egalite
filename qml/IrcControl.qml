@@ -34,6 +34,8 @@ Rectangle {
   property real restHeight: height - topHeight
   property real middleButtonWidth: 90
 
+  width: 600
+  height: 400
   color: baseColor
   visible: false
 

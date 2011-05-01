@@ -49,7 +49,7 @@ namespace egalite
 {
 
 IrcQmlControl::IrcQmlControl (QWidget *parent)
-  :QWidget (parent),
+  :QDeclarativeView (parent),
    initDone (false),
    qmlRoot (0),
    isRunning (false),
@@ -61,9 +61,9 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
    nickModel (this),
    selectedServer (0)
 {
-  ui.setupUi (this);
   setWindowTitle (tr ("%1 IRC Control")
                .arg(QString::fromUtf8("Égalité!")));
+  hide ();
   knownServers = new KnownServerModel (this);
   dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
   dockedChannels->Start ();
@@ -88,14 +88,16 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
 
   connect (&activeServers, SIGNAL (wantDisconnect (IrcSocket*)),
            this, SLOT (DisconnectServer (IrcSocket*)));
-  connect (ui.qmlView, SIGNAL (statusChanged (DeclarativeView::Status)),
+  connect (this, SIGNAL (statusChanged (DeclarativeView::Status)),
            this, SLOT (ViewStatusChange (QDeclarativeView::Status)));
-  qDebug () << " IrcQmlControl allocated and initialized";
+  qDebug () << " IrcQmlControl allocated and initialized";\
 }
 
 void
 IrcQmlControl::Show ()
 {
+  qDebug () << __PRETTY_FUNCTION__ << " ----------- showing ------------";
+  show ();
   if (isRunning) {
     LoadLists ();
   } else {
@@ -106,14 +108,13 @@ IrcQmlControl::Show ()
     move (oldPos);
     hidSelf = false;
   }
-  show ();
   raise ();
 }
 
 void
 IrcQmlControl::Hide ()
 {
-  qDebug () << " IrcQmlControl::Hide ()";
+  qDebug () << " IrcQmlControl::Hide () ======================";
   oldSize = size ();
   oldPos = pos();
   hidSelf = true;
@@ -141,7 +142,7 @@ IrcQmlControl::HideGroup ()
 
 void
 IrcQmlControl::ShowFloats ()
-{
+{ 
   FloatingMapType::iterator fit;
   for (fit=floatingChannels.begin (); fit != floatingChannels.end(); fit++) {
     fit.value()->Show ();
@@ -174,7 +175,7 @@ IrcQmlControl::Run ()
     dockedChannels->resize (groupBoxSize);
   }
 
-  QDeclarativeContext * context = ui.qmlView->rootContext ();
+  QDeclarativeContext * context = rootContext ();
   if (context == 0) {
     QMessageBox::critical (this, "Fatal", "QML Context Missing");
     return false;
@@ -187,16 +188,16 @@ IrcQmlControl::Run ()
   QUrl qmlSource (QUrl(QString::fromAscii("qrc:///qml/IrcControl.qml")));
 
   qDebug () << " load qml from " << qmlSource;
-  ui.qmlView->setSource (qmlSource);
-  qDebug () << "     back from load " << ui.qmlView->status ();
-  qmlRoot = ui.qmlView->rootObject();
+  setSource (qmlSource);
+  qDebug () << "     back from load " << status ();
+  qmlRoot = rootObject();
   if (qmlRoot == 0) {
     QMessageBox::critical (this, "Fatal", "QML Load Failure");
     return false;
   }
   ConnectGui ();
   show ();
-  ViewStatusChange (ui.qmlView->status());
+  ViewStatusChange (status());
 
   isRunning = true;
   return true;

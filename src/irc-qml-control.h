@@ -21,7 +21,6 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_irc-qml-control.h"
 #include "config-edit.h"
 #include "helpview.h"
 #include "irc-float.h"
@@ -35,6 +34,7 @@
 #include <QSize>
 #include <QPoint>
 #include <QGraphicsObject>
+#include <QDeclarativeView>
 
 using namespace deliberate;
 
@@ -46,7 +46,7 @@ namespace egalite
 class IrcAbstractChannel;
 class QmlIrcChannelGroup;
 
-class IrcQmlControl : public QWidget
+class IrcQmlControl : public QDeclarativeView
 {
 Q_OBJECT
 
@@ -198,7 +198,6 @@ private:
 
 
   bool                initDone;
-  Ui_IrcQmlControl    ui;
   QGraphicsObject    *qmlRoot;
   bool                isRunning;
 
