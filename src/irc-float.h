@@ -54,6 +54,8 @@ protected:
 
 private:
 
+  void CheckQml ();
+
   IrcAbstractChannel      *chanBox;
   QGraphicsObject         *qmlRoot;
   QDeclarativeItem        *qmlChannel;

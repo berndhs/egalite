@@ -110,15 +110,26 @@ IrcFloat::closeEvent (QCloseEvent *event)
 void
 IrcFloat::resizeEvent (QResizeEvent *event)
 {
+  CheckQml ();
   if (event && qmlRoot) {
     QSize size = event->size();
     qreal width = size.width();
     qreal height = size.height();
-    qDebug () << __PRETTY_FUNCTION__ << " new size w " << width << " h " << height;
+    //qDebug () << __PRETTY_FUNCTION__ << " new size w " << width << " h " << height;
     qmlRoot->setProperty ("width", width);
     qmlRoot->setProperty ("height", height);
   }
   //QDeclarativeView::resizeEvent (event);
+}
+
+void
+IrcFloat::CheckQml ()
+{
+  QGraphicsObject * qr = rootObject ();
+  if (qmlRoot != qr && qmlRoot != 0) {
+    qDebug () << __PRETTY_FUNCTION__ << " QML Root Changed !! " << qmlRoot << qr;
+    qmlRoot = qr;
+  }
 }
 
 } // namespace

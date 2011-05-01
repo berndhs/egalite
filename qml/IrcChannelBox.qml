@@ -60,6 +60,7 @@ Rectangle {
   signal wantPart ()
   signal showControl ()
   signal toggleFloat ()
+  signal toggleLog ()
 
   function selectUser (user) {
     console.log ("selected user " + user)
@@ -123,68 +124,73 @@ Rectangle {
     }
   }
 
-  DropMenu {
-    id: channelMenu
+  Rectangle {
+    id: channelMenuRect
     color: "transparent"
-    itemWidth: 150
-    itemHeight: 32
-    property real buttonRadius: 0.4 * itemHeight
-    z: parent.z + 1
-    isShown: false
-    rollDelay: 75
+    border.color: "red"
+    z: 10
+    height: childrenRect.height
+    width: childrenRect.width
     anchors { 
       top: channelBoxLabelRect.bottom; 
       left: channelBoxLabelRect.left 
       leftMargin: 8 
+      topMargin: 0
     }
-    ChoiceButton {
-      id: stopButton
-      height: parent.itemHeight
-      width: parent.itemWidth
-      radius: channelMenu.buttonRadius
-      anchors {top: parent.top; horizontalCenter: parent.horizontalCenter }
-      labelText: cookedFlickBox.interactive ? 
-                    qsTr (" Stop Scroll ") : qsTr (" Start Scroll ")
-      onClicked: { 
-        cookedFlickBox.interactive = !cookedFlickBox.interactive
-        channelMenu.hide () 
+    DropMenu {
+      id: channelMenu
+      anchors { top: channelMenuRect.top; left: channelMenuRect.left }
+      itemWidth: 150
+      itemHeight: 32
+      property real buttonRadius: 0.4 * itemHeight
+      z: parent.z + 1
+      isShown: true
+      rollDelay: 75
+      spacing: 2
+      ChoiceButton {
+        id: stopButton
+        height: parent.itemHeight
+        width: parent.itemWidth
+        radius: channelMenu.buttonRadius
+        labelText: cookedFlickBox.interactive ? 
+                      qsTr (" Stop Scroll ") : qsTr (" Start Scroll ")
+        onClicked: { 
+          cookedFlickBox.interactive = !cookedFlickBox.interactive
+          channelMenu.hide () 
+        }
       }
-    }
-    ChoiceButton {
-      id: partButton
-      height: parent.itemHeight
-      width: parent.itemWidth
-      radius: channelMenu.buttonRadius
-      anchors {top: stopButton.bottom; horizontalCenter: parent.horizontalCenter }
-      labelText: qsTr ("  Leave Channel  ")
-      onClicked: { channelBox.wantPart (); channelMenu.hide () }
-    }
-    ChoiceButton {
-      id: topicButton
-      height: parent.itemHeight
-      width: parent.itemWidth
-      radius: channelMenu.buttonRadius
-      anchors {top: partButton.bottom; horizontalCenter: parent.horizontalCenter }
-      labelText: qsTr (" Big Topic ")
-      onClicked: { topicBox.toggleHeight(); channelMenu.hide () }
-    }
-    ChoiceButton {
-      id: floatButton 
-      height: parent.itemHeight
-      width: parent.itemWidth
-      radius: channelMenu.buttonRadius
-      anchors { top: topicButton.bottom; horizontalCenter: parent.horizontalCenter }
-      labelText: qsTr ("Float/Dock")
-      onClicked: { channelBox.toggleFloat (); channelMenu.hide () }
-    }
-    ChoiceButton {
-      id: showControlButton
-      height: parent.itemHeight
-      width: parent.itemWidth
-      radius: channelMenu.buttonRadius
-      anchors { top: floatButton.bottom; horizontalCenter: parent.horizontalCenter }
-      labelText: qsTr ("Show Control")
-      onClicked: { channelBox.showControl (); channelMenu.hide () }
+      ChoiceButton {
+        id: partButton
+        height: parent.itemHeight
+        width: parent.itemWidth
+        radius: channelMenu.buttonRadius
+        labelText: qsTr ("  Leave Channel  ")
+        onClicked: { channelBox.wantPart (); channelMenu.hide () }
+      }
+      ChoiceButton {
+        id: floatButton 
+        height: parent.itemHeight
+        width: parent.itemWidth
+        radius: channelMenu.buttonRadius
+        labelText: qsTr ("Float/Dock")
+        onClicked: { channelBox.toggleFloat (); channelMenu.hide () }
+      }
+      ChoiceButton {
+        id: showControlButton
+        height: parent.itemHeight
+         width: parent.itemWidth
+        radius: channelMenu.buttonRadius
+        labelText: qsTr ("Show Control")
+        onClicked: { channelBox.showControl (); channelMenu.hide () }
+      }
+      ChoiceButton {
+        id: logChannelButton
+        height: parent.itemHeight
+        width: parent.itemWidth
+        radius: channelMenu.buttonRadius
+        labelText: qsTr ("Log Channel")
+        onClicked: { channelBox.toggleLog (); channelMenu.hide () }
+      }
     }
   }
   Rectangle {

@@ -24,7 +24,7 @@
 
 import QtQuick 1.0
 
-Rectangle {
+Column {
   id: dropMenu
   property real itemHeight: 32
   property real itemWidth: 100
@@ -43,7 +43,6 @@ Rectangle {
   width: itemWidth
   height: childrenRect.height
   scale: isShown ? 1 : 0
-  color: "green"
   MouseArea {
     anchors.fill: parent
     onExited: parent.hide ()
