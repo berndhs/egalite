@@ -94,6 +94,7 @@ IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
   connect (qmlItem, SIGNAL (toggleFloat()), this, SLOT (ToggleFloat ()));
   connect (qmlItem, SIGNAL (toggleLog()), this, SLOT (ToggleLog ()));
   qmlItem->setProperty ("channelName", chanName);
+  qmlItem->setProperty ("logging",logging);
 }
 
 void
