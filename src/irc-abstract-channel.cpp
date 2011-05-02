@@ -31,6 +31,7 @@
 #include <QEvent>
 #include <QUrl>
 #include <QDesktopServices>
+#include <QDateTime>
 #include <QFileDialog>
 #include <QListWidgetItem>
 #include <QDateTime>
@@ -113,9 +114,11 @@ IrcAbstractChannel::ToggleLog ()
     }
     logging = false;
   } else {
+    QString dateStamp = QDateTime::currentDateTimeUtc()
+              .toString ("-yyyy-MM-dd-hh-mm-ss");
     QString filename = QFileDialog::getSaveFileName (0, 
                tr("Log file for %1").arg(Name()),
-               QString ("./") + Name() + tr ("-log.html"));
+               QString ("./log-") + Name() + dateStamp + tr (".html"));
     if (!filename.isEmpty()) {
       logFile.setFileName (filename);
       logFile.open (QFile::WriteOnly);
