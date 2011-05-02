@@ -63,6 +63,7 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
 {
   setWindowTitle (tr ("%1 IRC Control")
                .arg(QString::fromUtf8("Égalité!")));
+  setResizeMode (QDeclarativeView::SizeRootObjectToView);
   hide ();
   knownServers = new KnownServerModel (this);
   dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
@@ -96,7 +97,6 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
 void
 IrcQmlControl::Show ()
 {
-  qDebug () << __PRETTY_FUNCTION__ << " ----------- showing ------------";
   show ();
   if (isRunning) {
     LoadLists ();
@@ -114,7 +114,6 @@ IrcQmlControl::Show ()
 void
 IrcQmlControl::Hide ()
 {
-  qDebug () << " IrcQmlControl::Hide () ======================";
   oldSize = size ();
   oldPos = pos();
   hidSelf = true;
@@ -196,11 +195,27 @@ IrcQmlControl::Run ()
     return false;
   }
   ConnectGui ();
+  fullWidth = size().width();
+  fullHeight = size().height();
   show ();
+  QTimer::singleShot (75, this, SLOT(HalfSize()));
+  QTimer::singleShot (200, this, SLOT(FullSize()));
   ViewStatusChange (status());
 
   isRunning = true;
   return true;
+}
+
+void
+IrcQmlControl::HalfSize ()
+{
+  resize (fullWidth/4, fullHeight/4);
+}
+
+void
+IrcQmlControl::FullSize ()
+{
+  resize (fullWidth, fullHeight);
 }
 
 void
@@ -638,7 +653,6 @@ IrcQmlControl::AddChannel (IrcSocket * sock,
            this, SLOT (WantsWhois (QString, QString, bool)));
   connect (newchan, SIGNAL (ShowControl()),
            this, SLOT (Show()));
-  //mainUi.chanList->addItem (chanName);
 }
 
 void
@@ -1155,6 +1169,23 @@ IrcQmlControl::Login ()
 {
   qDebug () << " IrcQmlControl Login " << selectedNick << selectedServer;
   NickLogin (selectedNick, selectedServer);
+}
+
+void
+IrcQmlControl::resizeEvent (QResizeEvent * event)
+{
+  if (event) {
+    Resize (event->size().width(), event->size().height());
+  }    
+}
+
+void
+IrcQmlControl::Resize (qreal width, qreal height)
+{
+  if (qmlRoot) {
+    qmlRoot->setProperty ("width",width);
+    qmlRoot->setProperty ("height",height);
+  }
 }
 
 } // namespace

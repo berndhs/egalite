@@ -96,6 +96,8 @@ private slots:
 
   void Exit ();
   void Exiting ();
+  void HalfSize ();
+  void FullSize ();
   void TryConnect (const QString & host, int port);
   void TryDisconnect ();
   void DisconnectServer (IrcSocket * sock);
@@ -126,6 +128,10 @@ private slots:
   
   void ViewStatusChange (QDeclarativeView::Status status);
 
+protected:
+
+  void resizeEvent (QResizeEvent * event);
+
 signals:
 
   void StatusChange ();
@@ -150,6 +156,7 @@ private:
           CtcpMapType;
 
   void ConnectGui ();
+  void Resize (qreal width, qreal height);
   void LoadLists ();
   void AddConnect (IrcSocket * sock);
   void NickLogin (const QString & nick, IrcSocket *sock);
@@ -234,6 +241,9 @@ private:
   IrcSocket          *selectedServer;
   QString             selectedChannel;
   QString             selectedNick;
+
+  int                 fullHeight;
+  int                 fullWidth;
 
   friend class IrcQmlSockStatic;
   friend class IrcCtcp;
