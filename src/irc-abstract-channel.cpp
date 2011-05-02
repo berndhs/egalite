@@ -123,6 +123,7 @@ IrcAbstractChannel::ToggleLog ()
       if (qmlItem) {
         qmlItem->setProperty ("logging", true);
       }
+      logFile.write (cookedLog.toUtf8());
     }
   }
 }
