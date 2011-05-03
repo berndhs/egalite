@@ -253,6 +253,10 @@ QmlIrcChannelGroup::resizeEvent (QResizeEvent *event)
     qDebug () << __PRETTY_FUNCTION__ << " new size w " << width << " h " << height;
     qmlRoot->setProperty ("width", width);
     qmlRoot->setProperty ("height", height);
+    int nc = channelList.count();
+    for (int i=0; i<nc; i++) {
+      channelList.at(i)->ParentSizeChanged (width, height);
+    }
   }
   QDeclarativeView::resizeEvent (event);
 }

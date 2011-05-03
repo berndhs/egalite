@@ -177,6 +177,16 @@ IrcAbstractChannel::HeadHeightChanged (int newHeight)
   }
 }
 
+void
+IrcAbstractChannel::ParentSizeChanged (int width, int height)
+{
+  qDebug () << __PRETTY_FUNCTION__ << width << height ;
+  if (qmlItem) {
+    qmlItem->setProperty ("parentWidth",width);
+    qmlItem->setProperty ("parentHeight",height);
+  }
+}
+
 bool
 IrcAbstractChannel::Topmost ()
 {

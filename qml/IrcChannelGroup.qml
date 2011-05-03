@@ -45,6 +45,8 @@ Rectangle {
     }
     if (compo.status == Component.Ready) {
       var newBox = compo.createObject (channelGroup)
+      newBox.parentHeight = height
+      newBox.parentWidth = width
       newBox.parentHeightReserve = channelList.height
       newBox.anchors.top = channelGroup.top
       return newBox

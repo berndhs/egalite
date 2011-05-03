@@ -44,13 +44,13 @@ Rectangle {
   property alias boxLabel: channelBoxLabel.text
   property alias userListCounter: userListCount.text
   property alias channelTopic: topicBox.topicText
-  property real channelBoxWidth: parent.width - parentWidthReserve
-  property real channelBoxHeight: parent.height - parentHeightReserve
+  property real parentHeight: parent.height
+  property real parentWidth: parent.width
   property bool logging: false
 
   objectName: "ChannelBox_" + channelName
-  height: channelBoxHeight
-  width: channelBoxWidth
+  height: parentHeight - parentHeightReserve
+  width: parentWidth - parentWidthReserve
   anchors { topMargin: parentHeightReserve }
   color: "#f3f6f6"
 
@@ -91,7 +91,14 @@ Rectangle {
   onTopmostChanged: {
     visible = topmost
   }
-
+  onParentHeightReserveChanged: {
+    height = parentHeight - parentHeightReserve
+  }
+  onParentWidthReserveChanged: {
+    width = parentWidth - parentWidthReseve
+  }
+  onParentHeightChanged: { height = parentHeight - parentHeightReserve }
+  onParentWidthChanged: { width = parentWidth - parentWidthReserve }
   Image {
     anchors.fill: parent
     fillMode: Image.Tile

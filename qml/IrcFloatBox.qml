@@ -15,9 +15,13 @@ Rectangle {
   signal hideMe ()
   signal dockMe ()
   
+  onWidthChanged: { floatingChannel.parentWidth = width }
+  onHeightChanged: { floatingChannel.parentHeight = height }
   IrcChannelBox {
     id: floatingChannel
     parentHeightReserve: 0
+    parentHeight: ircFloat.height
+    parentWidth: ircFloat.width
   }
 
   Rectangle {

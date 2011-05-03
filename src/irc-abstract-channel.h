@@ -79,6 +79,7 @@ public:
   bool Topmost ();
   void SetTopmost (bool top);
   void HeadHeightChanged (int newHeight);
+  void ParentSizeChanged (int width, int height);
   bool IsActive ();
   void SetActive (bool a);
   QRectF cookedBoundingRect () const;
