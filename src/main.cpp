@@ -22,6 +22,7 @@
  ****************************************************************/
 #include <iostream>
 #include "dchat.h"
+#include "dchat-magic.h"
 
 #include <QApplication>
 #include <QSettings>
@@ -144,6 +145,7 @@ main (int argc, char* argv[])
   egalite::DChatMain  chatmain;
 
   chatmain.Init (&app);
+  chatmain.setWindowTitle (egalite::Magic::Name);
   app.setWindowIcon (chatmain.windowIcon());
 
   chatmain.AddConfigMessages (configMessages);

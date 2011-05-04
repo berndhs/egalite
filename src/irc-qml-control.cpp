@@ -22,6 +22,7 @@
  ****************************************************************/
 
 #include "deliberate.h"
+#include "dchat-magic.h"
 #include "version.h"
 #include "helpview.h"
 #include "edit-simple.h"
@@ -62,7 +63,7 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
    selectedServer (0)
 {
   setWindowTitle (tr ("%1 IRC Control")
-               .arg(QString::fromUtf8("Égalité!")));
+               .arg(Magic::Name));
   setResizeMode (QDeclarativeView::SizeRootObjectToView);
   hide ();
   knownServers = new KnownServerModel (this);

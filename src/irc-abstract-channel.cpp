@@ -75,7 +75,7 @@ IrcAbstractChannel::~IrcAbstractChannel ()
 }
 
 void
-IrcAbstractChannel::SetQmlItem (QDeclarativeItem * item)
+IrcAbstractChannel::SetQmlItem (QObject * item)
 {
   if (qmlItem) {
     disconnect (qmlItem, 0,0,0);
@@ -169,21 +169,14 @@ IrcAbstractChannel::SetTopmost (bool top)
 }
 
 void
-IrcAbstractChannel::HeadHeightChanged (int newHeight)
+IrcAbstractChannel::ParentSizeChanged (qreal width, qreal height)
 {
-  qDebug () << "IrcAbstractChannel :: HeadHeightChanged " << newHeight;
   if (qmlItem) {
-    qmlItem->setProperty ("parentHeightReserve", newHeight);
-  }
-}
-
-void
-IrcAbstractChannel::ParentSizeChanged (int width, int height)
-{
-  qDebug () << __PRETTY_FUNCTION__ << width << height ;
-  if (qmlItem) {
-    qmlItem->setProperty ("parentWidth",width);
-    qmlItem->setProperty ("parentHeight",height);
+    qDebug () << __PRETTY_FUNCTION__ 
+       << " old height " <<  qmlItem->property("height");
+    QMetaObject::invokeMethod (qmlItem, "setSize",
+       Q_ARG (QVariant, QVariant (width)),
+       Q_ARG (QVariant, QVariant (height)));
   }
 }
 

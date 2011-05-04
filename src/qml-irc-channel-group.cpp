@@ -29,6 +29,7 @@
 #include <QRectF>
 #include "irc-abstract-channel.h"
 #include "irc-text-browser.h"
+#include "dchat-magic.h"
 
 namespace egalite
 {
@@ -49,7 +50,7 @@ QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
    channelMaskIdle 
      ("[%1] ")
 {
-  setWindowTitle (tr ("%1 IRC Channels").arg(QString::fromUtf8("Égalité!")));
+  setWindowTitle (tr ("%1 IRC Channels").arg(Magic::Name));
   activeIcon = QIcon (":/ircicons/active.png");
   quietIcon = QIcon (":/ircicons/inactive.png");
   connect (&debugTimer, SIGNAL (timeout()),
@@ -80,12 +81,11 @@ QmlIrcChannelGroup::Start ()
              "QmlIrcChannelGroup registered type as " << handle;
   connect (qmlRoot, SIGNAL (selectedChannel (QString)),
            this, SLOT (ClickedChannel (QString)));
-  connect (qmlRoot, SIGNAL (changedHeadHeight (int)),
-           this, SLOT (HeadHeightChanged (int)));
+  connect (qmlRoot, SIGNAL (changedChannelBox (qreal, qreal)),
+           this, SLOT (ChangedChannelBox (qreal, qreal)));
   connect (qmlRoot, SIGNAL (hideMe()),
            this, SLOT (hide ()));
 }
-
 
 void
 QmlIrcChannelGroup::SetChannelList ()
@@ -187,11 +187,11 @@ QmlIrcChannelGroup::ClickedChannel (QString link)
 }
 
 void
-QmlIrcChannelGroup::HeadHeightChanged (int newHeight)
+QmlIrcChannelGroup::ChangedChannelBox (qreal newWidth, qreal newHeight)
 {
   int nc = channelList.count();
   for (int i=0; i<nc; i++) {
-    channelList.at(i)->HeadHeightChanged (newHeight);
+    channelList.at(i)->ParentSizeChanged (newWidth, newHeight);
   }
 }
 

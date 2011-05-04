@@ -36,23 +36,22 @@ Rectangle {
   property real userNameHeight: 20
   property real countWidth: 0.25 * width
   property real rollDelay: 200
-  property real parentHeightReserve: 0
-  property real parentWidthReserve: 0
   property string backgroundImage: "qrc:///palee6.png"
   property bool   useBackgroundImage: true
   property alias userListModel: userList.model
   property alias boxLabel: channelBoxLabel.text
   property alias userListCounter: userListCount.text
   property alias channelTopic: topicBox.topicText
-  property real parentHeight: parent.height
-  property real parentWidth: parent.width
   property bool logging: false
 
   objectName: "ChannelBox_" + channelName
-  height: parentHeight - parentHeightReserve
-  width: parentWidth - parentWidthReserve
-  anchors { topMargin: parentHeightReserve }
+
   color: "#f3f6f6"
+
+  width: 400
+
+  height: 300
+
 
   signal userSend ()
   signal userUp ()
@@ -83,6 +82,10 @@ Rectangle {
 
   function setModel (theModel) { userList.model = theModel }
   function cookedBoundingRect () { return cookedLogBox.boundingRect () }
+  function setSize (w, h) { 
+    width = w; 
+    height = h 
+  }
 
   onChannelNameChanged: { 
     objectName = "ChannelBox_" + channelName 
@@ -91,14 +94,6 @@ Rectangle {
   onTopmostChanged: {
     visible = topmost
   }
-  onParentHeightReserveChanged: {
-    height = parentHeight - parentHeightReserve
-  }
-  onParentWidthReserveChanged: {
-    width = parentWidth - parentWidthReseve
-  }
-  onParentHeightChanged: { height = parentHeight - parentHeightReserve }
-  onParentWidthChanged: { width = parentWidth - parentWidthReserve }
   Image {
     anchors.fill: parent
     fillMode: Image.Tile
@@ -268,6 +263,7 @@ Rectangle {
       contentY = Math.max (0, cookedLogBox.height - cookedFlickBox.height - 2)
       console.log ("cooked box contentY set to " + contentY)
     }
+    
     IrcTextBrowser {
       id: cookedLogBox
       name: "Cooked_" + channelBox.channelName
@@ -281,7 +277,7 @@ Rectangle {
         cookedFlickBox.contentWidth = width
       }
     }
-
+    
     onWidthChanged: cookedLogBox.setTextWidth (width)
     Component.onCompleted: {
       cookedLogBox.setTextWidth (cookedFlickBox.width)

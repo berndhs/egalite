@@ -153,6 +153,7 @@ FORMS = \
 SOURCES = \
         src/main.cpp \
 	src/dchat.cpp \
+        src/dchat-magic.cpp \
 	src/cmdoptions.cpp \
 	src/delib-debug.cpp \
         src/deliberate.cpp \
@@ -202,6 +203,7 @@ audio {
 
 HEADERS += \
 	src/dchat.h \
+	src/dchat-magic.h \
 	src/cmdoptions.h \
 	src/delib-debug.h \
         src/deliberate.h \

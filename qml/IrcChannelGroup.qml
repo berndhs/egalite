@@ -33,7 +33,7 @@ Rectangle {
   color: "#f0f0f3"
 
   signal selectedChannel (string link)
-  signal changedHeadHeight (int newHeight)
+  signal changedChannelBox (real newWidth, real newHeight)
   signal hideMe ()
 
   function addChannel () {
@@ -45,10 +45,9 @@ Rectangle {
     }
     if (compo.status == Component.Ready) {
       var newBox = compo.createObject (channelGroup)
-      newBox.parentHeight = height
-      newBox.parentWidth = width
-      newBox.parentHeightReserve = channelList.height
-      newBox.anchors.top = channelGroup.top
+      newBox.height = channelGroup.height - channelList.height
+      newBox.width = channelGroup.width
+      newBox.anchors.top = channelList.bottom
       return newBox
     }
     return null
@@ -56,6 +55,9 @@ Rectangle {
   function setChannelList (theList) {
     console.log ("Channel Group list " + theList)
     channelListText.text = theList
+  }
+  function adjustChannelHeight (newHeadHeight) {
+    changedChannelBox (width, height - newHeadHeight)
   }
   Rectangle {
     id: channelList
@@ -75,7 +77,7 @@ Rectangle {
         channelGroup.selectedChannel (link)
       }
       onHeightChanged: {
-        channelGroup.changedHeadHeight (height)
+        channelGroup.adjustChannelHeight (height)
       }
     }
   }

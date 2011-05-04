@@ -69,17 +69,16 @@ public:
   QString Topic () { return topic; }
   QString Name ()  { return chanName; }
   QString Sock () { return sockName; }
-  QDeclarativeItem * QmlItem () { return qmlItem; }
+  QObject * QmlItem () { return qmlItem; }
 
-  void SetQmlItem (QDeclarativeItem * item);
+  void SetQmlItem (QObject * item);
 
   void StartWatching (const QRegExp & watch);
   void StopWatching  (const QRegExp & watch);
 
   bool Topmost ();
   void SetTopmost (bool top);
-  void HeadHeightChanged (int newHeight);
-  void ParentSizeChanged (int width, int height);
+  void ParentSizeChanged (qreal width, qreal height);
   bool IsActive ();
   void SetActive (bool a);
   QRectF cookedBoundingRect () const;
@@ -161,7 +160,7 @@ private:
   QString             historyBottom;
   int                 historyIndex;
   NameListModel       namesModel;
-  QDeclarativeItem   *qmlItem;
+  QObject            *qmlItem;
   bool                topmost;
   bool                active;
   bool                raw;
