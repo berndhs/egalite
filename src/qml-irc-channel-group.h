@@ -67,7 +67,8 @@ public slots:
 private slots:
 
   void ClickedChannel (QString link);
-  void ChangedChannelBox (qreal newWidth, qreal newHeight);
+  void ChangedChannelBox (qreal newWidth, qreal newHeight,
+                          qreal leftMargin, qreal topMargin);
   void DebugCheck ();
 
 protected:

@@ -27,10 +27,11 @@ import QtQuick 1.0
 
 Rectangle {
   id: channelGroup
-  property real channelTopMargin: 24
   height: 400
   width: 600
   color: "#f0f0f3"
+
+  property real channelTopMargin: 24
 
   signal selectedChannel (string link)
   signal changedChannelBox (real newWidth, real newHeight)
@@ -46,6 +47,7 @@ Rectangle {
     if (compo.status == Component.Ready) {
       var newBox = compo.createObject (channelGroup)
       newBox.height = channelGroup.height - channelList.height
+      newBox.topMargin = channelList.height
       newBox.width = channelGroup.width
       newBox.anchors.top = channelList.bottom
       return newBox
@@ -56,8 +58,9 @@ Rectangle {
     console.log ("Channel Group list " + theList)
     channelListText.text = theList
   }
-  function adjustChannelHeight (newHeadHeight) {
-    changedChannelBox (width, height - newHeadHeight)
+  function adjustChannelHeight (nowTopHeight) {
+    channelTopMargin = newTopHeight
+    changedChannelBox (width, height, 0, channelTopMargin)
   }
   Rectangle {
     id: channelList
@@ -77,7 +80,7 @@ Rectangle {
         channelGroup.selectedChannel (link)
       }
       onHeightChanged: {
-        channelGroup.adjustChannelHeight (height)
+        channelGroup.adjustChannelHeight (channelList.height)
       }
     }
   }

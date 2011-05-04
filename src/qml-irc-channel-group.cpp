@@ -187,11 +187,13 @@ QmlIrcChannelGroup::ClickedChannel (QString link)
 }
 
 void
-QmlIrcChannelGroup::ChangedChannelBox (qreal newWidth, qreal newHeight)
+QmlIrcChannelGroup::ChangedChannelBox (qreal newWidth, qreal newHeight,
+                                       qreal leftMargin, qreal topMargin)
 {
   int nc = channelList.count();
   for (int i=0; i<nc; i++) {
-    channelList.at(i)->ParentSizeChanged (newWidth, newHeight);
+    channelList.at(i)->ParentSizeChanged (newWidth, newHeight, 
+                                          leftMargin, topMargin);
   }
 }
 

@@ -78,7 +78,9 @@ public:
 
   bool Topmost ();
   void SetTopmost (bool top);
-  void ParentSizeChanged (qreal width, qreal height);
+  void ParentSizeChanged (qreal width, qreal height, 
+                          qreal top = -1, 
+                          qreal left = -1);
   bool IsActive ();
   void SetActive (bool a);
   QRectF cookedBoundingRect () const;

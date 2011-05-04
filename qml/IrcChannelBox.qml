@@ -43,6 +43,8 @@ Rectangle {
   property alias userListCounter: userListCount.text
   property alias channelTopic: topicBox.topicText
   property bool logging: false
+  property real leftMargin: 0
+  property real topMargin: 0
 
   objectName: "ChannelBox_" + channelName
 
@@ -82,9 +84,11 @@ Rectangle {
 
   function setModel (theModel) { userList.model = theModel }
   function cookedBoundingRect () { return cookedLogBox.boundingRect () }
-  function setSize (w, h) { 
-    width = w; 
-    height = h 
+  function setSize (newWidth, newHeight, newLeft, newTop) { 
+    if (newLeft != -1) leftMargin = newLeft
+    if (newTop != -1) topMargin = newTop
+    width = newWidth - leftMargin 
+    height = newHeight - topMargin
   }
 
   onChannelNameChanged: { 

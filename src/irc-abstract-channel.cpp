@@ -169,14 +169,17 @@ IrcAbstractChannel::SetTopmost (bool top)
 }
 
 void
-IrcAbstractChannel::ParentSizeChanged (qreal width, qreal height)
+IrcAbstractChannel::ParentSizeChanged (qreal width, qreal height, 
+                                       qreal top, qreal left)
 {
   if (qmlItem) {
     qDebug () << __PRETTY_FUNCTION__ 
        << " old height " <<  qmlItem->property("height");
     QMetaObject::invokeMethod (qmlItem, "setSize",
        Q_ARG (QVariant, QVariant (width)),
-       Q_ARG (QVariant, QVariant (height)));
+       Q_ARG (QVariant, QVariant (height)),
+       Q_ARG (QVariant, QVariant (left)),
+       Q_ARG (QVariant, QVariant (top)));
   }
 }
 
