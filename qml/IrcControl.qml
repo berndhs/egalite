@@ -36,6 +36,8 @@ Rectangle {
 
   width: 600
   height: 400
+  x: 0
+  y: 0
   color: baseColor
   visible: false
 

@@ -19,6 +19,7 @@ Rectangle {
     id: floatingChannel
     width: parent.width
     height: parent.height
+    anchors { top: parent.top; topMargin: 0 }
   }
 
   Component.onCompleted: {
