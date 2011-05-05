@@ -26,7 +26,7 @@
 import QtQuick 1.0
 import net.sf.egalite 1.0
 
-Rectangle {
+Item {
   id: channelBox
 
   property string channelName: qsTr ("no channel")
@@ -45,14 +45,13 @@ Rectangle {
   property bool logging: false
   property real leftMargin: 0
   property real topMargin: 0
+  property real visibleHeight: 300
 
   objectName: "ChannelBox_" + channelName
 
-  color: "#f3f6f6"
-
   width: 400
 
-  height: 300
+  height: 3000
 
 
   signal userSend ()
@@ -87,8 +86,8 @@ Rectangle {
   function setSize (newWidth, newHeight, newLeft, newTop) { 
     if (newLeft != -1) leftMargin = newLeft
     if (newTop != -1) topMargin = newTop
-    width = newWidth - leftMargin 
-    height = newHeight - topMargin
+    width = newWidth
+    visibleHeight = newHeight
   }
 
   onChannelNameChanged: { 
@@ -257,7 +256,7 @@ Rectangle {
     anchors { top: channelBoxLabelRect.bottom; left: parent.left; leftMargin: 2 }
     width: parent.width-2
     interactive: true
-    height: channelBox.height - channelBoxLabelRect.height - textEnterBox.height
+    height: channelBox.visibleHeight - channelBoxLabelRect.height - textEnterBox.height - topMargin
     clip: true
     contentWidth: width
     contentHeight: 0 

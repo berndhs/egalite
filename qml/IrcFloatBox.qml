@@ -8,6 +8,8 @@ Rectangle {
   property real channelTopMargin: 0
   height: 400
   width: 600
+  x: 0
+  y: 0
   color: "#f2f2f5"
 
   property alias floatName: floatingChannel.objectName
@@ -18,7 +20,7 @@ Rectangle {
   IrcChannelBox {
     id: floatingChannel
     width: parent.width
-    height: parent.height
+    visibleHeight: parent.height
     anchors { top: parent.top; topMargin: 0 }
   }
 

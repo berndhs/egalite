@@ -29,6 +29,8 @@ Rectangle {
   id: channelGroup
   height: 400
   width: 600
+  x: 0
+  y: 0
   color: "#f0f0f3"
 
   property real channelTopMargin: 24
@@ -46,7 +48,7 @@ Rectangle {
     }
     if (compo.status == Component.Ready) {
       var newBox = compo.createObject (channelGroup)
-      newBox.height = channelGroup.height - channelList.height
+      newBox.visibleHeight = channelGroup.height
       newBox.topMargin = channelList.height
       newBox.width = channelGroup.width
       newBox.anchors.top = channelList.bottom
