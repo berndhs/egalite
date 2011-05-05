@@ -1,3 +1,6 @@
+* Thu May 05 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.15-1
+- workaround for QML crash
+
 * Sun May 01 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.14-1
 - log channel traffic in local file
 
