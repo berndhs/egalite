@@ -31,7 +31,7 @@ Item {
 
   property string channelName: qsTr ("no channel")
   property bool topmost: true
-  property real labelHeight:32
+  property real labelHeight:36
   property real inputHeight: 28
   property real userNameHeight: 20
   property real countWidth: 0.25 * width
@@ -106,11 +106,15 @@ Item {
 
   Rectangle {
     id: channelBoxLabelRect
-    height: channelBoxLabel.height + 3
-    width: channelBoxLabel.width + 6
+    height: channelBoxLabel.height + 4
+    width: channelBoxLabel.width + 8
     anchors { top: parent.top; left: parent.left }
     color: "#ff99aa"
-    radius: 4
+    gradient: Gradient {
+      id: labelShade
+      GradientStop { position: 0.00; color: "#ff99aa" }
+      GradientStop { position: 1.00; color: "#fff0f0" }
+    }
     z: parent.z+1
     MouseArea { 
       anchors.fill: parent
@@ -124,7 +128,13 @@ Item {
       }
     }
     Text {
-      anchors { leftMargin: 2; rightMargin: 2; verticalCenter: parent.verticalCenter }
+      anchors { 
+        left: channelBoxLableRext.left
+        leftMargin: 4
+        rightMargin: 4
+        verticalCenter: parent.verticalCenter 
+      }
+      horizontalAlignment: Text.AlignHCenter
       id: channelBoxLabel
       text: " "
     }
@@ -141,10 +151,17 @@ Item {
     itemWidth: 150
     itemHeight: 32
     property real buttonRadius: 0.4 * itemHeight
-    z: parent.z + 1
+    z: parent.z + 2
     isShown: false
     rollDelay: 75
     spacing: 2
+
+    Gradient {
+      id: buttonShade
+      GradientStop { position: 0.00; color: "#c6e6e6" }
+      GradientStop { position: 1.00; color: "#f0f0f0" }
+    }
+
     ChoiceButton {
       id: stopButton
       height: parent.itemHeight
@@ -152,6 +169,7 @@ Item {
       radius: channelMenu.buttonRadius
       labelText: cookedFlickBox.interactive ? 
                     qsTr (" Stop Scroll ") : qsTr (" Start Scroll ")
+      gradient: buttonShade
       onClicked: { 
         cookedFlickBox.interactive = !cookedFlickBox.interactive
         channelMenu.hide () 
@@ -163,6 +181,7 @@ Item {
       width: parent.itemWidth
       radius: channelMenu.buttonRadius
       labelText: qsTr ("  Leave Channel  ")
+      gradient: buttonShade
       onClicked: { channelBox.wantPart (); channelMenu.hide () }
     }
     ChoiceButton {
@@ -171,6 +190,7 @@ Item {
       width: parent.itemWidth
       radius: channelMenu.buttonRadius
       labelText: qsTr ("Float/Dock")
+      gradient: buttonShade
       onClicked: { channelBox.toggleFloat (); channelMenu.hide () }
     }
     ChoiceButton {
@@ -179,6 +199,7 @@ Item {
        width: parent.itemWidth
       radius: channelMenu.buttonRadius
       labelText: qsTr ("Show Control")
+      gradient: buttonShade
       onClicked: { channelBox.showControl (); channelMenu.hide () }
     }
     ChoiceButton {
@@ -187,6 +208,7 @@ Item {
       width: parent.itemWidth
       radius: channelMenu.buttonRadius
       labelText: channelBox.logging ? qsTr ("Stop Logging") : qsTr("Log Channel")
+      gradient: buttonShade
       onClicked: { channelBox.toggleLog (); channelMenu.hide () }
     }
  
@@ -373,7 +395,7 @@ Item {
       property alias xScale: rollupScale.xScale
       height: userListBox.height - userListCountRect.height
       width: parent.width
-      color: channelBox.color
+      color: "#f0f7ff"
       opacity: 0.7
       anchors {top: userListCountRect.bottom; right: parent.right}
 
