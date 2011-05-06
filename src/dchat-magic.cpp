@@ -1,5 +1,5 @@
-#include "magic.h"
 
+#include "dchat-magic.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -22,7 +22,6 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include "dchat-magic.h"
 
 namespace egalite
 {
