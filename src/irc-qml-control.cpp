@@ -668,6 +668,7 @@ qDebug () << " DropChannel doesn't have " << chanName;
   IrcAbstractChannel * chanBox = channels [chanName];
   disconnect (chanBox, 0,0,0);
   qDebug () << " dropping channel " << chanName << chanBox->Name();
+  chanBox->SetQmlItem (0);
   if (dockedChannels->HaveChannel (chanBox)) {
     dockedChannels->RemoveChannel (chanBox);
   }

@@ -46,6 +46,7 @@ Item {
   property real leftMargin: 0
   property real topMargin: 0
   property real visibleHeight: 300
+  property bool dynamic: false
 
   objectName: "ChannelBox_" + channelName
 
@@ -66,9 +67,12 @@ Item {
   function selectUser (user) {
     console.log ("selected user " + user)
   }
-  function deallocateSelf () {
-    console.log ("deallocate channelBox")
-    channelBox.destroy()
+  function relinquished () {
+    console.log ("relinquished channelBox " + objectName + " dyn " + dynamic)
+    if (dynamic) {
+      channelBox.destroy()
+      dynamic = false
+    }
   }
   function setCookedLog (theText) {
     cookedLogBox.setHtml (theText)
@@ -129,7 +133,7 @@ Item {
     }
     Text {
       anchors { 
-        left: channelBoxLableRext.left
+        left: channelBoxLabelRect.left
         leftMargin: 4
         rightMargin: 4
         verticalCenter: parent.verticalCenter 
