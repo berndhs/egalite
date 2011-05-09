@@ -52,6 +52,7 @@ Rectangle {
       newBox.topMargin = channelList.height
       newBox.width = channelGroup.width
       newBox.anchors.top = channelList.bottom
+      newBox.dynamic = true
       return newBox
     }
     return null
@@ -60,7 +61,7 @@ Rectangle {
     console.log ("Channel Group list " + theList)
     channelListText.text = theList
   }
-  function adjustChannelHeight (nowTopHeight) {
+  function adjustChannelHeight (newTopHeight) {
     channelTopMargin = newTopHeight
     changedChannelBox (width, height, 0, channelTopMargin)
   }

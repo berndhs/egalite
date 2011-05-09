@@ -65,9 +65,6 @@ IrcAbstractChannel::IrcAbstractChannel (const QString & name,
 
 IrcAbstractChannel::~IrcAbstractChannel ()
 {
-  if (qmlItem) {
-    QMetaObject::invokeMethod (qmlItem, "deallocateSelf");
-  }
   if (logging) {
     logFile.close();
     logging = false;
@@ -79,7 +76,7 @@ IrcAbstractChannel::SetQmlItem (QObject * item)
 {
   if (qmlItem) {
     disconnect (qmlItem, 0,0,0);
-    QMetaObject::invokeMethod (qmlItem, "deallocateSelf");
+    QMetaObject::invokeMethod (qmlItem, "relinquished");
   }
   qmlItem = item;
   if (qmlItem == 0) {
