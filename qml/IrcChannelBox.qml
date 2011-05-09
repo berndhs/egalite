@@ -312,7 +312,7 @@ Item {
   Rectangle {
     id: textEnterBox
     height:inputHeight
-    width: parent.width
+    width: parent.width - sendButton.width
     anchors { left: parent.left; top: cookedFlickBox.bottom }
     color: "#ddffee"
     TextInput {
@@ -329,7 +329,7 @@ Item {
       labelText: qsTr ("Send")
       width: labelWidth
       height: inputHeight -4
-      anchors { verticalCenter: parent.verticalCenter; right: parent.right }
+      anchors { verticalCenter: parent.verticalCenter; left: textEnter.right }
       onLabelChanged: { width = labelWidth }
       onClicked: { channelBox.userSend () }
     }
@@ -383,7 +383,7 @@ Item {
             Text { width: userListBox.width; text: name }
             MouseArea {
               anchors.fill: parent
-              onClicked : selectUser (userName)
+              onClicked : selectUser (index)
             }
           }
         }

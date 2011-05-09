@@ -33,7 +33,7 @@
 #include "html-mangle.h"
 #include <QSize>
 #include "cert-store.h"
-#include "qml-irc-channel-group.h"
+#include "irc-qml-channel-group.h"
 #include "enter-string.h"
 #include <QDebug>
 #include <QTimer>
@@ -67,7 +67,7 @@ IrcQmlControl::IrcQmlControl (QWidget *parent)
   setResizeMode (QDeclarativeView::SizeRootObjectToView);
   hide ();
   knownServers = new KnownServerModel (this);
-  dockedChannels = new QmlIrcChannelGroup (0 /*parentWidget ()*/);
+  dockedChannels = new IrcQmlChannelGroup (0 /*parentWidget ()*/);
   dockedChannels->Start ();
   dockedChannels->hide ();
   commandXform ["MSG"] = IrcQmlSockStatic::TransformPRIVMSG;

@@ -1,5 +1,5 @@
 
-#include "qml-irc-channel-group.h"
+#include "irc-qml-channel-group.h"
 
 /****************************************************************
  * This file is distributed under the following license:
@@ -34,7 +34,7 @@
 namespace egalite
 {
 
-QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
+IrcQmlChannelGroup::IrcQmlChannelGroup (QWidget *parent)
   :QDeclarativeView (parent),
    qmlRoot (0),
    debugTimer (this),
@@ -60,7 +60,7 @@ QmlIrcChannelGroup::QmlIrcChannelGroup (QWidget *parent)
 }
 
 void
-QmlIrcChannelGroup::Start ()
+IrcQmlChannelGroup::Start ()
 {
   int handle = qmlRegisterType<IrcTextBrowser>
               ("net.sf.egalite",1,0,"IrcTextBrowser");
@@ -78,7 +78,7 @@ QmlIrcChannelGroup::Start ()
   qmlRoot->setProperty ("width", width);
   qmlRoot->setProperty ("height", height);
   qDebug () << " ----------------------- "
-             "QmlIrcChannelGroup registered type as " << handle;
+             "IrcQmlChannelGroup registered type as " << handle;
   connect (qmlRoot, SIGNAL (selectedChannel (QString)),
            this, SLOT (ClickedChannel (QString)));
   connect (qmlRoot, SIGNAL (changedChannelBox (qreal, qreal)),
@@ -88,7 +88,7 @@ QmlIrcChannelGroup::Start ()
 }
 
 void
-QmlIrcChannelGroup::SetChannelList ()
+IrcQmlChannelGroup::SetChannelList ()
 {
   if (qmlRoot) {
     QString chanAnchList;
@@ -109,7 +109,7 @@ QmlIrcChannelGroup::SetChannelList ()
 }
 
 void
-QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
+IrcQmlChannelGroup::AddChannel (IrcAbstractChannel * newchan)
 {
   if (newchan == 0) {
     return;
@@ -135,14 +135,14 @@ QmlIrcChannelGroup::AddChannel (IrcAbstractChannel * newchan)
 }
 
 QString
-QmlIrcChannelGroup::ChannelAnchor (const QString & name)
+IrcQmlChannelGroup::ChannelAnchor (const QString & name)
 {
   return QString("<a href=\"%2%1\">%1</a>")
          .arg(name).arg (chanLinkPrefix);
 }
 
 void
-QmlIrcChannelGroup::RemoveChannel (IrcAbstractChannel * chan)
+IrcQmlChannelGroup::RemoveChannel (IrcAbstractChannel * chan)
 {
   qDebug () << __PRETTY_FUNCTION__ << chan;
   if (chan) {
@@ -155,7 +155,7 @@ QmlIrcChannelGroup::RemoveChannel (IrcAbstractChannel * chan)
 }
 
 void
-QmlIrcChannelGroup::SetTopmostChannel (IrcAbstractChannel * topChan)
+IrcQmlChannelGroup::SetTopmostChannel (IrcAbstractChannel * topChan)
 {
   int nc = channelList.count();
   for (int i=0; i<nc; i++) {
@@ -165,7 +165,7 @@ QmlIrcChannelGroup::SetTopmostChannel (IrcAbstractChannel * topChan)
 }
 
 void
-QmlIrcChannelGroup::SetTopmostChannel (const QString & topName)
+IrcQmlChannelGroup::SetTopmostChannel (const QString & topName)
 {
   int nc = channelList.count();
   for (int i=0; i<nc; i++) {
@@ -176,7 +176,7 @@ QmlIrcChannelGroup::SetTopmostChannel (const QString & topName)
 }
 
 void
-QmlIrcChannelGroup::ClickedChannel (QString link)
+IrcQmlChannelGroup::ClickedChannel (QString link)
 {
   if (link.startsWith (chanLinkPrefix)) {
     QString name (link);
@@ -187,7 +187,7 @@ QmlIrcChannelGroup::ClickedChannel (QString link)
 }
 
 void
-QmlIrcChannelGroup::ChangedChannelBox (qreal newWidth, qreal newHeight,
+IrcQmlChannelGroup::ChangedChannelBox (qreal newWidth, qreal newHeight,
                                        qreal leftMargin, qreal topMargin)
 {
   int nc = channelList.count();
@@ -198,7 +198,7 @@ QmlIrcChannelGroup::ChangedChannelBox (qreal newWidth, qreal newHeight,
 }
 
 void
-QmlIrcChannelGroup::MarkActive (IrcAbstractChannel * chan, bool active)
+IrcQmlChannelGroup::MarkActive (IrcAbstractChannel * chan, bool active)
 {
   if (chan) {
     chan->SetActive (active);
@@ -207,7 +207,7 @@ QmlIrcChannelGroup::MarkActive (IrcAbstractChannel * chan, bool active)
 }
 
 bool
-QmlIrcChannelGroup::HaveChannel (IrcAbstractChannel * chan)
+IrcQmlChannelGroup::HaveChannel (IrcAbstractChannel * chan)
 {
   if (chan) {
     return channelList.contains (chan);
@@ -216,37 +216,37 @@ QmlIrcChannelGroup::HaveChannel (IrcAbstractChannel * chan)
 }
 
 void
-QmlIrcChannelGroup::Close ()
+IrcQmlChannelGroup::Close ()
 {
 }
 
 void
-QmlIrcChannelGroup::show ()
+IrcQmlChannelGroup::show ()
 {
   QDeclarativeView::show ();
 }
 
 void
-QmlIrcChannelGroup::ShowChannel (IrcAbstractChannel *chan)
+IrcQmlChannelGroup::ShowChannel (IrcAbstractChannel *chan)
 {
 }
 
 
 void
-QmlIrcChannelGroup::hide ()
+IrcQmlChannelGroup::hide ()
 {
   QDeclarativeView::hide ();
 }
 
 void
-QmlIrcChannelGroup::closeEvent (QCloseEvent *event)
+IrcQmlChannelGroup::closeEvent (QCloseEvent *event)
 {
   hide ();
   event->ignore ();
 }
 
 void
-QmlIrcChannelGroup::resizeEvent (QResizeEvent *event)
+IrcQmlChannelGroup::resizeEvent (QResizeEvent *event)
 {
   if (event && qmlRoot) {
     QSize size = event->size();
@@ -264,9 +264,9 @@ QmlIrcChannelGroup::resizeEvent (QResizeEvent *event)
 }
 
 void
-QmlIrcChannelGroup::DebugCheck ()
+IrcQmlChannelGroup::DebugCheck ()
 {
-  qDebug () << "QmlIrcChannelGroup :: DebugCheck ";
+  qDebug () << "IrcQmlChannelGroup :: DebugCheck ";
   int nc = channelList.count();
   for (int i=0; i<nc; i++) {
     IrcAbstractChannel * chan = channelList.at(i);

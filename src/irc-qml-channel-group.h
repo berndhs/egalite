@@ -41,13 +41,13 @@ namespace egalite
 
 class IrcAbstractChannel;
 
-class QmlIrcChannelGroup : public QDeclarativeView
+class IrcQmlChannelGroup : public QDeclarativeView
 {
 Q_OBJECT
 
 public:
 
-  QmlIrcChannelGroup (QWidget *parent=0);
+  IrcQmlChannelGroup (QWidget *parent=0);
 
   void Start ();
 

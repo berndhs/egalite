@@ -60,7 +60,7 @@ Rectangle {
     height: 30
     width: 80
     onClicked: {
-      console.log ("Hide Button clicked")
+      console.log ("Hide Button clicked x " + ircControlBox.x + "  y " + ircControlBox.y)
       ircControlBox.hideMe ()
     }
   }
@@ -89,7 +89,7 @@ Rectangle {
       visible: true
      // Behavior on color { PropertyAnimation { duration: rollDelay } }
       onClicked: {
-        console.log ("-------------- know list button clicked")
+        console.log ("-------------- known list button clicked x " + ircControlBox.x + "  y " + ircControlBox.y)
         console.log ("    see list is " + seeList)
         knownServerList.toggleVisible ();
       }

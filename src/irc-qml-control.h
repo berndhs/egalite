@@ -44,7 +44,7 @@ namespace egalite
 {
 
 class IrcAbstractChannel;
-class QmlIrcChannelGroup;
+class IrcQmlChannelGroup;
 
 class IrcQmlControl : public QDeclarativeView
 {
@@ -208,7 +208,7 @@ private:
   QGraphicsObject    *qmlRoot;
   bool                isRunning;
 
-  QmlIrcChannelGroup    *dockedChannels;
+  IrcQmlChannelGroup    *dockedChannels;
 
   SocketMapType       sockets;
   bool                isConnected;

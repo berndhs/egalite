@@ -179,7 +179,7 @@ SOURCES = \
 	src/direct-message.cpp \
 	src/direct-parser.cpp \
 	src/cert-list-edit.cpp \
-        src/qml-irc-channel-group.cpp \
+        src/irc-qml-channel-group.cpp \
         src/irc-abstract-channel.cpp \
         src/irc-float.cpp \
         src/irc-qml-control.cpp \
@@ -231,7 +231,7 @@ HEADERS += \
 	src/direct-message.h \
 	src/direct-parser.h \
 	src/cert-list-edit.h \
-        src/qml-irc-channel-group.h \
+        src/irc-qml-channel-group.h \
         src/irc-abstract-channel.h \
         src/irc-qml-control.h \
         src/irc-socket.h \
