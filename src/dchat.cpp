@@ -1136,19 +1136,7 @@ DChatMain::TrayMessageClicked ()
 void 
 DChatMain::closeEvent(QCloseEvent *event)
 {
-qDebug () << " ------------- DChatMain caught close event  " << event;
-  if (trayIcon && trayIcon->isVisible()) {
-    QMessageBox::information(this, QString::fromUtf8("Egalite"),
-                             tr("The program will keep running in the "
-                                 "system tray. To terminate the program, "
-                                 "choose <b>Quit</b> in the main menu "
-                                 "or in the system tray entry."));
-    hide();
-    event->ignore();
-  } else {
-qDebug () << "------------  closing DChatMain";
-    QMainWindow::closeEvent (event);
-  }
+ QMainWindow::closeEvent (event);
 }
 
 bool
