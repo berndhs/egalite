@@ -36,6 +36,8 @@
 #include <QGraphicsObject>
 #include <QDeclarativeView>
 
+#define EGALITE_IRC_CONTROL_RESIZE 0
+
 using namespace deliberate;
 
 class QListWidgetItem;
@@ -130,7 +132,9 @@ private slots:
 
 protected:
 
+#if EGALITE_IRC_CONTROL_RESIZE
   void resizeEvent (QResizeEvent * event);
+#endif
 
 signals:
 

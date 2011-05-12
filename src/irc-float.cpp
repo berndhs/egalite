@@ -38,6 +38,7 @@ IrcFloat::IrcFloat (QWidget *parent)
    qmlRoot (0),
    qmlChannel (0)
 {
+  setResizeMode (QDeclarativeView::SizeRootObjectToView);
   qmlRegisterType<IrcTextBrowser>
               ("net.sf.egalite",1,0,"IrcTextBrowser");
   setSource (QUrl ("qrc:///qml/IrcFloatBox.qml"));
@@ -111,6 +112,7 @@ void
 IrcFloat::resizeEvent (QResizeEvent *event)
 {
   CheckQml ();
+#if 0
   if (event && qmlRoot) {
     QSize size = event->size();
     qreal width = size.width();
@@ -119,7 +121,9 @@ IrcFloat::resizeEvent (QResizeEvent *event)
     qmlRoot->setProperty ("width", width);
     qmlRoot->setProperty ("height", height);
   }
-  //QDeclarativeView::resizeEvent (event);
+#else
+  QDeclarativeView::resizeEvent (event);
+#endif
 }
 
 void

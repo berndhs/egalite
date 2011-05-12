@@ -1173,13 +1173,18 @@ IrcQmlControl::Login ()
   NickLogin (selectedNick, selectedServer);
 }
 
+
+#if EGALITE_IRC_CONTROL_RESIZE
 void
 IrcQmlControl::resizeEvent (QResizeEvent * event)
 {
   if (event) {
     Resize (event->size().width(), event->size().height());
-  }    
+  }   
+  QDeclarativeView::resizeEvent (event); 
 }
+
+#endif
 
 void
 IrcQmlControl::Resize (qreal width, qreal height)
