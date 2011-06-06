@@ -165,7 +165,7 @@ MobiAudiMessage::StartPlay ()
   
   emit PlayStarting ();
   player->play ();
-  int playtime = (playUSecs / 1000) + 1000;
+  int playtime = (player->duration() / 1000) + 1000;
  // playLimitTimer->start (playtime);
  // QTimer::singleShot (playtime, this, SLOT (StopPlay()));
 }
