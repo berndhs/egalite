@@ -971,13 +971,13 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
 #if DO_AUDIO
     audio.StartReceive ();
     QFile * fp = audio.InFile ();
-#else
-  #if DO_MOBI_AUDIO
+#endif
+#if DO_MOBI_AUDIO
     mobiAudio.StartReceive ();
     QFile * fp = mobiAudio.InFile ();
-  #endif
 #endif
     bool isopen = fp->open (QFile::WriteOnly);
+qDebug () << __PRETTY_FUNCTION__ << " open " << fp->fileName() <<  isopen;
     if (isopen) {
       xferFile [xferId] = fp;
       xferState [xferId] = info;
