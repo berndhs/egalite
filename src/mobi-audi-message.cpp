@@ -53,6 +53,8 @@ MobiAudiMessage::MobiAudiMessage (QWidget *parent)
   inStateText[1] = QString("Recording");
   inStateText[2] = QString("Paused");
   inStateText[3] = QString("unknown");
+  connect (player, SIGNAL (stateChanged(QMediaPlayer::State)),
+           this, SLOT (PlayerStateChanged (QMediaPlayer::State)));
 }
 
 MobiAudiMessage::~MobiAudiMessage ()
@@ -89,7 +91,7 @@ MobiAudiMessage::Record (const QPoint & where, const QSize & size)
   outFile.setFileName(filename);
   outFile.open( QIODevice::WriteOnly | QIODevice::Truncate );
   
-  outFormat.setCodec("audio/speex");
+  outFormat.setCodec("audio/vorbis");
   outFormat.setSampleRate (-1);
   outFormat.setBitRate(96000);
   outFormat.setQuality (QtMultimediaKit::NormalQuality);
@@ -167,7 +169,7 @@ MobiAudiMessage::StartPlay ()
   player->play ();
   int playtime = (player->duration() / 1000) + 1000;
  // playLimitTimer->start (playtime);
- // QTimer::singleShot (playtime, this, SLOT (StopPlay()));
+  QTimer::singleShot (playtime, this, SLOT (StopPlay()));
 }
 
 #if 0
@@ -192,6 +194,21 @@ MobiAudiMessage::CheckPlayState ()
 }
 #endif
 
+void
+MobiAudiMessage::PlayerStateChanged (QMediaPlayer::State state)
+{
+  qDebug () << __PRETTY_FUNCTION__ << " state " << state;
+  switch (state) {
+  case QMediaPlayer::PlayingState:
+    break;
+  case QMediaPlayer::PausedState:
+    break;
+  case QMediaPlayer::StoppedState:
+    StopPlay ();
+    break;
+  }
+}
+
 
 void
 MobiAudiMessage::StopPlay ()
@@ -206,7 +223,7 @@ MobiAudiMessage::StopPlay ()
   busyReceive = false;
   emit PlayFinished ();
   playLimitTimer->stop ();
-  qDebug () << " done playing audio message";
+  qDebug () << __PRETTY_FUNCTION__ << " done playing audio message";
 }
 
 int

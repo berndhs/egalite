@@ -75,6 +75,7 @@ public slots:
 private slots:
 
   void CountDown ();
+  void PlayerStateChanged (QMediaPlayer::State state);
 
 signals:
 
