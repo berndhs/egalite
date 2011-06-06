@@ -1,3 +1,6 @@
+* Mon Jun 06 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.19-1
+- short audio messages using QtMobility
+
 * Thu May 08 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.18-1
 - do not close to system tray
 
