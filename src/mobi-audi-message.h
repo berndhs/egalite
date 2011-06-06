@@ -93,6 +93,7 @@ private:
 
   QAudioCaptureSource   *audioSource;
   QMediaRecorder        *recorder;
+  bool                   isRecording;
   QMediaPlayer          *player;
   QAudioEncoderSettings  outFormat;
   QAudioEncoderSettings  inFormat;

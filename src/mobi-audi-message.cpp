@@ -36,6 +36,7 @@ MobiAudiMessage::MobiAudiMessage (QWidget *parent)
    parentWidget (parent),
    audioSource (0),
    recorder (0),
+   isRecording (false),
    player (0),
    recTime (10.0),
    tick (0.0),
@@ -64,6 +65,7 @@ MobiAudiMessage::~MobiAudiMessage ()
   if (recorder) {
     disconnect (recorder, 0,0,0);
     recorder->stop ();
+    isRecording = false;
     delete recorder;
     recorder = 0;
   }
@@ -104,6 +106,7 @@ MobiAudiMessage::Record (const QPoint & where, const QSize & size)
   qDebug () << " record at " << clock.elapsed ();
   recorder->setOutputLocation (QUrl (outFile.fileName()));
   recorder->record ();
+  isRecording = true;
   move (parentWidget->mapToGlobal (where));
   show ();
   StartCount (10.0);
@@ -114,9 +117,10 @@ void
 MobiAudiMessage::StopRecording ()
 {
   qDebug () << " done recording at " << clock.elapsed ();
-  if (recorder) {
+  if (recorder && isRecording) {
     qint64 usecs = recorder->duration ();
     recorder->stop ();
+    isRecording = false;
     qDebug () << " closing outFile " << outFile.fileName();
     qDebug () << "         size " << outFile.size ();
     outFile.close ();

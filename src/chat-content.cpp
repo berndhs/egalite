@@ -398,6 +398,7 @@ qDebug () << " sending Dom Doc op " << doc.toByteArray().left(256);
 void
 ChatContent::SendDirectMessage (DirectMessage & msg)
 {
+  qDebug () << __PRETTY_FUNCTION__ ;
   DumpAttributes (msg, " <------- Outgoing Direct");
   // prepare message in XML format
   QBuffer outbuf;
@@ -527,17 +528,6 @@ ChatContent::Heartbeat ()
 {
   if (chatMode == ChatModeEmbed) {
     if (sendSinceBeat < 2) {
-#if 0
-      QDomDocument heartDoc ("egalite");
-      QDomElement root = heartDoc.createElement ("egalite");
-      root.setAttribute ("version",protoVersion); 
-      heartDoc.appendChild (root);
-      QDomElement msg = heartDoc.createElement ("cmd");
-      msg.setAttribute ("op","ctl");
-      msg.setAttribute ("subop","heartbeat");
-      root.appendChild (msg);
-      SendDomDoc (heartDoc);
-#endif
       DirectMessage dmsg;
       dmsg.SetOp ("ctl");
       dmsg.SetSubop ("heartbeat");
@@ -552,21 +542,6 @@ void
 ChatContent::EmbedDirectMessage (QByteArray & raw)
 {
   qDebug () << " sending " << raw;
-#if 0
-  QDomDocument directDoc ("egalite");
-  QDomElement root = directDoc.createElement ("egalite");
-  root.setAttribute ("version",protoVersion);
-  QDomElement msg = directDoc.createElement ("cmd");
-  msg.setAttribute ("op","xmpp");
-  msg.setAttribute ("subop","msg");
-  msg.setAttribute ("num",QString::number(sendCount));
-  root.appendChild (msg);
-  QDomText txt = directDoc.createTextNode (raw);
-  msg.appendChild (txt);
-  directDoc.appendChild (root);
-  sendCount++;
-  SendDomDoc (directDoc);
-#endif
   DirectMessage dmsg;
   dmsg.SetOp ("xmpp");
   dmsg.SetSubop ("msg");
@@ -711,20 +686,6 @@ ChatContent::SendFirstPart (const QString & id)
   }
   XferInfo & info = xferState[id];
   QFileInfo finfo (fp->fileName());
-#if 0
-  QDomDocument requestDoc ("egalite");
-  QDomElement  request = requestDoc.createElement ("egalite");
-  request.setAttribute ("version", protoVersion);
-  requestDoc.appendChild (request);
-  QDomElement cmd = requestDoc.createElement ("cmd");
-  cmd.setAttribute ("op","sendfile");
-  cmd.setAttribute ("subop","sendreq");
-  cmd.setAttribute ("xferid",id);
-  cmd.setAttribute ("name",finfo.fileName());
-  cmd.setAttribute ("size",info.fileSize);
-  request.appendChild (cmd);
-  SendDomDoc (requestDoc);
-#endif
   DirectMessage req;
   req.SetOp ("sendfile");
   req.SetSubop ("sendreq");
@@ -763,19 +724,6 @@ ChatContent::SendNextPart (const QString & id)
 void
 ChatContent::SendFinished (const QString & id)
 {
-#if 0
-  QDomDocument chunkDoc ("egalite");
-  QDomElement  chunkRoot = chunkDoc.createElement ("egalite");
-  chunkRoot.setAttribute ("version", protoVersion);
-  chunkDoc.appendChild (chunkRoot);
-  QDomElement cmd = chunkDoc.createElement ("cmd");
-  cmd.setAttribute ("op","sendfile");
-  cmd.setAttribute ("subop","snd-done");
-  cmd.setAttribute ("xferid",id);
-  chunkRoot.appendChild (cmd);
-  SendDomDoc (chunkDoc);
-#endif
-
   DirectMessage msg;
   msg.SetOp ("sendfile");
   msg.SetSubop ("snd-done");
@@ -898,19 +846,6 @@ ChatContent::SendfileChunkData (DirectMessage & msg)
 void
 ChatContent::AckChunk (const QString & id, quint64 num)
 {
-#if 0
-  QDomDocument  ackDoc ("egalite");
-  QDomElement   ack = ackDoc.createElement ("egalite");
-  ack.setAttribute ("version",protoVersion);
-  ackDoc.appendChild (ack);
-  QDomElement cmd = ackDoc.createElement ("cmd");
-  cmd.setAttribute ("op","sendfile");
-  cmd.setAttribute ("subop","chunk-ack");
-  cmd.setAttribute ("xferid",id);
-  cmd.setAttribute ("chunk",QString::number (num));
-  ack.appendChild (cmd);
-  SendDomDoc (ackDoc);
-#endif
   DirectMessage msg;
   msg.SetOp ("sendfile");
   msg.SetSubop ("chunk-ack");
@@ -924,18 +859,6 @@ ChatContent::AbortTransfer (const QString & id, QString msg)
 {
   qDebug () << " Abort Transfer: " << msg;
   CloseTransfer (id);
-#if 0
-  QDomDocument  abortDoc ("egalite");
-  QDomElement   nack = abortDoc.createElement ("egalite");
-  nack.setAttribute ("version",protoVersion);
-  abortDoc.appendChild (nack);
-  QDomElement cmd = abortDoc.createElement ("cmd");
-  cmd.setAttribute ("op","sendfile");
-  cmd.setAttribute ("subop","abort");
-  cmd.setAttribute ("xferid",id);
-  nack.appendChild (cmd);
-  SendDomDoc (abortDoc);
-#endif
   DirectMessage nack;
   nack.SetOp ("sendfile");
   nack.SetSubop ("abort");
@@ -1035,18 +958,6 @@ ChatContent::SendfileSendReq (DirectMessage & msg)
   default:
     break;
   }
-#if 0
-  QDomDocument  responseDoc ("egalite");
-  QDomElement response = responseDoc.createElement ("egalite");
-  response.setAttribute ("version",protoVersion);
-  responseDoc.appendChild (response);
-  QDomElement cmd = responseDoc.createElement ("cmd");
-  cmd.setAttribute ("op","sendfile");
-  cmd.setAttribute ("subop",subop);
-  cmd.setAttribute ("xferid",xferId);
-  response.appendChild (cmd);
-  SendDomDoc (responseDoc);
-#endif
   DirectMessage resp;
   resp.SetOp ("sendfile");
   resp.SetSubop (subop);
