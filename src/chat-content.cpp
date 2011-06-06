@@ -6,6 +6,9 @@
 #if DO_AUDIO
 #include "audio-message.h"
 #endif
+#if D_MOBI_AUDIO
+#include "mobi-audi-message.h"
+#endif
 #include <QXmppMessage.h>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
@@ -71,6 +74,9 @@ ChatContent::ChatContent (QWidget *parent)
 #if DO_AUDIO
    audio (this),
 #endif
+#if DO_MOBI_AUDIO
+   mobiAudio (this),
+#endif
    dateMask ("yy-MM-dd hh:mm:ss"),
    chatLine (tr("(%1) <b style=\"font-size:small; "
                  "color:@color@;\">%2</b>: %3")),
@@ -88,6 +94,16 @@ ChatContent::ChatContent (QWidget *parent)
   qtAudioOk = false;
   #endif
   
+  #if DO_MOBI_AUDIO
+  #if DELIBERATE_QT_AUDIO_OK
+  qtAudioOk = true;
+  #else
+  qtAudioOk = false;
+  #endif
+  #else
+  qtAudioOk = false;
+  #endif
+
   plainSendMessage = ui.sendFileButton->text ();
   plainAudioMessage = ui.samButton->text ();
   connect (ui.quitButton, SIGNAL (clicked()), this, SLOT (EndChat()));
@@ -104,6 +120,12 @@ ChatContent::ChatContent (QWidget *parent)
           this, SLOT (SendAudioRequest(qint64)));
   connect (&audio, SIGNAL (PlayStarting()), this, SLOT (AudioStarted()));
   connect (&audio, SIGNAL (PlayFinished()), this, SLOT (AudioStopped()));
+#endif
+#if DO_MOBI_AUDIO
+  connect (&mobiAudio, SIGNAL (HaveAudio(qint64)), 
+          this, SLOT (SendAudioRequest(qint64)));
+  connect (&mobiAudio, SIGNAL (PlayStarting()), this, SLOT (AudioStarted()));
+  connect (&mobiAudio, SIGNAL (PlayFinished()), this, SLOT (AudioStopped()));
 #endif
   ui.quitButton->setDefault (false);
   ui.saveButton->setDefault (false);
@@ -575,21 +597,31 @@ ChatContent::StartAudioSend ()
 #if DO_AUDIO
   ui.samButton->setEnabled  (false);
   audio.Record (ui.textHistory->pos(), ui.chatInput->size());
+#else
+  #if DO_MOBI_AUDIO
+  ui.samButton->setEnabled (false);
+  mobiAudio.Record (ui.textHistory->pos(), ui.chatInput->size());
+  #endif
 #endif
 }
 
 void
 ChatContent::SendAudioRequest (qint64 usecs)
 {
-#if DO_AUDIO
-qDebug () << " have audio " << audio.Filename();
+#if DO_AUDIO || DO_MOBI_AUDIO
   XferInfo  info;
   info.id = QUuid::createUuid ().toString();
   info.lastChunk = 0;
   info.kind = XferInfo::Xfer_Audio;
   info.inout = XferInfo::Xfer_Out;
   info.removeOnComplete = true;
+#if DO_AUDIO
   QFile * fp =  new QFile (audio.Filename());
+#else 
+  #if DO_MOBI_AUDIO
+  QFile * fp =  new QFile (mobiAudio.Filename());
+  #endif
+#endif
   bool isopen = fp ->open (QFile::ReadOnly);
   info.fileSize = fp->size ();
 qDebug () << " file open " << isopen << " size " << fp->size();
@@ -603,6 +635,7 @@ qDebug () << " file open " << isopen << " size " << fp->size();
     req.SetAttribute ("xferid",info.id);
     req.SetAttribute ("size",QString::number (info.fileSize));
     req.SetAttribute ("usecs",QString::number (usecs));
+#if DO_AUDIO
     req.SetAttribute ("name",audio.OutFormat().codec());
     req.SetAttribute ("rate",
                        QString::number (audio.OutFormat().frequency()));
@@ -615,6 +648,16 @@ qDebug () << " file open " << isopen << " size " << fp->size();
                        QString::number (audio.OutFormat().byteOrder()));
     req.SetAttribute ("sampletype",
                        QString::number (audio.OutFormat().sampleType()));
+#else
+  #if DO_MOBI_AUDIO
+    req.SetAttribute ("name",mobiAudio.OutFormat().codec());
+    req.SetAttribute ("rate",
+                       QString::number (mobiAudio.OutFormat().bitRate()));
+    req.SetAttribute ("channels",
+                       QString::number (mobiAudio.OutFormat().channelCount()));
+    req.SetAttribute ("codec",mobiAudio.OutFormat().codec());
+  #endif
+#endif
     SendDirectMessage (req);
     StartXferDisplay ();
   }
@@ -800,9 +843,15 @@ ChatContent::CloseTransfer (const QString & id, bool good)
     finished.exec ();
     break;
   case XferInfo::Xfer_Audio:
-#if DO_AUDIO
+#if DO_AUDIO || DO_MOBI_AUDIO
     if (inout == XferInfo::Xfer_In) {
+#if DO_AUDIO
       audio.FinishReceive ();
+#else
+  #if DO_MOBI_AUDIO
+      mobiAudio.FinishReceive ();
+  #endif
+#endif
     } else if (inout == XferInfo::Xfer_Out) {
       ui.samButton->setEnabled (qtAudioOk);
     }
@@ -904,8 +953,14 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
   qDebug () << " received SAM request";
   QString subop ("deny");
   QString xferId = msg.Attribute ("xferid");
+#if DO_AUDIO || DO_MOBI_AUDIO
 #if DO_AUDIO
   if (qtAudioOk && (!audio.BusyReceive())) {   
+#else
+  #if DO_MOBI_AUDIO
+  if (qtAudioOk && (!mobiAudio.BusyReceive())) {   
+  #endif
+#endif
     XferInfo info;
     info.id = xferId;
     info.fileSize = 0;
@@ -913,13 +968,21 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
     info.lastChunkAck = 0;
     info.kind = XferInfo::Xfer_Audio;
     info.inout = XferInfo::Xfer_In;
+#if DO_AUDIO
     audio.StartReceive ();
     QFile * fp = audio.InFile ();
+#else
+  #if DO_MOBI_AUDIO
+    mobiAudio.StartReceive ();
+    QFile * fp = mobiAudio.InFile ();
+  #endif
+#endif
     bool isopen = fp->open (QFile::WriteOnly);
     if (isopen) {
       xferFile [xferId] = fp;
       xferState [xferId] = info;
       subop = "goahead";
+#if DO_AUDIO
       QAudioFormat & fmt (audio.InFormat());
       fmt.setFrequency (msg.Attribute("rate").toInt());
       fmt.setChannels (msg.Attribute("channels").toInt());
@@ -929,6 +992,11 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
       fmt.setSampleType (QAudioFormat::SampleType 
                           (msg.Attribute("sampletype").toInt()));
       audio.SetInLength (msg.Attribute("usecs").toLongLong());
+#else
+  #if DO_MOBI_AUDIO
+      QAudioEncoderSettings & encSetts (mobiAudio.InFormat());
+  #endif
+#endif
       StartXferDisplay ();
     }
   }

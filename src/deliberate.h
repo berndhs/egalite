@@ -35,14 +35,22 @@
 #define DELIBERATE_HAVE_WEBELT 0
 #endif
 
-#if DO_AUDIO
+#if DO_AUDIO 
   #if DELIBERATE_QT_NUM > 40603
   #define DELIBERATE_QT_AUDIO_OK 1
   #else
   #define DELIBERATE_QT_AUDIO_OK 0
   #endif
 #else
-  #define DELIBERATE_QT_AUTIO_OK 0
+  #if DO_MOBI_AUDIO
+    #if DELIBERATE_QT_NUM > 40701
+    #define DELIBERATE_QT_AUDIO_OK 1
+    #else
+    #define DELIBERATE_QT_AUDIO_OK 0
+    #endif
+  #else
+  #define DELIBERATE_QT_AUDIO_OK 0
+  #endif
 #endif
 
 namespace deliberate {

@@ -78,7 +78,17 @@ main (int argc, char* argv[])
                        .arg (DELIBERATE_QT_NUM) ;
     #endif
   #else
-  configMessages << QString (" Audio Disabled in Build Configuration");
+    #if DO_MOBI_AUDIO
+      #if DELIBERATE_QT_AUDIO_OK
+      configMessages << QString(" MobilAudio enabled with Qt %1") 
+                        .arg (DELIBERATE_QT_NUM) ;
+      #else
+      configMessages << QString(" No MobilAudio Input with Qt %1") 
+                         .arg (DELIBERATE_QT_NUM) ;
+      #endif
+    #else
+    configMessages << QString (" Audio Disabled in Build Configuration");
+    #endif
   #endif
   QString locale = QLocale::system().name();
   QTranslator  translate;

@@ -25,6 +25,9 @@
 #if DO_AUDIO
 #include "audio-message.h"
 #endif
+#if DO_MOBI_AUDIO
+#include "mobi-audi-message.h"
+#endif
 #include "ui_chat-content.h"
 #include "direct-parser.h"
 #include <QDialog>
@@ -214,6 +217,9 @@ private:
   XferFileMap      xferFile;
 #if DO_AUDIO
   AudioMessage     audio;
+#endif
+#if DO_MOBI_AUDIO
+  MobiAudiMessage  mobiAudio;
 #endif
 
   QString          dateMask;

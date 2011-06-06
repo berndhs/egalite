@@ -106,9 +106,19 @@ win32 {
 message ("using extra libs $$LIBS")
 
 audio {
-        message ("---width audio")
-	QT += multimedia
+  message ("---width audio")
+  QT += multimedia
 }
+
+mobilaudio {
+  message ("---with mobil-audio")
+  CONFIG += mobility
+  MOBILITY += multimedia
+  DEFINES += DO_MOBI_AUDIO=1
+} else {
+  DEFINES += DO_MOBI_AUDIO=0
+}
+
 message ("QT variable is $$QT")
 
 build_x86 {
@@ -199,6 +209,10 @@ audio {
 	SOURCES += src/audio-message.cpp
 }
 
+mobilaudio {
+	SOURCES += src/mobi-audi-message.cpp
+}
+
 
 
 HEADERS += \
@@ -250,5 +264,10 @@ HEADERS += \
 audio {
 	HEADERS += src/audio-message.h
 }
+
+mobilaudio {
+	HEADERS += src/mobi-audi-message.h
+}
+
 
 

@@ -141,6 +141,7 @@ usage () {
    echo "--qxmppbase=QXDIR  qxmpp base directory [${QXMPP_BASE}]"
    echo "--qxmppname=QXNAME qxmpp basic name [${QXMPP_NAME}]"
    echo "--audio=<0|1>      Build with audio input support [${DO_AUDIO}]"
+   echo "--mobil-audio=<0|1>  Build with qtmobile audio [${DO_MOBI_AUDIO}]"
    echo
 }
 
@@ -155,6 +156,7 @@ QXMPP_BASE=/usr
 QXMPP_NAME=qxmppclient
 OPTIONS_FILE=options.pri
 DO_AUDIO=0
+DO_MOBI_AUDIO=0
 COMMAND_LINE="$0 $*"
 find_distro
 
@@ -196,6 +198,10 @@ case $ac_option in
    ;;
   --audio)
    DO_AUDIO=$ac_optarg
+   $ac_shift
+   ;;
+  --mobil-audio)
+   DO_MOBI_AUDIO=$ac_optarg
    $ac_shift
    ;;
   --distro)
@@ -262,11 +268,18 @@ echo "DEFINES += DISTRO_${DISTRO}=1" >> ${OPTIONS_FILE}
 echo "QXMPP_BASE = ${QXMPP_BASE}" >> ${OPTIONS_FILE}
 echo "QXMPP_NAME = ${QXMPP_NAME}" >> ${OPTIONS_FILE}
 echo "DO_AUDIO = ${DO_AUDIO}" >> ${OPTIONS_FILE}
+echo "DO_MOBI_AUDIO = ${DO_MOBI_AUDIO}" >> ${OPTIONS_FILE}
 if [ $DO_AUDIO -eq 1 ]
 then
   echo "CONFIG += audio" >> ${OPTIONS_FILE}
 else 
   echo "CONFIG -= audio" >> ${OPTIONS_FILE}
+fi
+if [ $DO_MOBI_AUDIO -eq 1 ]
+then
+  echo "CONFIG += mobilaudio" >> ${OPTIONS_FILE}
+else 
+  echo "CONFIG -= mobilaudio" >> ${OPTIONS_FILE}
 fi
 if [ $IS_ARM -eq 1 ]
 then
@@ -301,6 +314,7 @@ showmsg 'qmake is..................' $QMAKE
 showmsg 'Installation prefix is....' $PREFIX 
 showmsg 'Distro setting is.........' $DISTRO
 showmsg 'DO_AUDIO is...............' $DO_AUDIO
+showmsg 'DO_MOBI_AUDIO is..........' $DO_MOBI_AUDIO
 showmsg 'Qxmpp base dir is.........' $QXMPP_BASE
 showmsg 'Qxmpp name is.............' $QXMPP_NAME
 showmsg 'IS_ARM is.................' $IS_ARM
