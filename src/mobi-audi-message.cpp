@@ -84,7 +84,7 @@ MobiAudiMessage::Record (const QPoint & where, const QSize & size)
     tmppath.mkpath (tmpdir);
   } 
   filename = tmpdir + QDir::separator() 
-                    + QString ("egalite-%1.raw")
+                    + QString ("egalite-%1.ogg")
                       .arg(Tempname());
   outFile.setFileName(filename);
   outFile.open( QIODevice::WriteOnly | QIODevice::Truncate );
@@ -158,26 +158,16 @@ void
 MobiAudiMessage::StartPlay ()
 {
   qDebug () << __PRETTY_FUNCTION__ << "Play audio message";
-#if 0
-  QAudioDeviceInfo info = QAudioDeviceInfo::defaultOutputDevice();
-  if (!info.isFormatSupported(inFormat)) {
-    qWarning()<<"default inFormat not supported try to use nearest";
-    inFormat = info.nearestFormat(inFormat);
-  }
-  inFile.open (QFile::ReadOnly);
   if (player == 0) {
-    player = new QAudioOutput (inFormat, this);
-    connect (player, SIGNAL (stateChanged (QAudio::State)),
-             this, SLOT (PlayChanged (QAudio::State)));
-    connect (playLimitTimer, SIGNAL (timeout()),
-             this, SLOT (CheckPlayState ()));
+    return;
   }
+  player->setMedia (QMediaContent (QUrl::fromLocalFile (inFile.fileName())));
+  
   emit PlayStarting ();
-  player->start (&inFile);
+  player->play ();
   int playtime = (playUSecs / 1000) + 1000;
  // playLimitTimer->start (playtime);
-  QTimer::singleShot (playtime, this, SLOT (StopPlay()));
-#endif
+ // QTimer::singleShot (playtime, this, SLOT (StopPlay()));
 }
 
 #if 0
@@ -206,19 +196,17 @@ MobiAudiMessage::CheckPlayState ()
 void
 MobiAudiMessage::StopPlay ()
 {
-#if 0
   inFile.close ();
+#if 0
   inFile.remove ();
+#endif
   if (player) {
     player->stop();
-    player->deleteLater ();
-    player = 0;
   }
   busyReceive = false;
   emit PlayFinished ();
   playLimitTimer->stop ();
   qDebug () << " done playing audio message";
-#endif
 }
 
 int
@@ -237,7 +225,7 @@ MobiAudiMessage::StartReceive ()
     tmppath.mkpath (tmpdir);
   } 
   QString filename = tmpdir + QDir::separator() 
-                    + QString ("egalite-%1.raw")
+                    + QString ("egalite-%1.ogg")
                       .arg(Tempname ());
   inFile.setFileName(filename);
   busyReceive = true;

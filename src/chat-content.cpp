@@ -983,7 +983,7 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
       xferState [xferId] = info;
       subop = "goahead";
 #if DO_AUDIO
-      QAudioFormat & fmt (audio.InFormat());
+      QAudioFormat & fmt (audio.InFormat());  // NOTE the reference, not const!
       fmt.setFrequency (msg.Attribute("rate").toInt());
       fmt.setChannels (msg.Attribute("channels").toInt());
       fmt.setSampleSize (msg.Attribute("samplesize").toInt());
@@ -994,7 +994,6 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
       audio.SetInLength (msg.Attribute("usecs").toLongLong());
 #else
   #if DO_MOBI_AUDIO
-      QAudioEncoderSettings & encSetts (mobiAudio.InFormat());
   #endif
 #endif
       StartXferDisplay ();
