@@ -156,7 +156,7 @@ QXMPP_BASE=/usr
 QXMPP_NAME=qxmppclient
 OPTIONS_FILE=options.pri
 DO_AUDIO=0
-DO_MOBI_AUDIO=0
+DO_MOBI_AUDIO=1
 COMMAND_LINE="$0 $*"
 find_distro
 
