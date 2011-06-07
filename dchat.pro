@@ -27,9 +27,11 @@ win32 {
 }
 CONFIG(debug,debug|release) {
   TARGET = bin/egalite_d
+  BUILD_SUB = bld_debug
 }
 CONFIG(release,debug|release) {
   TARGET = bin/egalite
+  BUILD_SUB = bld_release
 }
 TRANS_DIR = translate
 TRANSLATIONS += $$TRANS_DIR/egalite_fr.ts $$TRANS_DIR/egalite_de.ts
@@ -127,10 +129,10 @@ build_x86 {
 
 RESOURCES = dchat.qrc
 
-UI_DIR = tmp/ui
-MOC_DIR = tmp/moc
-RCC_DIR = tmp/rcc
-OBJECTS_DIR = tmp/obj
+UI_DIR = tmp/$$BUILD_SUB/ui
+MOC_DIR = tmp/$$BUILD_SUB/moc
+RCC_DIR = tmp/$$BUILD_SUB/rcc
+OBJECTS_DIR = tmp/$$BUILD_SUB/obj
 
 FORMS = \
 	ui/dchat.ui \
