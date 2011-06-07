@@ -56,6 +56,8 @@ MobiAudiMessage::MobiAudiMessage (QWidget *parent)
   inStateText[3] = QString("unknown");
   connect (player, SIGNAL (stateChanged(QMediaPlayer::State)),
            this, SLOT (PlayerStateChanged (QMediaPlayer::State)));
+  connect (recorder, SIGNAL (error( QMediaRecorder::Error )),
+           this, SLOT (RecorderError ( QMediaRecorder::Error )));
 }
 
 MobiAudiMessage::~MobiAudiMessage ()
@@ -93,7 +95,7 @@ MobiAudiMessage::Record (const QPoint & where, const QSize & size)
   outFile.setFileName(filename);
   outFile.open( QIODevice::WriteOnly | QIODevice::Truncate );
   
-  outFormat.setCodec("audio/vorbis");
+  outFormat.setCodec("audio/speex");
   outFormat.setSampleRate (-1);
   outFormat.setBitRate(96000);
   outFormat.setQuality (QtMultimediaKit::NormalQuality);
@@ -103,7 +105,7 @@ MobiAudiMessage::Record (const QPoint & where, const QSize & size)
   recorder->setEncodingSettings (outFormat, 
                                  QVideoEncoderSettings(),
                                  QString("ogg"));
-  qDebug () << " record at " << clock.elapsed ();
+  qDebug () << __PRETTY_FUNCTION__ << " record at " << clock.elapsed ();
   recorder->setOutputLocation (QUrl (outFile.fileName()));
   recorder->record ();
   isRecording = true;
@@ -111,6 +113,21 @@ MobiAudiMessage::Record (const QPoint & where, const QSize & size)
   show ();
   StartCount (10.0);
   QTimer::singleShot (10000,this, SLOT (StopRecording()));
+}
+
+void
+MobiAudiMessage::RecorderError  (QMediaRecorder::Error error)
+{
+  qDebug () << __PRETTY_FUNCTION__ << " error " 
+            << error << recorder->errorString();
+  if (error == QMediaRecorder::NoError) {
+    return;
+  }
+  isRecording = false;
+  if (recorder) {
+    recorder->stop ();
+  }
+  StopRecording ();
 }
 
 void
