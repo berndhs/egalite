@@ -118,8 +118,8 @@ MobiAudiMessage::Record (const QPoint & where, const QSize & size)
 void
 MobiAudiMessage::RecorderError  (QMediaRecorder::Error error)
 {
-  qDebug () << __PRETTY_FUNCTION__ << " error " 
-            << error << recorder->errorString();
+  qDebug () << __PRETTY_FUNCTION__ << " error " << error ;
+  qDebug() << "               " << recorder->errorString();
   if (error == QMediaRecorder::NoError) {
     return;
   }
@@ -133,13 +133,14 @@ MobiAudiMessage::RecorderError  (QMediaRecorder::Error error)
 void
 MobiAudiMessage::StopRecording ()
 {
-  qDebug () << " done recording at " << clock.elapsed ();
+  qDebug () << __PRETTY_FUNCTION__ << " done recording at " << clock.elapsed ();
   if (recorder && isRecording) {
     qint64 usecs = recorder->duration ();
     recorder->stop ();
     isRecording = false;
     qDebug () << " closing outFile " << outFile.fileName();
-    qDebug () << "         size " << outFile.size ();
+    qDebug () << "            size " << outFile.size ();
+    qDebug () << "        duration " << usecs;
     outFile.close ();
     qDebug () << " recording stopped ";
     
@@ -187,10 +188,22 @@ MobiAudiMessage::StartPlay ()
   player->setMedia (QMediaContent (QUrl::fromLocalFile (inFile.fileName())));
   
   emit PlayStarting ();
+  player->setVolume (50);
+  player->setPosition (0);
   player->play ();
+  qDebug () << "    playing " << player->media().canonicalUrl();
+  qDebug () << "    duration " << player->duration();
+  qDebug () << "    err      " << player->errorString();
   int playtime = (player->duration() / 1000) + 1000;
  // playLimitTimer->start (playtime);
   QTimer::singleShot (playtime, this, SLOT (StopPlay()));
+}
+
+void
+MobiAudiMessage::PlayerError (QMediaPlayer::Error error)
+{
+  qDebug () << __PRETTY_FUNCTION__ << error;
+  qDebug () << "               " << player->errorString();
 }
 
 #if 0
