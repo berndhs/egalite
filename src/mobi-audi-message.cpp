@@ -40,14 +40,12 @@ MobiAudiMessage::MobiAudiMessage (QWidget *parent)
    player (0),
    recTime (10.0),
    tick (0.0),
-   secsLeft (0.0),
-   playLimitTimer (0)
+   secsLeft (0.0)
 {
   audioSource = new QAudioCaptureSource (this);
   recorder = new QMediaRecorder (audioSource, this);
   player = new QMediaPlayer (this);
   ui.setupUi (this);
-  playLimitTimer = new QTimer (this);
   hide ();
   clock.start ();
   inStateText[0] = QString("Stopper");
@@ -181,22 +179,38 @@ qDebug () << " countdown at " << secsLeft << " elapsed " << clock.elapsed();
 void
 MobiAudiMessage::StartPlay ()
 {
-  qDebug () << __PRETTY_FUNCTION__ << "Play audio message";
+  qDebug () << __PRETTY_FUNCTION__ << "Play audio message " << inFile.fileName();
   if (player == 0) {
     return;
   }
-  player->setMedia (QMediaContent (QUrl::fromLocalFile (inFile.fileName())));
+  if (playList.isEmpty()) {
+    return;
+  }
+  PlayItem item = playList.takeFirst();
+  if (item.filename.isEmpty() || item.duration < 1) {
+    return;
+  }
+  qDebug () << "   readable ? " << QFileInfo (item.filename).isReadable();
+  player->setMedia (QMediaContent (QUrl::fromLocalFile (item.filename)));
   
   emit PlayStarting ();
   player->setVolume (50);
   player->setPosition (0);
   player->play ();
-  qDebug () << "    playing " << player->media().canonicalUrl();
+  qDebug () << __PRETTY_FUNCTION__ ;
+  qDebug () << "    playing  " << player->media().canonicalUrl();
+  qDebug () << "  have audio " << player->isAudioAvailable ();
+  qDebug () << "    mime     " << player->media().canonicalResource().mimeType();
+  qDebug () << "    codec    " << player->media().canonicalResource().audioCodec();
+  qDebug () << "    bitrate  " << player->media().canonicalResource().audioBitRate();
+  qDebug () << "    null ?   " << player->media().isNull();
   qDebug () << "    duration " << player->duration();
+  qDebug () << "    position " << player->position();
   qDebug () << "    err      " << player->errorString();
-  int playtime = (player->duration() / 1000) + 1000;
- // playLimitTimer->start (playtime);
-  QTimer::singleShot (playtime, this, SLOT (StopPlay()));
+  qDebug () << "    rate     " << player->playbackRate();
+  int playtime = item.duration;
+  qDebug () << "    play tiemout set to " << playtime;
+  QTimer::singleShot (playtime, this, SLOT (TimeoutPlay()));
 }
 
 void
@@ -206,32 +220,21 @@ MobiAudiMessage::PlayerError (QMediaPlayer::Error error)
   qDebug () << "               " << player->errorString();
 }
 
-#if 0
-void
-MobiAudiMessage::CheckPlayState ()
-{
-  static qint64  oldWork (0);
-  if (player) {
-    QAudio::State  state = player->state ();
-    if (state == QAudio::IdleState) {
-      StopPlay ();
-    } else {
-      qint64 workdone = player->processedUSecs ();
-      if (workdone <= oldWork) {  // nothing done in 2 secs, shut it down
-        StopPlay ();
-        qDebug () << " forcing audio player stop";
-      } else {
-        oldWork = workdone;
-      }
-    }
-  }
-}
-#endif
 
 void
 MobiAudiMessage::PlayerStateChanged (QMediaPlayer::State state)
 {
-  qDebug () << __PRETTY_FUNCTION__ << " state " << state;
+  qDebug () << __PRETTY_FUNCTION__ << " new state " << state;
+  qDebug () << "    playing  " << player->media().canonicalUrl();
+  qDebug () << "  have audio " << player->isAudioAvailable ();
+  qDebug () << "    mime     " << player->media().canonicalResource().mimeType();
+  qDebug () << "    codec    " << player->media().canonicalResource().audioCodec();
+  qDebug () << "    bitrate  " << player->media().canonicalResource().audioBitRate();
+  qDebug () << "    null ?   " << player->media().isNull();
+  qDebug () << "    duration " << player->duration();
+  qDebug () << "    position " << player->position();
+  qDebug () << "    err      " << player->errorString();
+  qDebug () << "    rate     " << player->playbackRate();
   switch (state) {
   case QMediaPlayer::PlayingState:
     break;
@@ -240,6 +243,15 @@ MobiAudiMessage::PlayerStateChanged (QMediaPlayer::State state)
   case QMediaPlayer::StoppedState:
     StopPlay ();
     break;
+  }
+}
+
+void
+MobiAudiMessage::TimeoutPlay ()
+{
+  qDebug () << __PRETTY_FUNCTION__ ;
+  if (player && player->state() != QMediaPlayer::StoppedState) {
+    StopPlay();
   }
 }
 
@@ -256,7 +268,6 @@ MobiAudiMessage::StopPlay ()
   }
   busyReceive = false;
   emit PlayFinished ();
-  playLimitTimer->stop ();
   qDebug () << __PRETTY_FUNCTION__ << " done playing audio message";
 }
 
@@ -283,9 +294,11 @@ MobiAudiMessage::StartReceive ()
 }
 
 void
-MobiAudiMessage::FinishReceive ()
+MobiAudiMessage::FinishReceive (const QString & filename, qint64 duration)
 {
-  StartPlay ();
+  qDebug () << __PRETTY_FUNCTION__ << filename << duration;
+  playList.append (PlayItem (filename, duration));
+  QTimer::singleShot (100, this, SLOT (StartPlay ()));
 }
 
 QString

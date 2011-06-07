@@ -61,7 +61,6 @@ public:
   bool  BusyReceive () { return busyReceive; }
 
   void  Record (const QPoint & where, const QSize & size);
-  void  StartPlay ();
   int   Size ();
 
   void  SetInLength (qint64 usecs) { playUSecs = usecs; }
@@ -69,8 +68,7 @@ public:
 public slots:
 
   void StopRecording ();
-  void FinishReceive ();
-  void StopPlay ();
+  void FinishReceive (const QString & filename, qint64 duration);
 
 private slots:
 
@@ -78,6 +76,9 @@ private slots:
   void PlayerStateChanged (QMediaPlayer::State state);
   void RecorderError  (QMediaRecorder::Error error);
   void PlayerError  (QMediaPlayer::Error error);
+  void StartPlay ();
+  void StopPlay ();
+  void TimeoutPlay ();
 
 signals:
 
@@ -86,6 +87,19 @@ signals:
   void PlayFinished ();
 
 private:
+
+  class PlayItem {
+  public:
+    PlayItem ()
+      :filename(QString()), duration(0)
+    {}
+    PlayItem (const QString & name, qint64 len)
+      :filename (name), duration (len)
+    {}
+  
+    QString  filename;
+    qint64   duration;
+  };
 
   void       StartCount (double maxtime);
   QString    Tempname ();
@@ -105,11 +119,12 @@ private:
   double         recTime;
   double         tick;
   double         secsLeft;
-  QTimer        *playLimitTimer;
   qint64         playUSecs;
   bool           busyReceive;
   QTime          clock;
   QString        inStateText[4];
+
+  QList<PlayItem>  playList;
 
   Ui_CountDownDisplay ui;
 } ;

@@ -759,18 +759,27 @@ ChatContent::CloseTransfer (const QString & id, bool good)
   bool removeFile (false);
   XferInfo::XferKind kind (XferInfo::Xfer_None);
   XferInfo::XferDirection inout (XferInfo::Xfer_Out);
+  qint64  duration (0);
   XferStateMap::iterator  stateIt = xferState.find(id);
   if (stateIt != xferState.end()) {
     kind = stateIt->second.kind;
     inout = stateIt->second.inout;
     removeFile = stateIt->second.removeOnComplete;
+    duration = stateIt->second.usecs;
   }
   xferState.erase (id);
   QFile *fp = xferFile[id];
   QString filename (tr("unknown file"));
+  qDebug () << __PRETTY_FUNCTION__ << " file " << fp;
   if (fp) {
     filename = fp->fileName();
+    qDebug () << __PRETTY_FUNCTION__ 
+              << " closing receive file "  << fp->fileName();
     fp->close();
+    qDebug () << "     file size after close " 
+              << QFileInfo (filename).size ();
+    qDebug () << "     file perms after close " 
+              << QFileInfo (filename).permissions ();
     if (removeFile) {
       fp->remove ();
     }
@@ -795,10 +804,9 @@ ChatContent::CloseTransfer (const QString & id, bool good)
     if (inout == XferInfo::Xfer_In) {
 #if DO_AUDIO
       audio.FinishReceive ();
-#else
-  #if DO_MOBI_AUDIO
-      mobiAudio.FinishReceive ();
-  #endif
+#endif
+#if DO_MOBI_AUDIO
+      mobiAudio.FinishReceive (filename, duration);
 #endif
     } else if (inout == XferInfo::Xfer_Out) {
       ui.samButton->setEnabled (qtAudioOk);
@@ -891,6 +899,7 @@ ChatContent::SendfileSamReq (DirectMessage & msg)
     info.lastChunkAck = 0;
     info.kind = XferInfo::Xfer_Audio;
     info.inout = XferInfo::Xfer_In;
+    info.usecs = msg.Attribute("usecs").toLongLong();
 #if DO_AUDIO
     audio.StartReceive ();
     QFile * fp = audio.InFile ();
