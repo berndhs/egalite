@@ -1,3 +1,7 @@
+* Mon Jun 06 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.20-1
+- audio codec in settings
+- better build
+
 * Mon Jun 06 2011 Bernd Stramm <bernd.stramm@gmail.com> - 0.5.19-1
 - short audio messages using QtMobility
 
