@@ -126,6 +126,8 @@ private:
 
   QList<PlayItem>  playList;
 
+  QString        normalCodec;
+
   Ui_CountDownDisplay ui;
 } ;
 

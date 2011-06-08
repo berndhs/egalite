@@ -27,6 +27,9 @@
 #include <QTimer>
 #include <QUuid>
 #include <QDebug>
+#include "deliberate.h"
+
+using namespace deliberate;
 
 namespace egalite
 {
@@ -40,13 +43,16 @@ MobiAudiMessage::MobiAudiMessage (QWidget *parent)
    player (0),
    recTime (10.0),
    tick (0.0),
-   secsLeft (0.0)
+   secsLeft (0.0),
+   normalCodec ("audio/speex")
 {
   audioSource = new QAudioCaptureSource (this);
   recorder = new QMediaRecorder (audioSource, this);
   player = new QMediaPlayer (this);
   ui.setupUi (this);
   hide ();
+  normalCodec = Settings().value("audio/codec",normalCodec).toString();
+  Settings().setValue ("audio/codec",normalCodec);
   clock.start ();
   inStateText[0] = QString("Stopper");
   inStateText[1] = QString("Recording");
@@ -93,7 +99,7 @@ MobiAudiMessage::Record (const QPoint & where, const QSize & size)
   outFile.setFileName(filename);
   outFile.open( QIODevice::WriteOnly | QIODevice::Truncate );
   
-  outFormat.setCodec("audio/speex");
+  outFormat.setCodec(normalCodec);
   outFormat.setSampleRate (-1);
   outFormat.setBitRate(96000);
   outFormat.setQuality (QtMultimediaKit::NormalQuality);
@@ -260,9 +266,7 @@ void
 MobiAudiMessage::StopPlay ()
 {
   inFile.close ();
-#if 0
   inFile.remove ();
-#endif
   if (player) {
     player->stop();
   }
