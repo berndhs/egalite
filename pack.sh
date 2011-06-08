@@ -2,7 +2,7 @@
 
 NAME=egalite
 CHANGELOG=${NAME}.changes
-DESKTOP=${name}.desktop
+DESKTOP=${NAME}.desktop
 VERSION=`grep "ProgramVersion::VersionNumber" src/version.cpp \
         | awk '{print $3;}' \
         | sed s/[\(\"\;\)]//g`
