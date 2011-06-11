@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 NAME=egalite
 CHANGELOG=${NAME}.changes
