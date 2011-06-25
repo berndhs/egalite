@@ -155,15 +155,21 @@ main (int argc, char* argv[])
 
   egalite::DChatMain  chatmain;
 
-  QString fontFamily ("DejaVu Serif");
-  int pointSize (10);
+  QString defaultFamily = QFont().family ();
+  QString fontFamily ("default");
+  int pointSize (-1);
   fontFamily = deliberate::Settings().value("style/normalfont",fontFamily)
                    .toString();
   deliberate::Settings().setValue ("style/normalfont",fontFamily);
+  if (fontFamily == "default") {
+    fontFamily = defaultFamily;
+  }
   pointSize = deliberate::Settings().value ("style/normalpointsize",pointSize)
                    .toInt ();
   deliberate::Settings().setValue ("style/normalpointsize",pointSize);
-
+  if (pointSize < 0) {
+    pointSize = QFont().pointSize();
+  }
   app.setFont (QFont (fontFamily, pointSize));
 
   chatmain.Init (&app);
@@ -174,6 +180,6 @@ main (int argc, char* argv[])
 
   chatmain.Run ();
   int result = app.exec ();
-  qDebug () << " default font was " << app.font();
+  qDebug () << " default font was " << defaultFamily << QFont().pointSize();
   qDebug () << " application returns " << result;
 }
