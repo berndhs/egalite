@@ -34,6 +34,7 @@
 #include <QtCrypto>
 #include <QStringList>
 #include <QXmppLogger.h>
+#include <QFont>
 #include <QDebug>
 #include "delib-debug.h"
 #include "cmdoptions.h"
@@ -154,6 +155,17 @@ main (int argc, char* argv[])
 
   egalite::DChatMain  chatmain;
 
+  QString fontFamily ("DejaVu Serif");
+  int pointSize (10);
+  fontFamily = deliberate::Settings().value("style/normalfont",fontFamily)
+                   .toString();
+  deliberate::Settings().setValue ("style/normalfont",fontFamily);
+  pointSize = deliberate::Settings().value ("style/normalpointsize",pointSize)
+                   .toInt ();
+  deliberate::Settings().setValue ("style/normalpointsize",pointSize);
+
+  app.setFont (QFont (fontFamily, pointSize));
+
   chatmain.Init (&app);
   chatmain.setWindowTitle (egalite::Magic::Name);
   app.setWindowIcon (chatmain.windowIcon());
@@ -162,5 +174,6 @@ main (int argc, char* argv[])
 
   chatmain.Run ();
   int result = app.exec ();
+  qDebug () << " default font was " << app.font();
   qDebug () << " application returns " << result;
 }

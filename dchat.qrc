@@ -1,106 +1,98 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-  <file alias="dchatlogo.png">images/e6.png</file>
-  <file alias="treeback.png">images/pale.png</file>
-  <file alias="palee6.png">images/pale.png</file>
-</qresource>
-<qresource>
-  <file>qml/IrcChannelBox.qml</file>
-  <file>qml/IrcChannelGroup.qml</file>
-  <file>qml/IrcControl.qml</file>
-  <file>qml/IrcFloatBox.qml</file>
-  <file>qml/ChoiceButton.qml</file>
-  <file>qml/DropMenu.qml</file>
-  <file>qml/KnownServerList.qml</file>
-  <file>qml/ActiveServerList.qml</file>
-</qresource>
-<qresource prefix="/schemas">
-  <file alias="identities.sql">schemafiles/identities.sql</file>
-  <file alias="uniqueident.sql">schemafiles/uniqueident.sql</file>
-  <file alias="directcontacts.sql">schemafiles/directcontacts.sql</file>
-  <file alias="uniquenick.sql">schemafiles/uniquenick.sql</file>
-  <file alias="remotecerts.sql">schemafiles/remotecerts.sql</file>
-  <file alias="uniqueremote.sql">schemafiles/uniqueremote.sql</file>
-  <file alias="uniqueremotecert.sql">schemafiles/uniqueremotecert.sql</file>
-  <file alias="blackcerts.sql">schemafiles/blackcerts.sql</file>
-  <file alias="uniqueblack.sql">schemafiles/uniqueblack.sql</file>
-  <file alias="uniqueblackcert.sql">schemafiles/uniqueblackcert.sql</file>
-  <file alias="serveraccounts.sql">schemafiles/serveraccounts.sql</file>
-  <file alias="uniquejid.sql">schemafiles/uniquejid.sql</file>
-  <file alias="ircservers.sql">schemafiles/ircservers.sql</file>
-  <file alias="uniqueircserver.sql">schemafiles/uniqueircserver.sql</file>
-  <file alias="ircchannels.sql">schemafiles/ircchannels.sql</file>
-  <file alias="uniquechannel.sql">schemafiles/uniquechannel.sql</file>
-  <file alias="ircnicks.sql">schemafiles/ircnicks.sql</file>
-  <file alias="uniqueircnick.sql">schemafiles/uniqueircnick.sql</file>
-  <file alias="ircignore.sql">schemafiles/ircignore.sql</file>
-  <file alias="uniqueircignore.sql">schemafiles/uniqueircignore.sql</file>
-  <file alias="ircmessages.sql">schemafiles/ircmessages.sql</file>
-  <file alias="uniqueircmsgs.sql">schemafiles/uniqueircmsgs.sql</file>
-  <file alias="ircchannelservers.sql">schemafiles/ircchannelservers.sql</file>
-
-</qresource>
-<qresource prefix="/data">
-  <file alias="nobody-key.pem">data/nobody-key.pem</file>
-  <file alias="nobody-cert.pem">data/nobody-cert.pem</file>
-</qresource>
-<qresource prefix="/help">
-  <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
-  <file alias="helpman.html">helpfiles/helpman.html</file>
-</qresource>
-<qresource prefix="/help" lang="fr">
-  <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
-  <file alias="helpman.html">helpfiles/helpman_fr.html</file>
-</qresource>
-<qresource prefix="/translate">
-  <file alias="egalite_fr.qm">translate/egalite_fr.qm</file>
-  <file alias="egalite_de.qm">translate/egalite_de.qm</file>
-</qresource>
-<qresource prefix="icons/16x16/status">
-  <file alias="user-away-extended.png">images/16x16/status/user-away-extended.png</file>
-  <file alias="user-away.png">images/16x16/status/user-away.png</file>
-  <file alias="user-busy.png">images/16x16/status/user-busy.png</file>
-  <file alias="user-invisible.png">images/16x16/status/user-invisible.png</file>
-  <file alias="user-offline.png">images/16x16/status/user-offline.png</file>
-  <file alias="user-online.png">images/16x16/status/user-online.png</file>
-</qresource>
-<qresource prefix="icons/22x22/status">
-  <file alias="user-away-extended.png">images/22x22/status/user-away-extended.png</file>
-  <file alias="user-away.png">images/22x22/status/user-away.png</file>
-  <file alias="user-busy.png">images/22x22/status/user-busy.png</file>
-  <file alias="user-invisible.png">images/22x22/status/user-invisible.png</file>
-  <file alias="user-offline.png">images/22x22/status/user-offline.png</file>
-  <file alias="user-online.png">images/22x22/status/user-online.png</file>
-</qresource>
-<qresource prefix="icons/32x32/status">
-  <file alias="user-away-extended.png">images/32x32/status/user-away-extended.png</file>
-  <file alias="user-away.png">images/32x32/status/user-away.png</file>
-  <file alias="user-busy.png">images/32x32/status/user-busy.png</file>
-  <file alias="user-invisible.png">images/32x32/status/user-invisible.png</file>
-  <file alias="user-offline.png">images/32x32/status/user-offline.png</file>
-  <file alias="user-online.png">images/32x32/status/user-online.png</file>
-</qresource>
-<qresource prefix="icons/48x48/status">
-  <file alias="user-away-extended.png">images/48x48/status/user-away-extended.png</file>
-  <file alias="user-away.png">images/48x48/status/user-away.png</file>
-  <file alias="user-busy.png">images/48x48/status/user-busy.png</file>
-  <file alias="user-invisible.png">images/48x48/status/user-invisible.png</file>
-  <file alias="user-offline.png">images/48x48/status/user-offline.png</file>
-  <file alias="user-online.png">images/48x48/status/user-online.png</file>
-</qresource>
-<qresource prefix="icons/64x64/status">
-  <file alias="user-away-extended.png">images/64x64/status/user-away-extended.png</file>
-  <file alias="user-away.png">images/64x64/status/user-away.png</file>
-  <file alias="user-busy.png">images/64x64/status/user-busy.png</file>
-  <file alias="user-invisible.png">images/64x64/status/user-invisible.png</file>
-  <file alias="user-offline.png">images/64x64/status/user-offline.png</file>
-  <file alias="user-online.png">images/64x64/status/user-online.png</file>
-</qresource>
-<qresource prefix="ircicons">
-  <file alias="active.png">images/irc/user-online.png</file>
-  <file alias="inactive.png">images/irc/user-invisible.png</file>
-  <file alias="dock.png">images/irc/view-minimize.png</file>
-  <file alias="float.png">images/irc/weather-clouds.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file alias="dchatlogo.png">images/e6.png</file>
+        <file alias="treeback.png">images/pale.png</file>
+        <file alias="palee6.png">images/pale.png</file>
+        <file>qml/IrcChannelBox.qml</file>
+        <file>qml/IrcChannelGroup.qml</file>
+        <file>qml/IrcControl.qml</file>
+        <file>qml/IrcFloatBox.qml</file>
+        <file>qml/ChoiceButton.qml</file>
+        <file>qml/DropMenu.qml</file>
+        <file>qml/KnownServerList.qml</file>
+        <file>qml/ActiveServerList.qml</file>
+    </qresource>
+    <qresource prefix="/schemas">
+        <file alias="identities.sql">schemafiles/identities.sql</file>
+        <file alias="uniqueident.sql">schemafiles/uniqueident.sql</file>
+        <file alias="directcontacts.sql">schemafiles/directcontacts.sql</file>
+        <file alias="uniquenick.sql">schemafiles/uniquenick.sql</file>
+        <file alias="remotecerts.sql">schemafiles/remotecerts.sql</file>
+        <file alias="uniqueremote.sql">schemafiles/uniqueremote.sql</file>
+        <file alias="uniqueremotecert.sql">schemafiles/uniqueremotecert.sql</file>
+        <file alias="blackcerts.sql">schemafiles/blackcerts.sql</file>
+        <file alias="uniqueblack.sql">schemafiles/uniqueblack.sql</file>
+        <file alias="uniqueblackcert.sql">schemafiles/uniqueblackcert.sql</file>
+        <file alias="serveraccounts.sql">schemafiles/serveraccounts.sql</file>
+        <file alias="uniquejid.sql">schemafiles/uniquejid.sql</file>
+        <file alias="ircservers.sql">schemafiles/ircservers.sql</file>
+        <file alias="uniqueircserver.sql">schemafiles/uniqueircserver.sql</file>
+        <file alias="ircchannels.sql">schemafiles/ircchannels.sql</file>
+        <file alias="uniquechannel.sql">schemafiles/uniquechannel.sql</file>
+        <file alias="ircnicks.sql">schemafiles/ircnicks.sql</file>
+        <file alias="uniqueircnick.sql">schemafiles/uniqueircnick.sql</file>
+        <file alias="ircignore.sql">schemafiles/ircignore.sql</file>
+        <file alias="uniqueircignore.sql">schemafiles/uniqueircignore.sql</file>
+        <file alias="ircmessages.sql">schemafiles/ircmessages.sql</file>
+        <file alias="uniqueircmsgs.sql">schemafiles/uniqueircmsgs.sql</file>
+        <file alias="ircchannelservers.sql">schemafiles/ircchannelservers.sql</file>
+    </qresource>
+    <qresource prefix="/data">
+        <file alias="nobody-key.pem">data/nobody-key.pem</file>
+        <file alias="nobody-cert.pem">data/nobody-cert.pem</file>
+    </qresource>
+    <qresource prefix="/help">
+        <file alias="helpman.html">helpfiles/helpman.html</file>
+        <file alias="LICENSE.txt">helpfiles/LICENSE.txt</file>
+    </qresource>
+    <qresource prefix="/translate">
+        <file alias="egalite_fr.qm">translate/egalite_fr.qm</file>
+        <file alias="egalite_de.qm">translate/egalite_de.qm</file>
+    </qresource>
+    <qresource prefix="/icons/16x16/status">
+        <file alias="user-away-extended.png">images/16x16/status/user-away-extended.png</file>
+        <file alias="user-away.png">images/16x16/status/user-away.png</file>
+        <file alias="user-busy.png">images/16x16/status/user-busy.png</file>
+        <file alias="user-invisible.png">images/16x16/status/user-invisible.png</file>
+        <file alias="user-offline.png">images/16x16/status/user-offline.png</file>
+        <file alias="user-online.png">images/16x16/status/user-online.png</file>
+    </qresource>
+    <qresource prefix="/icons/22x22/status">
+        <file alias="user-away-extended.png">images/22x22/status/user-away-extended.png</file>
+        <file alias="user-away.png">images/22x22/status/user-away.png</file>
+        <file alias="user-busy.png">images/22x22/status/user-busy.png</file>
+        <file alias="user-invisible.png">images/22x22/status/user-invisible.png</file>
+        <file alias="user-offline.png">images/22x22/status/user-offline.png</file>
+        <file alias="user-online.png">images/22x22/status/user-online.png</file>
+    </qresource>
+    <qresource prefix="/icons/32x32/status">
+        <file alias="user-away-extended.png">images/32x32/status/user-away-extended.png</file>
+        <file alias="user-away.png">images/32x32/status/user-away.png</file>
+        <file alias="user-busy.png">images/32x32/status/user-busy.png</file>
+        <file alias="user-invisible.png">images/32x32/status/user-invisible.png</file>
+        <file alias="user-offline.png">images/32x32/status/user-offline.png</file>
+        <file alias="user-online.png">images/32x32/status/user-online.png</file>
+    </qresource>
+    <qresource prefix="/icons/48x48/status">
+        <file alias="user-away-extended.png">images/48x48/status/user-away-extended.png</file>
+        <file alias="user-away.png">images/48x48/status/user-away.png</file>
+        <file alias="user-busy.png">images/48x48/status/user-busy.png</file>
+        <file alias="user-invisible.png">images/48x48/status/user-invisible.png</file>
+        <file alias="user-offline.png">images/48x48/status/user-offline.png</file>
+        <file alias="user-online.png">images/48x48/status/user-online.png</file>
+    </qresource>
+    <qresource prefix="/icons/64x64/status">
+        <file alias="user-away-extended.png">images/64x64/status/user-away-extended.png</file>
+        <file alias="user-away.png">images/64x64/status/user-away.png</file>
+        <file alias="user-busy.png">images/64x64/status/user-busy.png</file>
+        <file alias="user-invisible.png">images/64x64/status/user-invisible.png</file>
+        <file alias="user-offline.png">images/64x64/status/user-offline.png</file>
+        <file alias="user-online.png">images/64x64/status/user-online.png</file>
+    </qresource>
+    <qresource prefix="/ircicons">
+        <file alias="active.png">images/irc/user-online.png</file>
+        <file alias="inactive.png">images/irc/user-invisible.png</file>
+        <file alias="dock.png">images/irc/view-minimize.png</file>
+        <file alias="float.png">images/irc/weather-clouds.png</file>
+    </qresource>
 </RCC>
-
