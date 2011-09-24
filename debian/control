@@ -1,0 +1,15 @@
+Source: egalite
+Section: user/other
+Priority: optional
+Maintainer: Bernd Stramm <bernd.stramm@gmail.com>
+Build-Depends: debhelper (>= 5), libqt4-dev, libqt4-network, libqt4-declarative,libqtm-sensors-dev, libqtm-systeminfo-dev
+Standards-Version: 3.7.3
+Homepage: http://egalite.sourceforge.net
+
+Package: egalite
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: IRC Chat
+ Chat on XMPP with your friends and enemies;
+ chat over direct SSL connections with spouses and sweethearts separately
+XSBC-Maemo-Display-Name: egalite
