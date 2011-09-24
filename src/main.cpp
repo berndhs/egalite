@@ -31,7 +31,7 @@
 #include <QTranslator>
 #include <QLocale>
 #include <QTextCodec>
-#include <QtCrypto>
+
 #include <QStringList>
 #include <QXmppLogger.h>
 #include <QFont>
@@ -40,6 +40,10 @@
 #include "cmdoptions.h"
 #include "deliberate.h"
 #include "version.h"
+
+#if EGALITE_GENCERT
+  #include <QtCrypto>
+#endif
 
 
 int
@@ -51,7 +55,10 @@ main (int argc, char* argv[])
   deliberate::ProgramVersion pv ("Egalite");
   QCoreApplication::setApplicationVersion (pv.Version());
 
+#if EGALITE_GENCERT
   QCA::Initializer  qcaInit;
+#endif
+  
   QApplication  app (argc,argv);
 
   QSettings  settings;
@@ -62,10 +69,16 @@ main (int argc, char* argv[])
   QStringList  configMessages;  
   configMessages.append (QObject::tr("Build with Qt %1").arg(QT_VERSION_STR));
   configMessages.append (QObject::tr("Running with Qt %1").arg(qVersion()));
-
+  
+  bool qcaGenerateSupported (false);
+  
+#if EGALITE_GENCERT
   QCA::scanForPlugins ();
+  qcaGenerateSupported = QCA::isSupported ("cert");
+#endif
+  
   // We need to ensure that we have certificate handling support
-  if ( !QCA::isSupported( "cert" ) ) {
+  if ( qcaGenerateSupported ) {
     configMessages << "No PKI certificate support on this system" ;
   } else {
     configMessages << " Certificate support available ";

@@ -22,7 +22,10 @@
 
 #include "cert-store.h"
 #include "deliberate.h"
-#include "cert-generate.h"
+
+#if EGALITE_GENCERT
+  #include "cert-generate.h"
+#endif
 
 #include <QDesktopServices>
 #include <QStandardItemModel>
@@ -132,10 +135,13 @@ CertStore::Connect ()
            this, SLOT (NewContact ()));
   connect (uiContact.deleteButton, SIGNAL (clicked()),
            this, SLOT (DeleteContact ()));  
+  
+#if EGALITE_GENCERT
   connect (certGenerate, SIGNAL (NewCertificate(QString,QString,
                                                 QString,QString, bool)),
            this, SLOT (StartNewCert (QString,QString, 
                                      QString, QString, bool)));
+#endif
 
 }
 
@@ -154,7 +160,9 @@ CertStore::Init (QWidget *parent)
   uiEditCert.setupUi (certEditDialog);
   contactDialog = new QDialog (parentWidget);
   uiContact.setupUi (contactDialog);
+#if EGALITE_GENCERT
   certGenerate = new CertGenerate (parentWidget);
+#endif
   Connect ();
   identityModel = new QStandardItemModel (certEditDialog);
   uiListCert.identList->setModel (identityModel);
@@ -205,9 +213,11 @@ CertStore::EnsureNobody ()
 void
 CertStore::CreateCertificate ()
 {
+#if EGALITE_GENCERT
   if (certGenerate == 0) {
   }
   certGenerate->Dialog ();
+#endif
 }
 
 void

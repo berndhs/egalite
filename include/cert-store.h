@@ -42,7 +42,11 @@ namespace egalite
 {
 
 
+#if EGALITE_GENCERT
 class CertGenerate;
+#else
+typedef void CertGenerate;
+#endif
 
 /** \brief CertStore keep track of SSL identities defined by certificates, and
   *  keep track of contact addresses for direct contacts.

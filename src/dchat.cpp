@@ -28,7 +28,7 @@
 #include <QDebug>
 #include <QXmppConfiguration.h>
 #include <QXmppMessage.h>
-#include <QXmppRoster.h>
+#include <QXmppRosterManager.h>
 #include <QXmppRosterIq.h>
 #include <QXmppPresence.h>
 #include <QString>
@@ -1009,17 +1009,17 @@ qDebug () << " polling " << xclient << " at "
   if (xclient == 0) {
     return;
   }
-  QXmppRoster & roster = xclient->getRoster();
-  contactJids = roster.getRosterBareJids();
+  QXmppRosterManager & rosterMgr = xclient->rosterManager();
+  contactJids = rosterMgr.getRosterBareJids();
   xmppConfig = xclient->getConfiguration ();
   QStringList::const_iterator stit;
   QString thisUser = xmppConfig.jidBare ();
 
   for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
-    QStringList resources = roster.getResources (id);
+    QStringList resources = rosterMgr.getResources (id);
     QString res;
-    QXmppRoster::QXmppRosterEntry entry = roster.getRosterEntry (id);
+    QXmppRosterIq::Item entry = rosterMgr.getRosterEntry (id);
     QString remoteName = entry.name();
 qDebug () << " id " << id << " is " << remoteName;
     QStringList::const_iterator   rit;
@@ -1031,7 +1031,7 @@ qDebug () << " setting offline " << id << " for user " << thisUser;
     for (rit = resources.begin (); rit != resources.end (); rit++) {
       res = *rit;
       QString bigId = id + QString("/") + res;
-      QXmppPresence pres = roster.getPresence (id,res);
+      QXmppPresence pres = rosterMgr.getPresence (id,res);
       QXmppPresence::Status status = pres.status();
       contactListModel.UpdateState (remoteName, thisUser, bigId, status);
     } 

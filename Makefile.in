@@ -13,11 +13,11 @@
 #// of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 #//
 
-PRO_FILE = dchat.pro
-MAKEFILE = MakeDChat
+PRO_FILE = egalite-linux.pro
+MAKEFILE = Make_Egalite
 TOP_MAKEFILE = Makefile
 TARGETS = bin/egalite
-DESKTOP_FILE = egalite.desktop
+DESKTOP_FILE = linux/egalite.desktop
 DESKTOP_DIR = /usr/share/applications
 ICON_FILE = egalite.png
 ICON_DIR = /usr/share/pixmaps
