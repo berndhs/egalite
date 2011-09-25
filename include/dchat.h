@@ -21,8 +21,9 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
-#include "ui_dchat.h"
-#include <QMainWindow>
+
+#include <QDeclarativeView>
+#include <QDeclarativeItem>
 #include <QXmppConfiguration.h>
 #include <QXmppPresence.h>
 #include <QXmppIq.h>
@@ -31,7 +32,8 @@
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
 #include <QEvent>
-#include "contact-list-model.h"
+
+#include "xlogin-model.h"
 
 #include "config-edit.h"
 #include "cert-store.h"
@@ -42,9 +44,7 @@
 #include "ui_getpassword.h"
 #include "ui_request-subscribe.h"
 #include "account-edit.h"
-#include "irc-nick-edit.h"
 #include "cert-list-edit.h"
-#include "irc-qml-control.h"
 
 #include <map>
 
@@ -66,7 +66,7 @@ typedef  std::map <QString, ChatBox*>         ChatMap;
 /** \brief The main messenger/chat application.
   */
 
-class DChatMain : public QMainWindow 
+class DChatMain : public QDeclarativeView 
 {
 Q_OBJECT
 
@@ -74,7 +74,7 @@ public:
 
   DChatMain (QWidget * parent = 0);
 
-  void Init (QApplication *pap);
+  void Init (QApplication *pap, bool phone=false);
 
   void Run ();
 
@@ -101,10 +101,8 @@ private slots:
   void Logout ();
   void ListenerAdd ();
   void ListenerDrop ();
-  void RunIrc ();
   void EditSettings ();
   void EditServerLogin ();
-  void EditIrcNick ();
   void RequestSubscribe ();
   void DoRequestSubscribe ();
   void CallDirect ();
@@ -131,9 +129,6 @@ private slots:
   void XmppDiscoveryIqReceived (const QXmppDiscoveryIq & disIq);
   void ExpandAccountView (QModelIndex accountIndex);
 
-  void IrcMenu ();
-  void DirectMenu ();
-  void XmppMenu ();
   void TrayActivated(QSystemTrayIcon::ActivationReason);
   void TrayMenu ();
   void TrayMessageClicked ();
@@ -157,10 +152,8 @@ private:
   void    StartListener (QString ownAddress, 
                          QString directIdentity, 
                          int     publicPort);
-  void    DoMenu (QMenu * menu);
   void    CreateSystemTrayStuff ();
 
-  Ui_DChatMain          ui;
   Ui_GetString          passui;
   Ui_RequestSubscribe   reqSubUi;
   QApplication         *pApp;
@@ -169,15 +162,13 @@ private:
 
   QStringList           configMessages;
 
-  ContactListModel  contactListModel;
+  XLoginModel           xloginModel;
 
   ConfigEdit            configEdit;
   deliberate::HelpView  helpView;
   SubscriptionChange    subscriptionDialog;
   AccountEdit           serverAccountEdit;
-  IrcNickEdit           ircNickEdit;
   CertListEdit          certListEdit;
-  IrcQmlControl        *ircQmlControl;
 
   QXmppConfiguration  xmppConfig;
   int           publicPort;
@@ -195,14 +186,11 @@ private:
   QTimer       *announceHeartbeat;
   QTimer       *statusTimer;
   int           directHeartPeriod;
-  QAction      *actionDirectStatus;
-  QAction      *actionXmppStatus;
-  QAction      *actionIrcStatus;
-  QMenu        *ircMenu;
-  QMenu        *directMenu;
-  QMenu        *xmppMenu;
-  QMenu        *trayMenu;
+  bool          isPhone;
   QSystemTrayIcon  *trayIcon;
+  QMenu            *trayMenu;
+  
+  QDeclarativeItem *qmlRoot;
 
 
   std::map <QString, XEgalClient*>    xclientMap;

@@ -117,6 +117,7 @@ main (int argc, char* argv[])
   opts.AddStringOption ("logdebug","L",QObject::tr("write Debug log to file"));
   opts.AddStringOption ("lang","l",
                    QObject::tr("language (2-letter lower case)"));
+  opts.AddSoloOption ("phone","P",QObject::tr("use phone user interface"));
 
   deliberate::UseMyOwnMessageHandler ();
 
@@ -167,7 +168,7 @@ main (int argc, char* argv[])
   qDebug () << " plugin library paths " <<  QCoreApplication::libraryPaths();
 
   egalite::DChatMain  chatmain;
-
+#if 0
   QString defaultFamily = QFont().family ();
   QString fontFamily ("default");
   int pointSize (-1);
@@ -184,8 +185,15 @@ main (int argc, char* argv[])
     pointSize = QFont().pointSize();
   }
   app.setFont (QFont (fontFamily, pointSize));
-
-  chatmain.Init (&app);
+#endif
+  bool isPhone = opts.SeenOpt("phone");
+  if (isPhone) {
+    QFont font = app.font();
+    font.setPointSize(font.pointSize()+6);
+    app.setFont(font);
+  }
+  qDebug () << " setting point size to " << app.font().pointSize();
+  chatmain.Init (&app,isPhone);
   chatmain.setWindowTitle (egalite::Magic::Name);
   app.setWindowIcon (chatmain.windowIcon());
 
@@ -193,6 +201,5 @@ main (int argc, char* argv[])
 
   chatmain.Run ();
   int result = app.exec ();
-  qDebug () << " default font was " << defaultFamily << QFont().pointSize();
   qDebug () << " application returns " << result;
 }

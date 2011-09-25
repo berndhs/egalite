@@ -157,7 +157,6 @@ FORMS = \
 	ui/server-account.ui \
 	ui/count-down.ui \
 	ui/cert-list.ui \
-        ui/irc-account.ui \
         ui/enter-string.ui \
         ui/edit-simple.ui \
 
@@ -190,21 +189,16 @@ SOURCES = \
 	src/direct-message.cpp \
 	src/direct-parser.cpp \
 	src/cert-list-edit.cpp \
-        src/irc-qml-channel-group.cpp \
-        src/irc-abstract-channel.cpp \
-        src/irc-float.cpp \
-        src/irc-qml-control.cpp \
-        src/irc-socket.cpp \
-        src/irc-ctcp.cpp \
-        src/irc-qml-sock-static.cpp \
-        src/irc-nick-edit.cpp \
-        src/irc-text-browser.cpp \
-        src/irc-known-server-model.cpp \
-        src/irc-active-server-model.cpp \
         src/enter-string.cpp \
         src/edit-simple.cpp \
         src/name-list-model.cpp \
         src/qml-view.cpp \
+    src/xlogin-model.cpp \
+    src/xcontact-model.cpp
+
+
+
+
 
 audio {
 	SOURCES += src/audio-message.cpp
@@ -245,21 +239,12 @@ HEADERS += \
 	include/direct-message.h \
 	include/direct-parser.h \
 	include/cert-list-edit.h \
-        include/irc-qml-channel-group.h \
-        include/irc-abstract-channel.h \
-        include/irc-qml-control.h \
-        include/irc-socket.h \
-        include/irc-ctcp.h \
-        include/irc-qml-sock-static.h \
-        include/irc-float.h \
-        include/irc-nick-edit.h \
-        include/irc-text-browser.h \
-        include/irc-known-server-model.h \
-        include/irc-active-server-model.h \
         include/enter-string.h \
         include/edit-simple.h \
         include/name-list-model.h \
         include/qml-view.h \
+    include/xlogin-model.h \
+    include/xcontact-model.h
 
 audio {
 	HEADERS += include/audio-message.h
@@ -273,6 +258,12 @@ gencert {
   SOURCES += src/cert-generate.cpp 
   HEADERS += include/cert-generate.h
 }
+
+
+
+
+
+
 
 
 

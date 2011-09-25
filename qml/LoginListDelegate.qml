@@ -27,17 +27,20 @@ import QtQuick 1.0
 Rectangle {
   id: loginListDelegate
   property real mainWidth: 512
+  property real rowHeight: 48
 
   Row {
     id: contactNameRow
     Rectangle {
       id: showHideMarker
-      width: 48
-      height: 48
+      width: loginListDelegate.rowHeight
+      height: loginListDelegate.rowHeight
       property bool showDetails: false
       Text {
         id: showHideMarkerText
         anchors.centerIn: parent
+        font.bold: true
+        font.pointSize: 30
         text: showHideMarker.showDetails ? "-" : "+"
       }
       MouseArea {
@@ -50,17 +53,19 @@ Rectangle {
     Rectangle {
       id: jidBox
       width: loginListDelegate.mainWidth * 0.5
+      height: loginListDelegate.rowHeight
       Text {
         id: jidBoxText
-        text: contactJid
+        text: loginJid
       }
     }
     Rectangle {
       id: nameBox
       width: loginListDelegate.mainWidth * 0.5
+      height: loginListDelegate.rowHeight
       Text {
         id: nameBoxText
-        text: contactName
+        text: loginName
       }
     }
   }
@@ -69,16 +74,19 @@ Rectangle {
     id: contactLoginBox
     property real indent: 24
     width: loginListDelegate.mainWidth - indent
+    height: showHideMarker.showDetails ? detailColumn.height : 0
     anchors {
       top: contactNameRow.bottom
       left: loginListDelegate.horizontalCenter
       leftMargin: indent - 0.5 * loginListDelegate.mainWidth
     }
     Column {
+      id: detailColumn
       Repeater {
-        model: cppLoginModel.logins (contactJid)
+        model: cppLoginModel.contacts (loginJid)
         delegate: Rectangle {
           width: contactLoginBox.width
+          height: loginListDelegate.rowHeight
           Flow {
             Text {
               text: contactLoginStatus
