@@ -43,6 +43,7 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <set>
+#include <QUuid>
 
 #include "direct-listener.h"
 #include "direct-caller.h"
@@ -61,7 +62,7 @@ DChatMain::DChatMain (QWidget *parent)
   :QDeclarativeView (parent),
    pApp (0),
    haveOldPos (false),
-   xloginModel (this),
+   xcontactModel (this),
    configEdit (this),
    helpView (this),
    subscriptionDialog (this),
@@ -125,6 +126,12 @@ DChatMain::Init (QApplication *pap, bool phone)
 {
   pApp = pap;
   isPhone = phone;
+  xcontactModel.updateState ("nobody@pirx.berndnet","bob@chat.bobhost.com",
+                           "Sleeping","Roberto",
+                           QXmppPresence::Status::Away);
+  xcontactModel.updateState ("nobody@pirx.berndnet","alice@chat.bobhost.com",
+                           "Waiting","Alicia",
+                           QXmppPresence::Status::Online);
 }
 
 void
@@ -148,11 +155,21 @@ DChatMain::Run ()
                                       directHeartPeriod).toInt();
   Settings().setValue ("direct/heartperiodsecs",directHeartPeriod);
   QDeclarativeContext * context = rootContext();
-  context->setContextProperty("cppLoginModel",&xloginModel);
+  context->setContextProperty("cppContactModel",&xcontactModel);
   setSource(QUrl("qrc:///qml/Main.qml"));
+  setResizeMode(QDeclarativeView::SizeRootObjectToView);
   qmlRoot = qobject_cast<QDeclarativeItem*> (rootObject());
   connect (qmlRoot,SIGNAL(doQuit()), this, SLOT(Quit()));
+  connect (qmlRoot,SIGNAL(doLogin()), this, SLOT (Login()));
+  connect (qmlRoot, SIGNAL(wantChat(const QString&,const QString &)),
+           this,SLOT(StartServerChat(const QString&,const QString&)));
   
+  if (isPhone) {
+    showFullScreen ();
+  } else {
+    resize (QSize (800,500));
+    showNormal ();
+  }
   show ();
   SetupListener ();
   Settings().sync ();
@@ -323,12 +340,18 @@ DChatMain::Login ()
     XEgalClient * xclient = xclientMap[user];
     if (!xclient) {
       xclient = new XEgalClient (this, user);
-      xloginModel.addLogin (user,"");
       xclientMap[user] = xclient;
     }
-    QXmppConfiguration & xconfig = xclient->getConfiguration();
-    xconfig.setResource ("Egalite.");
-    xclient->connectToServer (server,user, password);
+    QXmppConfiguration  & xconfig = xclient->configuration();
+    xconfig.setJid (user);
+    xconfig.setHost (server);
+    xconfig.setPasswd(password);
+    xconfig.setResource (QString ("Egalite.%1")
+                         .arg(QUuid::createUuid().toString()
+                              .remove(QRegExp("[{}-]"))));
+    qDebug () << " after setting resource before connect " << xconfig.resource();
+    xclient->connectToServer (xconfig);
+    qDebug () << " after setting resource after connect " << xconfig.resource();
     xmppUser = user;
     connect (xclient, SIGNAL (messageReceived  (const QXmppMessage  &)),
              this, SLOT (GetMessage (const QXmppMessage &)));
@@ -389,7 +412,7 @@ DChatMain::AnnounceMe ()
     if (xit->second) {
       xit->second->Announce (QXmppPresence::Available,
                              QXmppPresence::Status::Online,
-                             QString ("Egalite!"));
+                             isPhone ? QString ("Egalite! mobile") : QString ("Egalite!"));
     }
   }
 }
@@ -602,7 +625,7 @@ DChatMain::Logout ()
     return;
   }
   QString expired = pickString.Choice();
-  xloginModel.removeLogin (expired);
+  xcontactModel.removeMyJid (expired);
   XEgalClient * xclient = xclientMap [expired];
   if (xclient) {
     xclient->Disconnect ();
@@ -702,7 +725,7 @@ Q_UNUSED (localNick);
 }
 
 void
-DChatMain::StartServerChat (QString remoteName, QString serverLogin)
+DChatMain::StartServerChat (const QString & remoteName, const QString & serverLogin)
 {
 qDebug () << " starting new server chat for remote " << remoteName;
 qDebug () << "                              local  " << serverLogin;
@@ -831,7 +854,8 @@ DChatMain::XUpdateState (QString remoteName,
                          QString remoteId,
                          QXmppPresence::Status status)
 {
-  xloginModel.updateState (ownId,remoteId,remoteName, status.type());
+  xcontactModel.updateState (remoteId, ownId, remoteName, 
+                            status.getStatusText(), status.type());
 }
 
 void
@@ -903,11 +927,12 @@ qDebug () << " polling " << xclient << " at "
   }
   QXmppRosterManager & rosterMgr = xclient->rosterManager();
   contactJids = rosterMgr.getRosterBareJids();
-  xmppConfig = xclient->getConfiguration ();
-  QStringList::const_iterator stit;
+  xmppConfig = xclient->configuration ();
+  xmppConfig.setResource ("Egalite.");
+  //QStringList::const_iterator stit;
   QString thisUser = xmppConfig.jidBare ();
 
-  for (stit = contactJids.begin (); stit != contactJids.end (); stit++) {
+  for (auto stit = contactJids.begin (); stit != contactJids.end (); stit++) {
     QString id = *stit;
     QStringList resources = rosterMgr.getResources (id);
     QString res;
@@ -916,15 +941,16 @@ qDebug () << " polling " << xclient << " at "
 qDebug () << " id " << id << " is " << remoteName;
     QStringList::const_iterator   rit;
     if (resources.size () == 0) {
-qDebug () << " setting offline " << id << " for user " << thisUser;
-      xloginModel.updateStateAll(thisUser,id,QXmppPresence::Status::Offline);
+qDebug () << "    model-update setting offline " << id << " for user " << thisUser;
+      xcontactModel.updateStateAll(id,QXmppPresence::Status::Offline);
     }
     for (rit = resources.begin (); rit != resources.end (); rit++) {
       res = *rit;
       QString bigId = id + QString("/") + res;
       QXmppPresence pres = rosterMgr.getPresence (id,res);
       QXmppPresence::Status status = pres.status();
-      xloginModel.updateState (thisUser,bigId,remoteName,status.type());
+      qDebug () << "    model-update status of " << bigId << status.type();
+      xcontactModel.updateState (thisUser,bigId,remoteName,status.getStatusText(),status.type());
     } 
   }
 }

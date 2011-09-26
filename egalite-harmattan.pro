@@ -2,10 +2,13 @@
 PROJECT = egalite
 
 CONFIG -= gencert
+CONFIG += egalite_harmattan
+CONFIG -= mobileaudio
 
 INCLUDEPATH += /opt/qxmpp/include/qxmpp
 
 LIBS += -L/opt/qxmpp/lib
+LIBS += -lqxmpp
 
 include ("egalite-common.pri")
 
@@ -15,7 +18,8 @@ OTHER_FILES += \
     qtc_packaging/debian_harmattan/copyright \
     qtc_packaging/debian_harmattan/control \
     qtc_packaging/debian_harmattan/compat \
-    qtc_packaging/debian_harmattan/changelog
+    qtc_packaging/debian_harmattan/changelog \
+    qml/ContactDelegate.qml
 
 
 contains(MEEGO_EDITION,harmattan) {
@@ -34,3 +38,4 @@ contains(MEEGO_EDITION,harmattan) {
     desktop.path = /usr/share/applications
     INSTALLS += desktop
 }
+

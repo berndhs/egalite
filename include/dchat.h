@@ -33,7 +33,7 @@
 #include <QCloseEvent>
 #include <QEvent>
 
-#include "xlogin-model.h"
+#include "xcontact-model.h"
 
 #include "config-edit.h"
 #include "cert-store.h"
@@ -108,7 +108,7 @@ private slots:
   void CallDirect ();
   void ClearCall (int callid);
   void ConnectDirect (SymmetricSocket *direct, QString localNick);
-  void StartServerChat (QString remoteName, QString login);
+  void StartServerChat (const QString & remoteName, const QString & login);
   void CloseServerChat (QString remoteName);
   void ClearDirect (SymmetricSocket *direct);
   void XmppPoll ();
@@ -162,7 +162,7 @@ private:
 
   QStringList           configMessages;
 
-  XLoginModel           xloginModel;
+  XContactModel         xcontactModel;
 
   ConfigEdit            configEdit;
   deliberate::HelpView  helpView;

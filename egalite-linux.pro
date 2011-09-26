@@ -3,9 +3,12 @@ PROJECT = egalite
 
 CONFIG += gencert
 
-CONFIG += lib_pkgconfig
+#CONFIG += lib_pkgconfig
 
-PKGCONFIG += qxmpp
+#PKGCONFIG += qxmpp
+
+INCLUDEPATH += /usr/lib64/qt4/include/qxmpp
+LIBS += -lqxmpp
 
 include ("egalite-common.pri")
 

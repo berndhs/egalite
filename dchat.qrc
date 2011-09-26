@@ -72,7 +72,7 @@
     </qresource>
     <qresource prefix="/qml">
         <file alias="Main.qml">qml/Main.qml</file>
-        <file alias="LoginListDelegate.qml">qml/LoginListDelegate.qml</file>
         <file alias="ChoiceButton.qml">qml/ChoiceButton.qml</file>
+        <file alias="ContactDelegate.qml">qml/ContactDelegate.qml</file>
     </qresource>
 </RCC>

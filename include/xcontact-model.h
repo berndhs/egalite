@@ -27,7 +27,9 @@
 #include <QAbstractListModel>
 #include <QXmppPresence.h>
 #include <QString>
+#include <QStringList>
 #include <QList>
+#include "xcontact-login-model.h"
 
 namespace egalite
 {
@@ -38,38 +40,57 @@ public:
  
   XContactItem () {}
   XContactItem (const QString & jid,
-                const QString & name,
-                const QString & resource,
-                QXmppPresence::Status::Type presence)
+                const QString & name)
     :theJid (jid),
-     theName (name),
-     theResource (resource),
-     thePresence (presence)
+     theName (name)
   {}
   XContactItem (const XContactItem & other)
     :theJid (other.theJid),
      theName (other.theName),
-     theResource (other.theResource),
-     thePresence (other.thePresence)
-  {}
+     theLogins (),
+     theIdentities (other.theIdentities)
+  {
+    theLogins.copyLogins (other.theLogins);
+  }
+  
+  XContactItem & operator = (const XContactItem & other) 
+  {
+    if (&other != this) {
+      theJid = other.theJid;
+      theName = other.theName;
+      theLogins.copyLogins (other.theLogins);
+      theIdentities = other.theIdentities;
+    }
+    return *this;
+  }
   
   QString jid () const { return theJid; }
   QString name () const { return theName; }
-  QString resource () const { return theResource; }
-  QXmppPresence::Status::Type presence () const { return thePresence; }
   
   void setJid (const QString & jid) { theJid = jid; }
   void setName (const QString & name) { theName = name; }
-  void setResource (const QString & resource) { theResource = resource; }
-  void setPresence (QXmppPresence::Status::Type presence) 
-    { thePresence = presence; }
+  
+  int loginCount () const { return theLogins.rowCount(); }
+  
+  const XContactLoginModel & loginsRef () const 
+    { return theLogins; }
+  XContactLoginModel & loginsRef () 
+    { return theLogins; }
+  
+  Q_INVOKABLE const XContactLoginModel * logins () const 
+    { return &theLogins; }
+
+  QStringList & identities () { return theIdentities; }
+  const QStringList & identities () const { return theIdentities; }
+  
+  Q_INVOKABLE QString imageName (const int statusCode) const;
   
 private:
   
   QString                      theJid;
   QString                      theName;
-  QString                      theResource;
-  QXmppPresence::Status::Type  thePresence;
+  XContactLoginModel           theLogins;
+  QStringList                  theIdentities;
 };
 
 class XContactModel: public QAbstractListModel
@@ -80,29 +101,46 @@ public:
 
   XContactModel (QObject *parent=0);
   
-  int rowCount (const QModelIndex &parent) const;
+  int rowCount (const QModelIndex &parent = QModelIndex()) const;
   QVariant data (const QModelIndex &index, int role) const;
   
+  const XContactLoginModel * loginModel (const QString & otherJid) const;
+      
   void clear ();
   
   void addContact (const XContactItem & item);
   void removeContact (const QString & longId);
-  void updateState (const QString & longId, const QString & name, 
+  void updateState (const QString & longOtherJid, 
+                    const QString & myJid,
+                    const QString & name, 
+                    const QString & statusText,
                     QXmppPresence::Status::Type stype);
-  void updateStateAll (const QString & longId, QXmppPresence::Status::Type stype);
+  void updateStateAll (const QString & longId, 
+                    QXmppPresence::Status::Type stype);
+  void removeMyJid (const QString & myJid);
 
-
+  Q_INVOKABLE  QString imageName(const int statusCode) const;
+  
+signals:
+  
+  void newContact (const QString & jid);
+  
 private:
 
   enum Data_Types {
-    Data_Jid = Qt::UserRole +1,
-    Data_Name = Qt::UserRole +2,
-    Data_Resource = Qt::UserRole +3,
-    Data_Presence = Qt::UserRole +4
+    Data_OtherJid = Qt::UserRole +1,
+    Data_OtherName = Qt::UserRole +2,
+    Data_LoginCount = Qt::UserRole +3,
+    Data_MyJid = Qt::UserRole +4,
+    Data_BestStatus = Qt::UserRole +5
   };
+  
+  int bestStatus (int row) const;
+  
+  static QMap<QXmppPresence::Status::Type,int> initStatusPriorities ();
 
   QList<XContactItem>  contacts;
-  
+ 
 };
 
 } // namespace

@@ -44,6 +44,8 @@ CODEFORTR = UTF-8
 message ("generating MAKEFILE as $$MAKEFILE")
 QT += core gui network xml xmlpatterns sql webkit declarative
 
+QMAKE_CXXFLAGS += --std=c++0x
+
 
 DEFINES += DELIBERATE_QTM1=$$QT_MAJOR_VERSION
 DEFINES += DELIBERATE_QTM2=$$QT_MINOR_VERSION
@@ -60,13 +62,22 @@ INCLUDEPATH += ./include
 
 unix {
   message ("Applying Unix settings")
-  !include ( options.pri ) {
-    LIBS += -L./qxmpp/lib -lqxmpp 
+  egalite_harmattan {
     DEFINES += DO_AUDIO=0
-    message ("No options.pri, using default $$INCLUDEPATH")
+    mobilaudio {
+      DEFINES += DO_MOBI_AUDIO=1
+    } else {
+      DEFINES += DO_MOBI_AUDIO=0
+    }
   } else {
-    DEFINES += DO_AUDIO=$$DO_AUDIO
-    LIBX += -L./qxmpp/lib -lqxmpp 
+    !include ( options.pri ) {
+      LIBS += -L./qxmpp/lib -lqxmpp 
+      DEFINES += DO_AUDIO=0
+      message ("No options.pri, using default $$INCLUDEPATH")
+    } else {
+      DEFINES += DO_AUDIO=$$DO_AUDIO
+      LIBS += -L./qxmpp/lib -lqxmpp 
+    }
   }
   message ("include path: $$INCLUDEPATH")
   DEFINES += DELIBERATE_DEBUG=1
@@ -123,7 +134,7 @@ mobilaudio {
 
 message ("QT variable is $$QT")
 
-build_x86 {
+!egalite_harmattan:build_x86 {
   QMAKE_LFLAGS += "-z noexecstack"
 }
 
@@ -193,20 +204,9 @@ SOURCES = \
         src/edit-simple.cpp \
         src/name-list-model.cpp \
         src/qml-view.cpp \
-    src/xlogin-model.cpp \
-    src/xcontact-model.cpp
+    src/xcontact-model.cpp \
+    src/xcontact-login-model.cpp
 
-
-
-
-
-audio {
-	SOURCES += src/audio-message.cpp
-}
-
-mobilaudio {
-	SOURCES += src/mobi-audi-message.cpp
-}
 
 
 
@@ -243,21 +243,26 @@ HEADERS += \
         include/edit-simple.h \
         include/name-list-model.h \
         include/qml-view.h \
-    include/xlogin-model.h \
-    include/xcontact-model.h
+    include/xcontact-model.h \
+    include/xcontact-login-model.h
+
 
 audio {
-	HEADERS += include/audio-message.h
+  HEADERS += include/audio-message.h
+  SOURCES += src/audio-message.cpp
 }
 
 mobilaudio {
-	HEADERS += include/mobi-audi-message.h
+  HEADERS += include/mobi-audi-message.h
+  SOURCES += src/mobi-audi-message.cpp
 }
 
 gencert {
-  SOURCES += src/cert-generate.cpp 
   HEADERS += include/cert-generate.h
+  SOURCES += src/cert-generate.cpp 
 }
+
+
 
 
 

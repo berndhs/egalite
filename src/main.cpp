@@ -119,7 +119,7 @@ main (int argc, char* argv[])
                    QObject::tr("language (2-letter lower case)"));
   opts.AddSoloOption ("phone","P",QObject::tr("use phone user interface"));
 
-  deliberate::UseMyOwnMessageHandler ();
+ // deliberate::UseMyOwnMessageHandler ();
 
   bool optsOk = opts.Parse (argc, argv);
   if (!optsOk) {

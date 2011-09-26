@@ -37,11 +37,13 @@ Rectangle {
   property real rowHeight: 48
   
   signal doQuit ()
+  signal doLogin ()
+  signal wantChat (string remoteJid, string loginJid)
   
   Rectangle {
     id: brandingBox
     width: mainBox.mainWidth
-    color: "blue"
+    color: "#aaddff"
     height: mainBox.rowHeight
     anchors {
       top: mainBox.top
@@ -53,18 +55,29 @@ Rectangle {
         top: brandingBox.top
         horizontalCenter: brandingBox.horizontalCenter
       }
+      
+      ChoiceButton {
+        id: loginButton
+        height: brandingBox.height
+        topColor:"#ffaadd"
+        radius: height * 0.5
+        labelText: qsTr("Login XMPP")
+        
+        onClicked: {
+          mainBox.doLogin()
+        }
+      }  
     
       Rectangle {
         id: programNameBox
         width:programNameText.width * 2
         height: brandingBox.height
-        color:Qt.lighter (brandingBox.color)
-        radius:0.5*height
+        color: "transparent"
         Text {
           id: programNameText
           anchors.centerIn: parent
           font.bold: true
-          text:"Egalitè"
+          text:"Egalite"
         }
       }
       
@@ -82,18 +95,31 @@ Rectangle {
     }
   }
 
-  ListView {
-    id: loginList
-    model: cppLoginModel
+  ListView   {
+    id: contactList
+    model: cppContactModel
+    width: mainBox.mainWidth
+    height: mainBox.mainHeight - brandingBox.height
+    clip: true
     anchors {
       top:brandingBox.bottom
       horizontalCenter: mainBox.horizontalCenter
     }
-    width: mainBox.mainWidth
-    height: mainBox.mainHeight - brandingBox.height
 
-    delegate: LoginListDelegate {
+    delegate: ContactDelegate {
       mainWidth: mainBox.mainWidth
+      width: mainBox.mainWidth
+      onClickedImage: { 
+        console.log (" clicked image for " + contactJid)
+        mainBox.wantChat (contactJid, loginJid)
+      }
+      onClickedJid: {
+        console.log ("clicked Jid " +contactJid)
+        mainBox.wantChat (contactJid, loginJid)
+      }
+      onClickedLogin: {
+        console.log ("clicked login " + contactJid +"/" + contactResource)
+      }
     }
   }
 }
