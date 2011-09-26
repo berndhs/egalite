@@ -40,6 +40,7 @@ XContactModel::XContactModel (QObject *parent)
   roles[Data_LoginCount] = "contactLoginCount";
   roles[Data_MyJid] = "contactMyJid";
   roles[Data_BestStatus] = "contactBestStatus";
+  roles[Data_ChatAvailable] = "isOnline";
   setRoleNames (roles);
 }
 
@@ -77,6 +78,9 @@ XContactModel::data (const QModelIndex &index, int role) const
     } else {
       retVar = tr ("unkown identify");
     }
+    break;
+  case Data_ChatAvailable:
+    retVar = chatAvailable(row);
     break;
   default:
     qDebug () << __PRETTY_FUNCTION__ << " bad role " << role;
@@ -125,6 +129,15 @@ XContactModel::initStatusPriorities ()
   levels[QXmppPresence::Status::Invisible] = 5;
   qDebug () << __PRETTY_FUNCTION__ << levels;
   return levels;
+}
+
+bool
+XContactModel::chatAvailable(int row) const
+{
+  QXmppPresence::Status::Type stype = 
+      static_cast<QXmppPresence::Status::Type>(bestStatus(row));
+  return (stype != QXmppPresence::Status::Offline)
+      && (stype != QXmppPresence::Status::Invisible);
 }
 
 QString

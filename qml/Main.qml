@@ -36,6 +36,8 @@ Rectangle {
   property real mainHeight: isPortrait ? width: height
   property real rowHeight: 48
   
+  property bool showOfflines: true
+  
   signal doQuit ()
   signal doLogin ()
   signal wantChat (string remoteJid, string loginJid)
@@ -77,7 +79,7 @@ Rectangle {
           id: programNameText
           anchors.centerIn: parent
           font.bold: true
-          text:"Egalite"
+          text:"Egalité"
         }
       }
       
@@ -92,6 +94,35 @@ Rectangle {
           mainBox.doQuit()
         }
       }
+      
+      ChoiceButton {
+        id: menuButton
+        height: brandingBox.height 
+        width: height
+        topColor:"#ddbbdd"
+        radius: height * 0.5
+        labelText: qsTr("Menu")
+        onClicked: {
+          console.log ("clicked menu button")
+          moreMenu.isShown = ! moreMenu.isShown
+          console.log (" isShown " + moreMenu.isShown)
+        }
+      }
+    }
+  }
+  
+  MoreMenu {
+    id: moreMenu
+    isShown: false
+    rowHeight: mainBox.rowHeight
+    z: contactList.z + 2
+    anchors {
+      top: brandingBox.bottom
+      topMargin: mainBox.rowHeight * 0.5
+      horizontalCenter: mainBox.horizontalCenter
+    }
+    onDoShowOfflines: {
+      mainBox.showOfflines = show
     }
   }
 
@@ -109,6 +140,8 @@ Rectangle {
     delegate: ContactDelegate {
       mainWidth: mainBox.mainWidth
       width: mainBox.mainWidth
+      showOfflines: mainBox.showOfflines
+      heightWhenVisible: mainBox.rowHeight
       onClickedImage: { 
         console.log (" clicked image for " + contactJid)
         mainBox.wantChat (contactJid, loginJid)

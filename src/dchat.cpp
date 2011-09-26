@@ -126,12 +126,6 @@ DChatMain::Init (QApplication *pap, bool phone)
 {
   pApp = pap;
   isPhone = phone;
-  xcontactModel.updateState ("nobody@pirx.berndnet","bob@chat.bobhost.com",
-                           "Sleeping","Roberto",
-                           QXmppPresence::Status::Away);
-  xcontactModel.updateState ("nobody@pirx.berndnet","alice@chat.bobhost.com",
-                           "Waiting","Alicia",
-                           QXmppPresence::Status::Online);
 }
 
 void
@@ -173,7 +167,6 @@ DChatMain::Run ()
   show ();
   SetupListener ();
   Settings().sync ();
-  Login ();  
 }
 
 void

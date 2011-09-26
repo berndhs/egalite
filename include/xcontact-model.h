@@ -132,10 +132,12 @@ private:
     Data_OtherName = Qt::UserRole +2,
     Data_LoginCount = Qt::UserRole +3,
     Data_MyJid = Qt::UserRole +4,
-    Data_BestStatus = Qt::UserRole +5
+    Data_BestStatus = Qt::UserRole +5,
+    Data_ChatAvailable = Qt::UserRole +6
   };
   
   int bestStatus (int row) const;
+  bool chatAvailable (int row) const;
   
   static QMap<QXmppPresence::Status::Type,int> initStatusPriorities ();
 

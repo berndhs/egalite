@@ -73,6 +73,8 @@
     <qresource prefix="/qml">
         <file alias="Main.qml">qml/Main.qml</file>
         <file alias="ChoiceButton.qml">qml/ChoiceButton.qml</file>
+        <file alias="DropMenu.qml">qml/DropMenu.qml</file>
+        <file alias="MoreMenu.qml">qml/MoreMenu.qml</file>
         <file alias="ContactDelegate.qml">qml/ContactDelegate.qml</file>
     </qresource>
 </RCC>

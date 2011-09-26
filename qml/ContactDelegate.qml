@@ -3,15 +3,19 @@ import QtQuick 1.0
 Rectangle {
   id: mainBox
   width: 400
-  height: 48
-  color: "red"
-  border.color: "blue"; border.width: 3
+  color: "#eeeecc"
+  border.color: Qt.lighter(color); border.width: 2
   property string imageDir: ":/icons/64x64/status/"
   property real imageWidth: 48
   property real imageHeight: 48
   property bool showMyJid: false
   property bool showLogins: false
   property real mainWidth: width
+  property bool showOfflines: true
+  property real heightWhenVisible: 48
+  
+  height: visible ? heightWhenVisible : 0
+  visible: showOfflines || isOnline
   
   signal clickedImage (string contactJid, string loginJid)
   signal clickedJid (string contactJid, string loginJid)
@@ -39,7 +43,7 @@ Rectangle {
 
     Text {
       id: loginCountText
-      text: " [" + contactLoginCount + "] "
+      text: " (" + contactLoginCount + ") "
       MouseArea {
         anchors.fill: parent
         onPressAndHold: {
@@ -50,7 +54,7 @@ Rectangle {
 
     Text {
       id: jidText
-      text: "Jid: " + contactOtherJid
+      text: contactOtherJid
       MouseArea {
         anchors.fill: parent
         onClicked: {
