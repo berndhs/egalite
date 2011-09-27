@@ -309,8 +309,9 @@ XContactModel::removeMyJid (const QString & myJid)
 QString
 XContactModel::resourceList (int row) const
 {
-  QString resourcePattern ("<img height=\"%5\" width=\"%6\" src=\"%4\">"
-                           "<a href=\"xmppresource://%1\">%2</a> %3");
+  QString resourcePattern ("<a href=\"xmppresource://%1\">"
+                           "<img height=\"%5\" width=\"%6\" src=\"%4\">"
+                           "%2 &nbsp;&nbsp; %3</a>");
   QStringList lines;
   const QList<XContactLoginItem> & resourceItems = contacts.at(row).loginsRef().itemsRef();
   for (auto res = resourceItems.constBegin(); 

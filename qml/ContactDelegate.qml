@@ -21,6 +21,7 @@ Rectangle {
   signal clickedImage (string contactJid, string loginJid)
   signal clickedJid (string contactJid, string loginJid)
   signal clickedLogin (string contactJid, string loginJid, string contactResource)
+  signal clickedLink (string contactJid, string linkText)
   
   Flow {
     id: mainFlow
@@ -79,7 +80,7 @@ Rectangle {
     }
     Text {
       id: nameText
-      text: "Name: " + contactOtherName
+      text: contactOtherName
     }
     Rectangle {
       id: ownJidBox
@@ -106,6 +107,10 @@ Rectangle {
       Text {
         id: resourceListText
         text: resourceList
+        onLinkActivated: {
+          mainBox.clickedLink (contactOtherJid, link)
+          console.log ("clicked link " + link)
+        }
       }
     }
   }
