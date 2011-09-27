@@ -119,7 +119,7 @@ public:
                     QXmppPresence::Status::Type stype);
   void removeMyJid (const QString & myJid);
 
-  Q_INVOKABLE  QString imageName(const int statusCode) const;
+  Q_INVOKABLE  QString imageName(int statusCode) const;
   
 signals:
   
@@ -133,11 +133,13 @@ private:
     Data_LoginCount = Qt::UserRole +3,
     Data_MyJid = Qt::UserRole +4,
     Data_BestStatus = Qt::UserRole +5,
-    Data_ChatAvailable = Qt::UserRole +6
+    Data_ChatAvailable = Qt::UserRole +6,
+    Data_ResourceList = Qt::UserRole +7
   };
   
   int bestStatus (int row) const;
   bool chatAvailable (int row) const;
+  QString resourceList (int row) const;
   
   static QMap<QXmppPresence::Status::Type,int> initStatusPriorities ();
 

@@ -66,16 +66,12 @@ private:
   QXmppPresence::Status::Type  thePresence;
 };
 
-class XContactLoginModel: public QAbstractListModel
+class XContactLoginModel
 {
-Q_OBJECT
 
 public:
 
-  XContactLoginModel (QObject *parent=0);
-  
-  int rowCount (const QModelIndex &parent = QModelIndex()) const;
-  QVariant data (const QModelIndex &index, int role) const;
+  XContactLoginModel ();
   
   void clear ();
   
@@ -87,19 +83,12 @@ public:
   void updateStateAll (QXmppPresence::Status::Type stype);
   
   void copyLogins (const XContactLoginModel & other);
+  int rowCount () const { return logins.count(); }
   
-  QList<XContactLoginItem>  & itemsRef () { return logins; }
-
+  const QList<XContactLoginItem>  & itemsRef () const { return logins; }
 
 private:
 
-  enum Data_Types {
-    Data_Resource = Qt::UserRole +1,
-    Data_Status = Qt::UserRole +2,
-    Data_Presence = Qt::UserRole +3,
-    Data_IconName = Qt::UserRole +4
-  };
-  
   QString iconFileName (QXmppPresence::Status::Type stype) const;
 
   QList<XContactLoginItem>  logins;

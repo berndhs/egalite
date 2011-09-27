@@ -3,6 +3,7 @@ import QtQuick 1.0
 Rectangle {
   id: mainBox
   width: 400
+  clip: false
   color: "#eeeecc"
   border.color: Qt.lighter(color); border.width: 2
   property string imageDir: ":/icons/64x64/status/"
@@ -12,9 +13,9 @@ Rectangle {
   property bool showLogins: false
   property real mainWidth: width
   property bool showOfflines: true
-  property real heightWhenVisible: 48
+  property real minHeightWhenVisible: 48
   
-  height: visible ? heightWhenVisible : 0
+  height: visible ? Math.max (minHeightWhenVisible,mainFlow.height) : 0
   visible: showOfflines || isOnline
   
   signal clickedImage (string contactJid, string loginJid)
@@ -22,6 +23,7 @@ Rectangle {
   signal clickedLogin (string contactJid, string loginJid, string contactResource)
   
   Flow {
+    id: mainFlow
     spacing: 3
     Rectangle {
       id: statusImageBox
@@ -41,16 +43,26 @@ Rectangle {
       }
     }
 
-    Text {
-      id: loginCountText
-      text: " (" + contactLoginCount + ") "
+    Rectangle {
+      id: loginCountBox
+      width: mainBox.imageHeight
+      height: mainBox.imageHeight
+      color: Qt.lighter (mainBox.color)
+      radius: height * 0.3
+      Text {
+        id: loginCountText
+        anchors.centerIn: parent
+        text: " (" + contactLoginCount + ") "
+      }
       MouseArea {
         anchors.fill: parent
         onPressAndHold: {
           mainBox.showLogins = !mainBox.showLogins
+          console.log ("qml showLogins " + mainBox.showLogins)
         }
-      }
+      }      
     }
+
 
     Text {
       id: jidText
@@ -84,12 +96,16 @@ Rectangle {
     }
     Rectangle {
       id: resoureListBox
-      width: 300
-      height: mainBox.showLogins ? 96 : 0
+      width: resourceListText.width
+      height: mainBox.showLogins ? resourceListText.height : 0
       visible: mainBox.showLogins
+      color:"white"
+      opacity: 0.9
+      radius: 4
+      z: parent.z + 2
       Text {
         id: resourceListText
-        text: "resource list goes here"
+        text: resourceList
       }
     }
   }

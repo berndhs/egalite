@@ -37,7 +37,7 @@ Rectangle {
   property real rowHeight: 48
   
   property bool showOfflines: true
-  
+   
   signal doQuit ()
   signal doLogin ()
   signal wantChat (string remoteJid, string loginJid)
@@ -141,7 +141,7 @@ Rectangle {
       mainWidth: mainBox.mainWidth
       width: mainBox.mainWidth
       showOfflines: mainBox.showOfflines
-      heightWhenVisible: mainBox.rowHeight
+      minHeightWhenVisible: mainBox.rowHeight
       onClickedImage: { 
         console.log (" clicked image for " + contactJid)
         mainBox.wantChat (contactJid, loginJid)

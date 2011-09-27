@@ -23,8 +23,11 @@
 
 #include <QModelIndex>
 #include <QStringList>
+#include "deliberate.h"
 
 #include <QDebug>
+
+using namespace deliberate;
 
 namespace egalite
 {
@@ -41,12 +44,14 @@ XContactModel::XContactModel (QObject *parent)
   roles[Data_MyJid] = "contactMyJid";
   roles[Data_BestStatus] = "contactBestStatus";
   roles[Data_ChatAvailable] = "isOnline";
+  roles[Data_ResourceList] = "resourceList";
   setRoleNames (roles);
 }
 
 int
 XContactModel::rowCount(const QModelIndex &parent) const
 {
+  Q_UNUSED (parent);
   return contacts.count();
 }
 
@@ -74,13 +79,16 @@ XContactModel::data (const QModelIndex &index, int role) const
     break;
   case Data_MyJid:
     if (!contacts.at(row).identities().isEmpty()) {
-      retVar = contacts.at(row).identities().at(0);
+      retVar = contacts.at(row).identities().join("\n");
     } else {
       retVar = tr ("unkown identify");
     }
     break;
   case Data_ChatAvailable:
     retVar = chatAvailable(row);
+    break;
+  case Data_ResourceList:
+    retVar = resourceList (row);
     break;
   default:
     qDebug () << __PRETTY_FUNCTION__ << " bad role " << role;
@@ -100,8 +108,8 @@ XContactModel::bestStatus (int row) const
   XContactItem item = contacts[row];
   int best(0);
   QXmppPresence::Status::Type bestStat (QXmppPresence::Status::Offline);
-  QList<XContactLoginItem> & logs = item.loginsRef().itemsRef();
-  for (auto lo = logs.begin(); lo != logs.end(); lo++) {
+  const QList<XContactLoginItem> & logs = item.loginsRef().itemsRef();
+  for (auto lo = logs.constBegin(); lo != logs.constEnd(); lo++) {
     QXmppPresence::Status::Type stat = lo->presence();
     if (levels.contains(stat)) {
       int level = levels[stat];
@@ -296,6 +304,24 @@ XContactModel::removeMyJid (const QString & myJid)
       contacts.erase (cont);
     }
   }
+}
+
+QString
+XContactModel::resourceList (int row) const
+{
+  QString resourcePattern ("<img height=\"%5\" width=\"%6\" src=\"%4\">"
+                           "<a href=\"xmppresource://%1\">%2</a> %3");
+  QStringList lines;
+  const QList<XContactLoginItem> & resourceItems = contacts.at(row).loginsRef().itemsRef();
+  for (auto res = resourceItems.constBegin(); 
+       res != resourceItems.constEnd(); res++) {
+    lines.append (resourcePattern.arg(res->resource())
+                  .arg(res->status())
+                  .arg(res->resource())
+                  .arg(":/icons/64x64/status/" + imageName(res->presence()))
+                  .arg(32).arg(32));
+  }
+  return lines.join("\n<br>");
 }
 
 } // namespace
