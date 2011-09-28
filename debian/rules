@@ -16,7 +16,7 @@ export DH_VERBOSE=1
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	qmake PREFIX=/usr  e6irc-harmattan.pro # Uncomment this line for use without Qt Creator
+	qmake PREFIX=/usr  egalite-harmattan.pro # Uncomment this line for use without Qt Creator
 
 	touch configure-stamp
 
@@ -28,7 +28,7 @@ build-stamp: configure-stamp
 
 	# Add here commands to compile the package.
 	$(MAKE) # Uncomment this line for use without Qt Creator
-	#docbook-to-man debian/e6irc.sgml > e6irc.1
+	#docbook-to-man debian/egalite.sgml > egalite.1
 
 	touch $@
 
@@ -48,7 +48,7 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	# Add here commands to install the package into debian/e6irc.
+	# Add here commands to install the package into debian/egalite.
 	$(MAKE) INSTALL_ROOT="$(CURDIR)"/debian/egalite install
 
 

@@ -153,6 +153,8 @@ private:
                          QString directIdentity, 
                          int     publicPort);
   void    CreateSystemTrayStuff ();
+  
+  QString genResourceTag ();
 
   Ui_GetString          passui;
   Ui_RequestSubscribe   reqSubUi;

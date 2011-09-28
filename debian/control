@@ -9,7 +9,7 @@ Homepage: http://egalite.sourceforge.net
 Package: egalite
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: IRC Chat
+Description: XMPP chat and SSL direct chat
  Chat on XMPP with your friends and enemies;
- chat over direct SSL connections with spouses and sweethearts separately
+ chat over direct SSL connections with spouses and sweethearts - separately
 XSBC-Maemo-Display-Name: egalite

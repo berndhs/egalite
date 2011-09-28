@@ -333,15 +333,13 @@ DChatMain::Login ()
     XEgalClient * xclient = xclientMap[user];
     if (!xclient) {
       xclient = new XEgalClient (this, user);
-      xclientMap[user] = xclient;
+      xclientMap[user] = xclient; 
     }
     QXmppConfiguration  & xconfig = xclient->configuration();
     xconfig.setJid (user);
     xconfig.setHost (server);
     xconfig.setPasswd(password);
-    xconfig.setResource (QString ("Egalite.%1")
-                         .arg(QUuid::createUuid().toString()
-                              .remove(QRegExp("[{}-]"))));
+    xconfig.setResource (QString ("Egalite.%1").arg(genResourceTag()));
     qDebug () << " after setting resource before connect " << xconfig.resource();
     xclient->connectToServer (xconfig);
     qDebug () << " after setting resource after connect " << xconfig.resource();
@@ -1044,6 +1042,26 @@ DChatMain::event (QEvent *evt)
 {
   //qDebug () << " DChaiMain event " << evt;
   return QDeclarativeView::event (evt);
+}
+
+QString
+DChatMain::genResourceTag()
+{
+  QString uniqueS (QUuid::createUuid().toString().replace(QRegExp("[{}-]"),""));
+  quint64 sixBytes (0);
+  for (int d=0; d<uniqueS.length(); d++) {
+    bool ok;
+    QString uC (uniqueS.mid(d,1));
+    quint8 uByte = static_cast<quint8> (uC.toUInt(&ok,16) & 0xff);
+    qDebug () << " uniq: uC " << uC << hex << uByte << dec;
+    quint64 hi = (sixBytes & 0xff0000000000LLU) >> 32;
+    sixBytes <<= 6;
+    sixBytes = sixBytes & 0x7fffffffffffLLU;
+    sixBytes = sixBytes 
+               ^ static_cast<quint16> (hi << 8) 
+               ^ uByte; // put old high byte back in
+  }
+  return QString::number(sixBytes,16);
 }
 
 
